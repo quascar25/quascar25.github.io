@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Спроси Grok</title>
+    <title>Спроси про 1С 8.3</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,22 +23,56 @@
     </style>
 </head>
 <body>
-    <h1>Спроси Grok</h1>
+    <h1>Спроси про 1С 8.3</h1>
     <input type="text" id="question" placeholder="Введи свой вопрос">
     <button id="askButton">Спросить</button>
     <div id="answer">Ответ появится здесь</div>
 
     <script>
-        // Когда пользователь нажимает кнопку
+        // База данных 1С 8.3 (индекс: ключевые слова → ответ)
+        const knowledgeBase = {
+            "регистр накопления остатки виртуальные таблицы": "3",
+            "регистр накопления обороты виртуальные таблицы": "2",
+            "регистр накопления виды": "Остатки, обороты",
+            "вид движения регистр накопления": "В остатках",
+            "оборот данные регистр накопления": "Из регистров оборотов",
+            "план счетов регистр бухгалтерии": "1",
+            "субконто механизм определения": "ПВХ",
+            "субконто хранение": "Аналитика",
+            "корреспонденция признак": "Регистр бухгалтерии",
+            "признак учета тип": "Булево",
+            "периодичность регистр расчета": "мк",
+            "период регистрации регистр расчета": "Начало периода",
+            "график механизм": "Регистр расчета",
+            "график регистр расчета": "С периодом начисления",
+            "вытеснение виды расчета": "В 2 пвр",
+            "зависимость база виды расчета": "Для определенных как базовые"
+        };
+
         document.getElementById("askButton").addEventListener("click", function() {
-            let question = document.getElementById("question").value;
-            if (question.trim() === "") {
+            let question = document.getElementById("question").value.toLowerCase().trim();
+            if (question === "") {
                 document.getElementById("answer").innerText = "Пожалуйста, введи вопрос!";
                 return;
             }
-            // Пока просто показываем, что вопрос принят
-            document.getElementById("answer").innerText = "Твой вопрос: " + question + ". Ответ скоро будет!";
-            // Здесь будет код для API (добавим позже)
+
+            // Разбиваем вопрос на слова
+            let words = question.split(/\s+/);
+            let bestMatch = null;
+            let maxMatches = 0;
+
+            // Ищем совпадения в базе
+            for (let key in knowledgeBase) {
+                let keyWords = key.split(" ");
+                let matches = keyWords.filter(kw => words.includes(kw)).length;
+                if (matches > maxMatches) {
+                    maxMatches = matches;
+                    bestMatch = knowledgeBase[key];
+                }
+            }
+
+            // Выводим ответ
+            document.getElementById("answer").innerText = bestMatch || "Не знаю";
         });
     </script>
 </body>
