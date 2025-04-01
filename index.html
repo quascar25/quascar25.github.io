@@ -1,10 +1,67 @@
- fetch("https://api.x.ai/v1/chat", {
-    method: "POST",
-    headers: {
-        "Authorization": "Bearer ",
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message: "Привет, Grok!" })
-})
-.then(response => response.json())
-.then(data => console.log(data));
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Спроси Grok</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #question {
+            width: 300px;
+            padding: 10px;
+        }
+        #askButton {
+            padding: 10px 20px;
+            margin-left: 10px;
+        }
+        #answer {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Спроси Grok</h1>
+    <input type="text" id="question" placeholder="Введи свой вопрос">
+    <button id="askButton">Спросить</button>
+    <div id="answer">Ответ появится здесь</div>
+
+    <script>
+        document.getElementById("askButton").addEventListener("click", function() {
+            let question = document.getElementById("question").value;
+            if (question.trim() === "") {
+                document.getElementById("answer").innerText = "Пожалуйста, введи вопрос!";
+                return;
+            }
+
+            // Отправка запроса к API xAI
+            fetch("https://api.x.ai/v1/chat/completions", { // Это примерный endpoint, проверь точный в документации xAI
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer твой_ключ_здесь", // Замени на свой ключ
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "grok-3", // Укажи модель, если требуется
+                    messages: [{ role: "user", content: question }]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка: " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Предполагаем, что ответ приходит в data.choices[0].message.content
+                document.getElementById("answer").innerText = data.choices[0].message.content || "Нет ответа";
+            })
+            .catch(error => {
+                document.getElementById("answer").innerText = "Ошибка: " + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
