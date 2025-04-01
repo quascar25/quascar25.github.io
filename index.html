@@ -1,67 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Спроси Grok</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #question {
-            width: 300px;
-            padding: 10px;
-        }
-        #askButton {
-            padding: 10px 20px;
-            margin-left: 10px;
-        }
-        #answer {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Спроси Grok</h1>
-    <input type="text" id="question" placeholder="Введи свой вопрос">
-    <button id="askButton">Спросить</button>
-    <div id="answer">Ответ появится здесь</div>
-
-    <script>
-        document.getElementById("askButton").addEventListener("click", function() {
-            let question = document.getElementById("question").value;
-            if (question.trim() === "") {
-                document.getElementById("answer").innerText = "Пожалуйста, введи вопрос!";
-                return;
-            }
-
-            // Отправка запроса к API xAI
-            fetch("https://api.x.ai/v1/chat/completions", { // Это примерный endpoint, проверь точный в документации xAI
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer xai-vflU0nphUZ3IXvDE3Uo91i4FHVUUsqORKRrttrFmbk0xTyFjQjxCQYO3E5xemAC38JplEIbrJ4LgqpNF", // Замени на свой ключ
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: "grok-3", // Укажи модель, если требуется
-                    messages: [{ role: "user", content: question }]
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Ошибка: " + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Предполагаем, что ответ приходит в data.choices[0].message.content
-                document.getElementById("answer").innerText = data.choices[0].message.content || "Нет ответа";
-            })
-            .catch(error => {
-                document.getElementById("answer").innerText = "Ошибка: " + error.message;
-            });
-        });
-    </script>
-</body>
-</html>
+curl https://api.x.ai/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer xai-vflU0nphUZ3IXvDE3Uo91i4FHVUUsqORKRrttrFmbk0xTyFjQjxCQYO3E5xemAC38JplEIbrJ4LgqpNF" -d '{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a test assistant."
+    },
+    {
+      "role": "user",
+      "content": "Testing. Just say hi and hello world and nothing else."
+    }
+  ],
+  "model": "grok-2-latest",
+  "stream": false,
+  "temperature": 0
+}'
