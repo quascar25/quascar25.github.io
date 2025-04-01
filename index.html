@@ -1,1 +1,38 @@
+<script>
+    document.getElementById("askButton").addEventListener("click", function() {
+        let question = document.getElementById("question").value;
+        if (question.trim() === "") {
+            document.getElementById("answer").innerText = "Пожалуйста, введи вопрос!";
+            return;
+        }
 
+        fetch("https://api.x.ai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer xai-vflU0nphUZ3IXvDE3Uo91i4FHVUUsqORKRrttrFmbk0xTyFjQjxCQYO3E5xemAC38JplEIbrJ4LgqpNF", // Замени на свой ключ
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messages: [
+                    { role: "system", content: "You are a test assistant." },
+                    { role: "user", content: question }
+                ],
+                model: "grok-2-latest", // Указано из твоего curl
+                stream: false,
+                temperature: 0
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Ошибка: " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("answer").innerText = data.choices[0].message.content || "Нет ответа";
+        })
+        .catch(error => {
+            document.getElementById("answer").innerText = "Ошибка: " + error.message;
+        });
+    });
+</script>
