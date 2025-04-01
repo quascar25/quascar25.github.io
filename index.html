@@ -1,45 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Спроси Grok</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #question {
-            width: 300px;
-            padding: 10px;
-        }
-        #askButton {
-            padding: 10px 20px;
-            margin-left: 10px;
-        }
-        #answer {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Спроси Grok</h1>
-    <input type="text" id="question" placeholder="Введи свой вопрос">
-    <button id="askButton">Спросить</button>
-    <div id="answer">Ответ появится здесь</div>
-
-    <script>
-        // Когда пользователь нажимает кнопку
-        document.getElementById("askButton").addEventListener("click", function() {
-            let question = document.getElementById("question").value;
-            if (question.trim() === "") {
-                document.getElementById("answer").innerText = "Пожалуйста, введи вопрос!";
-                return;
-            }
-            // Пока просто показываем, что вопрос принят
-            document.getElementById("answer").innerText = "Твой вопрос: " + question + ". Ответ скоро будет!";
-            // Здесь будет код для API (добавим позже)
-        });
-    </script>
-</body>
+ fetch("https://api.x.ai/v1/chat", {
+    method: "POST",
+    headers: {
+        "Authorization": "Bearer xai-vflU0nphUZ3IXvDE3Uo91i4FHVUUsqORKRrttrFmbk0xTyFjQjxCQYO3E5xemAC38JplEIbrJ4LgqpNF",
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: "Привет, Grok!" })
+})
+.then(response => response.json())
+.then(data => console.log(data));
 </html>
