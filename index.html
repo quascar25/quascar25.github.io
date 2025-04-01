@@ -1,11 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Мой первый сайт</title>
+    <title>Спроси Grok</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #question {
+            width: 300px;
+            padding: 10px;
+        }
+        #askButton {
+            padding: 10px 20px;
+            margin-left: 10px;
+        }
+        #answer {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Привет, это мой сайт!</h1>
-    <p>Сделано на GitHub Pages.</p>
+    <h1>Спроси Grok</h1>
+    <input type="text" id="question" placeholder="Введи свой вопрос">
+    <button id="askButton">Спросить</button>
+    <div id="answer">Ответ появится здесь</div>
+
+    <script>
+        // Когда пользователь нажимает кнопку
+        document.getElementById("askButton").addEventListener("click", function() {
+            let question = document.getElementById("question").value;
+            if (question.trim() === "") {
+                document.getElementById("answer").innerText = "Пожалуйста, введи вопрос!";
+                return;
+            }
+            // Пока просто показываем, что вопрос принят
+            document.getElementById("answer").innerText = "Твой вопрос: " + question + ". Ответ скоро будет!";
+            // Здесь будет код для API (добавим позже)
+        });
+    </script>
 </body>
 </html>
-Добавлен index.html 
