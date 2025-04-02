@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Верхняя часть сайта</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        /* Шапка */
+        .header-top {
+            background-color: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .header-top div {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-top img {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e90ff;
+        }
+
+        .nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .nav a:hover {
+            color: #1e90ff;
+        }
+
+        .callback-btn {
+            background-color: #ff4500;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .callback-btn:hover {
+            background-color: #e03e00;
+        }
+
+        /* Секция преимуществ */
+        .advantages {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #f9f9f9;
+        }
+
+        .advantages h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .advantages-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .advantage-item {
+            width: 22%;
+            text-align: center;
+        }
+
+        .advantage-item img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+        }
+
+        .advantage-item h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .advantage-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-main {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav a {
+                margin: 0 10px;
+            }
+
+            .advantage-item {
+                width: 45%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .advantage-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="header-top">
+            <div>
+                <img src="location.png" alt="Location Icon">
+                <span>Адрес: г. Москва, ул. Пилюгина, д. 1</span>
+            </div>
+            <div>
+                <img src="email.png" alt="Email Icon">
+                <span>Почта: info@mail.ru</span>
+            </div>
+            <div>
+                <img src="phone.png" alt="Phone Icon">
+                <span>Телефон: 8 800 000 11 11</span>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="logo">LOGOTYPE</div>
+            <nav class="nav">
+                <a href="#">Электромонтажные работы</a>
+                <a href="#">О компании</a>
+                <a href="#">Каталог</a>
+                <a href="#">Новости</a>
+            </nav>
+            <button class="callback-btn">Обратный звонок</button>
+        </div>
+    </header>
+
+    <!-- Секция преимуществ -->
+    <section class="advantages">
+        <h1>Преимущества нашей фирмы</h1>
+        <div class="advantages-grid">
+            <div class="advantage-item">
+                <img src="experience.png" alt="Experience Icon">
+                <h3>Большой разнообразный опыт</h3>
+                <p>Опыт различных проектов, выполненных электрических, строительных и пусконаладочных работ</p>
+            </div>
+            <div class="advantage-item">
+                <img src="reputation.png" alt="Reputation Icon">
+                <h3>Положительная деловая репутация</h3>
+                <p>Положительная репутация, отсутствие судебных споров и разногласий</p>
+            </div>
+            <div class="advantage-item">
+                <img src="staff.png" alt="Staff Icon">
+                <h3>Квалифицированный кадровый состав</h3>
+                <p>Квалифицированный кадровый состав, ежегодное переобучение, отсутствие текучести кадров</p>
+            </div>
+            <div class="advantage-item">
+                <img src="delivery.png" alt="Delivery Icon">
+                <h3>Сжатые сроки поставок оборудования и материалов</h3>
+                <p>Собственный оборудованный склад с оборудованием и материалами</p>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
