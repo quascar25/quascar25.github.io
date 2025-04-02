@@ -53,10 +53,22 @@
             align-items: center;
         }
 
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
         .logo {
             font-size: 24px;
             font-weight: bold;
-            color: #1e90ff;
+            color: #0D3E6F; /* RGB(13, 62, 111) */
+            margin-bottom: 5px; /* Отступ между LOGOTYPE и Электромонтажные работы */
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
         }
 
         .nav a {
@@ -139,7 +151,6 @@
             }
 
             .nav {
-                display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
             }
@@ -180,13 +191,17 @@
                 </div>
             </div>
             <div class="header-nav">
-                <div class="logo">LOGOTYPE</div>
-                <nav class="nav">
-                    <a href="#">Электромонтажные работы</a>
+                <div class="logo-section">
+                    <div class="logo">LOGOTYPE</div>
+                    <div class="nav">
+                        <a href="#">Электромонтажные работы</a>
+                    </div>
+                </div>
+                <div class="nav">
                     <a href="#">О компании</a>
                     <a href="#">Каталог</a>
                     <a href="#">Новости</a>
-                </nav>
+                </div>
                 <button class="callback-btn">Обратный звонок</button>
             </div>
         </div>
