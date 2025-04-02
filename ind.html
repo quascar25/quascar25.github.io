@@ -19,31 +19,38 @@
 
         /* Шапка */
         .header-top {
-            background-color: #f5f5f5;
-            padding: 10px 20px;
+            background-color: #e8ecef; /* Светло-серый фон для верхней полоски */
+            height: 20px; /* Можно настроить высоту, если нужно */
+        }
+
+        .header-main {
+            background-color: #ffffff; /* Белый фон */
+            padding: 15px 20px;
+        }
+
+        .header-contacts {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
+            margin-bottom: 15px; /* Отступ снизу */
         }
 
-        .header-top div {
+        .header-contacts div {
             display: flex;
             align-items: center;
         }
 
-        .header-top img {
+        .header-contacts img {
             width: 16px;
             height: 16px;
             margin-right: 5px;
         }
 
-        .header-main {
+        .header-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background-color: #fff;
         }
 
         .logo {
@@ -81,7 +88,7 @@
         .advantages {
             text-align: center;
             padding: 40px 20px;
-            background-color: #f9f9f9;
+            background-color: #f5f7fa; /* Светло-серый фон для секции преимуществ */
         }
 
         .advantages h1 {
@@ -121,12 +128,12 @@
 
         /* Адаптивность */
         @media (max-width: 768px) {
-            .header-top {
+            .header-contacts {
                 flex-direction: column;
                 gap: 10px;
             }
 
-            .header-main {
+            .header-nav {
                 flex-direction: column;
                 gap: 15px;
             }
@@ -150,29 +157,32 @@
 <body>
     <!-- Шапка -->
     <header>
-        <div class="header-top">
-            <div>
-                <img src="location.png" alt="Location Icon">
-                <span>Адрес: г. Москва, ул. Пилюгина, д. 1</span>
-            </div>
-            <div>
-                <img src="email.png" alt="Email Icon">
-                <span>Почта: info@mail.ru</span>
-            </div>
-            <div>
-                <img src="phone.png" alt="Phone Icon">
-                <span>Телефон: 8 800 000 11 11</span>
-            </div>
-        </div>
+        <div class="header-top"></div> <!-- Пустая светло-серая полоска -->
         <div class="header-main">
-            <div class="logo">LOGOTYPE</div>
-            <nav class="nav">
-                <a href="#">Электромонтажные работы</a>
-                <a href="#">О компании</a>
-                <a href="#">Каталог</a>
-                <a href="#">Новости</a>
-            </nav>
-            <button class="callback-btn">Обратный звонок</button>
+            <div class="header-contacts">
+                <div>
+                    <img src="location.png" alt="Location Icon">
+                    <span>Адрес: г. Москва, ул. Пилюгина, д. 1</span>
+                </div>
+                <div>
+                    <img src="email.png" alt="Email Icon">
+                    <span>Почта: info@mail.ru</span>
+                </div>
+                <div>
+                    <img src="phone.png" alt="Phone Icon">
+                    <span>Телефон: 8 800 000 11 11</span>
+                </div>
+            </div>
+            <div class="header-nav">
+                <div class="logo">LOGOTYPE</div>
+                <nav class="nav">
+                    <a href="#">Электромонтажные работы</a>
+                    <a href="#">О компании</a>
+                    <a href="#">Каталог</a>
+                    <a href="#">Новости</a>
+                </nav>
+                <button class="callback-btn">Обратный звонок</button>
+            </div>
         </div>
     </header>
 
