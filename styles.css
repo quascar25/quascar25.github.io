@@ -1,0 +1,7 @@
+@media (max-width: 768px) {
+  .viewport { height: 50vh; }
+  .tools-panel { display: flex; overflow-x: auto; }
+  .content { flex-direction: column; }
+  .commander { width: 100%; max-width: 300px; }
+  button { position: fixed; bottom: 10px; }
+}
