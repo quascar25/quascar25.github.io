@@ -1,251 +1,231 @@
---!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проверка сайта</title>
+    <title>Электроинструмент</title>
+    <!-- Подключение шрифта Roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --text: #333;
-            --text-light: #7f8c8d;
-        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
-            background: var(--light);
-            color: var(--text);
-            line-height: 1.7;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
         }
+
+        /* Шапка */
+        .header {
+            background-image: url('DV.png'); /* Замените на путь к вашему изображению */
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Контейнер для секций */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px;
         }
-        /* ˜ ¯ª  */
-        header {
-            background: white;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            padding: 15px 0;
-        }
-        .header-content {
+
+        /* Секция товара */
+        .product-section {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            height: 50px;
-        }
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-        nav ul li {
-            margin-left: 30px;
-        }
-        nav ul li a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        nav ul li a:hover {
-            color: var(--secondary);
-        }
-        /* ƒ¥à®©-á¥ªæ¨ï */
-        .hero {
-            display: flex;
-            align-items: center;
-            padding: 60px 0;
-            min-height: 80vh;
-        }
-        .hero-content {
-            flex: 1;
-            padding-right: 40px;
-        }
-        .hero-image {
-            flex: 1;
-            text-align: center;
-        }
-        .hero-image img {
-            max-width: 100%;
+            flex-direction: column;
+            background-color: white;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        h1 {
-            font-size: 2.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            color: var(--dark);
-            line-height: 1.3;
+            padding: 20px;
         }
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            margin-bottom: 30px;
-            max-width: 500px;
+
+        .product-image {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
-        .btn {
-            display: inline-block;
-            background: var(--secondary);
-            color: white;
-            padding: 15px 35px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
+
+        .product-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-info {
             margin-top: 20px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
+            text-align: left;
         }
-        .btn:hover {
-            background: #2980b9;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(41, 128, 185, 0.3);
-        }
-        /* ”ãâ¥à */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 50px 0 20px;
-            margin-top: 50px;
-        }
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .footer-column h3 {
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-        .footer-column ul {
-            list-style: none;
-        }
-        .footer-column ul li {
+
+        .product-info h2 {
+            font-size: 1.5rem;
+            color: #333;
             margin-bottom: 10px;
         }
-        .footer-column ul li a {
-            color: #bdc3c7;
-            text-decoration: none;
-            transition: all 0.3s ease;
+
+        .product-info p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 5px;
         }
-        .footer-column ul li a:hover {
-            color: white;
+
+        .price {
+            font-size: 1.5rem;
+            color: #e60000;
+            font-weight: 700;
+            margin-top: 10px;
         }
-        .copyright {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #bdc3c7;
-            font-size: 0.9rem;
+
+        .old-price {
+            font-size: 1.2rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 10px;
         }
-        /* €¤ ¯â æ¨ï */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
+
+        /* Адаптивность для ПК */
+        @media (min-width: 768px) {
+            .product-section {
+                flex-direction: row;
+                align-items: center;
             }
-            nav ul {
-                margin-top: 20px;
-                justify-content: center;
+
+            .product-image {
+                width: 40%;
+                margin: 0;
             }
-            nav ul li {
-                margin: 0 15px;
+
+            .product-info {
+                width: 60%;
+                margin-top: 0;
+                padding-left: 20px;
             }
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 40px 0;
-            }
-            .hero-content {
-                padding-right: 0;
-                margin-bottom: 40px;
-            }
-            .subtitle {
-                margin-left: auto;
-                margin-right: auto;
-            }
-            h1 {
-                font-size: 2rem;
+
+            .header {
+                height: 300px;
+                font-size: 3.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <img src="https://i.ibb.co/kV09cy0B/photo-2024-03-04-20-30-59.jpg" alt="logo" class="logo">
-            <nav>
-                <ul>
-                    <li><a href="#">ƒ« ¢­ ï</a></li>
-                    <li><a href="#">Ž ­ á</a></li>
-                    <li><a href="#">“á«ã£¨</a></li>
-                    <li><a href="#">Š®­â ªâë</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <!-- Шапка -->
+    <div class="header">
+        ЭЛЕКТРОИНСТРУМЕНТ
+    </div>
 
-    <main>
-        <section class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <h1>‘®§¤ ¥¬ á®¢à¥¬¥­­ë¥ à¥è¥­¨ï ¤«ï ¢ è¥£® ¡¨§­¥á </h1>
-                    <p class="subtitle">Œë ¯®¬®£ ¥¬ ª®¬¯ ­¨ï¬ ¢ëå®¤¨âì ­  ­®¢ë© ãà®¢¥­ì á ¯®¬®éìî ¨­­®¢ æ¨®­­ëå â¥å­®«®£¨© ¨ ªà¥ â¨¢­ëå à¥è¥­¨©.</p>
-                    <a href="#" class="btn"> ç âì á®âàã¤­¨ç¥áâ¢®</a>
-                </div>
-                <div class="hero-image">
-                    <img src="https://i.ibb.co/kV09cy0B/photo-2024-03-04-20-30-59.jpg" alt=" è¨ à ¡®âë">
-                </div>
+    <!-- Контейнер для секций -->
+    <div class="container">
+        <!-- Секция 1 -->
+        <div class="product-section">
+            <div class="product-image">
+                <img src="dr01.png" alt="Дрель-шуруповерт Recasta ДА-20"> <!-- Замените на путь к вашему изображению -->
             </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>Š®¬¯ ­¨ï</h3>
-                    <ul>
-                        <li><a href="#">Ž ­ á</a></li>
-                        <li><a href="#">Š®¬ ­¤ </a></li>
-                        <li><a href="#">‚ ª ­á¨¨</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>“á«ã£¨</h3>
-                    <ul>
-                        <li><a href="#"> §à ¡®âª </a></li>
-                        <li><a href="#">„¨§ ©­</a></li>
-                        <li><a href="#">Œ àª¥â¨­£</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Š®­â ªâë</h3>
-                    <ul>
-                        <li><a href="tel:+79991234567">+7 999 123-45-67</a></li>
-                        <li><a href="mailto:info@example.com">info@example.com</a></li>
-                        <li><a href="#">‘®æ¨ «ì­ë¥ á¥â¨</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2024 ‚á¥ ¯à ¢  § é¨é¥­ë</p>
+            <div class="product-info">
+                <h2>Дрель-шуруповерт Recasta ДА-20</h2>
+                <p><strong>Производитель:</strong> Recasta</p>
+                <p><strong>Тип инструмента:</strong> Дрель-шуруповерт</p>
+                <p><strong>Питание:</strong> От аккумулятора</p>
+                <p><strong>Емкость аккумулятора:</strong> 2 А/ч</p>
+                <p><strong>Напряжение удара безударного:</strong> -</p>
+                <p><strong>Размер зажимаемой оснастки:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр патрона:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр сверления (дерево):</strong> 30 мм</p>
+                <p><strong>Прорезиненная рукоятка:</strong> Обеспечивает удобное и надежное использование</p>
+                <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
             </div>
         </div>
-    </footer>
+
+        <!-- Секция 2 -->
+        <div class="product-section">
+            <div class="product-image">
+                <img src="dr01.png" alt="Дрель-шуруповерт Recasta ДА-20">
+            </div>
+            <div class="product-info">
+                <h2>Дрель-шуруповерт Recasta ДА-20</h2>
+                <p><strong>Производитель:</strong> Recasta</p>
+                <p><strong>Тип инструмента:</strong> Дрель-шуруповерт</p>
+                <p><strong>Питание:</strong> От аккумулятора</p>
+                <p><strong>Емкость аккумулятора:</strong> 2 А/ч</p>
+                <p><strong>Напряжение удара безударного:</strong> -</p>
+                <p><strong>Размер зажимаемой оснастки:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр патрона:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр сверления (дерево):</strong> 30 мм</p>
+                <p><strong>Прорезиненная рукоятка:</strong> Обеспечивает удобное и надежное использование</p>
+                <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
+            </div>
+        </div>
+
+        <!-- Секция 3 -->
+        <div class="product-section">
+            <div class="product-image">
+                <img src="dr01.png" alt="Дрель-шуруповерт Recasta ДА-20">
+            </div>
+            <div class="product-info">
+                <h2>Дрель-шуруповерт Recasta ДА-20</h2>
+                <p><strong>Производитель:</strong> Recasta</p>
+                <p><strong>Тип инструмента:</strong> Дрель-шуруповерт</p>
+                <p><strong>Питание:</strong> От аккумулятора</p>
+                <p><strong>Емкость аккумулятора:</strong> 2 А/ч</p>
+                <p><strong>Напряжение удара безударного:</strong> -</p>
+                <p><strong>Размер зажимаемой оснастки:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр патрона:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр сверления (дерево):</strong> 30 мм</p>
+                <p><strong>Прорезиненная рукоятка:</strong> Обеспечивает удобное и надежное использование</p>
+                <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
+            </div>
+        </div>
+
+        <!-- Секция 4 -->
+        <div class="product-section">
+            <div class="product-image">
+                <img src="dr01.png" alt="Дрель-шуруповерт Recasta ДА-20">
+            </div>
+            <div class="product-info">
+                <h2>Дрель-шуруповерт Recasta ДА-20</h2>
+                <p><strong>Производитель:</strong> Recasta</p>
+                <p><strong>Тип инструмента:</strong> Дрель-шуруповерт</p>
+                <p><strong>Питание:</strong> От аккумулятора</p>
+                <p><strong>Емкость аккумулятора:</strong> 2 А/ч</p>
+                <p><strong>Напряжение удара безударного:</strong> -</p>
+                <p><strong>Размер зажимаемой оснастки:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр патрона:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр сверления (дерево):</strong> 30 мм</p>
+                <p><strong>Прорезиненная рукоятка:</strong> Обеспечивает удобное и надежное использование</p>
+                <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
+            </div>
+        </div>
+
+        <!-- Секция 5 -->
+        <div class="product-section">
+            <div class="product-image">
+                <img src="dr01.png" alt="Дрель-шуруповерт Recasta ДА-20">
+            </div>
+            <div class="product-info">
+                <h2>Дрель-шуруповерт Recasta ДА-20</h2>
+                <p><strong>Производитель:</strong> Recasta</p>
+                <p><strong>Тип инструмента:</strong> Дрель-шуруповерт</p>
+                <p><strong>Питание:</strong> От аккумулятора</p>
+                <p><strong>Емкость аккумулятора:</strong> 2 А/ч</p>
+                <p><strong>Напряжение удара безударного:</strong> -</p>
+                <p><strong>Размер зажимаемой оснастки:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр патрона:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр сверления (дерево):</strong> 30 мм</p>
+                <p><strong>Прорезиненная рукоятка:</strong> Обеспечивает удобное и надежное использование</p>
+                <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
