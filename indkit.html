@@ -18,6 +18,11 @@
             background-color: #404040;
         }
 
+       .sticky {
+           position: sticky;
+           top: 0;
+        }
+
         /* Шапка */
         /*   positioning  area */
         /* background-size: cover;   //  contain */
@@ -127,15 +132,19 @@
     </style>
 </head>
 <body>
-    <!-- Шапка -->
-    <div class="header">
-      <!--  ЭЛЕКТРОИНСТРУМЕНТ  -->
-    </div>
+    
+  <section class="sticky">  
+      <!-- Шапка -->
+      <div class="header">
+        <!--  ЭЛЕКТРОИНСТРУМЕНТ  -->
+      </div>
+  </section>
     
     <!-- Контейнер для секций -->
     <div class="container">
+
         <!-- Секция 1 -->
-        <div class="product-section">
+          <div class="product-section">
             <div class="product-info">
                 <h2>Дрель-шуруповерт Recasta ДА-20</h2>
                 <p><strong>Производитель:</strong> Recasta</p>
@@ -153,7 +162,7 @@
                 <img src="dr01.png" alt="Дрель-шуруповерт Recasta ДА-20"> <!-- Замените на путь к вашему изображению -->
             </div>
         </div>
-
+        
         <!-- Секция 2 -->
         <div class="product-section">
             <div class="product-image">
