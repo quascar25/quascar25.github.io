@@ -21,11 +21,14 @@
         /* Шапка */
         /*   positioning  area */
         /* background-size: cover;   //  contain */
+        /* background-attachment:  fixed;   // фон не двигается    */
+        /*  background: no-repeat;  // не замощает   */
+        
         .header {
-            background-image: url('DV.png'); /* Замените на путь к вашему изображению */
+            background-image: url('DV.png') no-repeat; /* Замените на путь к вашему изображению */
             background-size: contain;
             background-position: center;
-            background-attachment:  fixed;
+            
             
             height: 200px;
             display: flex;
