@@ -80,6 +80,17 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            color: #add8e6; /* Цвет как у остального текста */
+            text-decoration: none; /* Убираем стандартное подчеркивание */
+        }
+
+        .link-with-icon:hover {
+            color: white; /* Меняем цвет при наведении */
+            cursor: pointer; /* Курсор в виде "руки" */
+        }
+        
+        .link-with-icon:hover .link-icon {
+            background-color: white;
         }
 
         .link-icon {
