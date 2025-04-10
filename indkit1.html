@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Электроинструмент</title>
-    <!-- Подключение шрифта Roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -18,9 +17,9 @@
             background-color: #404040;
         }
 
-       .sticky {
-           position: sticky;
-           top: 0;
+        .sticky {
+            position: sticky;
+            top: 0;
         }
 
         /* Шапка */
@@ -53,26 +52,26 @@
         }
 
         .top-left {
-            top: 5px;
-            left: 5px;
+            top: 40px;  /* Отступ сверху (y) */
+            left: 20px; /* Отступ слева (x) */
             text-align: left;
         }
 
         .bottom-left {
-            bottom: 5px;
-            left: 5px;
+            bottom: 80px; /* Отступ снизу (y) */
+            left: 20px;   /* Отступ слева (x) */
             text-align: left;
         }
 
         .top-right {
-            top: 5px;
-            right: 5px;
+            top: 40px;   /* Отступ сверху (y) */
+            right: 20px;  /* Отступ справа (x) */
             text-align: right;
         }
 
         .bottom-right {
-            bottom: 5px;
-            right: 5px;
+            bottom: 80px; /* Отступ снизу (y) */
+            right: 20px;  /* Отступ справа (x) */
             text-align: right;
         }
 
@@ -110,9 +109,14 @@
             font-size: 20px;
             text-decoration: none;
             background-color: transparent;
+            transition: all 0.3s ease; /* Плавный эффект при наведении */
         }
 
-        /* Контейнер для секций   10000   */
+        .rounded-button:hover {
+            background-color: rgba(173, 216, 230, 0.1); /* Легкая подсветка */
+        }
+
+        /* Контейнер для секций */
         .container {
             max-width: 768px;
             margin: 0 auto;
@@ -130,60 +134,16 @@
             padding: 10px;
         }
 
-        .product-image {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: auto;
-        }
-
-        .product-info {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .product-info h2 {
-            font-size: 1.5rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .product-info p {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .price {
-            font-size: 1.5rem;
-            color: #e60000;
-            font-weight: 700;
-            margin-top: 10px;
-        }
-
-        .old-price {
-            font-size: 1.2rem;
-            color: #999;
-            text-decoration: line-through;
-            margin-left: 10px;
-        }
-
         /* Адаптивность для ПК */
         @media (min-width: 768px) {
             .product-section {
                 flex-direction: row;
                 align-items: center;
             }
-
             .product-image {
                 width: 40%;
                 margin: 0;
             }
-
             .product-info {
                 width: 60%;
                 margin-top: 0;
@@ -194,9 +154,8 @@
 </head>
 <body>
     
- <!-- <section class="sticky">  -->
-      <!-- Шапка -->
-      <div class="header-container">
+    <!-- Шапка с текстом и кнопками -->
+    <div class="header-container">
         <div class="header">
             <!-- Текст в верхнем левом углу -->
             <div class="text-block top-left">
@@ -214,38 +173,36 @@
                 <div>Строка 4</div>
             </div>
             
-            <!-- Текст в верхнем правом углу -->
+            <!-- Текст и ссылки в верхнем правом углу -->
             <div class="text-block top-right">
                 <div>Строка 1</div>
                 <div>Строка 2</div>
-                <div class="link-with-icon">
+                <a href="index.html" class="link-with-icon">
                     <div class="link-icon"></div>
                     <div>Гиперссылка 1</div>
-                </div>
-                <div class="link-with-icon">
+                </a>
+                <a href="index.html" class="link-with-icon">
                     <div class="link-icon"></div>
                     <div>Гиперссылка 2</div>
-                </div>
+                </a>
                 <div>Строка 5</div>
             </div>
             
             <!-- Кнопки в нижнем правом углу -->
             <div class="text-block bottom-right">
                 <div class="button-container">
-                    <a href="#" class="rounded-button">Кнопка 1</a>
-                    <a href="#" class="rounded-button">Кнопка 2</a>
-                    <a href="#" class="rounded-button">Кнопка 3</a>
+                    <a href="ind.html" class="rounded-button">Кнопка 1</a>
+                    <a href="ind.html" class="rounded-button">Кнопка 2</a>
+                    <a href="ind.html" class="rounded-button">Кнопка 3</a>
                 </div>
             </div>
         </div>
-      </div>
-  <!-- </section>  -->
+    </div>
     
     <!-- Контейнер для секций -->
     <div class="container">
-
-        <!-- Секция 1 -->
-          <div class="product-section">
+        <!-- Секция товара -->
+        <div class="product-section">
             <div class="product-info">
                 <h2>Дрель-шуруповерт Recasta ДА-20</h2>
                 <p><strong>Производитель:</strong> Recasta</p>
@@ -260,15 +217,13 @@
                 <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
             </div>
             <div class="product-image">
-               <!-- <img src="e0001.mp4" alt="Дрель-шуруповерт Recasta ДА-20">  Замените на путь к вашему изображению     controls  это кнопки  -->
-               <video width="300" height="300" autoplay muted loop poster="dr01.png">
-                   <source src="e0001.webm" type="video/webm">
-                   <source src="e0001.mp4" type="video/mp4">
-                   Ваш браузер не поддерживает видео тег.
-               </video>
+                <video width="300" height="300" autoplay muted loop poster="dr01.png">
+                    <source src="e0001.webm" type="video/webm">
+                    <source src="e0001.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео тег.
+                </video>
             </div>
         </div>
-
     </div>
 </body>
 </html>
