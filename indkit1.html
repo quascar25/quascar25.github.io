@@ -175,21 +175,28 @@
         .rounded-button {
             width: 130px;
             height: 38px;
-            border: 1px solid #add8e6;
+            border: 1px solid #add8e6; /* Светло-синяя рамка */
             border-radius: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #add8e6;
+            color: #add8e6; /* Светло-синий текст */
             font-size: 12px;
             text-decoration: none;
-            background-color: transparent;
-            transition: all 0.3s ease; /* Плавный эффект при наведении */
+            background-color: transparent; /* Прозрачный фон */
+            transition: color 0.3s ease, border-color 0.3s ease; /* Плавность только для текста и рамки */
+        }
+        
+        .rounded-button:hover {
+            color: white; /* Белый текст при наведении */
+            border-color: white; /* Белая рамка при наведении */
+            background-color: transparent; /* Отключаем подсветку фона */
+            transform: scale(1.02); /* Лёгкое увеличение */
         }
 
-        .rounded-button:hover {
-            background-color: rgba(173, 216, 230, 0.1); /* Легкая подсветка */
-        }
+
+
+        
 
         /* Контейнер для секций */
         .container {
