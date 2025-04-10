@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Электроинструмент</title>
+    <!-- Подключение шрифта Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #404040;
+        }
+
+       .sticky {
+           position: sticky;
+           top: 0;
+        }
+
+        /* Шапка */
+        .header-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-top: 41.6667%; /* Соотношение 500/1200 = 0.416667 */
+            overflow: hidden;
+        }
+
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('DV.webp');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Текстовые блоки */
+        .text-block {
+            position: absolute;
+            color: #add8e6; /* светло-синий */
+            font-size: 5px;
+            line-height: 1.2;
+        }
+
+        .top-left {
+            top: 5px;
+            left: 5px;
+            text-align: left;
+        }
+
+        .bottom-left {
+            bottom: 5px;
+            left: 5px;
+            text-align: left;
+        }
+
+        .top-right {
+            top: 5px;
+            right: 5px;
+            text-align: right;
+        }
+
+        .bottom-right {
+            bottom: 5px;
+            right: 5px;
+            text-align: right;
+        }
+
+        /* Ссылки с иконками */
+        .link-with-icon {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .link-icon {
+            width: 5px;
+            height: 5px;
+            margin-right: 2px;
+            background-color: #add8e6;
+        }
+
+        /* Кнопки */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .rounded-button {
+            width: 120px;
+            height: 50px;
+            border: 1px solid #add8e6;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #add8e6;
+            font-size: 5px;
+            text-decoration: none;
+            background-color: transparent;
+        }
+
+        /* Контейнер для секций   10000   */
+        .container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 5px;
+        }
+
+        /* Секция товара */
+        .product-section {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-info {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .product-info h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-info p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            color: #e60000;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .old-price {
+            font-size: 1.2rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+
+        /* Адаптивность для ПК */
+        @media (min-width: 768px) {
+            .product-section {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .product-image {
+                width: 40%;
+                margin: 0;
+            }
+
+            .product-info {
+                width: 60%;
+                margin-top: 0;
+                padding-left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+ <!-- <section class="sticky">  -->
+      <!-- Шапка -->
+      <div class="header-container">
+        <div class="header">
+            <!-- Текст в верхнем левом углу -->
+            <div class="text-block top-left">
+                <div>Строка 1</div>
+                <div>Строка 2</div>
+                <div>Строка 3</div>
+                <div>Строка 4</div>
+            </div>
+            
+            <!-- Текст в нижнем левом углу -->
+            <div class="text-block bottom-left">
+                <div>Строка 1</div>
+                <div>Строка 2</div>
+                <div>Строка 3</div>
+                <div>Строка 4</div>
+            </div>
+            
+            <!-- Текст в верхнем правом углу -->
+            <div class="text-block top-right">
+                <div>Строка 1</div>
+                <div>Строка 2</div>
+                <div class="link-with-icon">
+                    <div class="link-icon"></div>
+                    <div>Гиперссылка 1</div>
+                </div>
+                <div class="link-with-icon">
+                    <div class="link-icon"></div>
+                    <div>Гиперссылка 2</div>
+                </div>
+                <div>Строка 5</div>
+            </div>
+            
+            <!-- Кнопки в нижнем правом углу -->
+            <div class="text-block bottom-right">
+                <div class="button-container">
+                    <a href="#" class="rounded-button">Кнопка 1</a>
+                    <a href="#" class="rounded-button">Кнопка 2</a>
+                    <a href="#" class="rounded-button">Кнопка 3</a>
+                </div>
+            </div>
+        </div>
+      </div>
+  <!-- </section>  -->
+    
+    <!-- Контейнер для секций -->
+    <div class="container">
+
+        <!-- Секция 1 -->
+          <div class="product-section">
+            <div class="product-info">
+                <h2>Дрель-шуруповерт Recasta ДА-20</h2>
+                <p><strong>Производитель:</strong> Recasta</p>
+                <p><strong>Тип инструмента:</strong> Дрель-шуруповерт</p>
+                <p><strong>Питание:</strong> От аккумулятора</p>
+                <p><strong>Емкость аккумулятора:</strong> 2 А/ч</p>
+                <p><strong>Напряжение удара безударного:</strong> -</p>
+                <p><strong>Размер зажимаемой оснастки:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр патрона:</strong> 10 мм</p>
+                <p><strong>Максимальный диаметр сверления (дерево):</strong> 30 мм</p>
+                <p><strong>Прорезиненная рукоятка:</strong> Обеспечивает удобное и надежное использование</p>
+                <div class="price">10 650 руб. <span class="old-price">14 079 руб.</span></div>
+            </div>
+            <div class="product-image">
+               <!-- <img src="e0001.mp4" alt="Дрель-шуруповерт Recasta ДА-20">  Замените на путь к вашему изображению     controls  это кнопки  -->
+               <video width="300" height="300" autoplay muted loop poster="dr01.png">
+                   <source src="e0001.webm" type="video/webm">
+                   <source src="e0001.mp4" type="video/mp4">
+                   Ваш браузер не поддерживает видео тег.
+               </video>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
