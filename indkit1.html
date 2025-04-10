@@ -52,36 +52,47 @@
             background-position: center;
             background-repeat: no-repeat;
          }
-
+        /* Текстовые блоки 1 */
+        .text-block1 {
+            position: absolute;
+            color: #add8e6; /* светло-синий */
+            font-size: 100px;
+            line-height: 1.2;
+        }
         /* Текстовые блоки */
         .text-block {
             position: absolute;
             color: #add8e6; /* светло-синий */
-            font-size: 5px;
+            font-size: 20px;
             line-height: 1.2;
         }
+        .top-left-elekt {
+            top: 80px;  /* Отступ сверху (y) */
+            left: 80px; /* Отступ слева (x) */
+            text-align: left;
+        }        
 
         .top-left {
-            top: 40px;  /* Отступ сверху (y) */
-            left: 20px; /* Отступ слева (x) */
+            top: 120px;  /* Отступ сверху (y) */
+            left: 80px; /* Отступ слева (x) */
             text-align: left;
         }
 
         .bottom-left {
-            bottom: 80px; /* Отступ снизу (y) */
-            left: 20px;   /* Отступ слева (x) */
+            bottom: 20px; /* Отступ снизу (y) */
+            left: 80px;   /* Отступ слева (x) */
             text-align: left;
         }
 
         .top-right {
-            top: 40px;   /* Отступ сверху (y) */
-            right: 20px;  /* Отступ справа (x) */
+            top: 80px;   /* Отступ сверху (y) */
+            right: 80px;  /* Отступ справа (x) */
             text-align: right;
         }
 
         .bottom-right {
-            bottom: 80px; /* Отступ снизу (y) */
-            right: 20px;  /* Отступ справа (x) */
+            bottom: 20px; /* Отступ снизу (y) */
+            right: 30px;  /* Отступ справа (x) */
             text-align: right;
         }
 
@@ -119,8 +130,8 @@
         }
 
         .rounded-button {
-            width: 320px;
-            height: 100px;
+            width: 280px;
+            height: 80px;
             border: 1px solid #add8e6;
             border-radius: 10px;
             display: flex;
@@ -139,7 +150,7 @@
 
         /* Контейнер для секций */
         .container {
-            max-width: 768px;
+            max-width: 760px;
             margin: 0 auto;
             padding: 5px;
                 margin-top: 0; /* Убираем отступ сверху */
@@ -157,7 +168,7 @@
         }
 
         /* Адаптивность для ПК */
-        @media (min-width: 768px) {
+        @media (min-width: 760px) {
             .product-section {
                 flex-direction: row;
                 align-items: center;
@@ -179,43 +190,53 @@
     <!-- Шапка с текстом и кнопками -->
     <div class="header-container">
         <div class="header">
+
+            <!-- Текст ОСНОВНОЕ -->
+            <div class="text-block1 top-left-elekt">
+                <div>ЭЛЕКТРОИНСТРУМЕНТ</div>
+            </div>
+            
             <!-- Текст в верхнем левом углу -->
             <div class="text-block top-left">
-                <div>Строка 1</div>
-                <div>Строка 2</div>
-                <div>Строка 3</div>
-                <div>Строка 4</div>
+                <div>+7 (495) 320-42-12</div>
+                <div>Отдел продаж</div>
+                <div>shop@technostor</div>
+                <div> </div>
+                <div>Отдел закупок</div>
+                <div>shop@technostor</div>
+                <div>Политика конфиденциальности</div>
             </div>
             
             <!-- Текст в нижнем левом углу -->
             <div class="text-block bottom-left">
-                <div>Строка 1</div>
-                <div>Строка 2</div>
-                <div>Строка 3</div>
-                <div>Строка 4</div>
+                <div>Дисковая пила Makita 5477NB предназначена</div>
+                <div>Для распиловки заготовок из древесины.</div>
+                <div>Модель оснащена исключительно мощным</div>
+                <div>1800-ватным двигателем, который</div>
+                <div>разгоняет 185-миллиметровый диск до 4500</div>
             </div>
             
             <!-- Текст и ссылки в верхнем правом углу -->
             <div class="text-block top-right">
-                <div>Строка 1</div>
-                <div>Строка 2</div>
+                <div>Отдел продаж</div>
+                <div>Отдел продаж</div>
                 <a href="index.html" class="link-with-icon">
                     <div class="link-icon"></div>
-                    <div>Гиперссылка 1</div>
+                    <div>shop@technostor</div>
                 </a>
                 <a href="index.html" class="link-with-icon">
                     <div class="link-icon"></div>
-                    <div>Гиперссылка 2</div>
+                    <div>shop@technostor</div>
                 </a>
-                <div>Строка 5</div>
+                <div>Отдел закупок</div>
             </div>
             
             <!-- Кнопки в нижнем правом углу -->
             <div class="text-block bottom-right">
                 <div class="button-container">
-                    <a href="ind.html" class="rounded-button">Кнопка 1</a>
-                    <a href="ind.html" class="rounded-button">Кнопка 2</a>
-                    <a href="ind.html" class="rounded-button">Кнопка 3</a>
+                    <a href="ind.html" class="rounded-button">Доставка</a>
+                    <a href="ind.html" class="rounded-button">Самовывоз</a>
+                    <a href="ind.html" class="rounded-button">Оплата</a>
                 </div>
             </div>
         </div>
