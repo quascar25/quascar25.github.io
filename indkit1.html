@@ -221,11 +221,10 @@ body {
             margin-top: 0; /* Убираем отступ сверху */
         }
 
-        /* Секция товара   display: flex; flex-direction: column; */
+        /* Секция товара   flex-direction: column; */
         .product-section {
-            
-            
-           
+            display: flex; 
+            flex-direction: row;
             background-color: white;
             border-radius: 6px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -233,7 +232,7 @@ body {
             padding: 10px;
         }
 
-        /* Адаптивность для ПК 
+        /* Адаптивность для ПК */
         @media (min-width: 760px) {
             .product-section {
                 flex-direction: row;
@@ -247,7 +246,7 @@ body {
                 width: 60%;
                 margin-top: 0;
                 padding-left: 20px;
-            }*/
+            }
         }
     </style>
 </head>
