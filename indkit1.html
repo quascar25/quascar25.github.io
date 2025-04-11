@@ -166,6 +166,7 @@ body {
         .link-with-icon:hover {
             color: white; /* Меняем цвет при наведении */
             cursor: pointer; /* Курсор в виде "руки" */
+            transform: scale(1.02); 
         }
         
         .link-with-icon:hover .link-icon {
@@ -288,61 +289,28 @@ body {
             <!-- Текст и ссылки в верхнем правом углу   link-icon -->
             <div class="text-block top-right">
                 <div>Отдел продаж</div>
-                <div>Отдел продаж</div>
-                <a href="index.html" class="link-with-icon">
-                   <!--  <div> <img src="phone.png" class="link-icon"> </div>   
-
-                    <span class="emoji-icon">📞</span>   -->
-                    
-                    <div>shop@technostor</div>
-                </a>
-                
-                <!--  
-                <a href="index.html" class="link-with-icon">
-                    <div> <img src="email.png" class="link-icon"> </div>
-                    <div>shop@technostor</div>
-                </a>
-                  -->
-
+                <div>Отдел закупок</div>
                 <div class="text-block top-right">
                   <a href="tel:+123456789" class="link-with-icon">
-                    <!-- Способ 1: SVG -->
-                    <svg class="phone-icon" viewBox="0 0 48 48" width="40" height="40">
+                    <svg class="phone-icon" viewBox="0 0 24 24" width="20" height="20">
                       <path fill="currentColor" d="M20 15.5c-1.2 0-2.5-.2-3.6-.6h-.3c-.3 0-.5.1-.7.3l-2.2 2.2c-2.8-1.5-5.2-3.8-6.6-6.6l2.2-2.2c.4-.4.4-1 .2-1.4V8.6c-.5-1.2-.7-2.5-.7-3.6 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.5-.4-1-1-1z"/>
                     </svg>
                     <span>Позвонить</span>
                   </a>
+                  <a href="mailto:shop@technostor" class="link-with-icon">
+                    <svg class="email-icon" viewBox="0 0 24 24" width="20" height="20">
+                      <path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.7l-8 5.3-8-5.3V6l8 5.3 8-5.3v2.7z"/>
+                    </svg>
+                    <span>Написать</span>
+                  </a>
+                 <!-- <a href="/cart" class="icon-link">-->
+                  <a href="mailto:example@mail.com" class="link-with-icon">
+                    <svg class="cart-icon" viewBox="0 0 24 24" width="20" height="20">
+                      <path fill="currentColor" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.6L5.2 14c-.1.3-.2.6-.2 1 0 1.1.9 2 2 2h12v-2H7.4c-.1 0-.2-.1-.2-.2v-.1l.9-1.7h7.4c.8 0 1.4-.4 1.7-1l3.9-7-1.7-1-3.9 7h-7L4.6 4H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    <span>Корзина</span>
+                  </a>
                 </div>
-
-
-
-                    <!-- конверт  карзина -->
-                    <!-- <div class="icons-container">  -->
-                      <!-- Конверт -->
-                      
-                    <!--
-                      <a href="mailto:example@mail.com" class="icon-link">-->
-                      <a href="mailto:example@mail.com" class="link-with-icon">
-                        <svg class="email-icon" viewBox="0 0 24 24" width="20" height="20">
-                          <path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.7l-8 5.3-8-5.3V6l8 5.3 8-5.3v2.7z"/>
-                        </svg>
-                        <span>Написать</span>
-                      </a>
-                    
-                                    
-                      <!-- Корзина -->
-                     <!--               
-                      <a href="/cart" class="icon-link">-->
-                      <a href="mailto:example@mail.com" class="link-with-icon">
-                        <svg class="cart-icon" viewBox="0 0 24 24" width="20" height="20">
-                          <path fill="currentColor" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.6L5.2 14c-.1.3-.2.6-.2 1 0 1.1.9 2 2 2h12v-2H7.4c-.1 0-.2-.1-.2-.2v-.1l.9-1.7h7.4c.8 0 1.4-.4 1.7-1l3.9-7-1.7-1-3.9 7h-7L4.6 4H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-                        </svg>
-                        <span>Корзина</span>
-                      </a>
-                    </div>
-
-                
-                <div>Отдел закупок</div>
             </div>
             
             <!-- Кнопки в нижнем правом углу -->
