@@ -1,0 +1,72 @@
+html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ball Lightning - Ind Tigr</title>
+    <style>
+        body {
+            margin: 0;
+            background: #1a1a1a; /* Почти чёрный фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        canvas {
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 50; // 100x100 пикселей
+        let frame = 0;
+
+        function drawBallLightning() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Основной шар с размытием и градиентом
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, 'rgba(0, 102, 255, 0.9)'); // Яркий центр
+            gradient.addColorStop(0.5, 'rgba(0, 102, 255, 0.5)'); // Полупрозрачный
+            gradient.addColorStop(1, 'rgba(0, 102, 255, 0)'); // Прозрачный край
+
+            ctx.beginPath();
+            const dynamicRadius = radius + Math.sin(frame * 0.2) * 5; // Изменение границ
+            ctx.arc(centerX, centerY, dynamicRadius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Мини-молнии
+            for (let i = 0; i < 5; i++) {
+                const angle = (frame * 0.1 + i * 2 * Math.PI / 5) % (2 * Math.PI);
+                const length = 20 + Math.random() * 10;
+                const endX = centerX + Math.cos(angle) * length;
+                const endY = centerY + Math.sin(angle) * length;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + Math.sin(frame * 0.3) * 0.5})`; // Мерцание
+                ctx.lineWidth = 1 + Math.random() * 1;
+                ctx.stroke();
+            }
+
+            frame++;
+            requestAnimationFrame(drawBallLightning);
+        }
+
+        drawBallLightning();
+    </script>
+</body>
+</html>
+
