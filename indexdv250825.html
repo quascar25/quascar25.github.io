@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Имперский протокол №DV-426</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #000000 0%, #1a1a2e 30%, #16213e 70%, #0f3460 100%);
+            color: #00ffff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Космические звезды на фоне */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px);
+            background-size: 50px 50px;
+            background-position: 0 0;
+            animation: stars 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes stars {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 1000px; }
+        }
+
+        .imperial-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ff0000;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .imperial-header::after {
+            content: '⚡';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .title {
+            font-size: 2.8em;
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 1.6em;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-bottom: 15px;
+        }
+
+        .directive {
+            font-size: 1.3em;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+            font-style: italic;
+            margin-bottom: 30px;
+            border: 1px solid #ffff00;
+            padding: 10px;
+            background: rgba(255,255,0,0.1);
+        }
+
+        .registration-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .imperial-btn {
+            background: linear-gradient(45deg, #8B0000, #B22222);
+            color: #000000;
+            border: 2px solid #ff0000;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        .imperial-btn:hover {
+            background: linear-gradient(45deg, #B22222, #DC143C);
+            box-shadow: 0 0 25px #ff0000;
+            transform: scale(1.05);
+        }
+
+        .imperial-form {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            padding: 25px;
+            border-radius: 5px;
+            max-width: 450px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffff;
+            border-radius: 3px;
+            font-size: 1em;
+            color: #00ffff;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ffff;
+            border-color: #ffff00;
+        }
+
+        .imperial-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 3px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(45deg, #006400, #008000);
+            color: #000;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(45deg, #8B0000, #B22222);
+            color: #000;
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .directive-frame {
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid #ffff00;
+            border-radius: 8px;
+            padding: 25px;
+            min-height: 180px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.4em;
+            color: #ffff00;
+            line-height: 1.8;
+            text-shadow: 0 0 10px #ffff00;
+            position: relative;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        .directive-frame::before {
+            content: '⌘';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 24px;
+            color: #ffff00;
+        }
+
+        .directive-frame::after {
+            content: '⌘';
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #ffff00;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2.2em; }
+            .subtitle { font-size: 1.3em; }
+            .directive { font-size: 1.1em; }
+            .directive-frame { font-size: 1.2em; min-height: 150px; }
+        }
+
+        /* Имперская печать */
+        .seal {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #8B0000, #000000);
+            border: 2px solid #ff0000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #ff0000;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    
+    <div class="imperial-header">
+        <div class="title">ИМПЕРСКИЙ ПРОТОКОЛ</div>
+        <div class="subtitle">ПРИКАЗ № DV-426</div>
+        <div class="directive">Каждому штурмовику - свою цель для уничтожения</div>
+    </div>
+
+    <div class="registration-section">
+        <button class="imperial-btn" onclick="toggleRegistration()">АКТИВИРОВАТЬ ПРОТОКОЛ</button>
+        
+        <div class="imperial-form" id="registrationForm">
+            <div class="form-group">
+                <label for="fio">ИДЕНТИФИКАЦИОННЫЙ КОД:</label>
+                <input type="text" id="fio" placeholder="Введите имперский идентификатор">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">ГАЛАКТИЧЕСКАЯ СВЯЗЬ:</label>
+                <input type="email" id="email" placeholder="Частота гиперпространственной связи">
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Позывной @штурмовика:</label>
+                <input type="text" id="username" placeholder="Имперский позывной">
+            </div>
+            
+            <div class="imperial-buttons">
+                <button class="btn btn-confirm" onclick="register()">ПОДТВЕРДИТЬ</button>
+                <button class="btn btn-cancel" onclick="cancelRegistration()">ОТМЕНА</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="directive-frame">
+        ПОЛНОЕ ПОВИНОВЕНИЕ • БЕСПОЩАДНОСТЬ • ВЛАСТЬ ТЕМНОЙ СТОРОНЫ
+    </div>
+
+    <div class="seal">⚡</div>
+
+    <script>
+        // Имперская логика регистрации
+        function toggleRegistration() {
+            const form = document.getElementById('registrationForm');
+            const isVisible = form.style.display === 'block';
+            form.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                // Имперский звуковой эффект (закомментирован, но можно добавить)
+                // const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQ...');
+                // audio.play().catch(e => console.log('Audio play failed'));
+            }
+        }
+
+        function register() {
+            const fio = document.getElementById('fio').value;
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+
+            if (!fio || !email || !username) {
+                alert('▮✖ ВСЕ ПОЛЯ ДОЛЖНЫ БЫТЬ ЗАПОЛНЕНЫ ✖▮');
+                return;
+            }
+
+            // Имперский лимит - максимум 3 штурмовика на терминал
+            const troops = JSON.parse(localStorage.getItem('imperial_troops') || '[]');
+            if (troops.length >= 3) {
+                alert('✖ ПРЕВЫШЕН ЛИМИТ РЕГИСТРАЦИЙ НА ДАННОМ ТЕРМИНАЛЕ ✖');
+                return;
+            }
+
+            // Регистрация нового штурмовика
+            const newTroop = {
+                id: fio,
+                frequency: email,
+                callsign: username,
+                registration_date: new Date().toISOString(),
+                status: 'active'
+            };
+
+            troops.push(newTroop);
+            localStorage.setItem('imperial_troops', JSON.stringify(troops));
+
+            alert('✅ ПРОТОКОЛ АКТИВИРОВАН! ШТУРМОВИК ДОБАВЛЕН В СИСТЕМУ');
+            cancelRegistration();
+        }
+
+        function cancelRegistration() {
+            document.getElementById('registrationForm').style.display = 'none';
+            // Очистка полей
+            document.getElementById('fio').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('username').value = '';
+        }
+
+        // PWA функционал
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('Имперский сервис активирован'))
+                .catch(error => console.log('Ошибка активации сервиса'));
+        }
+    </script>
+</body>
+</html>
