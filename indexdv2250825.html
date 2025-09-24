@@ -8,21 +8,7 @@
     <link rel="manifest" href="manifest.json">
     
     
-     <!-- Блокировка ориентации -->
-    <script>
-        // Попытка блокировки ориентации
-        function lockScreenOrientation() {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('portrait').catch(function(error) {
-                    console.log('Ориентация не заблокирована, но это нормально');
-                });
-            }
-        }
-        
-        // Блокировка при загрузке и изменении ориентации
-        window.addEventListener('load', lockScreenOrientation);
-        window.addEventListener('orientationchange', lockScreenOrientation);
-    </script>
+
     
     <style>
         /* Принудительный портретный режим */
@@ -450,6 +436,25 @@
     <div class="seal">⚡</div>
 
     <script>
+
+
+     <!-- Блокировка ориентации -->
+
+        // Попытка блокировки ориентации
+        function lockScreenOrientation() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(function(error) {
+                    console.log('Ориентация не заблокирована, но это нормально');
+                });
+            }
+        }
+        
+        // Блокировка при загрузке и изменении ориентации
+        window.addEventListener('load', lockScreenOrientation);
+        window.addEventListener('orientationchange', lockScreenOrientation);
+
+
+        
         // Логика командного протокола
         function toggleRegistration() {
             const form = document.getElementById('registrationForm');
