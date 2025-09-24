@@ -18,4 +18,8 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+    {
+  "display": "fullscreen",
+  "orientation": "portrait"
+}
   ]
