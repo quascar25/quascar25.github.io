@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доцент - Устав</title>
+    <meta name="theme-color" content="#1e88e5">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0E0E0 50%, #1976D2 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1565C0;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            color: #0D47A1;
+            margin-bottom: 20px;
+        }
+
+        .slogan {
+            font-size: 1.4em;
+            color: #1976D2;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .registration-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .registration-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .registration-btn:hover {
+            background: #1976D3;
+            transform: translateY(-2px);
+        }
+
+        .registration-form {
+            display: none;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #BBDEFB;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-yes {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .info-frame {
+            background: rgba(245, 245, 245, 0.95);
+            border: 2px solid #BDBDBD;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.3em;
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2em; }
+            .subtitle { font-size: 1.5em; }
+            .slogan { font-size: 1.2em; }
+            .info-frame { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">Доцент</div>
+        <div class="subtitle">Устав</div>
+        <div class="slogan">Каждому члену партии свое</div>
+    </div>
+
+    <div class="registration-section">
+        <button class="registration-btn" onclick="toggleRegistration()">Регистрация</button>
+        
+        <div class="registration-form" id="registrationForm">
+            <div class="form-group">
+                <label for="fio">ФИО:</label>
+                <input type="text" id="fio" placeholder="Введите ваше ФИО">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" placeholder="Введите ваш email">
+            </div>
+            
+            <div class="form-group">
+                <label for="username">@username:</label>
+                <input type="text" id="username" placeholder="Введите username мессенджера">
+            </div>
+            
+            <div class="form-buttons">
+                <button class="btn btn-yes" onclick="register()">Да</button>
+                <button class="btn btn-cancel" onclick="cancelRegistration()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-frame">
+        свобода, равенство, братство
+    </div>
+
+    <script>
+        // Логика регистрации
+        function toggleRegistration() {
+            const form = document.getElementById('registrationForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function register() {
+            const fio = document.getElementById('fio').value;
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+
+            if (!fio || !email || !username) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+
+            // Проверка лимита в 3 пользователя
+            const users = JSON.parse(localStorage.getItem('party_users') || '[]');
+            if (users.length >= 3) {
+                alert('Превышен лимит регистраций на этом устройстве (максимум 3)');
+                return;
+            }
+
+            // Сохранение пользователя
+            const newUser = {
+                fio: fio,
+                email: email,
+                username: username,
+                date: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('party_users', JSON.stringify(users));
+
+            alert('Регистрация успешна!');
+            cancelRegistration();
+        }
+
+        function cancelRegistration() {
+            document.getElementById('registrationForm').style.display = 'none';
+            // Очистка полей
+            document.getElementById('fio').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('username').value = '';
+        }
+
+        // PWA функционал
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('SW registered'))
+                .catch(error => console.log('SW registration failed'));
+        }
+    </script>
+</body>
+</html>
