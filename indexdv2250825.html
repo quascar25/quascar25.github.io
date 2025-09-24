@@ -438,20 +438,6 @@
     <script>
 
 
-     <!-- Блокировка ориентации -->
-
-        // Попытка блокировки ориентации
-        function lockScreenOrientation() {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('portrait').catch(function(error) {
-                    console.log('Ориентация не заблокирована, но это нормально');
-                });
-            }
-        }
-        
-        // Блокировка при загрузке и изменении ориентации
-        window.addEventListener('load', lockScreenOrientation);
-        window.addEventListener('orientationchange', lockScreenOrientation);
 
 
         
