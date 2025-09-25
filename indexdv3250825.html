@@ -9,6 +9,42 @@
     
     <!-- Блокировка ориентации экрана -->
     <script>
+
+// Элементы музыки
+const spaceMusic = document.getElementById('spaceMusic');
+let isMusicPlaying = false;
+
+// Автозапуск музыки при первом клике
+document.addEventListener('click', function initMusic() {
+    if (!isMusicPlaying) {
+        spaceMusic.play().then(() => {
+            isMusicPlaying = true;
+            spaceMusic.volume = 0.3;
+        }).catch(e => {
+            console.log('Автозапуск музыки заблокирован');
+        });
+        document.removeEventListener('click', initMusic);
+    }
+});
+
+// Управление музыкой
+function toggleMusic() {
+    if (isMusicPlaying) {
+        spaceMusic.pause();
+        isMusicPlaying = false;
+    } else {
+        spaceMusic.play().then(() => {
+            isMusicPlaying = true;
+        });
+    }
+}
+
+function setVolume(volume) {
+    spaceMusic.volume = volume;
+}
+        //===================
+
+        
         // Блокировка ориентации в портретном режиме
         function lockScreenOrientation() {
             if (screen.orientation && screen.orientation.lock) {
