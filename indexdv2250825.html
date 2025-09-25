@@ -2,42 +2,60 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ЗВЁЗДНЫЙ КОРАБЛЬ - КОМАНДНЫЙ ПРОТОКОЛ</title>
     <meta name="theme-color" content="#1a237e">
     <link rel="manifest" href="manifest.json">
     
-    
-
-    
-    <style>
-        /* Принудительный портретный режим */
-        @media (orientation: landscape) {
-            body::before {
-                content: "Пожалуйста, поверните устройство в портретный режим";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.9);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.5em;
-                z-index: 9999;
-                text-align: center;
-                padding: 20px;
+    <!-- Блокировка ориентации экрана -->
+    <script>
+        // Блокировка ориентации в портретном режиме
+        function lockScreenOrientation() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(function(error) {
+                    console.log('Блокировка ориентации не поддерживается');
+                });
             }
         }
-
         
+        // Блокировка при загрузке
+        window.addEventListener('load', lockScreenOrientation);
+        window.addEventListener('orientationchange', lockScreenOrientation);
+    </script>
+    
+    <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Orbitron', 'Arial', sans-serif;
+        }
+
+        /* Предупреждение о повороте экрана */
+        @media (orientation: landscape) {
+            body::before {
+                content: "🚀 Пожалуйста, поверните устройство в портретный режим для оптимального отображения";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(45deg, #0d1b2a, #1a237e);
+                color: #00e5ff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4em;
+                z-index: 9999;
+                text-align: center;
+                padding: 40px;
+                line-height: 1.5;
+                text-shadow: 0 0 10px #00bcd4;
+            }
+            
+            body > *:not(:before) {
+                display: none !important;
+            }
         }
 
         body {
@@ -323,7 +341,7 @@
             border: 3px solid #00bcd4;
             border-radius: 10px;
             padding: 25px;
-            margin-top: 40px; /* Поднят выше */
+            margin-top: 40px;
             min-height: 140px;
             display: flex;
             align-items: center;
@@ -382,7 +400,14 @@
             .bridge-btn { padding: 15px 25px; font-size: 1.1em; }
         }
 
-
+        /* Мобильная оптимизация */
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .bridge-panel { padding: 15px; }
+            .bridge-header { padding: 15px; margin-bottom: 20px; }
+            .title { font-size: 1.6em; }
+        }
+    </style>
 </head>
 <body>
     <div class="stars"></div>
@@ -436,11 +461,6 @@
     <div class="seal">⚡</div>
 
     <script>
-
-
-
-
-        
         // Логика командного протокола
         function toggleRegistration() {
             const form = document.getElementById('registrationForm');
@@ -491,6 +511,15 @@
                 .then(registration => console.log('Системный протокол активирован'))
                 .catch(error => console.log('Ошибка активации протокола'));
         }
+
+        // Дополнительная блокировка ориентации
+        document.addEventListener('DOMContentLoaded', function() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(() => {
+                    // Игнорируем ошибки - некоторые браузеры не поддерживают
+                });
+            }
+        });
     </script>
-</body>
+</head>
 </html>
