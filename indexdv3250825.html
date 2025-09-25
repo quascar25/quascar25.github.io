@@ -446,6 +446,42 @@
             .title { font-size: 1.6em; }
             .music-btn { padding: 6px 10px; font-size: 0.7em; }
         }
+
+.music-controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.music-btn {
+    background: rgba(0, 188, 212, 0.3);
+    border: 1px solid #00bcd4;
+    color: #00e5ff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.music-btn:hover {
+    background: rgba(0, 188, 212, 0.6);
+    transform: scale(1.05);
+}
+
+.volume-slider {
+    width: 80px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #00bcd4;
+    border-radius: 10px;
+    outline: none;
+}
+        
     </style>
 </head>
 <body>
