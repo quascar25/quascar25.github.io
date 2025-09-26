@@ -7,45 +7,7 @@
     <meta name="theme-color" content="#1a237e">
     <link rel="manifest" href="manifest.json">
     
-    <!-- Блокировка ориентации экрана -->
     <script>
-
-// Элементы музыки
-const spaceMusic = document.getElementById('spaceMusic');
-let isMusicPlaying = false;
-
-// Автозапуск музыки при первом клике
-document.addEventListener('click', function initMusic() {
-    if (!isMusicPlaying) {
-        spaceMusic.play().then(() => {
-            isMusicPlaying = true;
-            spaceMusic.volume = 0.3;
-        }).catch(e => {
-            console.log('Автозапуск музыки заблокирован');
-        });
-        document.removeEventListener('click', initMusic);
-    }
-});
-
-// Управление музыкой
-function toggleMusic() {
-    if (isMusicPlaying) {
-        spaceMusic.pause();
-        isMusicPlaying = false;
-    } else {
-        spaceMusic.play().then(() => {
-            isMusicPlaying = true;
-        });
-    }
-}
-
-function setVolume(volume) {
-    spaceMusic.volume = volume;
-}
-        //===================
-
-        
-        // Блокировка ориентации в портретном режиме
         function lockScreenOrientation() {
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('portrait').catch(function(error) {
@@ -53,8 +15,6 @@ function setVolume(volume) {
                 });
             }
         }
-        
-        // Блокировка при загрузке
         window.addEventListener('load', lockScreenOrientation);
         window.addEventListener('orientationchange', lockScreenOrientation);
     </script>
@@ -67,10 +27,9 @@ function setVolume(volume) {
             font-family: 'Orbitron', 'Arial', sans-serif;
         }
 
-        /* Предупреждение о повороте экрана */
         @media (orientation: landscape) {
             body::before {
-                content: "🚀 Пожалуйста, поверните устройство в портретный режим для оптимального отображения";
+                content: "🚀 Пожалуйста, поверните устройство в портретный режим";
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -86,26 +45,10 @@ function setVolume(volume) {
                 text-align: center;
                 padding: 40px;
                 line-height: 1.5;
-                text-shadow: 0 0 10px #00bcd4;
             }
-            
             body > *:not(:before) {
                 display: none !important;
             }
-        }
-
-        body {
-            min-height: 100vh;
-            background: 
-                linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #2c3e50 50%, #1a237e 75%, #0d1b2a 100%),
-                radial-gradient(circle at 20% 80%, rgba(120, 120, 120, 0.2) 2%, transparent 20%),
-                radial-gradient(circle at 80% 20%, rgba(80, 80, 80, 0.3) 1%, transparent 25%);
-            color: #e0f7fa;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
         }
 
         /* Панель управления музыкой */
@@ -141,10 +84,22 @@ function setVolume(volume) {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid #00bcd4;
             border-radius: 10px;
-            outline: none;
         }
 
-        /* Звездное небо */
+        body {
+            min-height: 100vh;
+            background: 
+                linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #2c3e50 50%, #1a237e 75%, #0d1b2a 100%),
+                radial-gradient(circle at 20% 80%, rgba(120, 120, 120, 0.2) 2%, transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(80, 80, 80, 0.3) 1%, transparent 25%);
+            color: #e0f7fa;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
         .stars {
             position: absolute;
             top: 0;
@@ -167,7 +122,6 @@ function setVolume(volume) {
             to { transform: translateY(-100px); }
         }
 
-        /* Сканирующая линия */
         .scan-line {
             position: absolute;
             top: 0;
@@ -187,7 +141,6 @@ function setVolume(volume) {
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Металлическая панель - основная */
         .bridge-panel {
             background: 
                 linear-gradient(160deg, #37474f 0%, #263238 30%, #102027 100%),
@@ -204,7 +157,6 @@ function setVolume(volume) {
                 inset 0 0 50px rgba(0, 0, 0, 0.5);
         }
 
-        /* Иллюминаторы - треугольные */
         .viewport {
             position: absolute;
             width: 120px;
@@ -229,7 +181,6 @@ function setVolume(volume) {
             transform: rotate(180deg);
         }
 
-        /* Заклепки */
         .rivet {
             position: absolute;
             width: 8px;
@@ -244,7 +195,6 @@ function setVolume(volume) {
         .rivet:nth-child(3) { bottom: 10px; left: 10px; }
         .rivet:nth-child(4) { bottom: 10px; right: 10px; }
 
-        /* Заголовок */
         .bridge-header {
             text-align: center;
             margin-bottom: 30px;
@@ -278,7 +228,6 @@ function setVolume(volume) {
             text-shadow: 0 0 5px #ffb300;
         }
 
-        /* Кнопка активации */
         .activation-section {
             text-align: center;
             margin: 30px 0;
@@ -323,7 +272,6 @@ function setVolume(volume) {
             left: 100%;
         }
 
-        /* Форма регистрации */
         .bridge-form {
             display: none;
             background: rgba(13, 19, 33, 0.9);
@@ -405,7 +353,6 @@ function setVolume(volume) {
             box-shadow: 0 0 25px currentColor;
         }
 
-        /* Нижний дисплей */
         .command-display {
             background: 
                 linear-gradient(160deg, #37474f 0%, #263238 100%),
@@ -445,7 +392,6 @@ function setVolume(volume) {
             right: 15px;
         }
 
-        /* Печать в углу */
         .seal {
             position: fixed;
             bottom: 20px;
@@ -474,7 +420,6 @@ function setVolume(volume) {
             .volume-slider { width: 60px; }
         }
 
-        /* Мобильная оптимизация */
         @media (max-width: 480px) {
             body { padding: 10px; }
             .bridge-panel { padding: 15px; }
@@ -482,50 +427,19 @@ function setVolume(volume) {
             .title { font-size: 1.6em; }
             .music-btn { padding: 6px 10px; font-size: 0.7em; }
         }
-
-.music-controls {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 1000;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.music-btn {
-    background: rgba(0, 188, 212, 0.3);
-    border: 1px solid #00bcd4;
-    color: #00e5ff;
-    padding: 8px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.8em;
-    transition: all 0.3s;
-    backdrop-filter: blur(10px);
-}
-
-.music-btn:hover {
-    background: rgba(0, 188, 212, 0.6);
-    transform: scale(1.05);
-}
-
-.volume-slider {
-    width: 80px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid #00bcd4;
-    border-radius: 10px;
-    outline: none;
-}
-        
     </style>
 </head>
 <body>
-<!-- Панель управления музыкой -->
-<div class="music-controls">
-    <button class="music-btn" onclick="toggleMusic()">🎵 ВКЛ/ВЫКЛ</button>
-    <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.3" oninput="setVolume(this.value)">
-</div>
+    <!-- Панель управления музыкой -->
+    <div class="music-controls">
+        <button class="music-btn" onclick="toggleMusic()">🎵 ВКЛ/ВЫКЛ</button>
+        <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.3" oninput="setVolume(this.value)">
+    </div>
+
+    <!-- Аудио элемент -->
+    <audio id="spaceMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1718ab41b.mp3?filename=space-ambience-140271.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="stars"></div>
     <div class="scan-line"></div>
@@ -577,29 +491,25 @@ function setVolume(volume) {
 
     <div class="seal">⚡</div>
 
-    <!-- Аудио элемент -->
-    <audio id="spaceMusic" loop>
-        <source src="https://assets.mixkit.co/music/preview/mixkit-space-game-668.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
-        // Элементы музыки
+        // ===== МУЗЫКА =====
         const spaceMusic = document.getElementById('spaceMusic');
         let isMusicPlaying = false;
-        
-        // Автозапуск музыки (с разрешения пользователя)
-        document.addEventListener('click', function() {
+
+        // Автозапуск при первом клике
+        document.addEventListener('click', function initMusic() {
             if (!isMusicPlaying && spaceMusic.paused) {
                 spaceMusic.play().then(() => {
                     isMusicPlaying = true;
                     spaceMusic.volume = 0.3;
                 }).catch(e => {
-                    console.log('Автозапуск музыки заблокирован браузером');
+                    console.log('Автозапуск музыки заблокирован');
                 });
+                // Удаляем обработчик после первого клика
+                document.removeEventListener('click', initMusic);
             }
-        }, { once: true });
+        });
 
-        // Управление музыкой
         function toggleMusic() {
             if (isMusicPlaying) {
                 spaceMusic.pause();
@@ -615,11 +525,7 @@ function setVolume(volume) {
             spaceMusic.volume = volume;
         }
 
-
-
-
-        
-        // Логика командного протокола
+        // ===== ЛОГИКА ПРИЛОЖЕНИЯ =====
         function toggleRegistration() {
             const form = document.getElementById('registrationForm');
             const isVisible = form.style.display === 'block';
@@ -670,12 +576,9 @@ function setVolume(volume) {
                 .catch(error => console.log('Ошибка активации протокола'));
         }
 
-        // Дополнительная блокировка ориентации
         document.addEventListener('DOMContentLoaded', function() {
             if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('portrait').catch(() => {
-                    // Игнорируем ошибки - некоторые браузеры не поддерживают
-                });
+                screen.orientation.lock('portrait').catch(() => {});
             }
         });
     </script>
