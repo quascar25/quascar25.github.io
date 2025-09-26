@@ -6,49 +6,13 @@
     <title>ЗВЁЗДНЫЙ КОРАБЛЬ - КОМАНДНЫЙ ПРОТОКОЛ</title>
     <meta name="theme-color" content="#1a237e">
     <link rel="manifest" href="manifest.json">
-    
-    <script>
-        function lockScreenOrientation() {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('portrait').catch(function(error) {
-                    console.log('Блокировка ориентации не поддерживается');
-                });
-            }
-        }
-        window.addEventListener('load', lockScreenOrientation);
-        window.addEventListener('orientationchange', lockScreenOrientation);
-    </script>
-    
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Orbitron', 'Arial', sans-serif;
-        }
-
-        @media (orientation: landscape) {
-            body::before {
-                content: "🚀 Пожалуйста, поверните устройство в портретный режим";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(45deg, #0d1b2a, #1a237e);
-                color: #00e5ff;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.4em;
-                z-index: 9999;
-                text-align: center;
-                padding: 40px;
-                line-height: 1.5;
-            }
-            body > *:not(:before) {
-                display: none !important;
-            }
         }
 
         /* Панель управления музыкой */
@@ -576,11 +540,6 @@
                 .catch(error => console.log('Ошибка активации протокола'));
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('portrait').catch(() => {});
-            }
-        });
     </script>
 </body>
 </html>
