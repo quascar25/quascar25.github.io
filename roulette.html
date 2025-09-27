@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Космическая Рулетка</title>
+    <style>
+        :root {
+            --color-primary: #2a3b4d;
+            --color-secondary: #1e2a36;
+            --color-accent: #4a6572;
+            --color-text: #ffffff;
+            --color-chip: #e0e0e0;
+            --color-chip-text: #000000;
+            --color-win: #4CAF50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: var(--color-text);
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Шапка с балансом и управлением звуком */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        .balance {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .sound-toggle {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: var(--color-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Основная игровая зона */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Колесо рулетки */
+        .wheel-container {
+            grid-column: 1 / -1;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .wheel {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #008000 0deg 9.73deg,    /* 0 - зеленый */
+                #ff0000 9.73deg 29.19deg, /* 32 - красный */
+                #000000 29.19deg 48.65deg, /* 15 - черный */
+                #ff0000 48.65deg 68.11deg, /* 19 - красный */
+                #000000 68.11deg 87.57deg, /* 4 - черный */
+                #ff0000 87.57deg 107.03deg, /* 21 - красный */
+                #000000 107.03deg 126.49deg, /* 2 - черный */
+                #ff0000 126.49deg 145.95deg, /* 25 - красный */
+                #000000 145.95deg 165.41deg, /* 17 - черный */
+                #ff0000 165.41deg 184.86deg, /* 34 - красный */
+                #000000 184.86deg 204.32deg, /* 6 - черный */
+                #ff0000 204.32deg 223.78deg, /* 27 - красный */
+                #000000 223.78deg 243.24deg, /* 13 - черный */
+                #ff0000 243.24deg 262.70deg, /* 36 - красный */
+                #000000 262.70deg 282.16deg, /* 11 - черный */
+                #ff0000 282.16deg 301.62deg, /* 30 - красный */
+                #000000 301.62deg 321.08deg, /* 8 - черный */
+                #ff0000 321.08deg 340.54deg, /* 23 - красный */
+                #000000 340.54deg 360deg     /* 10 - черный */
+            );
+            cursor: pointer;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: gold;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 2;
+        }
+
+        /* Сетка ставок */
+        .betting-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .number-cell {
+            aspect-ratio: 1;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .number-cell.zero { background-color: #008000; }
+        .number-cell.red { background-color: #ff0000; }
+        .number-cell.black { background-color: #000000; }
+
+        /* Статистика */
+        .stats {
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .stats h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 2px;
+        }
+
+        .stat-number {
+            aspect-ratio: 1;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+        }
+
+        /* Панель управления */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .chip-value {
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chip-value.active {
+            background-color: var(--color-accent);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .action-btn {
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--color-accent);
+        }
+
+        /* Фишки */
+        .chip {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--color-chip);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: var(--color-chip-text);
+            font-weight: bold;
+            z-index: 3;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Маркер последнего выпадения */
+        .last-marker {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: gold;
+            border-radius: 50%;
+            z-index: 4;
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка с балансом и звуком -->
+        <div class="header">
+            <div class="balance">Баланс: <span id="balance">100</span></div>
+            <button class="sound-toggle" id="soundToggle">🔇</button>
+        </div>
+
+        <!-- Игровая зона -->
+        <div class="game-area">
+            <!-- Колесо рулетки -->
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div class="wheel" id="rouletteWheel"></div>
+                <div class="last-marker" id="lastMarker"></div>
+            </div>
+
+            <!-- Сетка для ставок -->
+            <div class="betting-grid" id="bettingGrid">
+                <!-- Сетка будет заполнена JavaScript -->
+            </div>
+
+            <!-- Статистика -->
+            <div class="stats">
+                <h3>Последние выпадения</h3>
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Статистика будет заполнена JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель управления -->
+        <div class="controls">
+            <div class="chip-value" data-value="1">1</div>
+            <div class="chip-value" data-value="5">5</div>
+            <div class="chip-value" data-value="10">10</div>
+            <div class="chip-value" data-value="25">25</div>
+            <div class="chip-value" data-value="100">100</div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="action-buttons">
+            <div class="action-btn" id="clearBets">Очистить</div>
+            <div class="action-btn" id="repeatBets">Повторить</div>
+        </div>
+    </div>
+
+    <!-- Аудио элемент -->
+    <audio id="backgroundMusic" loop>
+        <source src="Аудио/космическая музыка.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио элемент.
+    </audio>
+
+    <script>
+        class RouletteGame {
+            constructor() {
+                this.balance = 100;
+                this.currentChipValue = 1;
+                this.bets = {};
+                this.lastBets = {};
+                this.history = [];
+                this.isSpinning = false;
+                this.isSoundOn = false;
+
+                this.initializeElements();
+                this.createBettingGrid();
+                this.createStatsGrid();
+                this.setupEventListeners();
+                this.updateDisplay();
+            }
+
+            initializeElements() {
+                this.balanceElement = document.getElementById('balance');
+                this.wheelElement = document.getElementById('rouletteWheel');
+                this.bettingGridElement = document.getElementById('bettingGrid');
+                this.statsGridElement = document.getElementById('statsGrid');
+                this.lastMarkerElement = document.getElementById('lastMarker');
+                this.soundToggleElement = document.getElementById('soundToggle');
+                this.backgroundMusic = document.getElementById('backgroundMusic');
+                this.clearBetsButton = document.getElementById('clearBets');
+                this.repeatBetsButton = document.getElementById('repeatBets');
+            }
+
+            createBettingGrid() {
+                const numbers = [
+                    {num: 0, color: 'zero'},
+                    {num: 32, color: 'red'}, {num: 15, color: 'black'}, {num: 19, color: 'red'},
+                    {num: 4, color: 'black'}, {num: 21, color: 'red'}, {num: 2, color: 'black'},
+                    {num: 25, color: 'red'}, {num: 17, color: 'black'}, {num: 34, color: 'red'},
+                    {num: 6, color: 'black'}, {num: 27, color: 'red'}, {num: 13, color: 'black'},
+                    {num: 36, color: 'red'}, {num: 11, color: 'black'}, {num: 30, color: 'red'},
+                    {num: 8, color: 'black'}, {num: 23, color: 'red'}, {num: 10, color: 'black'}
+                ];
+
+                numbers.forEach((item, index) => {
+                    const cell = document.createElement('div');
+                    cell.className = `number-cell ${item.color}`;
+                    cell.textContent = item.num;
+                    cell.dataset.number = item.num;
+                    this.bettingGridElement.appendChild(cell);
+                });
+            }
+
+            createStatsGrid() {
+                for (let i = 0; i < 37; i++) {
+                    const statCell = document.createElement('div');
+                    statCell.className = 'stat-number';
+                    statCell.id = `stat-${i}`;
+                    this.statsGridElement.appendChild(statCell);
+                }
+            }
+
+            setupEventListeners() {
+                // Выбор значения фишки
+                document.querySelectorAll('.chip-value').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        document.querySelectorAll('.chip-value').forEach(btn => 
+                            btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentChipValue = parseInt(e.target.dataset.value);
+                    });
+                });
+
+                // Размещение ставок
+                this.bettingGridElement.addEventListener('click', (e) => {
+                    if (this.isSpinning) return;
+                    
+                    const numberCell = e.target.closest('.number-cell');
+                    if (numberCell) {
+                        this.placeBet(parseInt(numberCell.dataset.number));
+                    }
+                });
+
+                // Запуск рулетки
+                this.wheelElement.addEventListener('click', () => {
+                    if (!this.isSpinning && Object.keys(this.bets).length > 0) {
+                        this.spinWheel();
+                    }
+                });
+
+                // Управление звуком
+                this.soundToggleElement.addEventListener('click', () => {
+                    this.toggleSound();
+                });
+
+                // Кнопки действий
+                this.clearBetsButton.addEventListener('click', () => {
+                    this.clearBets();
+                });
+
+                this.repeatBetsButton.addEventListener('click', () => {
+                    this.repeatBets();
+                });
+
+                // Сброс маркера при клике
+                document.addEventListener('click', (e) => {
+                    if (!this.wheelElement.contains(e.target) && 
+                        !e.target.closest('.number-cell')) {
+                        this.resetMarker();
+                    }
+                });
+            }
+
+            placeBet(number) {
+                const betKey = number.toString();
+                
+                if (!this.bets[betKey]) {
+                    this.bets[betKey] = 0;
+                }
+
+                this.bets[betKey] += this.currentChipValue;
+                
+                if (this.bets[betKey] > 0) {
+                    this.updateBetDisplay(number);
+                }
+            }
+
+            updateBetDisplay(number) {
+                // Удаляем старую фишку
+                const oldChip = document.querySelector(`.chip[data-number="${number}"]`);
+                if (oldChip) {
+                    oldChip.remove();
+                }
+
+                // Добавляем новую фишку
+                const cell = document.querySelector(`[data-number="${number}"]`);
+                const rect = cell.getBoundingClientRect();
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.dataset.number = number;
+                chip.textContent = this.bets[number.toString()];
+                chip.style.left = `${rect.left + rect.width/2}px`;
+                chip.style.top = `${rect.top + rect.height/2}px`;
+                document.body.appendChild(chip);
+            }
+
+            spinWheel() {
+                this.isSpinning = true;
+                this.lastBets = {...this.bets};
+                
+                // Анимация вращения
+                const spinDegrees = 1800 + Math.random() * 360;
+                this.wheelElement.style.transform = `rotate(${spinDegrees}deg)`;
+
+                setTimeout(() => {
+                    const winningNumber = Math.floor(Math.random() * 37);
+                    this.processWin(winningNumber);
+                }, 3000);
+            }
+
+            processWin(winningNumber) {
+                this.history.unshift(winningNumber);
+                if (this.history.length > 37) {
+                    this.history.pop();
+                }
+
+                this.updateStats();
+                this.moveMarker(winningNumber);
+
+                // Проверяем выигрыш
+                const winAmount = this.calculateWin(winningNumber);
+                this.balance += winAmount;
+
+                // Очищаем текущие ставки
+                this.clearBets();
+
+                this.isSpinning = false;
+                this.updateDisplay();
+            }
+
+            calculateWin(winningNumber) {
+                let win = 0;
+                const betNumber = this.lastBets[winningNumber.toString()];
+                
+                if (betNumber) {
+                    win += betNumber * 36; // Выигрыш за прямое попадание
+                }
+
+                // Можно добавить логику для других типов ставок
+                return win - this.getTotalBet();
+            }
+
+            getTotalBet() {
+                return Object.values(this.bets).reduce((sum, bet) => sum + bet, 0);
+            }
+
+            updateStats() {
+                for (let i = 0; i < 37; i++) {
+                    const count = this.history.filter(num => num === i).length;
+                    const statElement = document.getElementById(`stat-${i}`);
+                    statElement.textContent = count > 0 ? count : '';
+                    statElement.style.backgroundColor = count > 0 ? 'rgba(255,255,255,0.2)' : '';
+                }
+            }
+
+            moveMarker(winningNumber) {
+                const targetCell = document.querySelector(`[data-number="${winningNumber}"]`);
+                if (targetCell) {
+                    const rect = targetCell.getBoundingClientRect();
+                    this.lastMarkerElement.style.left = `${rect.left + rect.width/2}px`;
+                    this.lastMarkerElement.style.top = `${rect.top + rect.height/2}px`;
+                }
+            }
+
+            resetMarker() {
+                const wheelRect = this.wheelElement.getBoundingClientRect();
+                this.lastMarkerElement.style.left = `${wheelRect.right - 20}px`;
+                this.lastMarkerElement.style.top = `${wheelRect.bottom - 20}px`;
+            }
+
+            toggleSound() {
+                this.isSoundOn = !this.isSoundOn;
+                this.soundToggleElement.textContent = this.isSoundOn ? '🔊' : '🔇';
+                
+                if (this.isSoundOn) {
+                    this.backgroundMusic.play().catch(e => {
+                        console.log('Автовоспроизведение заблокировано');
+                    });
+                } else {
+                    this.backgroundMusic.pause();
+                }
+            }
+
+            clearBets() {
+                this.bets = {};
+                document.querySelectorAll('.chip').forEach(chip => chip.remove());
+            }
+
+            repeatBets() {
+                if (this.isSpinning) return;
+                
+                this.clearBets();
+                this.bets = {...this.lastBets};
+                
+                for (const number in this.bets) {
+                    this.updateBetDisplay(parseInt(number));
+                }
+            }
+
+            updateDisplay() {
+                this.balanceElement.textContent = this.balance;
+                
+                // Активируем первую фишку по умолчанию
+                if (!document.querySelector('.chip-value.active')) {
+                    document.querySelector('.chip-value').classList.add('active');
+                }
+            }
+        }
+
+        // Инициализация игры при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new RouletteGame();
+        });
+    </script>
+</body>
+</html>
