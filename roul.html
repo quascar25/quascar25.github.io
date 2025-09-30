@@ -61,7 +61,7 @@
             fill: rgba(52, 152, 219, 0.3);
         }
         .chip {
-            fill: #e74c3c;
+            fill: #9ab9e5;
             r: 12;
             pointer-events: none;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
@@ -88,7 +88,6 @@
     <div class="container">
         <div class="controls">
             <button id="clear-chips">Clear All Chips</button>
-            <button id="change-color">Change Chip Color</button>
             <span id="chip-count">Chips: 0</span>
         </div>
         <div id="grid-container">
@@ -100,10 +99,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             const svg = document.getElementById('roulette-svg');
             let chipCount = 0;
-            let chipColor = '#e74c3c';
             const chipCountElement = document.getElementById('chip-count');
 
-            // Основные зоны стола для рулетки на основе координат из файла
+            // Основные зоны стола для рулетки
             const createRouletteTable = () => {
                 // Создаем основную зону ставок (зеленое поле)
                 const bettingGrid = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -251,7 +249,6 @@
                 chip.classList.add("chip");
                 chip.setAttribute("cx", x);
                 chip.setAttribute("cy", y);
-                chip.setAttribute("fill", chipColor);
                 chip.setAttribute("data-chip-id", chipCount);
                 
                 const chipText = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -283,13 +280,6 @@
                 chips.forEach(chip => chip.remove());
                 chipCount = 0;
                 chipCountElement.textContent = `Chips: ${chipCount}`;
-            });
-
-            // Смена цвета фишек
-            document.getElementById('change-color').addEventListener('click', function() {
-                const colors = ['#e74c3c', '#3498db', '#f39c12', '#9b59b6', '#1abc9c'];
-                const currentIndex = colors.indexOf(chipColor);
-                chipColor = colors[(currentIndex + 1) % colors.length];
             });
 
             // Создаем стол для рулетки
