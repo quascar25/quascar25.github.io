@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Grid with Chips</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 0 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #grid-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            border: 1px solid #ddd;
+            overflow: auto;
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        .grid-cell {
+            fill: rgba(200, 200, 200, 0.3);
+            stroke: #999;
+            stroke-width: 1;
+            cursor: pointer;
+        }
+        .grid-cell:hover {
+            fill: rgba(100, 100, 255, 0.3);
+        }
+        .chip {
+            fill: red;
+            r: 15;
+            pointer-events: none;
+        }
+        .chip-text {
+            fill: white;
+            font-size: 12px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        .info-panel {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive Grid with Chips</h1>
+        
+        <div class="controls">
+            <button id="clear-chips">Clear All Chips</button>
+            <button id="toggle-grid">Toggle Grid</button>
+            <span id="chip-count">Chips placed: 0</span>
+        </div>
+        
+        <div id="grid-container"></div>
+        
+        <div class="info-panel">
+            <p>Click on any grid cell to place a chip. Each chip is numbered sequentially.</p>
+            <p>Use the buttons above to clear all chips or toggle grid visibility.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse the vertex data from the file
+            const vertices = [];
+            const vertexRegex = /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g;
+            const fileContent = `[file content from set.txt]`;
+            
+            // Extract vertices from the file content
+            let match;
+            while ((match = vertexRegex.exec(fileContent)) !== null) {
+                vertices.push({
+                    x: parseFloat(match[1]),
+                    y: parseFloat(match[3]) // Note: swapping y and z for 2D display
+                });
+            }
+            
+            // Create SVG element
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("viewBox", "-600 -300 3000 1500");
+            
+            // Find min and max coordinates to center the grid
+            const xCoords = vertices.map(v => v.x);
+            const yCoords = vertices.map(v => v.y);
+            const minX = Math.min(...xCoords);
+            const maxX = Math.max(...xCoords);
+            const minY = Math.min(...yCoords);
+            const maxY = Math.max(...yCoords);
+            
+            // Create grid cells based on vertices
+            // We'll create rectangular cells by connecting vertices in order
+            const cells = [];
+            for (let i = 0; i < vertices.length - 4; i += 4) {
+                if (i + 3 < vertices.length) {
+                    cells.push([
+                        vertices[i],
+                        vertices[i+1],
+                        vertices[i+2],
+                        vertices[i+3]
+                    ]);
+                }
+            }
+            
+            // Draw grid cells
+            cells.forEach((cell, index) => {
+                const points = cell.map(v => `${v.x},${v.y}`).join(' ');
+                const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                polygon.setAttribute("points", points);
+                polygon.classList.add("grid-cell");
+                polygon.setAttribute("data-index", index);
+                svg.appendChild(polygon);
+            });
+            
+            // Add click event listeners to grid cells
+            let chipCount = 0;
+            const chipCountElement = document.getElementById('chip-count');
+            
+            svg.addEventListener('click', function(e) {
+                if (e.target.classList.contains('grid-cell')) {
+                    // Calculate center of the polygon
+                    const polygon = e.target;
+                    const points = polygon.getAttribute('points').split(' ').map(p => {
+                        const [x, y] = p.split(',').map(Number);
+                        return {x, y};
+                    });
+                    
+                    // Calculate centroid
+                    let centroidX = 0;
+                    let centroidY = 0;
+                    points.forEach(p => {
+                        centroidX += p.x;
+                        centroidY += p.y;
+                    });
+                    centroidX /= points.length;
+                    centroidY /= points.length;
+                    
+                    // Create chip
+                    chipCount++;
+                    const chip = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    chip.classList.add("chip");
+                    chip.setAttribute("cx", centroidX);
+                    chip.setAttribute("cy", centroidY);
+                    chip.setAttribute("data-chip-id", chipCount);
+                    
+                    // Create chip number
+                    const chipText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    chipText.classList.add("chip-text");
+                    chipText.setAttribute("x", centroidX);
+                    chipText.setAttribute("y", centroidY);
+                    chipText.textContent = chipCount;
+                    
+                    svg.appendChild(chip);
+                    svg.appendChild(chipText);
+                    
+                    // Update chip count display
+                    chipCountElement.textContent = `Chips placed: ${chipCount}`;
+                }
+            });
+            
+            // Add SVG to container
+            document.getElementById('grid-container').appendChild(svg);
+            
+            // Clear chips button
+            document.getElementById('clear-chips').addEventListener('click', function() {
+                const chips = svg.querySelectorAll('.chip, .chip-text');
+                chips.forEach(chip => chip.remove());
+                chipCount = 0;
+                chipCountElement.textContent = `Chips placed: ${chipCount}`;
+            });
+            
+            // Toggle grid button
+            document.getElementById('toggle-grid').addEventListener('click', function() {
+                const gridCells = svg.querySelectorAll('.grid-cell');
+                gridCells.forEach(cell => {
+                    cell.style.display = cell.style.display === 'none' ? '' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
