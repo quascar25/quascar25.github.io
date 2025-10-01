@@ -3,191 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Roulette Grid</title>
+    <title>Roulette Table</title>
     <style>
-        body {
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: rgb(91, 107, 160);
             font-family: Arial, sans-serif;
-            background-color: #2c3e50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 3vw;
         }
-        .container {
-            background: #1a1a1a;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        
+        .roulette-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .controls {
-            text-align: center;
-            margin-bottom: 20px;
-            color: white;
+        
+        .roulette-field {
+            position: relative;
+            width: 100%;
+            max-width: calc(13 * 11vw - 1vw);
+            transform: rotate(-90deg);
+            margin: 5vw 0;
         }
-        button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+        
+        .zero-section {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 10vw;
+            height: 32vw;
         }
-        button:hover {
-            background: #c0392b;
+        
+        .zero-rect {
+            width: 100%;
+            height: 100%;
+            fill: transparent;
+            stroke: rgb(154, 185, 229);
+            stroke-width: 0.3vw;
+            rx: 2vw;
+            ry: 2vw;
         }
-        #chip-count {
-            font-size: 18px;
-            margin-left: 20px;
-            color: #ecf0f1;
-        }
-        #grid-container {
-            background: #2ecc71;
-            border: 3px solid #27ae60;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .grid-cell {
-            fill: rgba(255, 255, 255, 0.2);
-            stroke: #34495e;
-            stroke-width: 2;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .grid-cell:hover {
-            fill: rgba(52, 152, 219, 0.4);
-        }
-        .chip {
-            fill: #9ab9e5;
-            r: 15;
-            pointer-events: none;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
-        }
-        .chip-text {
-            fill: white;
-            font-size: 12px;
-            font-weight: bold;
+        
+        .zero-text {
+            font-size: 5vw;
+            font-weight: 500;
+            fill: rgb(49, 106, 69);
             text-anchor: middle;
+            dominant-baseline: central;
+            transform: rotate(90deg);
+        }
+        
+        .numbers-grid {
+            position: absolute;
+            left: 11vw;
+            bottom: 0;
+            display: grid;
+            grid-template-columns: repeat(13, 10vw);
+            grid-template-rows: repeat(3, 10vw);
+            gap: 1vw;
+        }
+        
+        .number-cell {
+            width: 10vw;
+            height: 10vw;
+            position: relative;
+        }
+        
+        .cell-bg {
+            width: 100%;
+            height: 100%;
+            fill: transparent;
+            stroke: rgb(154, 185, 229);
+            stroke-width: 0.3vw;
+            rx: 2vw;
+            ry: 2vw;
+        }
+        
+        .cell-text {
+            font-size: 5vw;
+            font-weight: 500;
+            fill: rgb(210, 63, 63);
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+        
+        .bet-text {
+            font-size: 3vw;
+            font-weight: 500;
+            fill: rgb(210, 63, 63);
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+        
+        .controls {
+            margin-top: 5vw;
+            text-align: center;
+        }
+        
+        .clear-btn {
+            background: rgb(154, 185, 229);
+            color: rgb(91, 107, 160);
+            border: none;
+            padding: 2vw 4vw;
+            border-radius: 2vw;
+            font-size: 4vw;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .chip {
+            position: absolute;
+            width: 6vw;
+            height: 6vw;
+            background: rgb(154, 185, 229);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3vw;
+            font-weight: bold;
             pointer-events: none;
-            user-select: none;
+            transform: rotate(90deg);
+            z-index: 10;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="controls">
-            <button id="clear-chips">Clear All Chips</button>
-            <span id="chip-count">Chips: 0</span>
+    <div class="roulette-container">
+        <div class="roulette-field">
+            <!-- Ноль -->
+            <div class="zero-section">
+                <svg class="zero-rect" viewBox="0 0 10 32">
+                    <rect class="zero-rect" x="0.15" y="0.15" width="9.7" height="31.7"/>
+                    <text class="zero-text" x="5" y="16">0</text>
+                </svg>
+            </div>
+            
+            <!-- Сетка чисел -->
+            <div class="numbers-grid" id="numbers-grid">
+                <!-- Числа 1-36 и специальные ставки будут сгенерированы через JavaScript -->
+            </div>
         </div>
-        <div id="grid-container">
-            <svg id="roulette-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
+        
+        <div class="controls">
+            <button class="clear-btn" onclick="clearChips()">Clear Chips</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const svg = document.getElementById('roulette-svg');
-            let chipCount = 0;
-            const chipCountElement = document.getElementById('chip-count');
-
-            // Создаем 4 ячейки на основе координат из файла (упрощенно)
-            const createSimpleGrid = () => {
-                // 4 левые ячейки - берем приблизительные координаты из начала файла
-                const cells = [
-                    // Ячейка 1 (левый верхний)
-                    { 
-                        points: "100,50 200,50 200,150 100,150",
-                        center: { x: 150, y: 100 }
-                    },
-                    // Ячейка 2 (левый второй сверху)
-                    { 
-                        points: "100,150 200,150 200,250 100,250",
-                        center: { x: 150, y: 200 }
-                    },
-                    // Ячейка 3 (левый третий сверху)  
-                    { 
-                        points: "100,250 200,250 200,350 100,350",
-                        center: { x: 150, y: 300 }
-                    },
-                    // Ячейка 4 (левый нижний)
-                    { 
-                        points: "100,350 200,350 200,450 100,450",
-                        center: { x: 150, y: 400 }
-                    }
-                ];
-
-                cells.forEach((cell, index) => {
-                    // Создаем ячейку
-                    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                    polygon.setAttribute("points", cell.points);
-                    polygon.classList.add("grid-cell");
-                    polygon.setAttribute("data-cell-index", index);
-                    
-                    // Добавляем текст с номером ячейки
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("x", cell.center.x);
-                    text.setAttribute("y", cell.center.y);
-                    text.setAttribute("text-anchor", "middle");
-                    text.setAttribute("fill", "white");
-                    text.setAttribute("font-weight", "bold");
-                    text.setAttribute("font-size", "16");
-                    text.textContent = (index + 1).toString();
-                    
-                    svg.appendChild(polygon);
-                    svg.appendChild(text);
+        let chipCount = 0;
+        
+        // Создаем сетку чисел
+        function createNumberGrid() {
+            const grid = document.getElementById('numbers-grid');
+            const numbers = [];
+            
+            // Числа от 1 до 36
+            for (let i = 1; i <= 36; i++) {
+                numbers.push({
+                    type: 'number',
+                    value: i.toString(),
+                    row: Math.floor((i - 1) / 13),
+                    col: (i - 1) % 13
                 });
-            };
-
-            // Обработчик кликов по ячейкам
-            svg.addEventListener('click', function(e) {
-                if (e.target.classList.contains('grid-cell')) {
-                    const cellIndex = e.target.getAttribute('data-cell-index');
-                    const cells = [
-                        { center: { x: 150, y: 100 } },
-                        { center: { x: 150, y: 200 } },
-                        { center: { x: 150, y: 300 } },
-                        { center: { x: 150, y: 400 } }
-                    ];
-                    
-                    const center = cells[cellIndex].center;
-                    placeChip(center.x, center.y);
-                }
-            });
-
-            function placeChip(x, y) {
-                chipCount++;
-                
-                const chip = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                chip.classList.add("chip");
-                chip.setAttribute("cx", x);
-                chip.setAttribute("cy", y);
-                chip.setAttribute("data-chip-id", chipCount);
-                
-                const chipText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                chipText.classList.add("chip-text");
-                chipText.setAttribute("x", x);
-                chipText.setAttribute("y", y + 5);
-                chipText.textContent = chipCount;
-                
-                svg.appendChild(chip);
-                svg.appendChild(chipText);
-                
-                chipCountElement.textContent = `Chips: ${chipCount}`;
             }
-
-            // Кнопка очистки фишек
-            document.getElementById('clear-chips').addEventListener('click', function() {
-                const chips = svg.querySelectorAll('.chip, .chip-text');
-                chips.forEach(chip => chip.remove());
-                chipCount = 0;
-                chipCountElement.textContent = `Chips: ${chipCount}`;
+            
+            // Специальные ставки на последних трех позициях
+            numbers.push(
+                { type: 'bet', value: '1to2', row: 0, col: 12 },
+                { type: 'bet', value: '1to2', row: 1, col: 12 },
+                { type: 'bet', value: '1to2', row: 2, col: 12 }
+            );
+            
+            numbers.forEach(item => {
+                const cell = document.createElement('div');
+                cell.className = 'number-cell';
+                cell.style.gridRow = item.row + 1;
+                cell.style.gridColumn = item.col + 1;
+                cell.setAttribute('data-type', item.type);
+                cell.setAttribute('data-value', item.value);
+                
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 10 10');
+                svg.setAttribute('class', 'cell-bg');
+                
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('class', 'cell-bg');
+                rect.setAttribute('x', '0.15');
+                rect.setAttribute('y', '0.15');
+                rect.setAttribute('width', '9.7');
+                rect.setAttribute('height', '9.7');
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('class', item.type === 'bet' ? 'bet-text' : 'cell-text');
+                text.setAttribute('x', '5');
+                text.setAttribute('y', '5');
+                text.textContent = item.value;
+                
+                svg.appendChild(rect);
+                svg.appendChild(text);
+                cell.appendChild(svg);
+                
+                // Добавляем обработчик клика
+                cell.addEventListener('click', function(e) {
+                    placeChip(this, e);
+                });
+                
+                grid.appendChild(cell);
             });
-
-            // Создаем простую сетку
-            createSimpleGrid();
+        }
+        
+        // Размещение фишки
+        function placeChip(cell, event) {
+            chipCount++;
+            
+            const rect = cell.getBoundingClientRect();
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.textContent = chipCount;
+            chip.style.left = (rect.left + rect.width / 2 - 3) + 'px';
+            chip.style.top = (rect.top + rect.height / 2 - 3) + 'px';
+            
+            document.body.appendChild(chip);
+            
+            // Анимация появления
+            chip.style.transform = 'rotate(90deg) scale(0)';
+            setTimeout(() => {
+                chip.style.transition = 'transform 0.2s ease-out';
+                chip.style.transform = 'rotate(90deg) scale(1)';
+            }, 10);
+        }
+        
+        // Очистка всех фишек
+        function clearChips() {
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach(chip => chip.remove());
+            chipCount = 0;
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            createNumberGrid();
+        });
+        
+        // Адаптация к изменению размера экрана
+        window.addEventListener('resize', function() {
+            // Перемещаем существующие фишки
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach(chip => {
+                const chipNumber = chip.textContent;
+                const cells = document.querySelectorAll('.number-cell, .zero-section');
+                // Здесь можно добавить логику для перерасчета позиций фишек
+            });
         });
     </script>
 </body>
