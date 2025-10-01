@@ -29,13 +29,13 @@
             justify-content: center;
         }
         
-        .roulette-field {
-            position: relative;
-            width: 100%;
-            max-width: calc(13 * 11vw - 1vw);
-            transform: rotate(-90deg);
-            margin: 5vw 0;
-        }
+       .roulette-field {
+    position: relative;
+    width: 100%;
+    max-width: calc(13 * 11vw - 1vw);
+    transform: rotate(0deg);  /* ← НОВАЯ СТРОКА */
+    margin: 5vw 0;
+}
         
         .zero-section {
             position: absolute;
@@ -122,22 +122,21 @@
             cursor: pointer;
         }
         
-        .chip {
-            position: absolute;
-            width: 6vw;
-            height: 6vw;
-            background: rgb(154, 185, 229);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3vw;
-            font-weight: bold;
-            pointer-events: none;
-            transform: rotate(90deg);
-            z-index: 10;
-        }
+            .chip {
+                position: absolute;
+                width: 6vw;
+                height: 6vw;
+                background: rgb(154, 185, 229);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 3vw;
+                font-weight: bold;
+                pointer-events: none;
+                z-index: 10;
+            }
     </style>
 </head>
 <body>
