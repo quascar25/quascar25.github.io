@@ -50,9 +50,9 @@
             height: 100%;
             fill: transparent;
             stroke: rgb(154, 185, 229);
-            stroke-width: 0.3vw;
-            rx: 2vw;
-            ry: 2vw;
+            stroke-width: 0.0375vw;
+            rx: 0.25vw;
+            ry: 0.25vw;
         }
         
         .zero-text {
@@ -85,9 +85,9 @@
             height: 100%;
             fill: transparent;
             stroke: rgb(154, 185, 229);
-            stroke-width: 0.3vw;
-            rx: 2vw;
-            ry: 2vw;
+            stroke-width: 0.0375vw;
+            rx: 0.25vw;
+            ry: 0.25vw;
         }
         
         .cell-text {
@@ -145,7 +145,7 @@
             <!-- Ноль -->
             <div class="zero-section">
                 <svg class="zero-rect" viewBox="0 0 10 32">
-                    <rect class="zero-rect" x="0.15" y="0.15" width="9.7" height="31.7"/>
+                    <rect class="zero-rect" x="0.01875" y="0.01875" width="9.9625" height="31.9625"/>
                     <text class="zero-text" x="5" y="16">0</text>
                 </svg>
             </div>
@@ -200,10 +200,10 @@
                 
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 rect.setAttribute('class', 'cell-bg');
-                rect.setAttribute('x', '0.15');
-                rect.setAttribute('y', '0.15');
-                rect.setAttribute('width', '9.7');
-                rect.setAttribute('height', '9.7');
+                rect.setAttribute('x', '0.01875');
+                rect.setAttribute('y', '0.01875');
+                rect.setAttribute('width', '9.9625');
+                rect.setAttribute('height', '9.9625');
                 
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 text.setAttribute('class', item.type === 'bet' ? 'bet-text' : 'cell-text');
