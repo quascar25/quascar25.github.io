@@ -18,15 +18,17 @@
             align-items: center;
             min-height: 100vh;
             font-family: Arial, sans-serif;
-            padding: 5%;
+            overflow: hidden;
         }
         
-        .grid-container {
-            width: 100%;
-            height: calc(100vh - 10%);
-            max-height: calc(100vw * 16 / 9);
+        .container {
+            width: 90vw;
+            height: calc(100vh - 10vh); /* Высота экрана минус 5% сверху и 5% снизу */
+            max-width: calc((100vh - 10vh) * 9 / 16); /* Соотношение 9:16 */
             position: relative;
-            border: 3px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .grid {
@@ -36,6 +38,7 @@
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(18, 1fr);
             gap: 3px;
+            border: 3px solid white;
             padding: 3px;
         }
         
@@ -47,36 +50,53 @@
         .coordinates {
             position: absolute;
             color: white;
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: bold;
             pointer-events: none;
         }
         
         .x-coordinate {
-            bottom: -20px;
+            bottom: -25px;
+            text-align: center;
+            width: 20px;
+            margin-left: -10px;
         }
         
         .y-coordinate {
-            left: -25px;
+            left: -30px;
+            text-align: center;
+            height: 20px;
+            margin-top: -10px;
         }
         
-        @media (max-width: 768px) {
-            .coordinates {
-                font-size: 10px;
-            }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="grid-container">
-        <div class="grid">
+    <div class="info">
+        Сетка 5×18<br>
+        Поля: 5% от высоты экрана
+    </div>
+    
+    <div class="container">
+        <div class="grid" id="grid">
             <!-- Сетка создается с помощью JavaScript -->
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const grid = document.querySelector('.grid');
-            const gridContainer = document.querySelector('.grid-container');
+            const grid = document.getElementById('grid');
+            const container = document.querySelector('.container');
             
             // Создаем сетку 5x18
             for (let y = 0; y < 18; y++) {
@@ -87,27 +107,36 @@
                     cell.dataset.y = y;
                     grid.appendChild(cell);
                     
-                    // Добавляем координаты для первого ряда и первого столбца
+                    // Добавляем координаты для первого столбца (Y)
                     if (x === 0) {
                         const yCoord = document.createElement('div');
                         yCoord.className = 'coordinates y-coordinate';
-                        yCoord.style.top = `calc(${(y + 0.5) * (100/18)}% - 6px)`;
+                        yCoord.style.top = `calc(${(y + 0.5) * (100/18)}%)`;
                         yCoord.textContent = y + 1;
-                        gridContainer.appendChild(yCoord);
+                        container.appendChild(yCoord);
                     }
                 }
                 
-                // Добавляем координаты X для последнего ряда
+                // Добавляем координаты для последней строки (X)
                 if (y === 17) {
                     for (let x = 0; x < 5; x++) {
                         const xCoord = document.createElement('div');
                         xCoord.className = 'coordinates x-coordinate';
-                        xCoord.style.left = `calc(${(x + 0.5) * (100/5)}% - 6px)`;
+                        xCoord.style.left = `calc(${(x + 0.5) * (100/5)}%)`;
                         xCoord.textContent = x + 1;
-                        gridContainer.appendChild(xCoord);
+                        container.appendChild(xCoord);
                     }
                 }
             }
+            
+            // Добавляем обработчик клика для демонстрации
+            grid.addEventListener('click', function(e) {
+                if (e.target.classList.contains('grid-cell')) {
+                    const x = parseInt(e.target.dataset.x) + 1;
+                    const y = parseInt(e.target.dataset.y) + 1;
+                    alert(`Вы кликнули на ячейку: X=${x}, Y=${y}`);
+                }
+            });
         });
     </script>
 </body>
