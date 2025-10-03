@@ -230,6 +230,26 @@
                          //====_dil
 
      //================11
+
+// ==== Заполняем ячейки числами от 1 до 33 ====
+let currentNumber = 1;
+for (let row = 5; row <= 16; row++) {
+    for (let col = 1; col <= 3; col++) { // Только колонки 2,3,4 (индексы 1,2,3)
+        const cell = document.querySelector(`.grid-cell[data-x="${col}"][data-y="${row}"]`);
+        if (cell && currentNumber <= 33) {
+            // Определяем цвет числа
+            const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32];
+            if (redNumbers.includes(currentNumber)) {
+                cell.style.backgroundColor = '#aa0000'; // Красный
+            } else {
+                cell.style.backgroundColor = '#222222'; // Черный
+            }
+            cell.textContent = currentNumber;
+            currentNumber++;
+        }
+    }
+}
+            
             //================22
             
             // Создаем объединенный верхний прямоугольник
