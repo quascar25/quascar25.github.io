@@ -20,15 +20,30 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
             padding-top: 20px;
+            perspective: 1000px; /* Добавляем перспективу для body */
         }
         
         .container {
             width: 90vw;
-            height: calc(85.5vh - 19px); /* Уменьшено на 5% (95% от предыдущего) */
+            height: calc(85.5vh - 19px);
             max-width: calc((85.5vh - 19px) * 9 / 16);
             position: relative;
-            transform-origin: top center; /* Центр масштабирования - верхняя линия */
-            transform: scaleY(0.95); /* Сжатие по оси Y до 95% */
+            transform-origin: top center;
+            /* 3D-трансформация с перспективой */
+            transform: 
+                perspective(800px)
+                rotateX(8deg)
+                scaleY(0.95);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        /* Добавим эффект при наведении для демонстрации */
+        .container:hover {
+            transform: 
+                perspective(800px)
+                rotateX(12deg)
+                scaleY(0.95);
         }
         
         .grid {
@@ -38,6 +53,7 @@
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(18, 1fr);
             gap: 1px;
+            transform-style: preserve-3d;
         }
         
         .grid-cell {
@@ -48,9 +64,17 @@
             color: white;
             font-weight: bold;
             font-size: calc(1.2vw + 1.2vh);
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
         }
         
-        /* Объединенный верхний прямоугольник */
+        /* Эффект глубины для ячеек */
+        .grid-cell:hover {
+            transform: translateZ(10px);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Остальные стили остаются без изменений */
         .header-cell {
             grid-column: 1 / 6;
             grid-row: 1;
@@ -78,6 +102,12 @@
             align-items: center;
             position: relative;
             margin-right: 10px;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+        
+        .gramophone:hover {
+            transform: translateZ(5px) scale(1.1);
         }
         
         .gramophone-icon {
@@ -88,7 +118,6 @@
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/%3E%3C/svg%3E") no-repeat center;
         }
         
-        /* Область рулетки */
         .roulette-cell {
             grid-column: 1 / 6;
             grid-row: 2 / 5;
@@ -98,6 +127,7 @@
             align-items: center;
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
         
         .roulette-wheel {
@@ -107,6 +137,7 @@
             border-radius: 50%;
             position: relative;
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+            transform-style: preserve-3d;
         }
         
         .roulette-center {
@@ -130,27 +161,30 @@
             cursor: pointer;
             font-weight: bold;
             z-index: 3;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
         }
         
         .roulette-spin-btn:hover {
             background-color: white;
+            transform: translateZ(5px);
         }
         
-        /* Предпоследний ряд с числами */
         .number-cell {
             grid-row: 17;
             font-size: calc(1.5vw + 1.5vh);
         }
         
-        /* Нижний ряд с кнопками */
         .button-cell {
             grid-row: 18;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
         }
         
         .button-cell:hover {
             background-color: rgba(255, 255, 255, 0.3);
+            transform: translateZ(5px);
         }
         
         .clear-btn {
@@ -170,13 +204,12 @@
     </div>
 
     <script>
+        // JavaScript код остается без изменений
         document.addEventListener('DOMContentLoaded', function() {
             const grid = document.getElementById('grid');
             
-            // Создаем сетку 5x18
             for (let y = 0; y < 18; y++) {
                 for (let x = 0; x < 5; x++) {
-                    // Пропускаем ячейки, которые будут заменены специальными элементами
                     if (y === 0 || y === 1 || y === 2 || y === 3 || y === 16 || y === 17) continue;
                     
                     const cell = document.createElement('div');
@@ -187,7 +220,6 @@
                 }
             }
             
-            // Создаем объединенный верхний прямоугольник
             const headerCell = document.createElement('div');
             headerCell.className = 'header-cell';
             
@@ -207,7 +239,6 @@
             headerCell.appendChild(gramophone);
             grid.appendChild(headerCell);
             
-            // Создаем область рулетки
             const rouletteCell = document.createElement('div');
             rouletteCell.className = 'roulette-cell';
             
@@ -226,7 +257,6 @@
             rouletteCell.appendChild(spinButton);
             grid.appendChild(rouletteCell);
             
-            // Создаем предпоследний ряд с числами
             const numbers = ['1', '5', '10', '25', '100'];
             for (let x = 0; x < 5; x++) {
                 const numberCell = document.createElement('div');
@@ -237,7 +267,6 @@
                 grid.appendChild(numberCell);
             }
             
-            // Создаем нижний ряд с кнопками
             const clearBtn = document.createElement('div');
             clearBtn.className = 'grid-cell button-cell clear-btn';
             clearBtn.textContent = 'Очистить';
@@ -253,13 +282,11 @@
             grid.appendChild(clearBtn);
             grid.appendChild(repeatBtn);
             
-            // Обработчик для грамофончика
             let isPlaying = false;
             let audio = null;
             
             gramophone.addEventListener('click', function() {
                 if (!isPlaying) {
-                    // Начинаем воспроизведение
                     try {
                         audio = new Audio('audio/space-music.mp3');
                         audio.play().catch(e => {
@@ -273,7 +300,6 @@
                         alert('Не удалось воспроизвести аудиофайл');
                     }
                 } else {
-                    // Останавливаем воспроизведение
                     if (audio) {
                         audio.pause();
                         audio.currentTime = 0;
@@ -283,7 +309,6 @@
                 }
             });
             
-            // Обработчик для рулетки
             let isSpinning = false;
             
             spinButton.addEventListener('click', function() {
@@ -300,7 +325,6 @@
                 }
             });
             
-            // Обработчики для кнопок
             clearBtn.addEventListener('click', function() {
                 alert('Функция "Очистить" активирована');
             });
