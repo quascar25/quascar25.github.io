@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сетка 5x18</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: rgb(91, 107, 160);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            padding: 5%;
+        }
+        
+        .grid-container {
+            width: 100%;
+            height: calc(100vh - 10%);
+            max-height: calc(100vw * 16 / 9);
+            position: relative;
+            border: 3px solid white;
+        }
+        
+        .grid {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(18, 1fr);
+            gap: 3px;
+            padding: 3px;
+        }
+        
+        .grid-cell {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+        }
+        
+        .coordinates {
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            pointer-events: none;
+        }
+        
+        .x-coordinate {
+            bottom: -20px;
+        }
+        
+        .y-coordinate {
+            left: -25px;
+        }
+        
+        @media (max-width: 768px) {
+            .coordinates {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="grid">
+            <!-- Сетка создается с помощью JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const grid = document.querySelector('.grid');
+            const gridContainer = document.querySelector('.grid-container');
+            
+            // Создаем сетку 5x18
+            for (let y = 0; y < 18; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    grid.appendChild(cell);
+                    
+                    // Добавляем координаты для первого ряда и первого столбца
+                    if (x === 0) {
+                        const yCoord = document.createElement('div');
+                        yCoord.className = 'coordinates y-coordinate';
+                        yCoord.style.top = `calc(${(y + 0.5) * (100/18)}% - 6px)`;
+                        yCoord.textContent = y + 1;
+                        gridContainer.appendChild(yCoord);
+                    }
+                }
+                
+                // Добавляем координаты X для последнего ряда
+                if (y === 17) {
+                    for (let x = 0; x < 5; x++) {
+                        const xCoord = document.createElement('div');
+                        xCoord.className = 'coordinates x-coordinate';
+                        xCoord.style.left = `calc(${(x + 0.5) * (100/5)}% - 6px)`;
+                        xCoord.textContent = x + 1;
+                        gridContainer.appendChild(xCoord);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
