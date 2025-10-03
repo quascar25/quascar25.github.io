@@ -149,20 +149,6 @@
             z-index: 2;
         }
         
-        /* Ячейка для отображения результата */
-        .result-cell {
-            grid-column: 5; /* Правая ячейка */
-            grid-row: 3; /* Третий ряд сверху */
-            border: 1px solid white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            font-size: calc(1.2vw + 1.2vh);
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
         .number-cell {
             grid-row: 17;
             font-size: calc(1.5vw + 1.5vh);
@@ -197,6 +183,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const grid = document.getElementById('grid');
+            let resultCell = null;
             
             // Создаем сетку 5x18
             for (let y = 0; y < 18; y++) {
@@ -207,6 +194,13 @@
                     cell.className = 'grid-cell';
                     cell.dataset.x = x;
                     cell.dataset.y = y;
+                    
+                    // Сохраняем ссылку на ячейку в пятом ряду, правом столбце (x=4, y=4)
+                    if (y === 4 && x === 4) {
+                        resultCell = cell;
+                        cell.textContent = '-';
+                    }
+                    
                     grid.appendChild(cell);
                 }
             }
@@ -243,13 +237,6 @@
             
             const rouletteCenter = document.createElement('div');
             rouletteCenter.className = 'roulette-center';
-            
-            // Создаем ячейку для результата
-            const resultCell = document.createElement('div');
-            resultCell.className = 'result-cell';
-            resultCell.id = 'result-cell';
-            resultCell.textContent = '-';
-            grid.appendChild(resultCell);
             
             // Создаем сектора рулетки
             const rouletteNumbers = [
@@ -359,15 +346,16 @@
                         const winningIndex = rouletteNumbers.length - 1 - Math.floor((randomStopAngle / 360) * rouletteNumbers.length);
                         const winningNumber = rouletteNumbers[winningIndex % rouletteNumbers.length];
                         
-                        // Отображаем результат в ячейке
-                        const resultCell = document.getElementById('result-cell');
-                        resultCell.textContent = winningNumber;
-                        
-                        // Подсвечиваем ячейку с результатом
-                        resultCell.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                        setTimeout(() => {
-                            resultCell.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                        }, 2000);
+                        // Отображаем результат в существующей ячейке
+                        if (resultCell) {
+                            resultCell.textContent = winningNumber;
+                            
+                            // Подсвечиваем ячейку с результатом
+                            resultCell.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                            setTimeout(() => {
+                                resultCell.style.backgroundColor = '';
+                            }, 2000);
+                        }
                         
                     }, 4000);
                 }
@@ -376,8 +364,9 @@
             // Обработчики для кнопок
             clearBtn.addEventListener('click', function() {
                 // Очищаем результат
-                const resultCell = document.getElementById('result-cell');
-                resultCell.textContent = '-';
+                if (resultCell) {
+                    resultCell.textContent = '-';
+                }
                 alert('Функция "Очистить" активирована');
             });
             
