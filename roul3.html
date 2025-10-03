@@ -164,6 +164,9 @@
             [12, 13, 11], [11, 10, 12], [9, 4, 7], [8, 5, 6]
         ];
 
+        // Числа рулетки в стандартном порядке
+        const rouletteNumbers = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+
         document.addEventListener('DOMContentLoaded', function() {
             const grid = document.getElementById('grid');
             
@@ -293,7 +296,6 @@
             scene.background = new THREE.Color(0x5b6ba0);
             
             // Камера - настраиваем под размер контейнера
-           // camera = new THREE.PerspectiveCamera(45, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
             camera = new THREE.PerspectiveCamera(45, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
             camera.position.set(0, 40, 80);
             camera.lookAt(0, 0, 0);
@@ -330,11 +332,13 @@
                 const angle = (i / 37) * Math.PI * 2;
                 sector.rotation.y = angle;
                 rouletteWheel.add(sector);
+                
+                // Добавляем число на сектор
+                addNumberToSector(i, angle);
             }
             
             // Масштабируем рулетку чтобы вписать в контейнер
-            // rouletteWheel.scale.set(0.2, 0.2, 0.2);
-            rouletteWheel.scale.set(1.5, 1.5, 1.5);
+            rouletteWheel.scale.set(0.25, 0.25, 0.25);
             rouletteWheel.rotation.x = Math.PI / 6;
             
             scene.add(rouletteWheel);
@@ -371,6 +375,52 @@
             const mesh = new THREE.Mesh(geometry, material);
             
             return mesh;
+        }
+        
+        function addNumberToSector(sectorIndex, angle) {
+            // Создаем canvas для текста
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            // Очищаем canvas
+            context.fillStyle = 'rgba(0,0,0,0)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем текст
+            context.font = 'bold 48px Arial';
+            context.fillStyle = 'white';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(rouletteNumbers[sectorIndex], canvas.width / 2, canvas.height / 2);
+            
+            // Создаем текстуру из canvas
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ 
+                map: texture,
+                transparent: true
+            });
+            
+            const sprite = new THREE.Sprite(material);
+            
+            // Позиционируем число на секторе
+            const radius = 35; // Радиус от центра
+            const numberAngle = angle + (Math.PI / 37); // Смещаем к центру сектора
+            
+            sprite.position.set(
+                Math.sin(numberAngle) * radius,
+                1, // Немного выше поверхности
+                Math.cos(numberAngle) * radius
+            );
+            
+            // Масштабируем до размера ~5 пикселей
+            sprite.scale.set(8, 8, 1);
+            
+            // Поворачиваем число к камере
+            sprite.rotation.y = -numberAngle;
+            
+            rouletteWheel.add(sprite);
         }
         
         function spinRoulette() {
@@ -415,9 +465,8 @@
         }
         
         function calculateWinningNumber(stopAngle) {
-            const numbers = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
             const index = Math.floor((1 - (stopAngle / (Math.PI * 2))) * 37) % 37;
-            return numbers[index];
+            return rouletteNumbers[index];
         }
         
         function animate() {
