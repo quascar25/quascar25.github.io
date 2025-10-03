@@ -35,7 +35,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(18, 1fr);
-            gap: 3px;
+            gap: 1px;
         }
         
         .grid-cell {
@@ -63,6 +63,7 @@
             font-size: calc(1.2vw + 1.2vh);
             display: flex;
             align-items: center;
+            color: white;
         }
         
         .gramophone {
@@ -190,10 +191,10 @@
                 if (!isPlaying) {
                     // Начинаем воспроизведение
                     try {
-                        audio = new Audio('Audi/space-music.mp3');
+                        audio = new Audio('Audio/space-music.mp3');
                         audio.play().catch(e => {
                             console.log('Ошибка воспроизведения:', e);
-                            alert('Файл Audi/space-music.mp3 не найден или не может быть воспроизведен');
+                            alert('Файл Audio/space-music.mp3 не найден или не может быть воспроизведен');
                         });
                         isPlaying = true;
                         gramophone.style.backgroundColor = '#4CAF50';
