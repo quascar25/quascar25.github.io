@@ -293,7 +293,8 @@
             scene.background = new THREE.Color(0x5b6ba0);
             
             // Камера - настраиваем под размер контейнера
-            camera = new THREE.PerspectiveCamera(45, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
+           // camera = new THREE.PerspectiveCamera(45, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(65, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
             camera.position.set(0, 40, 80);
             camera.lookAt(0, 0, 0);
             
