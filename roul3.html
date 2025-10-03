@@ -174,7 +174,8 @@
             for (let y = 0; y < 18; y++) {
                 for (let x = 0; x < 5; x++) {
                     if (y === 0 || y === 1 || y === 2 || y === 3 || y === 16 || y === 17) continue;
-                    
+
+                   
                     const cell = document.createElement('div');
                     cell.className = 'grid-cell';
                     cell.dataset.x = x;
@@ -189,6 +190,40 @@
                     grid.appendChild(cell);
                 }
             }
+
+                        //====dil__
+                        
+                                            // Удаляем ячейки 2, 3 и 4 в пятом ряду
+                        const cellsToRemove = [];
+                        for (let x = 0; x < 5; x++) {
+                            if (x === 1 || x === 2 || x === 3) { // Вторая, третья и четвертая ячейки (индексы 1,2,3)
+                                const cell = document.querySelector(`.grid-cell[data-x="${x}"][data-y="4"]`);
+                                if (cell) {
+                                    cellsToRemove.push(cell);
+                                }
+                            }
+                        }
+                        
+                        cellsToRemove.forEach(cell => cell.remove());
+                        
+                        // Создаем объединенную ячейку
+                        const mergedCell = document.createElement('div');
+                        mergedCell.className = 'grid-cell';
+                        mergedCell.style.gridColumn = '2 / 5'; // Занимает колонки 2,3,4
+                        mergedCell.style.gridRow = '5';
+                        mergedCell.style.display = 'flex';
+                        mergedCell.style.justifyContent = 'center';
+                        mergedCell.style.alignItems = 'center';
+                        mergedCell.style.color = 'rgb(49, 106, 69)';
+                        mergedCell.style.fontSize = 'calc(1.5vw + 1.5vh)';
+                        mergedCell.style.fontWeight = 'bold';
+                        mergedCell.textContent = '0';
+                        
+                        // Добавляем объединенную ячейку в сетку
+                        grid.appendChild(mergedCell);
+                                            
+                         //====_dil
+            
             
             // Создаем объединенный верхний прямоугольник
             const headerCell = document.createElement('div');
