@@ -219,10 +219,14 @@
                         mergedCell.style.display = 'flex';
                         mergedCell.style.justifyContent = 'center';
                         mergedCell.style.alignItems = 'center';
-                        mergedCell.style.color = 'rgb(49, 106, 69)';
+                       // mergedCell.style.color = 'rgb(49, 106, 69)';
+                        mergedCell.style.backgroundColor = '#228822'; // Зеленый фон
+                        mergedCell.style.color = 'white'; // Белый текст         
+            
                         mergedCell.style.fontSize = 'calc(1.5vw + 1.5vh)';
                         mergedCell.style.fontWeight = 'bold';
                         mergedCell.textContent = '0';
+
                         
                         // Добавляем объединенную ячейку в сетку
                         grid.appendChild(mergedCell);
@@ -240,7 +244,7 @@ for (let row = 5; row <= 16; row++) {
             // Определяем цвет числа
             const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32];
             if (redNumbers.includes(currentNumber)) {
-                cell.style.backgroundColor = '#aa0000'; // Красный
+                cell.style.backgroundColor = '#882222'; // Красный
             } else {
                 cell.style.backgroundColor = '#222222'; // Черный
             }
