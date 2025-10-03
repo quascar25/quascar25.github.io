@@ -365,10 +365,17 @@
             
             // Цвета секторов (европейская рулетка)
             let color;
+            // if (sectorIndex === 0) {
+            //     color = 0x00ff00; // Зеленый для 0
+            // } else {
+            //     color = (sectorIndex % 2 === 1) ? 0xff0000 : 0x000000; // Чередование красный/черный
+            // }
+
+                        // Альтернативные цвета:
             if (sectorIndex === 0) {
-                color = 0x00ff00; // Зеленый для 0
+                color = 0x00aa00; // Темно-зеленый
             } else {
-                color = (sectorIndex % 2 === 1) ? 0xff0000 : 0x000000; // Чередование красный/черный
+                color = (sectorIndex % 2 === 1) ? 0xaa0000 : 0x222222; // Темно-красный / Темно-серый
             }
             
             const material = new THREE.MeshLambertMaterial({ color: color });
