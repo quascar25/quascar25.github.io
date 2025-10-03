@@ -24,9 +24,11 @@
         
         .container {
             width: 90vw;
-            height: calc(90vh - 20px);
-            max-width: calc((90vh - 20px) * 9 / 16);
+            height: calc(85.5vh - 19px); /* Уменьшено на 5% (95% от предыдущего) */
+            max-width: calc((85.5vh - 19px) * 9 / 16);
             position: relative;
+            transform-origin: top center; /* Центр масштабирования - верхняя линия */
+            transform: scaleY(0.95); /* Сжатие по оси Y до 95% */
         }
         
         .grid {
@@ -89,7 +91,7 @@
         /* Область рулетки */
         .roulette-cell {
             grid-column: 1 / 6;
-            grid-row: 2 / 5; /* Занимает 3 строки (в 3 раза больше высоты) */
+            grid-row: 2 / 5;
             border: 1px solid white;
             display: flex;
             justify-content: center;
@@ -287,7 +289,7 @@
             spinButton.addEventListener('click', function() {
                 if (!isSpinning) {
                     isSpinning = true;
-                    const randomRotations = 5 + Math.random() * 5; // 5-10 полных оборотов
+                    const randomRotations = 5 + Math.random() * 5;
                     const randomAngle = 360 * randomRotations;
                     
                     rouletteWheel.style.transform = `rotate(${randomAngle}deg)`;
