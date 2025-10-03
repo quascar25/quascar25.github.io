@@ -15,20 +15,18 @@
             background-color: rgb(91, 107, 160);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            padding-top: 20px;
         }
         
         .container {
             width: 90vw;
-            height: calc(100vh - 10vh); /* Высота экрана минус 5% сверху и 5% снизу */
-            max-width: calc((100vh - 10vh) * 9 / 16); /* Соотношение 9:16 */
+            height: calc(90vh - 20px); /* Ужатие по высоте на 10% */
+            max-width: calc((90vh - 20px) * 9 / 16);
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         
         .grid {
@@ -38,55 +36,81 @@
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(18, 1fr);
             gap: 3px;
-            border: 3px solid white;
-            padding: 3px;
         }
         
         .grid-cell {
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid white;
-        }
-        
-        .coordinates {
-            position: absolute;
+            border: 3px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             color: white;
-            font-size: 14px;
             font-weight: bold;
-            pointer-events: none;
         }
         
-        .x-coordinate {
-            bottom: -25px;
-            text-align: center;
-            width: 20px;
-            margin-left: -10px;
+        /* Объединенный верхний прямоугольник */
+        .header-cell {
+            grid-column: 1 / 6;
+            grid-row: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border: 3px solid white;
         }
         
-        .y-coordinate {
-            left: -30px;
-            text-align: center;
-            height: 20px;
-            margin-top: -10px;
+        .balance-text {
+            font-size: calc(1.5vw + 1.5vh);
+            height: 33.33%;
+            display: flex;
+            align-items: center;
         }
         
-        .info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
+        .gramophone {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .gramophone::before {
+            content: "♫";
+            font-size: 24px;
+            color: rgb(91, 107, 160);
+        }
+        
+        /* Предпоследний ряд с числами */
+        .number-cell {
+            grid-row: 17;
+            font-size: calc(1.5vw + 1.5vh);
+        }
+        
+        /* Нижний ряд с кнопками */
+        .button-cell {
+            grid-row: 18;
+            font-size: calc(1.2vw + 1.2vh);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .button-cell:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .clear-btn {
+            grid-column: 1 / 3;
+        }
+        
+        .repeat-btn {
+            grid-column: 4 / 6;
         }
     </style>
 </head>
 <body>
-    <div class="info">
-        Сетка 5×18<br>
-        Поля: 5% от высоты экрана
-    </div>
-    
     <div class="container">
         <div class="grid" id="grid">
             <!-- Сетка создается с помощью JavaScript -->
@@ -96,46 +120,101 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const grid = document.getElementById('grid');
-            const container = document.querySelector('.container');
             
             // Создаем сетку 5x18
             for (let y = 0; y < 18; y++) {
                 for (let x = 0; x < 5; x++) {
+                    // Пропускаем ячейки, которые будут заменены специальными элементами
+                    if (y === 0 || y === 16 || y === 17) continue;
+                    
                     const cell = document.createElement('div');
                     cell.className = 'grid-cell';
                     cell.dataset.x = x;
                     cell.dataset.y = y;
                     grid.appendChild(cell);
-                    
-                    // Добавляем координаты для первого столбца (Y)
-                    if (x === 0) {
-                        const yCoord = document.createElement('div');
-                        yCoord.className = 'coordinates y-coordinate';
-                        yCoord.style.top = `calc(${(y + 0.5) * (100/18)}%)`;
-                        yCoord.textContent = y + 1;
-                        container.appendChild(yCoord);
-                    }
-                }
-                
-                // Добавляем координаты для последней строки (X)
-                if (y === 17) {
-                    for (let x = 0; x < 5; x++) {
-                        const xCoord = document.createElement('div');
-                        xCoord.className = 'coordinates x-coordinate';
-                        xCoord.style.left = `calc(${(x + 0.5) * (100/5)}%)`;
-                        xCoord.textContent = x + 1;
-                        container.appendChild(xCoord);
-                    }
                 }
             }
             
-            // Добавляем обработчик клика для демонстрации
-            grid.addEventListener('click', function(e) {
-                if (e.target.classList.contains('grid-cell')) {
-                    const x = parseInt(e.target.dataset.x) + 1;
-                    const y = parseInt(e.target.dataset.y) + 1;
-                    alert(`Вы кликнули на ячейку: X=${x}, Y=${y}`);
+            // Создаем объединенный верхний прямоугольник
+            const headerCell = document.createElement('div');
+            headerCell.className = 'header-cell';
+            
+            const balanceText = document.createElement('div');
+            balanceText.className = 'balance-text';
+            balanceText.textContent = 'Баланс: 100';
+            
+            const gramophone = document.createElement('div');
+            gramophone.className = 'gramophone';
+            gramophone.id = 'gramophone';
+            
+            headerCell.appendChild(balanceText);
+            headerCell.appendChild(gramophone);
+            grid.appendChild(headerCell);
+            
+            // Создаем предпоследний ряд с числами
+            const numbers = ['1', '5', '10', '25', '100'];
+            for (let x = 0; x < 5; x++) {
+                const numberCell = document.createElement('div');
+                numberCell.className = 'grid-cell number-cell';
+                numberCell.textContent = numbers[x];
+                numberCell.dataset.x = x;
+                numberCell.dataset.y = 16;
+                grid.appendChild(numberCell);
+            }
+            
+            // Создаем нижний ряд с кнопками
+            const clearBtn = document.createElement('div');
+            clearBtn.className = 'grid-cell button-cell clear-btn';
+            clearBtn.textContent = 'Очистить';
+            clearBtn.dataset.x = 0;
+            clearBtn.dataset.y = 17;
+            
+            const repeatBtn = document.createElement('div');
+            repeatBtn.className = 'grid-cell button-cell repeat-btn';
+            repeatBtn.textContent = 'Повторить';
+            repeatBtn.dataset.x = 3;
+            repeatBtn.dataset.y = 17;
+            
+            grid.appendChild(clearBtn);
+            grid.appendChild(repeatBtn);
+            
+            // Обработчик для грамофончика
+            let isPlaying = false;
+            let audio = null;
+            
+            gramophone.addEventListener('click', function() {
+                if (!isPlaying) {
+                    // Начинаем воспроизведение
+                    try {
+                        audio = new Audio('Audi/space-music.mp3');
+                        audio.play().catch(e => {
+                            console.log('Ошибка воспроизведения:', e);
+                            alert('Файл Audi/space-music.mp3 не найден или не может быть воспроизведен');
+                        });
+                        isPlaying = true;
+                        gramophone.style.backgroundColor = '#4CAF50'; // Зеленый при воспроизведении
+                    } catch (error) {
+                        console.log('Ошибка:', error);
+                        alert('Не удалось воспроизвести аудиофайл');
+                    }
+                } else {
+                    // Останавливаем воспроизведение
+                    if (audio) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                    isPlaying = false;
+                    gramophone.style.backgroundColor = 'white'; // Возвращаем исходный цвет
                 }
+            });
+            
+            // Обработчики для кнопок
+            clearBtn.addEventListener('click', function() {
+                alert('Функция "Очистить" активирована');
+            });
+            
+            repeatBtn.addEventListener('click', function() {
+                alert('Функция "Повторить" активирована');
             });
         });
     </script>
