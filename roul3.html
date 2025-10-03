@@ -186,10 +186,10 @@
                 if (!isPlaying) {
                     // Начинаем воспроизведение
                     try {
-                        audio = new Audio('Audi/space-music.mp3');
+                        audio = new Audio('audio/space-music.mp3');
                         audio.play().catch(e => {
                             console.log('Ошибка воспроизведения:', e);
-                            alert('Файл Audi/space-music.mp3 не найден или не может быть воспроизведен');
+                            alert('Файл audio/space-music.mp3 не найден или не может быть воспроизведен');
                         });
                         isPlaying = true;
                         gramophone.style.backgroundColor = '#4CAF50'; // Зеленый при воспроизведении
