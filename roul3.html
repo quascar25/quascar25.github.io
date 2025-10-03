@@ -67,8 +67,8 @@
         }
         
         .gramophone {
-            width: 20px; /* Уменьшено на 50% (было 40px) */
-            height: 20px; /* Уменьшено на 50% (было 40px) */
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             background-color: rgb(91, 107, 160);
             display: flex;
@@ -84,6 +84,54 @@
             background-color: white;
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/%3E%3C/svg%3E") no-repeat center;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/%3E%3C/svg%3E") no-repeat center;
+        }
+        
+        /* Область рулетки */
+        .roulette-cell {
+            grid-column: 1 / 6;
+            grid-row: 2 / 5; /* Занимает 3 строки (в 3 раза больше высоты) */
+            border: 1px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .roulette-wheel {
+            width: 80%;
+            height: 80%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            border-radius: 50%;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+        
+        .roulette-center {
+            position: absolute;
+            width: 20%;
+            height: 20%;
+            background-color: white;
+            border-radius: 50%;
+            top: 40%;
+            left: 40%;
+            z-index: 2;
+        }
+        
+        .roulette-spin-btn {
+            position: absolute;
+            bottom: 10px;
+            padding: 5px 15px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 3;
+        }
+        
+        .roulette-spin-btn:hover {
+            background-color: white;
         }
         
         /* Предпоследний ряд с числами */
@@ -127,7 +175,7 @@
             for (let y = 0; y < 18; y++) {
                 for (let x = 0; x < 5; x++) {
                     // Пропускаем ячейки, которые будут заменены специальными элементами
-                    if (y === 0 || y === 16 || y === 17) continue;
+                    if (y === 0 || y === 1 || y === 2 || y === 3 || y === 16 || y === 17) continue;
                     
                     const cell = document.createElement('div');
                     cell.className = 'grid-cell';
@@ -156,6 +204,25 @@
             headerCell.appendChild(balanceText);
             headerCell.appendChild(gramophone);
             grid.appendChild(headerCell);
+            
+            // Создаем область рулетки
+            const rouletteCell = document.createElement('div');
+            rouletteCell.className = 'roulette-cell';
+            
+            const rouletteWheel = document.createElement('div');
+            rouletteWheel.className = 'roulette-wheel';
+            
+            const rouletteCenter = document.createElement('div');
+            rouletteCenter.className = 'roulette-center';
+            
+            const spinButton = document.createElement('button');
+            spinButton.className = 'roulette-spin-btn';
+            spinButton.textContent = 'Крутить';
+            
+            rouletteWheel.appendChild(rouletteCenter);
+            rouletteCell.appendChild(rouletteWheel);
+            rouletteCell.appendChild(spinButton);
+            grid.appendChild(rouletteCell);
             
             // Создаем предпоследний ряд с числами
             const numbers = ['1', '5', '10', '25', '100'];
@@ -198,7 +265,6 @@
                             alert('Файл audio/space-music.mp3 не найден или не может быть воспроизведен');
                         });
                         isPlaying = true;
-                        //gramophone.style.backgroundColor = '#4CAF50';
                         gramophone.style.backgroundColor = 'rgb(91, 107, 160)';
                     } catch (error) {
                         console.log('Ошибка:', error);
@@ -212,6 +278,23 @@
                     }
                     isPlaying = false;
                     gramophone.style.backgroundColor = 'rgb(91, 107, 160)';
+                }
+            });
+            
+            // Обработчик для рулетки
+            let isSpinning = false;
+            
+            spinButton.addEventListener('click', function() {
+                if (!isSpinning) {
+                    isSpinning = true;
+                    const randomRotations = 5 + Math.random() * 5; // 5-10 полных оборотов
+                    const randomAngle = 360 * randomRotations;
+                    
+                    rouletteWheel.style.transform = `rotate(${randomAngle}deg)`;
+                    
+                    setTimeout(() => {
+                        isSpinning = false;
+                    }, 3000);
                 }
             });
             
