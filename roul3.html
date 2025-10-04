@@ -300,6 +300,28 @@ for (let row = 5; row <= 16; row++) {
                 numberCell.dataset.y = 16;
                 grid.appendChild(numberCell);
             }
+
+            //================34
+
+            // ==== Меняем ячейки в 17-ом ряду ====
+const row17Cells = document.querySelectorAll('.grid-cell[data-y="16"]'); // 17 ряд (индекс 16)
+
+// Меняем ячейки согласно требованиям
+if (row17Cells.length >= 5) {
+    // Ячейка с "5" (индекс 1) меняем на "34" красный
+    row17Cells[1].textContent = '34';
+    row17Cells[1].style.backgroundColor = '#aa0000'; // Красный как у 32
+    
+    // Ячейка с "10" (индекс 2) меняем на "35" черный  
+    row17Cells[2].textContent = '35';
+    row17Cells[2].style.backgroundColor = '#222222'; // Черный как у 33
+    
+    // Ячейка с "25" (индекс 3) меняем на "36" красный
+    row17Cells[3].textContent = '36';
+    row17Cells[3].style.backgroundColor = '#aa0000'; // Красный как у 32
+}
+            
+            //================35
             
             // Создаем нижний ряд с кнопками
             const clearBtn = document.createElement('div');
