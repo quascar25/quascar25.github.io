@@ -51,16 +51,6 @@
             font-size: calc(1.2vw + 1.2vh);
         }
         
-        .chip {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: yellow;
-            border-radius: 50%;
-            z-index: 10;
-            transition: all 0.5s ease;
-        }
-        
         .header-cell {
             grid-column: 1 / 6;
             grid-row: 1;
@@ -142,7 +132,6 @@
         <div class="grid" id="grid">
             <!-- Сетка создается с помощью JavaScript -->
         </div>
-        <div id="chip" class="chip"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -246,23 +235,23 @@
                 }
             }
 
-            // Добавляем числа в правые ячейки
+            // Добавляем числа в правые ячейки (общий фон)
             const cell14 = document.querySelector('.grid-cell[data-x="4"][data-y="13"]');
             if (cell14) {
                 cell14.textContent = '1';
-                cell14.style.backgroundColor = '#aa0000';
+                cell14.style.backgroundColor = 'rgb(91, 107, 160)'; // Общий фон
             }
 
             const cell15 = document.querySelector('.grid-cell[data-x="4"][data-y="14"]');
             if (cell15) {
                 cell15.textContent = '5';
-                cell15.style.backgroundColor = '#aa0000';
+                cell15.style.backgroundColor = 'rgb(91, 107, 160)'; // Общий фон
             }
 
             const cell16 = document.querySelector('.grid-cell[data-x="4"][data-y="15"]');
             if (cell16) {
                 cell16.textContent = '25';
-                cell16.style.backgroundColor = '#aa0000';
+                cell16.style.backgroundColor = 'rgb(91, 107, 160)'; // Общий фон
             }
 
             // Убираем "1" из левой ячейки 17 ряда
@@ -272,7 +261,7 @@
                 cell17.style.backgroundColor = '';
             }
 
-            // Создаем фишку
+            // Создаем фишку в левой ячейке 5 ряда
             const chipCell = document.querySelector('.grid-cell[data-x="0"][data-y="4"]');
             if (chipCell) {
                 chipCell.innerHTML = '';
@@ -370,13 +359,16 @@
                     cell.textContent = 'Чист';
                     cell.addEventListener('click', function() {
                         if (resultCell) resultCell.textContent = '-';
+                        resetChipPosition();
                     });
                 } else if (x >= 1 && x <= 3) {
                     cell.textContent = '1to2';
+                    cell.addEventListener('click', resetChipPosition);
                 } else if (x === 4) {
                     cell.textContent = 'Дубл';
                     cell.addEventListener('click', function() {
                         alert('Функция "Повторить" активирована');
+                        resetChipPosition();
                     });
                 }
                 
@@ -422,13 +414,22 @@
             const chipCell = document.getElementById('chip-origin');
             if (!chipCell) return;
             
-            const targetCell = Array.from(document.querySelectorAll('.grid-cell'))
-                .find(cell => cell.textContent === number.toString() && cell.id !== 'chip-origin');
+            // Ищем ячейку с нужным числом только в диапазоне рядов 5-17
+            let targetCell = null;
+            for (let row = 5; row <= 17; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.querySelector(`.grid-cell[data-x="${col}"][data-y="${row}"]`);
+                    if (cell && cell.textContent === number.toString() && cell.id !== 'chip-origin') {
+                        targetCell = cell;
+                        break;
+                    }
+                }
+                if (targetCell) break;
+            }
             
             if (targetCell) {
                 const chipRect = chipCell.getBoundingClientRect();
                 const targetRect = targetCell.getBoundingClientRect();
-                const containerRect = document.querySelector('.container').getBoundingClientRect();
                 
                 chipCell.style.transition = 'all 0.5s ease';
                 chipCell.style.transform = `translate(${targetRect.left - chipRect.left}px, ${targetRect.top - chipRect.top}px)`;
