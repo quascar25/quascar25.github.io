@@ -103,32 +103,22 @@
             display: block;
         }
         
+        /* Убираем увеличенный шрифт для 16-го ряда */
         .number-cell {
             grid-row: 17;
-            font-size: calc(1.5vw + 1.5vh);
+            /* font-size: calc(1.5vw + 1.5vh); УДАЛЕНО */
         }
         
+        /* Убираем увеличенный шрифт для кнопок */
         .button-cell {
             grid-row: 18;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-size: calc(1.5vw + 1.5vh);
+            /* font-size: calc(1.5vw + 1.5vh); УДАЛЕНО */
         }
         
         .button-cell:hover {
             background-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .clear-btn {
-            grid-column: 1;
-        }
-        
-        .repeat-btn {
-            grid-column: 5;
-        }
-        
-        .bet-btn {
-            grid-column: span 1;
         }
         
         .red-cell {
@@ -152,9 +142,10 @@
             transform: scale(0.7);
         }
         
-        .row-17-cell {
-            font-size: calc(1.5vw + 1.5vh);
-        }
+        /* Убираем специальный класс для 17-го ряда */
+        /* .row-17-cell {
+            font-size: calc(1.5vw + 1.5vh); УДАЛЕНО
+        } */
     </style>
 </head>
 <body>
@@ -378,14 +369,12 @@
             const row17Cells = document.querySelectorAll('.grid-cell[data-y="16"]');
             if (row17Cells.length >= 5) {
                 row17Cells[0].textContent = '';
-                row17Cells[0].className += ' row-17-cell';
                 row17Cells[1].textContent = '34';
-                row17Cells[1].className += ' red-cell row-17-cell';
+                row17Cells[1].className += ' red-cell';
                 row17Cells[2].textContent = '35';
-                row17Cells[2].className += ' black-cell row-17-cell';
+                row17Cells[2].className += ' black-cell';
                 row17Cells[3].textContent = '36';
-                row17Cells[3].className += ' red-cell row-17-cell';
-                row17Cells[4].className += ' row-17-cell';
+                row17Cells[3].className += ' red-cell';
             }
         }
 
