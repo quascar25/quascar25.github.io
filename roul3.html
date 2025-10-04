@@ -255,6 +255,33 @@ for (let row = 5; row <= 16; row++) {
 }
             
             //================22
+                // ==== Добавляем пустой ряд между 16 и 17 ====
+                for (let x = 0; x < 5; x++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'grid-cell';
+                    emptyCell.style.gridColumn = (x + 1).toString();
+                    emptyCell.style.gridRow = '17'; // Новый ряд становится 17-м
+                    grid.appendChild(emptyCell);
+                }
+                
+                // ==== Обновляем номера рядов ниже ====
+                // Сдвигаем предпоследний ряд с числами (был 17, теперь 18)
+                const numberCells = document.querySelectorAll('.number-cell');
+                numberCells.forEach(cell => {
+                    cell.style.gridRow = '18';
+                });
+                
+                // Сдвигаем нижний ряд с кнопками (был 18, теперь 19)
+                const buttonCells = document.querySelectorAll('.button-cell');
+                buttonCells.forEach(cell => {
+                    cell.style.gridRow = '19';
+                });
+                
+                // Обновляем grid-template-rows
+                grid.style.gridTemplateRows = 'repeat(19, 1fr)';
+
+          //=====================33
+
             
             // Создаем объединенный верхний прямоугольник
             const headerCell = document.createElement('div');
