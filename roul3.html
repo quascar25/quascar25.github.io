@@ -331,6 +331,7 @@
             // Меняем ячейки в 17-ом ряду
             const row17Cells = document.querySelectorAll('.grid-cell[data-y="16"]');
             if (row17Cells.length >= 5) {
+                row17Cells[0].textContent = '';  // Очищаем левую ячейку
                 row17Cells[1].textContent = '34';
                 row17Cells[1].style.backgroundColor = '#aa0000';
                 row17Cells[2].textContent = '35';
