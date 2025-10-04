@@ -323,21 +323,56 @@ if (row17Cells.length >= 5) {
             
             //================35
             
-            // Создаем нижний ряд с кнопками
-            const clearBtn = document.createElement('div');
-            clearBtn.className = 'grid-cell button-cell clear-btn';
-            clearBtn.textContent = 'Очистить';
-            clearBtn.dataset.x = 0;
-            clearBtn.dataset.y = 17;
+          //  // Создаем нижний ряд с кнопками
+          //  const clearBtn = document.createElement('div');
+          //  clearBtn.className = 'grid-cell button-cell clear-btn';
+          //  clearBtn.textContent = 'Очистить';
+          //  clearBtn.dataset.x = 0;
+          //  clearBtn.dataset.y = 17;
+          //  
+          //  const repeatBtn = document.createElement('div');
+          //  repeatBtn.className = 'grid-cell button-cell repeat-btn';
+          //  repeatBtn.textContent = 'Повторить';
+          //  repeatBtn.dataset.x = 3;
+          //  repeatBtn.dataset.y = 17;
+
+            ////===============
+// ==== Восстанавливаем 18-й ряд в исходное состояние ====
+// Удаляем существующие кнопки
+const existingButtons = document.querySelectorAll('.button-cell');
+existingButtons.forEach(button => button.remove());
+
+// Создаем 5 ячеек в 18-м ряду
+for (let x = 0; x < 5; x++) {
+    const cell = document.createElement('div');
+    cell.className = 'grid-cell';
+    cell.style.gridColumn = (x + 1).toString();
+    cell.style.gridRow = '18';
+    cell.style.display = 'flex';
+    cell.style.justifyContent = 'center';
+    cell.style.alignItems = 'center';
+    cell.style.color = 'white';
+    cell.style.fontSize = 'calc(1.2vw + 1.2vh)';
+    cell.style.fontWeight = 'bold';
+    cell.style.backgroundColor = 'rgb(91, 107, 160)'; // Цвет как у общего фона
+    cell.style.border = '1px solid white';
+    cell.style.cursor = 'pointer';
+    
+    // Заполняем содержимое
+    if (x === 0) {
+        cell.textContent = 'Очистить';
+    } else if (x >= 1 && x <= 3) {
+        cell.textContent = '1to2';
+    } else if (x === 4) {
+        cell.textContent = 'Повторить';
+    }
+    
+    grid.appendChild(cell);
+}
+            //================
             
-            const repeatBtn = document.createElement('div');
-            repeatBtn.className = 'grid-cell button-cell repeat-btn';
-            repeatBtn.textContent = 'Повторить';
-            repeatBtn.dataset.x = 3;
-            repeatBtn.dataset.y = 17;
-            
-            grid.appendChild(clearBtn);
-            grid.appendChild(repeatBtn);
+          //  grid.appendChild(clearBtn);
+          //  grid.appendChild(repeatBtn);
             
             // Обработчик для грамофончика
             let isPlaying = false;
