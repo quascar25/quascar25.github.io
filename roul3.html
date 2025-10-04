@@ -39,7 +39,6 @@
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(18, 1fr);
             gap: 0px;
-            //background-color: white;
         }
         
         .grid-cell {
@@ -126,54 +125,112 @@
         .repeat-btn {
             grid-column: 4 / 6;
         }
+        
+        .red-cell {
+            background-color: #882222;
+        }
+        
+        .black-cell {
+            background-color: #222222;
+        }
+        
+        .green-cell {
+            background-color: #228822;
+        }
+        
+        .chip-svg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: scale(0.7);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="grid" id="grid">
-            <!-- Сетка создается с помощью JavaScript -->
-        </div>
+        <div class="grid" id="grid"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, rouletteWheel;
-        let isSpinning = false;
-        let resultCell = null;
-        
-        // Данные сектора из OBJ файла
-        const sectorVertices = [
-            [0.871418, 0.000000, -0.148808],
-            [0.000077, 0.000000, -0.000028],
-            [0.001686, 0.000000, 0.000015],
-            [0.884061, 0.000000, 0.000617],
-            [80.002892, -2.203763, 0.075245],
-            [78.861351, -2.203763, -13.447731],
-            [68.994087, -5.824495, -11.810030],
-            [69.995773, -5.824494, 0.021153],
-            [49.301624, -4.511277, -8.434131],
-            [50.020695, -4.511277, 0.021154],
-            [39.448170, -2.203763, -6.744274],
-            [40.014412, -2.203763, 0.021154],
-            [19.723009, 0.000000, -3.360104],
-            [20.008930, 0.000000, 0.021154]
-        ];
-        
-        const sectorFaces = [
-            [2, 3, 0], [1, 2, 0], [7, 4, 5], [6, 7, 5],
-            [8, 9, 7], [7, 6, 8], [10, 11, 9], [9, 8, 10],
-            [12, 13, 11], [11, 10, 12], [9, 4, 7], [8, 5, 6]
-        ];
+        // Конфигурация приложения
+        const CONFIG = {
+            RED_NUMBERS: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],
+            ROULETTE_NUMBERS: [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26],
+            SECTOR_VERTICES: [
+                [0.871418, 0.000000, -0.148808],
+                [0.000077, 0.000000, -0.000028],
+                [0.001686, 0.000000, 0.000015],
+                [0.884061, 0.000000, 0.000617],
+                [80.002892, -2.203763, 0.075245],
+                [78.861351, -2.203763, -13.447731],
+                [68.994087, -5.824495, -11.810030],
+                [69.995773, -5.824494, 0.021153],
+                [49.301624, -4.511277, -8.434131],
+                [50.020695, -4.511277, 0.021154],
+                [39.448170, -2.203763, -6.744274],
+                [40.014412, -2.203763, 0.021154],
+                [19.723009, 0.000000, -3.360104],
+                [20.008930, 0.000000, 0.021154]
+            ],
+            SECTOR_FACES: [
+                [2, 3, 0], [1, 2, 0], [7, 4, 5], [6, 7, 5],
+                [8, 9, 7], [7, 6, 8], [10, 11, 9], [9, 8, 10],
+                [12, 13, 11], [11, 10, 12], [9, 4, 7], [8, 5, 6]
+            ]
+        };
 
-        // Числа рулетки в стандартном порядке
-        const rouletteNumbers = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+        // Состояние приложения
+        const AppState = {
+            isSpinning: false,
+            resultCell: null,
+            scene: null,
+            camera: null,
+            renderer: null,
+            rouletteWheel: null,
+            audio: null,
+            isPlaying: false
+        };
 
+        // Инициализация приложения
         document.addEventListener('DOMContentLoaded', function() {
+            initializeGrid();
+            initializeThreeJS();
+            setupEventListeners();
+        });
+
+        // Функции для работы с сеткой
+        function initializeGrid() {
             const grid = document.getElementById('grid');
             
             // Создаем сетку 5x18
+            createGridCells(grid);
+            
+            // Создаем объединенную ячейку для 0
+            createMergedCell(grid);
+            
+            // Заполняем ячейки числами от 1 до 33
+            fillNumberCells();
+            
+            // Настраиваем специальные ячейки
+            setupSpecialCells();
+            
+            // Создаем верхний заголовок
+            createHeader(grid);
+            
+            // Создаем ряд с числами ставок
+            createBetNumbersRow(grid);
+            
+            // Создаем нижний ряд с кнопками
+            createButtonRow(grid);
+        }
+
+        function createGridCells(grid) {
             for (let y = 0; y < 18; y++) {
                 for (let x = 0; x < 5; x++) {
+                    // Пропускаем строки, которые будут заполнены отдельно
                     if (y === 0 || y === 1 || y === 2 || y === 3 || y === 16 || y === 17) continue;
 
                     const cell = document.createElement('div');
@@ -181,9 +238,9 @@
                     cell.dataset.x = x;
                     cell.dataset.y = y;
                     
-                    // Сохраняем ссылку на ячейку в пятом ряду, правом столбце (x=4, y=4)
+                    // Сохраняем ссылку на ячейку результата
                     if (y === 4 && x === 4) {
-                        resultCell = cell;
+                        AppState.resultCell = cell;
                         cell.textContent = '-';
                     }
                     
@@ -191,78 +248,68 @@
                 }
             }
 
-            // Удаляем ячейки 2, 3 и 4 в пятом ряду
+            // Удаляем ненужные ячейки в пятом ряду
+            removeUnnecessaryCells();
+        }
+
+        function removeUnnecessaryCells() {
             const cellsToRemove = [];
             for (let x = 0; x < 5; x++) {
                 if (x === 1 || x === 2 || x === 3) {
                     const cell = document.querySelector(`.grid-cell[data-x="${x}"][data-y="4"]`);
-                    if (cell) {
-                        cellsToRemove.push(cell);
-                    }
+                    if (cell) cellsToRemove.push(cell);
                 }
             }
             cellsToRemove.forEach(cell => cell.remove());
+        }
 
-            // Создаем объединенную ячейку
+        function createMergedCell(grid) {
             const mergedCell = document.createElement('div');
-            mergedCell.className = 'grid-cell';
+            mergedCell.className = 'grid-cell green-cell';
             mergedCell.style.gridColumn = '2 / 5';
             mergedCell.style.gridRow = '5';
-            mergedCell.style.display = 'flex';
-            mergedCell.style.justifyContent = 'center';
-            mergedCell.style.alignItems = 'center';
-            mergedCell.style.backgroundColor = '#228822';
-            mergedCell.style.color = 'white';
-            mergedCell.style.fontSize = 'calc(1.5vw + 1.5vh)';
-            mergedCell.style.fontWeight = 'bold';
             mergedCell.textContent = '0';
             grid.appendChild(mergedCell);
+        }
 
-            // Заполняем ячейки числами от 1 до 33
+        function fillNumberCells() {
             let currentNumber = 1;
             for (let row = 5; row <= 16; row++) {
                 for (let col = 1; col <= 3; col++) {
                     const cell = document.querySelector(`.grid-cell[data-x="${col}"][data-y="${row}"]`);
                     if (cell && currentNumber <= 33) {
-                        const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32];
-                        if (redNumbers.includes(currentNumber)) {
-                            cell.style.backgroundColor = '#882222';
-                        } else {
-                            cell.style.backgroundColor = '#222222';
-                        }
+                        cell.className += CONFIG.RED_NUMBERS.includes(currentNumber) ? ' red-cell' : ' black-cell';
                         cell.textContent = currentNumber;
                         currentNumber++;
                     }
                 }
             }
+        }
 
-            // Добавляем числа в правые ячейки (общий фон)
-            const cell14 = document.querySelector('.grid-cell[data-x="4"][data-y="13"]');
-            if (cell14) {
-                cell14.textContent = '1';
-                cell14.style.backgroundColor = 'rgb(91, 107, 160)'; // Общий фон
-            }
+        function setupSpecialCells() {
+            // Настраиваем ячейки с числами в правом столбце
+            const specialCells = [
+                { x: 4, y: 13, text: '1' },
+                { x: 4, y: 14, text: '5' },
+                { x: 4, y: 15, text: '25' }
+            ];
+            
+            specialCells.forEach(cellData => {
+                const cell = document.querySelector(`.grid-cell[data-x="${cellData.x}"][data-y="${cellData.y}"]`);
+                if (cell) {
+                    cell.textContent = cellData.text;
+                }
+            });
 
-            const cell15 = document.querySelector('.grid-cell[data-x="4"][data-y="14"]');
-            if (cell15) {
-                cell15.textContent = '5';
-                cell15.style.backgroundColor = 'rgb(91, 107, 160)'; // Общий фон
-            }
-
-            const cell16 = document.querySelector('.grid-cell[data-x="4"][data-y="15"]');
-            if (cell16) {
-                cell16.textContent = '25';
-                cell16.style.backgroundColor = 'rgb(91, 107, 160)'; // Общий фон
-            }
-
-            // Убираем "1" из левой ячейки 17 ряда
+            // Очищаем левую ячейку 17 ряда
             const cell17 = document.querySelector('.grid-cell[data-x="0"][data-y="16"]');
-            if (cell17) {
-                cell17.textContent = '';
-                cell17.style.backgroundColor = '';
-            }
+            if (cell17) cell17.textContent = '';
 
             // Создаем фишку в левой ячейке 5 ряда
+            createChipCell();
+        }
+
+        function createChipCell() {
             const chipCell = document.querySelector('.grid-cell[data-x="0"][data-y="4"]');
             if (chipCell) {
                 chipCell.innerHTML = '';
@@ -270,26 +317,17 @@
                 chipCell.id = 'chip-origin';
                 
                 const chipSvg = `
-                    <svg width="100%" height="100%" viewBox="-60 -120 120 120" style="position:absolute; top:0; left:0;transform: scale(0.7);">   //было 100
+                    <svg class="chip-svg" viewBox="-60 -120 120 120">
                         <path d="M60,0 L60,-10 L20,-10 L10,-20 L10,-56 L16.2,-60 L26.2,-80 L20,-96.8 L0,-106.1 L-20,-96.8 L-26.2,-80 L-16.4,-60 L-10,-56 L-10,-20 L-20,-10 L-60,-10 L-60,0 Z" 
                               fill="yellow" stroke="black" stroke-width="1"/>
                     </svg>
                 `;
                 chipCell.innerHTML = chipSvg;
                 chipCell.style.cursor = 'pointer';
-                
-                // Обработчик клика на фишку
-                chipCell.addEventListener('click', resetChipPosition);
             }
+        }
 
-            // Обработчик клика на любую ячейку
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('grid-cell') && !e.target.id.includes('chip')) {
-                    resetChipPosition();
-                }
-            });
-
-            // Создаем объединенный верхний прямоугольник
+        function createHeader(grid) {
             const headerCell = document.createElement('div');
             headerCell.className = 'header-cell';
             
@@ -314,11 +352,9 @@
             rouletteCell.className = 'roulette-cell';
             rouletteCell.id = 'roulette-cell';
             grid.appendChild(rouletteCell);
-            
-            // Инициализируем Three.js сцену
-            initThreeJS();
-            
-            // Создаем предпоследний ряд с числами
+        }
+
+        function createBetNumbersRow(grid) {
             const numbers = ['1', '5', '10', '25', '100'];
             for (let x = 0; x < 5; x++) {
                 const numberCell = document.createElement('div');
@@ -329,172 +365,92 @@
                 grid.appendChild(numberCell);
             }
 
-            // Меняем ячейки в 17-ом ряду
+            // Настраиваем ячейки в 17-ом ряду
             const row17Cells = document.querySelectorAll('.grid-cell[data-y="16"]');
             if (row17Cells.length >= 5) {
-                row17Cells[0].textContent = '';  // Очищаем левую ячейку
+                row17Cells[0].textContent = '';
                 row17Cells[1].textContent = '34';
-                row17Cells[1].style.backgroundColor = '#aa0000';
+                row17Cells[1].className += ' red-cell';
                 row17Cells[2].textContent = '35';
-                row17Cells[2].style.backgroundColor = '#222222';
+                row17Cells[2].className += ' black-cell';
                 row17Cells[3].textContent = '36';
-                row17Cells[3].style.backgroundColor = '#aa0000';
+                row17Cells[3].className += ' red-cell';
             }
+        }
+
+        function createButtonRow(grid) {
+            const buttonConfigs = [
+                { text: 'Очист', col: '1 / 3', action: clearResult },
+                { text: '1to2', col: '2 / 4', action: resetChipPosition },
+                { text: 'Дубль', col: '4 / 6', action: repeatAction }
+            ];
             
-            // Создаем 18-й ряд
-            for (let x = 0; x < 5; x++) {
+            buttonConfigs.forEach(config => {
                 const cell = document.createElement('div');
-                cell.className = 'grid-cell';
-                cell.style.gridColumn = (x + 1).toString();
+                cell.className = 'grid-cell button-cell';
+                cell.style.gridColumn = config.col;
                 cell.style.gridRow = '18';
-                cell.style.display = 'flex';
-                cell.style.justifyContent = 'center';
-                cell.style.alignItems = 'center';
-                cell.style.color = 'white';
-                cell.style.fontSize = 'calc(1.2vw + 1.2vh)';
-                cell.style.fontWeight = 'bold';
-                cell.style.backgroundColor = 'rgb(91, 107, 160)';
-                cell.style.border = '1px solid white';
-                cell.style.cursor = 'pointer';
-                
-                if (x === 0) {
-                    cell.textContent = 'Очист';
-                    cell.addEventListener('click', function() {
-                        if (resultCell) resultCell.textContent = '-';
-                        resetChipPosition();
-                    });
-                } else if (x >= 1 && x <= 3) {
-                    cell.textContent = '1to2';
-                    cell.addEventListener('click', resetChipPosition);
-                } else if (x === 4) {
-                    cell.textContent = 'Дубль';
-                    cell.addEventListener('click', function() {
-                        alert('Функция "Повторить" активирована');
-                        resetChipPosition();
-                    });
-                }
-                
+                cell.textContent = config.text;
+                cell.addEventListener('click', config.action);
                 grid.appendChild(cell);
-            }
-            
-            // Обработчик для грамофончика
-            let isPlaying = false;
-            let audio = null;
-            
-            gramophone.addEventListener('click', function() {
-                if (!isPlaying) {
-                    try {
-                        audio = new Audio('audio/space-music.mp3');
-                        audio.play().catch(e => {
-                            alert('Файл audio/space-music.mp3 не найден');
-                        });
-                        isPlaying = true;
-                    } catch (error) {
-                        alert('Не удалось воспроизвести аудиофайл');
-                    }
-                } else {
-                    if (audio) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }
-                    isPlaying = false;
-                }
             });
-        });
-
-        // Функция для сброса позиции фишки
-        function resetChipPosition() {
-            const chipCell = document.getElementById('chip-origin');
-            if (chipCell) {
-                chipCell.style.transition = 'all 0.5s ease';
-                chipCell.style.transform = 'translate(0, 0)';
-            }
         }
 
-        // Функция для перемещения фишки
-        function moveChipToNumber(number) {
-            const chipCell = document.getElementById('chip-origin');
-            if (!chipCell) return;
-            
-            // Ищем ячейку с нужным числом только в диапазоне рядов 5-17
-            let targetCell = null;
-            for (let row = 5; row <= 17; row++) {
-                for (let col = 0; col < 5; col++) {
-                    const cell = document.querySelector(`.grid-cell[data-x="${col}"][data-y="${row}"]`);
-                    if (cell && cell.textContent === number.toString() && cell.id !== 'chip-origin') {
-                        targetCell = cell;
-                        break;
-                    }
-                }
-                if (targetCell) break;
-            }
-            
-            if (targetCell) {
-                const chipRect = chipCell.getBoundingClientRect();
-                const targetRect = targetCell.getBoundingClientRect();
-                
-                chipCell.style.transition = 'all 0.5s ease';
-                chipCell.style.transform = `translate(${targetRect.left - chipRect.left}px, ${targetRect.top - chipRect.top+5}px)`;  //+10 смещение фишки книзу
-                
-                setTimeout(() => {
-                    chipCell.style.transition = 'all 0.5s ease';
-                    chipCell.style.transform = 'translate(0, 0)';
-                }, 2000);
-            }
-        }
-
-        function initThreeJS() {
+        // Функции для работы с Three.js
+        function initializeThreeJS() {
             const rouletteCell = document.getElementById('roulette-cell');
             
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x5b6ba0);
+            AppState.scene = new THREE.Scene();
+            AppState.scene.background = new THREE.Color(0x5b6ba0);
             
-            camera = new THREE.PerspectiveCamera(45, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
-            camera.position.set(0, 40, 80);
-            camera.lookAt(0, 0, 0);
+            AppState.camera = new THREE.PerspectiveCamera(45, rouletteCell.clientWidth / rouletteCell.clientHeight, 0.1, 1000);
+            AppState.camera.position.set(0, 40, 80);
+            AppState.camera.lookAt(0, 0, 0);
             
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(rouletteCell.clientWidth, rouletteCell.clientHeight);
-            rouletteCell.appendChild(renderer.domElement);
+            AppState.renderer = new THREE.WebGLRenderer({ antialias: true });
+            AppState.renderer.setSize(rouletteCell.clientWidth, rouletteCell.clientHeight);
+            rouletteCell.appendChild(AppState.renderer.domElement);
             
+            setupLighting();
+            createRouletteWheel();
+            animate();
+        }
+
+        function setupLighting() {
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
+            AppState.scene.add(ambientLight);
             
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(30, 50, 30);
-            scene.add(directionalLight);
-            
-            createRouletteWheel();
-            renderer.domElement.addEventListener('click', spinRoulette);
-            animate();
+            AppState.scene.add(directionalLight);
         }
-        
+
         function createRouletteWheel() {
-            rouletteWheel = new THREE.Group();
+            AppState.rouletteWheel = new THREE.Group();
             
             for (let i = 0; i < 37; i++) {
                 const sector = createSector(i);
                 const angle = (i / 37) * Math.PI * 2;
                 sector.rotation.y = angle;
-                rouletteWheel.add(sector);
+                AppState.rouletteWheel.add(sector);
                 addNumberToSector(i, angle);
             }
             
-            rouletteWheel.scale.set(1.5, 1.5, 1.5);
-            rouletteWheel.rotation.x = Math.PI / 6;
-            scene.add(rouletteWheel);
+            AppState.rouletteWheel.scale.set(1.5, 1.5, 1.5);
+            AppState.rouletteWheel.rotation.x = Math.PI / 6;
+            AppState.scene.add(AppState.rouletteWheel);
         }
-        
+
         function createSector(sectorIndex) {
             const geometry = new THREE.BufferGeometry();
             const vertices = [];
             const indices = [];
             
-            sectorVertices.forEach(vertex => {
+            CONFIG.SECTOR_VERTICES.forEach(vertex => {
                 vertices.push(...vertex);
             });
             
-            sectorFaces.forEach(face => {
+            CONFIG.SECTOR_FACES.forEach(face => {
                 indices.push(face[0] - 1, face[1] - 1, face[2] - 1);
             });
             
@@ -502,13 +458,12 @@
             geometry.setIndex(indices);
             geometry.computeVertexNormals();
             
+            const currentNumber = CONFIG.ROULETTE_NUMBERS[sectorIndex];
             let color;
-            const currentNumber = rouletteNumbers[sectorIndex];
-            const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
             
             if (currentNumber === 0) {
                 color = 0x228822;
-            } else if (redNumbers.includes(currentNumber)) {
+            } else if (CONFIG.RED_NUMBERS.includes(currentNumber)) {
                 color = 0xaa0000;
             } else {
                 color = 0x222222;
@@ -517,7 +472,7 @@
             const material = new THREE.MeshLambertMaterial({ color: color });
             return new THREE.Mesh(geometry, material);
         }
-        
+
         function addNumberToSector(sectorIndex, angle) {
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -531,7 +486,7 @@
             context.fillStyle = 'white';
             context.textAlign = 'center';
             context.textBaseline = 'middle';
-            context.fillText(rouletteNumbers[sectorIndex], canvas.width / 2, canvas.height / 2);
+            context.fillText(CONFIG.ROULETTE_NUMBERS[sectorIndex], canvas.width / 2, canvas.height / 2);
             
             const texture = new THREE.CanvasTexture(canvas);
             const material = new THREE.SpriteMaterial({ 
@@ -549,20 +504,21 @@
                 Math.cos(numberAngle) * radius
             );
             
-            sprite.scale.set(10,10, 2);
+            sprite.scale.set(10, 10, 2);
             sprite.rotation.y = -numberAngle;
-            rouletteWheel.add(sprite);
+            AppState.rouletteWheel.add(sprite);
         }
-        
+
+        // Функции для работы с рулеткой
         function spinRoulette() {
-            if (isSpinning) return;
+            if (AppState.isSpinning) return;
             
-            isSpinning = true;
+            AppState.isSpinning = true;
             const randomRotations = 5 + Math.random() * 5;
             const randomStopAngle = Math.random() * Math.PI * 2;
             const targetRotation = randomRotations * Math.PI * 2 + randomStopAngle;
             
-            const startRotation = rouletteWheel.rotation.y;
+            const startRotation = AppState.rouletteWheel.rotation.y;
             const startTime = Date.now();
             const duration = 4000;
             
@@ -571,51 +527,140 @@
                 const progress = Math.min(elapsed / duration, 1);
                 
                 const easeOut = 1 - Math.pow(1 - progress, 3);
-                rouletteWheel.rotation.y = startRotation + targetRotation * easeOut;
+                AppState.rouletteWheel.rotation.y = startRotation + targetRotation * easeOut;
                 
                 if (progress < 1) {
                     requestAnimationFrame(animateSpin);
                 } else {
-                    isSpinning = false;
+                    AppState.isSpinning = false;
                     const winningNumber = calculateWinningNumber(randomStopAngle);
                     
-                    if (resultCell) {
-                        resultCell.textContent = winningNumber;
-                        resultCell.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                    if (AppState.resultCell) {
+                        AppState.resultCell.textContent = winningNumber;
+                        AppState.resultCell.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
                         setTimeout(() => {
-                            resultCell.style.backgroundColor = '';
+                            AppState.resultCell.style.backgroundColor = '';
                         }, 2000);
                     }
                     
-                    // Перемещаем фишку на выпавшее число
                     moveChipToNumber(winningNumber);
                 }
             }
             
             animateSpin();
         }
-        
+
         function calculateWinningNumber(stopAngle) {
             const index = Math.floor((1 - (stopAngle / (Math.PI * 2))) * 37) % 37;
-            return rouletteNumbers[index];
+            return CONFIG.ROULETTE_NUMBERS[index];
         }
-        
+
         function animate() {
             requestAnimationFrame(animate);
             
-            if (!isSpinning) {
-                rouletteWheel.rotation.y += 0.001;
+            if (!AppState.isSpinning) {
+                AppState.rouletteWheel.rotation.y += 0.001;
             }
             
-            renderer.render(scene, camera);
+            AppState.renderer.render(AppState.scene, AppState.camera);
         }
-        
-        window.addEventListener('resize', function() {
+
+        // Функции для работы с фишкой
+        function resetChipPosition() {
+            const chipCell = document.getElementById('chip-origin');
+            if (chipCell) {
+                chipCell.style.transition = 'all 0.5s ease';
+                chipCell.style.transform = 'translate(0, 0)';
+            }
+        }
+
+        function moveChipToNumber(number) {
+            const chipCell = document.getElementById('chip-origin');
+            if (!chipCell) return;
+            
+            let targetCell = null;
+            for (let row = 5; row <= 17; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.querySelector(`.grid-cell[data-x="${col}"][data-y="${row}"]`);
+                    if (cell && cell.textContent === number.toString() && cell.id !== 'chip-origin') {
+                        targetCell = cell;
+                        break;
+                    }
+                }
+                if (targetCell) break;
+            }
+            
+            if (targetCell) {
+                const chipRect = chipCell.getBoundingClientRect();
+                const targetRect = targetCell.getBoundingClientRect();
+                
+                chipCell.style.transition = 'all 0.5s ease';
+                chipCell.style.transform = `translate(${targetRect.left - chipRect.left}px, ${targetRect.top - chipRect.top + 5}px)`;
+                
+                setTimeout(() => {
+                    chipCell.style.transition = 'all 0.5s ease';
+                    chipCell.style.transform = 'translate(0, 0)';
+                }, 2000);
+            }
+        }
+
+        // Обработчики событий
+        function setupEventListeners() {
+            // Обработчик клика на любую ячейку
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('grid-cell') && !e.target.id.includes('chip')) {
+                    resetChipPosition();
+                }
+            });
+            
+            // Обработчик для грамофончика
+            const gramophone = document.getElementById('gramophone');
+            gramophone.addEventListener('click', toggleAudio);
+            
+            // Обработчик для рулетки
+            AppState.renderer.domElement.addEventListener('click', spinRoulette);
+            
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', handleResize);
+        }
+
+        function toggleAudio() {
+            if (!AppState.isPlaying) {
+                try {
+                    AppState.audio = new Audio('audio/space-music.mp3');
+                    AppState.audio.play().catch(e => {
+                        alert('Файл audio/space-music.mp3 не найден');
+                    });
+                    AppState.isPlaying = true;
+                } catch (error) {
+                    alert('Не удалось воспроизвести аудиофайл');
+                }
+            } else {
+                if (AppState.audio) {
+                    AppState.audio.pause();
+                    AppState.audio.currentTime = 0;
+                }
+                AppState.isPlaying = false;
+            }
+        }
+
+        function handleResize() {
             const rouletteCell = document.getElementById('roulette-cell');
-            camera.aspect = rouletteCell.clientWidth / rouletteCell.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(rouletteCell.clientWidth, rouletteCell.clientHeight);
-        });
+            AppState.camera.aspect = rouletteCell.clientWidth / rouletteCell.clientHeight;
+            AppState.camera.updateProjectionMatrix();
+            AppState.renderer.setSize(rouletteCell.clientWidth, rouletteCell.clientHeight);
+        }
+
+        // Вспомогательные функции
+        function clearResult() {
+            if (AppState.resultCell) AppState.resultCell.textContent = '-';
+            resetChipPosition();
+        }
+
+        function repeatAction() {
+            alert('Функция "Повторить" активирована');
+            resetChipPosition();
+        }
     </script>
 </body>
 </html>
