@@ -357,7 +357,7 @@
                 cell.style.cursor = 'pointer';
                 
                 if (x === 0) {
-                    cell.textContent = 'Чист';
+                    cell.textContent = 'Очист';
                     cell.addEventListener('click', function() {
                         if (resultCell) resultCell.textContent = '-';
                         resetChipPosition();
@@ -366,7 +366,7 @@
                     cell.textContent = '1to2';
                     cell.addEventListener('click', resetChipPosition);
                 } else if (x === 4) {
-                    cell.textContent = 'Дубл';
+                    cell.textContent = 'Дубль';
                     cell.addEventListener('click', function() {
                         alert('Функция "Повторить" активирована');
                         resetChipPosition();
