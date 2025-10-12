@@ -166,9 +166,15 @@
         <label>Звук: <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5"></label>
         <button id="playPause">Play</button>
     </div>
+
+    <audio id="backgroundAudio" loop preload="auto">
+    <source src="audy/space-music.mp3" type="audio/mpeg">  <!-- Здесь укажи путь к файлу! -->
+    <source src="cosmic-hum.ogg" type="audio/ogg">   <!-- Альтернатива для браузеров -->
+    Your browser does not support the audio element.
+</audio>
     
     <script>
-        // Генерация звёзд
+        // Генерация звёзд (остаётся как есть)
         function createStars() {
             const starsContainer = document.getElementById('stars');
             for (let i = 0; i < 50; i++) {
@@ -183,25 +189,49 @@
         }
         createStars();
         
-        // Фоновая озвучка
-        let audioContext, oscillator, gainNode;
+        // Фоновая озвучка с файлом (вариант 1: простой <audio>)
+        const audioElement = document.getElementById('backgroundAudio');
         const playPauseBtn = document.getElementById('playPause');
         const volumeSlider = document.getElementById('volume');
         
-        function initAudio() {
+        playPauseBtn.addEventListener('click', () => {
+            if (audioElement.paused) {
+                audioElement.play();
+                playPauseBtn.textContent = 'Pause';
+            } else {
+                audioElement.pause();
+                playPauseBtn.textContent = 'Play';
+            }
+        });
+        
+        volumeSlider.addEventListener('input', (e) => {
+            audioElement.volume = e.target.value;
+        });
+        
+        // Альтернатива: Если хочешь продвинутый контроль (фейд, петля) через AudioContext
+        // Раскомментируй ниже и закомментируй верхний блок
+        /*
+        let audioContext, source, gainNode;
+        function initAudioFile() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            oscillator = audioContext.createOscillator();
             gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            oscillator.frequency.setValueAtTime(55, audioContext.currentTime); // Низкий гул
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            oscillator.start();
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime); // Фейд-ин
+        
+            fetch('cosmic-hum.mp3')  // Здесь укажи путь к файлу!
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(decodedData => {
+                    source = audioContext.createBufferSource();
+                    source.buffer = decodedData;
+                    source.loop = true;
+                    source.connect(gainNode);
+                    source.start(0);
+                    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 2); // Фейд за 2 сек
+                });
         }
         
         playPauseBtn.addEventListener('click', () => {
-            if (!audioContext) initAudio();
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
                 playPauseBtn.textContent = 'Pause';
@@ -215,7 +245,16 @@
             if (gainNode) gainNode.gain.setValueAtTime(e.target.value * 0.3, audioContext.currentTime);
         });
         
-        // Parallax эффект на прокрутку
+        // Инициализация при первом клике
+        playPauseBtn.addEventListener('click', () => {
+            if (!audioContext) {
+                initAudioFile();
+            }
+            // ... остальной код
+        }, { once: true });
+        */
+        
+        // Parallax эффект на прокрутку (остаётся как есть)
         window.addEventListener('scroll', () => {
             const scrolled = window.pageYOffset;
             document.querySelector('.parallax-layer').style.transform = `translateY(${scrolled * 0.5}px)`;
