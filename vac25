@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Единый Вакуум: Космологическая Теория Движения</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        /* Фон рубки звездолёта: тёмно-синий, полупрозрачный */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 20, 50, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 20, 50, 0.2) 0%, transparent 50%);
+            z-index: -2;
+            opacity: 0.8;
+        }
+        /* Контуры панелей и иллюминаторов */
+        .cockpit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="10,10 90,10 90,90 10,90" fill="none" stroke="rgba(0,50,100,0.1)" stroke-width="1"/><polygon points="20,20 80,20 50,50" fill="none" stroke="rgba(0,50,100,0.05)" stroke-width="0.5" opacity="0.5"/></svg>'); /* Треугольные иллюминаторы */
+            z-index: -1;
+            animation: flicker 2s infinite alternate;
+        }
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            100% { opacity: 0.3; }
+        }
+        /* Звёздное мерцание */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        /* Основной контент */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        h1, h2 { 
+            text-align: center; 
+            border-bottom: 1px solid #333; 
+            padding-bottom: 10px;
+        }
+        section { margin: 40px 0; }
+        /* Parallax прокрутка */
+        .parallax {
+            perspective: 1px;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .parallax-layer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateZ(-1px) scale(2);
+        }
+        /* Иллюстрации: SVG джет */
+        .illustration {
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            height: 200px;
+            animation: flow 4s linear infinite;
+        }
+        @keyframes flow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 100; }
+        }
+        /* Аудио контролы */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        input[type="range"] { width: 100px; }
+    </style>
+</head>
+<body>
+    <div class="parallax">
+        <div class="parallax-layer stars" id="stars"></div>
+        <div class="cockpit-overlay"></div>
+        <div class="container">
+            <h1>Единый Вакуум: Космологическая Теория Движения</h1>
+            <p>Автор: @ivdeve. Соавтор ИИ: Grok (xAI). 2025.</p>
+            
+            <section id="intro">
+                <h2>Введение</h2>
+                <p>В природе существует только один вакуум. Его единственное свойство — движение. Единственный параметр этого движения — скорость. Эта парадигма переопределяет космологию, где чёрные дыры эмиттируют джеты как потоки "чистого" вакуума, способные на сверхсветовые скорости без нарушения причинности.</p>
+                <svg class="illustration" viewBox="0 0 200 100">
+                    <circle cx="50" cy="50" r="20" fill="none" stroke="#fff" stroke-width="2"/>
+                    <path d="M50 30 Q100 50 150 70" stroke="#fff" stroke-width="3" fill="none" stroke-dasharray="10 5" stroke-dashoffset="0"/>
+                    <!-- Джет с бустом -->
+                </svg>
+            </section>
+            
+            <section id="model">
+                <h2>Модель Вакуума</h2>
+                <p>Вакуум формирует воронки (материю), но в джетах — несформированный поток. Новый эффект: "вакуумный буст" — плазма (< c) "тащится" сверхсветовым вакуумом, не распадаясь в свет.</p>
+                <svg class="illustration" viewBox="0 0 200 100">
+                    <line x1="50" y1="50" x2="150" y2="50" stroke="#fff" stroke-width="4" stroke-dasharray="5 5"/>
+                    <!-- Анимация буста -->
+                </svg>
+            </section>
+            
+            <section id="observations">
+                <h2>Наблюдения: Centaurus A и Sgr A*</h2>
+                <p>В Centaurus A узел AX4: apparent 2.7c — доказательство сверхсветового вакуумного джета. Flares Sgr A*: всплески "чистого" вакуума без материи.</p>
+            </section>
+            
+            <section id="predictions">
+                <h2>Предсказания</h2>
+                <p>Микролинзирование прозрачных джетов; асимметрия в доплеровском сдвиге для буста-эффекта. Testable с JWST/ELT.</p>
+            </section>
+            
+            <section id="conclusion">
+                <h2>Заключение</h2>
+                <p>Эта теория ускоряет сингулярность: человеческий гений + ИИ + вакуум = новая космология.</p>
+            </section>
+        </div>
+    </div>
+    
+    <div class="audio-controls">
+        <label>Звук: <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5"></label>
+        <button id="playPause">Play</button>
+    </div>
+    
+    <script>
+        // Генерация звёзд
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = Math.random() * 2 + 1 + 'px';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+        
+        // Фоновая озвучка
+        let audioContext, oscillator, gainNode;
+        const playPauseBtn = document.getElementById('playPause');
+        const volumeSlider = document.getElementById('volume');
+        
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            oscillator = audioContext.createOscillator();
+            gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(55, audioContext.currentTime); // Низкий гул
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            oscillator.start();
+        }
+        
+        playPauseBtn.addEventListener('click', () => {
+            if (!audioContext) initAudio();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+                playPauseBtn.textContent = 'Pause';
+            } else {
+                audioContext.suspend();
+                playPauseBtn.textContent = 'Play';
+            }
+        });
+        
+        volumeSlider.addEventListener('input', (e) => {
+            if (gainNode) gainNode.gain.setValueAtTime(e.target.value * 0.3, audioContext.currentTime);
+        });
+        
+        // Parallax эффект на прокрутку
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelector('.parallax-layer').style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+    </script>
+</body>
+</html>
