@@ -62,15 +62,16 @@
     }
 }
         /* Верхняя картинка */
-        .top-image {
-            width: 100%;
-            max-width: 300px; /* Квадратный квадрат, подгони под PNG */
-            height: auto;
-            aspect-ratio: 1;
-            margin: 8px auto;
-            display: block;
-            border: none;
-        }
+.top-image {
+    width: auto;  /* Авто-ширина по оригиналу */
+    max-width: 100%;  /* Не выходит за контейнер */
+    max-height: 300px;  /* Ограничение по высоте, если нужно квадрат-ish */
+    height: auto;  /* Сохраняет пропорции */
+    object-fit: contain;  /* Вписывает без искажений */
+    display: block;
+    margin: 8px auto;  /* Центр + поля */
+    border: none;
+}
         /* Основная рамка-квадрат */
         .main-frame {
             border: 1px solid #fff;
