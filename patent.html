@@ -40,15 +40,27 @@
             50% { opacity: 1; }
         }
         /* Основной контейнер */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 8px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 16px); /* Учёт внешних полей */
-        }
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 8px;
+    padding-bottom: 100px; /* Твой фикс — базовый отступ */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 16px - env(safe-area-inset-bottom)); /* Учёт безопасной зоны iOS */
+    box-sizing: border-box;
+}
+
+/* Медиа для мобилки: больше отступа и плавный скролл */
+@media (max-width: 768px) {
+    .container {
+        padding-bottom: 120px; /* Увеличиваем для панели браузера */
+    }
+    .text-container {
+        -webkit-overflow-scrolling: touch; /* Уже есть, но на всякий */
+    }
+}
         /* Верхняя картинка */
         .top-image {
             width: 100%;
