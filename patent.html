@@ -40,38 +40,38 @@
             50% { opacity: 1; }
         }
         /* Основной контейнер */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 8px;
-    padding-bottom: 100px; /* Твой фикс — базовый отступ */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 16px - env(safe-area-inset-bottom)); /* Учёт безопасной зоны iOS */
-    box-sizing: border-box;
-}
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 8px;
+            padding-bottom: 100px; /* Твой фикс — базовый отступ */
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 16px - env(safe-area-inset-bottom)); /* Учёт безопасной зоны iOS */
+            box-sizing: border-box;
+        }
 
-/* Медиа для мобилки: больше отступа и плавный скролл */
-@media (max-width: 768px) {
-    .container {
-        padding-bottom: 120px; /* Увеличиваем для панели браузера */
-    }
-    .text-container {
-        -webkit-overflow-scrolling: touch; /* Уже есть, но на всякий */
-    }
-}
+        /* Медиа для мобилки: больше отступа и плавный скролл */
+        @media (max-width: 768px) {
+            .container {
+                padding-bottom: 120px; /* Увеличиваем для панели браузера */
+            }
+            .text-container {
+                -webkit-overflow-scrolling: touch; /* Уже есть, но на всякий */
+            }
+        }
         /* Верхняя картинка */
-.top-image {
-    width: auto;  /* Авто-ширина по оригиналу */
-    max-width: 100%;  /* Не выходит за контейнер */
-    max-height: 300px;  /* Ограничение по высоте, если нужно квадрат-ish */
-    height: auto;  /* Сохраняет пропорции */
-    object-fit: contain;  /* Вписывает без искажений */
-    display: block;
-    margin: 8px auto;  /* Центр + поля */
-    border: none;
-}
+        .top-image {
+            width: auto;  /* Авто-ширина по оригиналу */
+            max-width: 100%;  /* Не выходит за контейнер */
+            max-height: 300px;  /* Ограничение по высоте, если нужно квадрат-ish */
+            height: auto;  /* Сохраняет пропорции */
+            object-fit: contain;  /* Вписывает без искажений */
+            display: block;
+            margin: 8px auto;  /* Центр + поля */
+            border: none;
+        }
         /* Основная рамка-квадрат */
         .main-frame {
             border: 1px solid #fff;
@@ -95,6 +95,40 @@
             margin-bottom: 8px;
             box-sizing: border-box;
             flex-shrink: 0;
+        }
+        .progress-section {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;  /* Чтобы не переполнялось */
+        }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 0;  /* Скрытый thumb для progress */
+            height: 0;
+            background: transparent;
+        }
+        .time-display {
+            font-size: 10px;
+            color: #b4b4b4;
+            min-width: 40px;
+            text-align: right;
+        }
+        .volume-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .volume-slider {
             flex: 0 0 auto;
@@ -171,6 +205,9 @@
             .text-container {
                 -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
             }
+            .progress-bar {
+                width: 60px;  /* Уменьшить на маленьких экранах */
+            }
         }
     </style>
 </head>
@@ -185,12 +222,18 @@
         <div class="main-frame">
             <!-- Узкая верхняя рамка -->
             <div class="top-bar">
-                <div class="volume-slider">
-                    <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+                <div class="progress-section">
+                    <input type="range" class="progress-bar" id="progress" min="0" max="100" value="0">
+                    <span class="time-display" id="time">0:00</span>
                 </div>
-                <div class="lang-buttons">
-                    <button class="lang-btn" id="en-btn">En</button>
-                    <button class="lang-btn" id="ru-btn">Ru</button>
+                <div class="volume-section">
+                    <div class="volume-slider">
+                        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+                    </div>
+                    <div class="lang-buttons">
+                        <button class="lang-btn" id="en-btn">En</button>
+                        <button class="lang-btn" id="ru-btn">Ru</button>
+                    </div>
                 </div>
             </div>
             
@@ -295,26 +338,70 @@ Best regards, @ivdeve. <br>
         }
         createStars();
         
-        // Аудио логика для En/Ru (простая, добавь свои файлы)
+        // Аудио логика
         const enAudio = new Audio('audio/Eng.mp3');
         const ruAudio = new Audio('audio/space-music.mp3');
         enAudio.loop = true;
         ruAudio.loop = true;
         
+        const progressBar = document.getElementById('progress');
+        const timeDisplay = document.getElementById('time');
+        const volumeSlider = document.getElementById('volume');
+        
+        let currentAudio = null;  // Текущий активный трек
+        
+        // Функция обновления прогресса
+        function updateProgress() {
+            if (!currentAudio || currentAudio.duration === Infinity) return;
+            const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+            progressBar.value = progress;
+            const currentMin = Math.floor(currentAudio.currentTime / 60);
+            const currentSec = Math.floor(currentAudio.currentTime % 60);
+            timeDisplay.textContent = `${currentMin}:${currentSec.toString().padStart(2, '0')}`;
+        }
+        
+        // Обработчик для обоих аудио
+        function setupAudioListeners(audio) {
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('loadedmetadata', () => {
+                updateProgress();
+            });
+            audio.addEventListener('seeked', updateProgress);
+        }
+        setupAudioListeners(enAudio);
+        setupAudioListeners(ruAudio);
+        
+        // Прогресс-бар: клик для seek
+        progressBar.addEventListener('input', (e) => {
+            if (currentAudio && currentAudio.duration !== Infinity) {
+                const seekTime = (e.target.value / 100) * currentAudio.duration;
+                currentAudio.currentTime = seekTime;
+                updateProgress();
+            }
+        });
+        
+        // Кнопки En/Ru
         document.getElementById('en-btn').addEventListener('click', () => {
             ruAudio.pause();
+            currentAudio = enAudio;
             enAudio.play();
         });
         
         document.getElementById('ru-btn').addEventListener('click', () => {
             enAudio.pause();
+            currentAudio = ruAudio;
             ruAudio.play();
         });
         
-        document.getElementById('volume').addEventListener('input', (e) => {
+        // Громкость
+        volumeSlider.addEventListener('input', (e) => {
             enAudio.volume = e.target.value;
             ruAudio.volume = e.target.value;
         });
+        
+        // Инициализация: начать с Ru, например
+        currentAudio = ruAudio;
+        ruAudio.play().catch(e => console.log('Autoplay blocked'));
     </script>
 </body>
 </html>
