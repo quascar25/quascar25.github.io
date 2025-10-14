@@ -266,14 +266,21 @@
         <div class="main-frame">
             <!-- Узкая верхняя рамка -->
             <div class="top-bar">
+
+                <div class="volume-slider">
+                    <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+                </div>
+                
                 <div class="progress-section">
                     <input type="range" class="progress-bar" id="progress" min="0" max="100" value="0">
                     <span class="time-display" id="time">0:00</span>
                 </div>
+
+               
                 <div class="volume-section">
-                    <div class="volume-slider">
-                        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
-                    </div>
+
+
+                    
                     <div class="lang-buttons">
                         <button class="lang-btn" id="en-btn">En</button>
                         <button class="lang-btn" id="ru-btn">Ru</button>
