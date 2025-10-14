@@ -157,7 +157,6 @@
             border-radius: 2px;
             outline: none;
             -webkit-appearance: none;
-            transform: translateY(-4px);  /* Лёгкий подъём thumb'а, подгони по пикселям */
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -168,6 +167,11 @@
             cursor: pointer;
             border-radius: 50%;
         }
+        #volume::-webkit-slider-thumb {
+            transform: translateY(-4px);  /* Подъём только для громкости */
+        }
+
+        
         /* Кнопки En/Ru с иконкой play */
         .lang-buttons {
             display: flex;
