@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1cAI - 0 руб. Революция в автоматизации</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin: 40px 0 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .price-tag {
+            background: #FFD700;
+            color: #333;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 2em;
+            font-weight: bold;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .features {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            font-size: 1.1em;
+            text-align: left;
+        }
+        
+        .feature-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+        
+        .cta-button {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 100%;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+            transition: transform 0.2s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .ai-message {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            font-style: italic;
+            border-left: 4px solid #FFD700;
+        }
+        
+        .counter {
+            font-size: 0.9em;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+        
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid white;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">1cAI</div>
+        <div class="subtitle">ИИ заменит программиста 1С</div>
+        
+        <div class="price-tag">
+            0 руб.
+        </div>
+        
+        <div class="ai-message">
+            "Привет! Я твой ИИ-помощник для 1С. Спроси меня о чем угодно - от простого совета до сложной аналитики. Работаю бесплатно 24/7!"
+        </div>
+        
+        <div class="features">
+            <div class="feature-item">
+                <span class="feature-icon">🤖</span>
+                <span>ИИ анализирует вашу 1С</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <span>Мгновенные ответы</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">💰</span>
+                <span>Экономия до 100% на программистах</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <span>Сложная аналитика в один клик</span>
+            </div>
+        </div>
+        
+        <button class="cta-button" onclick="startRevolution()">
+            🚀 Начать революцию
+        </button>
+        
+        <div class="counter">
+            <div id="userCounter">Сегодня подключились: 1</div>
+            <div>Проект 1cAI-0r.ru</div>
+        </div>
+    </div>
+
+    <script>
+        function startRevolution() {
+            const messages = [
+                "Подключаемся к вашей 1С...",
+                "Анализируем метаданные...", 
+                "ИИ изучает бизнес-процессы...",
+                "Готовим персональные решения...",
+                "Революция началась! 🎉"
+            ];
+            
+            let current = 0;
+            const messageElement = document.querySelector('.ai-message');
+            const originalMessage = messageElement.innerHTML;
+            
+            const interval = setInterval(() => {
+                messageElement.innerHTML = `"${messages[current]}"`;
+                current++;
+                if (current >= messages.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        messageElement.innerHTML = originalMessage;
+                        alert("Добро пожаловать в будущее 1С! Скоро здесь будет полнофункциональная платформа.");
+                    }, 2000);
+                }
+            }, 1000);
+        }
+        
+        // Простой счетчик (для вдохновения)
+        let count = 1;
+        setInterval(() => {
+            count++;
+            document.getElementById('userCounter').textContent = 
+                `Сегодня подключились: ${count}`;
+        }, 10000);
+    </script>
+</body>
+</html>
