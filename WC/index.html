@@ -89,85 +89,387 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    
-        <!-- Подключаем Firebase SDK -->
+    <!-- Подключаем Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
     <script>
-      // Вставьте сюда скопированную конфигурацию
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        // Конфигурация Firebase
         const firebaseConfig = {
-          apiKey: "AIzaSyChVNJexhWHuV9KCv52VssFA1MvYaRulBk",
-          authDomain: "jetchat-481ee.firebaseapp.com",
-          projectId: "jetchat-481ee",
-          storageBucket: "jetchat-481ee.firebasestorage.app",
-          messagingSenderId: "180249150993",
-          appId: "1:180249150993:web:eaeb4ed6165f6f16fe53b0",
-          measurementId: "G-75MCW0R6ED"
+            apiKey: "AIzaSyChVNJexhWHuV9KCv52VssFA1MvYaRulBk",
+            authDomain: "jetchat-481ee.firebaseapp.com",
+            databaseURL: "https://jetchat-481ee-default-rtdb.firebaseio.com",
+            projectId: "jetchat-481ee",
+            storageBucket: "jetchat-481ee.firebasestorage.app",
+            messagingSenderId: "180249150993",
+            appId: "1:180249150993:web:eaeb4ed6165f6f16fe53b0",
+            measurementId: "G-75MCW0R6ED"
         };
-    
-      // Инициализируем Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      const database = firebase.database();
 
-      /////
+        // Инициализация Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         // Ссылки на разделы базы данных
         const messagesRef = database.ref('messages');
         const usersRef = database.ref('users');
-        
-        // Функция для отправки сообщения
-            function sendMessage(userId, userName, text) {
-              // Проверяем, что все параметры переданы
-              if (!userId || !userName || !text) {
-                console.error('❌ Ошибка: все параметры должны быть заданы');
-                console.log('userId:', userId, 'userName:', userName, 'text:', text);
-                return;
-              }
-              
-              const message = {
-                senderId: userId,
-                senderName: userName,
-                text: text,
-                timestamp: Date.now()
-              };
-              
-              console.log('📤 Отправляем сообщение:', message);
-              messagesRef.push(message)
-                .then(() => console.log('✅ Сообщение отправлено!'))
-                .catch(error => console.error('❌ Ошибка отправки:', error));
+
+        class DatingChat {
+            constructor() {
+                this.userPhotos = [];
+                this.participants = new Map();
+                this.chatMessages = [];
+                this.emojiPickerVisible = false;
+                this.userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                this.userName = 'Аноним';
+                
+                this.init();
             }
-        
-///////
-// Тестовая функция с готовыми параметрами
-function testSendMessage() {
-  const userId = 'test_user_' + Date.now();
-  const userName = 'Тестовый Пользователь';
-  const text = 'Привет, это тестовое сообщение от ' + new Date().toLocaleTimeString();
-  
-  console.log('🔄 Тестовые параметры:', { userId, userName, text });
-  sendMessage(userId, userName, text);
-}
 
-// Вызываем тестовую функцию
-testSendMessage();
-//////////
+            init() {
+                this.setupEventListeners();
+                this.loadAllData();
+                this.createStars();
+                this.setupFirebaseListeners();
+                this.simulateOtherUsers();
+            }
 
-        
-        
-        // Функция для чтения сообщений в реальном времени
-        function setupChatListener() {
-          messagesRef.limitToLast(20).on('value', (snapshot) => {
-            console.log('📨 Новые сообщения:', snapshot.val());
-          });
+            setupEventListeners() {
+                // Загрузка фотографий
+                document.getElementById('avatarUpload').addEventListener('change', (e) => {
+                    this.handlePhotoUpload(e.target.files);
+                });
+
+                // Отправка сообщения по Enter
+                document.getElementById('messageInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+
+                // Закрытие эмодзи-пикера при клике вне его
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.emoji-picker')) {
+                        this.hideEmojiPicker();
+                    }
+                });
+            }
+
+            setupFirebaseListeners() {
+                // Слушаем новые сообщения из Firebase
+                messagesRef.limitToLast(50).on('value', (snapshot) => {
+                    const messages = snapshot.val();
+                    this.displayMessagesFromFirebase(messages);
+                });
+            }
+
+            displayMessagesFromFirebase(messages) {
+                const messagesContainer = document.getElementById('chatMessages');
+                
+                if (!messages) return;
+                
+                // Преобразуем объект в массив и сортируем по времени
+                const messagesArray = Object.entries(messages).map(([key, value]) => ({
+                    id: key,
+                    ...value
+                })).sort((a, b) => a.timestamp - b.timestamp);
+
+                // Очищаем только если это первая загрузка
+                if (this.chatMessages.length === 0) {
+                    messagesContainer.innerHTML = '<div class="system-message">🌟 Добро пожаловать в космический чат! Сообщения синхронизируются в реальном времени.</div>';
+                }
+
+                // Добавляем только новые сообщения
+                messagesArray.forEach(msg => {
+                    if (!this.chatMessages.find(m => m.id === msg.id)) {
+                        this.addMessageToUI(msg.senderName, msg.text, msg.senderId === this.userId ? 'user' : 'other');
+                        this.chatMessages.push(msg);
+                    }
+                });
+
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            sendMessage() {
+                const input = document.getElementById('messageInput');
+                const message = input.value.trim();
+
+                if (message) {
+                    // Отправляем в Firebase
+                    const messageData = {
+                        senderId: this.userId,
+                        senderName: this.userName,
+                        text: message,
+                        timestamp: Date.now()
+                    };
+                    
+                    messagesRef.push(messageData)
+                        .then(() => {
+                            console.log('✅ Сообщение отправлено в Firebase!');
+                            input.value = '';
+                        })
+                        .catch(error => {
+                            console.error('❌ Ошибка отправки:', error);
+                        });
+                }
+            }
+
+            addMessageToUI(sender, text, type) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+
+                messageDiv.innerHTML = `
+                    <div class="message-header">${sender} • ${timeString}</div>
+                    <div class="message-text">${this.formatMessage(text)}</div>
+                `;
+
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                messageDiv.classList.add('new-message');
+                setTimeout(() => messageDiv.classList.remove('new-message'), 500);
+            }
+
+            formatMessage(text) {
+                return text.replace(/\n/g, '<br>');
+            }
+
+            handlePhotoUpload(files) {
+                if (this.userPhotos.length + files.length > 5) {
+                    alert('Максимум 5 фотографий!');
+                    return;
+                }
+
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.userPhotos.push({
+                                id: Date.now() + Math.random(),
+                                data: e.target.result,
+                                timestamp: new Date().toISOString()
+                            });
+                            this.updatePhotoPreview();
+                            this.saveUserData();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            updatePhotoPreview() {
+                const preview = document.getElementById('photoPreview');
+                preview.innerHTML = '';
+
+                this.userPhotos.forEach((photo, index) => {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'photo-item';
+                    imgContainer.innerHTML = `
+                        <img src="${photo.data}" alt="Фото ${index + 1}" onclick="window.datingChat.showFullPhoto('${photo.data}')">
+                        <button class="delete-photo" onclick="window.datingChat.deletePhoto(${index})">×</button>
+                    `;
+                    preview.appendChild(imgContainer);
+                });
+
+                if (this.userPhotos.length > 0) {
+                    document.getElementById('userAvatar').src = this.userPhotos[0].data;
+                } else {
+                    document.getElementById('userAvatar').src = '';
+                }
+            }
+
+            deletePhoto(index) {
+                this.userPhotos.splice(index, 1);
+                this.updatePhotoPreview();
+                this.saveUserData();
+            }
+
+            showFullPhoto(photoData) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.9);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                    cursor: pointer;
+                `;
+                
+                const img = document.createElement('img');
+                img.src = photoData;
+                img.style.cssText = `
+                    max-width: 90%;
+                    max-height: 90%;
+                    border-radius: 10px;
+                    box-shadow: 0 0 30px rgba(79, 195, 247, 0.5);
+                `;
+
+                modal.appendChild(img);
+                modal.onclick = () => document.body.removeChild(modal);
+                document.body.appendChild(modal);
+            }
+
+            simulateOtherUsers() {
+                const fakeUsers = [
+                    { name: 'Космический странник', id: 'user1' },
+                    { name: 'Лунная принцесса', id: 'user2' },
+                    { name: 'Звездный воин', id: 'user3' }
+                ];
+
+                fakeUsers.forEach(user => {
+                    this.participants.set(user.id, user);
+                    this.addParticipant(user.name, user.id);
+                });
+
+                document.getElementById('onlineCount').textContent = this.participants.size + 1;
+            }
+
+            addParticipant(name, id) {
+                const participantsList = document.getElementById('participantsList');
+                const participantDiv = document.createElement('div');
+                participantDiv.className = 'participant';
+                participantDiv.id = `participant-${id}`;
+
+                participantDiv.innerHTML = `
+                    <div class="participant-avatar">${name.charAt(0)}</div>
+                    <div class="participant-info">
+                        <div class="participant-name">${name}</div>
+                        <div class="participant-status online">online</div>
+                    </div>
+                `;
+
+                participantsList.appendChild(participantDiv);
+            }
+
+            toggleEmojiPicker() {
+                this.emojiPickerVisible = !this.emojiPickerVisible;
+                const emojiGrid = document.getElementById('emojiGrid');
+                
+                if (this.emojiPickerVisible) {
+                    emojiGrid.classList.add('show');
+                } else {
+                    emojiGrid.classList.remove('show');
+                }
+            }
+
+            hideEmojiPicker() {
+                this.emojiPickerVisible = false;
+                document.getElementById('emojiGrid').classList.remove('show');
+            }
+
+            addEmoji(emoji) {
+                const input = document.getElementById('messageInput');
+                input.value += emoji;
+                input.focus();
+                this.hideEmojiPicker();
+            }
+
+            createStars() {
+                this.createStarLayer('stars', 200, 3);
+                this.createStarLayer('stars2', 100, 2);
+                this.createStarLayer('stars3', 50, 1);
+            }
+
+            createStarLayer(layerId, count, size) {
+                const layer = document.getElementById(layerId);
+                for (let i = 0; i < count; i++) {
+                    const star = document.createElement('div');
+                    star.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: white;
+                        border-radius: 50%;
+                        top: ${Math.random() * 100}%;
+                        left: ${Math.random() * 100}%;
+                        animation: twinkle ${2 + Math.random() * 3}s infinite;
+                        animation-delay: ${Math.random() * 5}s;
+                    `;
+                    layer.appendChild(star);
+                }
+            }
+
+            saveUserData() {
+                const userData = {
+                    photos: this.userPhotos,
+                    lastUpdated: new Date().toISOString()
+                };
+                localStorage.setItem('cosmicDatingUserData', JSON.stringify(userData));
+            }
+
+            loadAllData() {
+                this.loadUserData();
+            }
+
+            loadUserData() {
+                try {
+                    const saved = localStorage.getItem('cosmicDatingUserData');
+                    if (saved) {
+                        const userData = JSON.parse(saved);
+                        this.userPhotos = userData.photos || [];
+                        this.updatePhotoPreview();
+                    }
+                } catch (error) {
+                    console.log('Ошибка загрузки данных пользователя:', error);
+                }
+            }
+
+            clearAllData() {
+                if (confirm('Очистить все данные?')) {
+                    localStorage.removeItem('cosmicDatingUserData');
+                    location.reload();
+                }
+            }
         }
-        
-        // Инициализируем прослушиватель сообщений
-        setupChatListener();
-      /////
-        
+
+        // Глобальные функции для вызова из HTML
+        function toggleEmojiPicker() {
+            window.datingChat.toggleEmojiPicker();
+        }
+
+        function addEmoji(emoji) {
+            window.datingChat.addEmoji(emoji);
+        }
+
+        function sendMessage() {
+            window.datingChat.sendMessage();
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            window.datingChat = new DatingChat();
+            
+            // Кнопка очистки для отладки
+            const clearBtn = document.createElement('button');
+            clearBtn.textContent = '🧹 Очистить данные';
+            clearBtn.style.cssText = `
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                background: rgba(255,0,0,0.3);
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 5px;
+                cursor: pointer;
+                z-index: 1000;
+                font-size: 12px;
+            `;
+            clearBtn.onclick = () => window.datingChat.clearAllData();
+            document.body.appendChild(clearBtn);
+        });
     </script>
-    
 </body>
 </html>
