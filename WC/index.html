@@ -118,16 +118,26 @@
         const usersRef = database.ref('users');
         
         // Функция для отправки сообщения
-        function sendMessage(userId, userName, text) {
-          const message = {
-            senderId: userId,
-            senderName: userName,
-            text: text,
-            timestamp: Date.now()
-          };
-          
-          messagesRef.push(message);
-        }
+            function sendMessage(userId, userName, text) {
+              // Проверяем, что все параметры переданы
+              if (!userId || !userName || !text) {
+                console.error('❌ Ошибка: все параметры должны быть заданы');
+                console.log('userId:', userId, 'userName:', userName, 'text:', text);
+                return;
+              }
+              
+              const message = {
+                senderId: userId,
+                senderName: userName,
+                text: text,
+                timestamp: Date.now()
+              };
+              
+              console.log('📤 Отправляем сообщение:', message);
+              messagesRef.push(message)
+                .then(() => console.log('✅ Сообщение отправлено!'))
+                .catch(error => console.error('❌ Ошибка отправки:', error));
+            }
         
         // Функция для чтения сообщений в реальном времени
         function setupChatListener() {
