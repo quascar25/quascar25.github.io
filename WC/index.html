@@ -90,5 +90,26 @@
     </div>
 
     <script src="script.js"></script>
+    
+        <!-- Подключаем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <script>
+      // Вставьте сюда скопированную конфигурацию
+      const firebaseConfig = {
+        apiKey: "ваш-api-key",
+        authDomain: "ваш-auth-domain",
+        databaseURL: "ваш-database-url",
+        projectId: "ваш-project-id",
+        storageBucket: "ваш-storage-bucket",
+        appId: "ваш-app-id"
+      };
+    
+      // Инициализируем Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+    </script>
+    
 </body>
 </html>
