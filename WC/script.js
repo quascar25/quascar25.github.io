@@ -2,21 +2,17 @@ class DatingChat {
     constructor() {
         this.userPhotos = [];
         this.participants = new Map();
-        this.currentUserId = this.generateUserId();
+        this.chatMessages = [];
         this.emojiPickerVisible = false;
         
         this.init();
     }
 
-    generateUserId() {
-        return 'user_' + Math.random().toString(36).substr(2, 9);
-    }
-
     init() {
         this.setupEventListeners();
-        this.loadUserData();
-        this.simulateOtherUsers();
+        this.loadAllData();
         this.createStars();
+        this.simulateOtherUsers();
     }
 
     setupEventListeners() {
@@ -52,7 +48,11 @@ class DatingChat {
                     .then(compressedFile => {
                         const reader = new FileReader();
                         reader.onload = (e) => {
-                            this.userPhotos.push(e.target.result);
+                            this.userPhotos.push({
+                                id: Date.now() + Math.random(),
+                                data: e.target.result,
+                                timestamp: new Date().toISOString()
+                            });
                             this.updatePhotoPreview();
                             this.saveUserData();
                         };
@@ -60,6 +60,7 @@ class DatingChat {
                     })
                     .catch(error => {
                         console.error('Ошибка сжатия изображения:', error);
+                        alert('Ошибка при загрузке изображения');
                     });
             }
         });
@@ -91,6 +92,7 @@ class DatingChat {
                 canvas.width = width;
                 canvas.height = height;
 
+                // Рисуем сжатое изображение
                 ctx.drawImage(img, 0, 0, width, height);
 
                 canvas.toBlob(blob => {
@@ -111,17 +113,27 @@ class DatingChat {
         preview.innerHTML = '';
 
         this.userPhotos.forEach((photo, index) => {
-            const img = document.createElement('img');
-            img.src = photo;
-            img.alt = `Фото ${index + 1}`;
-            img.onclick = () => this.showFullPhoto(photo);
-            preview.appendChild(img);
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'photo-item';
+            imgContainer.innerHTML = `
+                <img src="${photo.data}" alt="Фото ${index + 1}">
+                <button class="delete-photo" onclick="window.datingChat.deletePhoto(${index})">×</button>
+            `;
+            preview.appendChild(imgContainer);
         });
 
         // Обновляем аватар первым фото
         if (this.userPhotos.length > 0) {
-            document.getElementById('userAvatar').src = this.userPhotos[0];
+            document.getElementById('userAvatar').src = this.userPhotos[0].data;
+        } else {
+            document.getElementById('userAvatar').src = '';
         }
+    }
+
+    deletePhoto(index) {
+        this.userPhotos.splice(index, 1);
+        this.updatePhotoPreview();
+        this.saveUserData();
     }
 
     showFullPhoto(photo) {
@@ -164,6 +176,8 @@ class DatingChat {
             
             // Симуляция ответов других пользователей
             setTimeout(() => this.simulateReply(message), 1000 + Math.random() * 3000);
+            
+            this.saveChatHistory();
         }
     }
 
@@ -189,11 +203,18 @@ class DatingChat {
         messageDiv.classList.add('new-message');
         setTimeout(() => messageDiv.classList.remove('new-message'), 500);
 
-        this.saveChatHistory();
+        // Сохраняем в историю
+        this.chatMessages.push({
+            id: Date.now(),
+            sender,
+            text,
+            type,
+            timestamp: now.toISOString()
+        });
     }
 
     formatMessage(text) {
-        // Простая обработка эмодзи и текста
+        // Заменяем переносы строк и обрабатываем эмодзи
         return text.replace(/\n/g, '<br>');
     }
 
@@ -202,7 +223,8 @@ class DatingChat {
             { name: 'Космический странник', id: 'user1' },
             { name: 'Лунная принцесса', id: 'user2' },
             { name: 'Звездный воин', id: 'user3' },
-            { name: 'Галактический исследователь', id: 'user4' }
+            { name: 'Галактический исследователь', id: 'user4' },
+            { name: 'Туманность', id: 'user5' }
         ];
 
         fakeUsers.forEach(user => {
@@ -214,8 +236,10 @@ class DatingChat {
 
         // Периодические сообщения от ботов
         setInterval(() => {
-            if (Math.random() > 0.7) {
-                const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
+            if (Math.random() > 0.7 && this.chatMessages.length > 0) {
+                const randomUser = Array.from(this.participants.values())[
+                    Math.floor(Math.random() * this.participants.size)
+                ];
                 const messages = [
                     'Привет! Как твои космические дела? 🌟',
                     'Кто-нибудь здесь любит смотреть на звезды? 🌌',
@@ -224,12 +248,17 @@ class DatingChat {
                     'Кто хочет отправиться в межзвездное путешествие? 👽',
                     'Люблю эти космические закаты... 🌅',
                     'Только что закончил читать книгу о черных дырах! 📚',
-                    'Есть здесь астрономы? 🔭'
+                    'Есть здесь астрономы? 🔭',
+                    'Как думаете, есть ли жизнь на других планетах? 🪐',
+                    'Люблю скорость света! ⚡',
+                    'Сегодня ночью будет метеорный поток! 🌠',
+                    'Кто-нибудь был на Марсе? 🤖'
                 ];
                 const randomMessage = messages[Math.floor(Math.random() * messages.length)];
                 this.addMessage(randomUser.name, randomMessage, 'other');
+                this.saveChatHistory();
             }
-        }, 10000);
+        }, 15000);
     }
 
     simulateReply(userMessage) {
@@ -238,12 +267,16 @@ class DatingChat {
             const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
             
             const replies = {
-                'привет': ['Привет! 👋', 'Здравствуй! 🌟', 'Приветствую! 🚀'],
+                'привет': ['Привет! 👋', 'Здравствуй! 🌟', 'Приветствую! 🚀', 'Привет, землянин! 👽'],
                 'как дела': ['Отлично, наблюдаю за звездами! 🌌', 'Прекрасно, планирую космический полет! 👽', 'Хорошо, изучаю новые галактики! 💫'],
+                'пока': ['До встречи! 👋', 'Удачи в космосе! 🚀', 'Пока! Возвращайся скорее! 🌟'],
                 'default': [
                     'Интересно! Расскажи подробнее? 👀',
                     'Понятно! А что думаешь о космосе? 🌠',
-                    'Занимательно! Хочешь обсудить звезды? ⭐'
+                    'Занимательно! Хочешь обсудить звезды? ⭐',
+                    'Ух ты! Это круто! 😎',
+                    'Ничего себе! 🎉',
+                    'Вот это да! 🌟'
                 ]
             };
 
@@ -252,10 +285,12 @@ class DatingChat {
 
             if (lowerMessage.includes('привет')) reply = replies['привет'];
             else if (lowerMessage.includes('как дела')) reply = replies['как дела'];
+            else if (lowerMessage.includes('пока')) reply = replies['пока'];
             else reply = replies['default'];
 
             const randomReply = reply[Math.floor(Math.random() * reply.length)];
             this.addMessage(randomUser.name, randomReply, 'other');
+            this.saveChatHistory();
         }
     }
 
@@ -324,34 +359,80 @@ class DatingChat {
         }
     }
 
+    // Сохранение данных в localStorage
     saveUserData() {
         const userData = {
             photos: this.userPhotos,
-            userId: this.currentUserId
+            lastUpdated: new Date().toISOString()
         };
-        localStorage.setItem('cosmicDatingData', JSON.stringify(userData));
-    }
-
-    loadUserData() {
-        const saved = localStorage.getItem('cosmicDatingData');
-        if (saved) {
-            const userData = JSON.parse(saved);
-            this.userPhotos = userData.photos || [];
-            this.currentUserId = userData.userId || this.currentUserId;
-            this.updatePhotoPreview();
-        }
+        localStorage.setItem('cosmicDatingUserData', JSON.stringify(userData));
     }
 
     saveChatHistory() {
-        // В реальном приложении здесь была бы синхронизация с сервером
-        const messages = document.getElementById('chatMessages').innerHTML;
-        localStorage.setItem('cosmicChatHistory', messages);
+        // Сохраняем только последние 100 сообщений
+        const recentMessages = this.chatMessages.slice(-100);
+        localStorage.setItem('cosmicChatHistory', JSON.stringify(recentMessages));
+    }
+
+    loadAllData() {
+        this.loadUserData();
+        this.loadChatHistory();
+    }
+
+    loadUserData() {
+        try {
+            const saved = localStorage.getItem('cosmicDatingUserData');
+            if (saved) {
+                const userData = JSON.parse(saved);
+                this.userPhotos = userData.photos || [];
+                this.updatePhotoPreview();
+            }
+        } catch (error) {
+            console.log('Ошибка загрузки данных пользователя:', error);
+        }
     }
 
     loadChatHistory() {
-        const saved = localStorage.getItem('cosmicChatHistory');
-        if (saved) {
-            document.getElementById('chatMessages').innerHTML = saved;
+        try {
+            const saved = localStorage.getItem('cosmicChatHistory');
+            if (saved) {
+                const messages = JSON.parse(saved);
+                this.chatMessages = messages;
+                
+                // Восстанавливаем сообщения в чате
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.innerHTML = '<div class="system-message">🌟 Добро пожаловать в космический чат! Вы видите всех, другие видят только вас.</div>';
+                
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.type}`;
+
+                    const time = new Date(msg.timestamp);
+                    const timeString = time.toLocaleTimeString('ru-RU', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+
+                    messageDiv.innerHTML = `
+                        <div class="message-header">${msg.sender} • ${timeString}</div>
+                        <div class="message-text">${this.formatMessage(msg.text)}</div>
+                    `;
+                    messagesContainer.appendChild(messageDiv);
+                });
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        } catch (error) {
+            console.log('Ошибка загрузки истории чата:', error);
+        }
+    }
+
+    // Очистка данных (для отладки)
+    clearAllData() {
+        if (confirm('Очистить все данные?')) {
+            localStorage.removeItem('cosmicDatingUserData');
+            localStorage.removeItem('cosmicChatHistory');
+            location.reload();
         }
     }
 }
@@ -372,4 +453,23 @@ function sendMessage() {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     window.datingChat = new DatingChat();
+    
+    // Добавляем кнопку очистки для отладки (можно удалить в продакшене)
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = '🧹 Очистить данные';
+    clearBtn.style.cssText = `
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(255,0,0,0.3);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 12px;
+    `;
+    clearBtn.onclick = () => window.datingChat.clearAllData();
+    document.body.appendChild(clearBtn);
 });
