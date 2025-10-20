@@ -110,11 +110,29 @@
     // Инициализация Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const storage = firebase.storage();
 
     // Ссылки на разделы базы данных
     const messagesRef = database.ref('messages');
     const usersRef = database.ref('users');
+
+    // ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ HTML
+    function toggleEmojiPicker() {
+        if (window.datingChat) {
+            window.datingChat.toggleEmojiPicker();
+        }
+    }
+
+    function addEmoji(emoji) {
+        if (window.datingChat) {
+            window.datingChat.addEmoji(emoji);
+        }
+    }
+
+    function sendMessage() {
+        if (window.datingChat) {
+            window.datingChat.sendMessage();
+        }
+    }
 
     class DatingChat {
         constructor() {
@@ -124,7 +142,7 @@
             this.emojiPickerVisible = false;
             this.userId = 'user_' + Math.random().toString(36).substr(2, 9);
             this.userName = 'Аноним';
-            this.userAvatarText = ''; // Теперь храним текст вместо URL
+            this.userAvatarText = '';
             
             this.init();
         }
@@ -139,16 +157,22 @@
 
         setupEventListeners() {
             // Загрузка фотографий
-            document.getElementById('avatarUpload').addEventListener('change', (e) => {
-                this.handlePhotoUpload(e.target.files);
-            });
+            const avatarUpload = document.getElementById('avatarUpload');
+            if (avatarUpload) {
+                avatarUpload.addEventListener('change', (e) => {
+                    this.handlePhotoUpload(e.target.files);
+                });
+            }
 
             // Отправка сообщения по Enter
-            document.getElementById('messageInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    this.sendMessage();
-                }
-            });
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+            }
 
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.emoji-picker')) {
@@ -157,53 +181,17 @@
             });
         }
 
-            // В функции setupFirebaseListeners добавляем:
-            setupFirebaseListeners() {
-                // Слушаем сообщения
-                messagesRef.limitToLast(50).on('value', (snapshot) => {
-                    const messages = snapshot.val();
-                    this.displayMessagesFromFirebase(messages);
-                });
-                
-                // Слушаем обновления пользователей (для аватаров)
-                usersRef.on('child_added', (snapshot) => {
-                    const userData = snapshot.val();
-                    if (userData.avatarText) {
-                        this.updateUserAvatar(snapshot.key, userData.avatarText);
-                    }
-                });
-            }
+        setupFirebaseListeners() {
+            // Слушаем новые сообщения из Firebase
+            messagesRef.limitToLast(50).on('value', (snapshot) => {
+                const messages = snapshot.val();
+                this.displayMessagesFromFirebase(messages);
+            });
+        }
 
-                        
-                // Функция обновления аватара пользователя
-                updateUserAvatar(userId, avatarText) {
-                    // Если это текущий пользователь
-                    if (userId === this.userId) {
-                        document.getElementById('userAvatar').src = avatarText;
-                    }
-                    
-                    // Можно добавить отображение аватаров других пользователей в чате
-                    const userElement = document.getElementById(`participant-${userId}`);
-                    if (userElement) {
-                        const avatarElement = userElement.querySelector('.participant-avatar');
-                        if (avatarElement) {
-                            // Создаем маленькую версию аватара
-                            const smallImg = document.createElement('img');
-                            smallImg.src = avatarText;
-                            smallImg.style.width = '40px';
-                            smallImg.style.height = '40px';
-                            smallImg.style.borderRadius = '50%';
-                            avatarElement.innerHTML = '';
-                            avatarElement.appendChild(smallImg);
-                        }
-                    }
-                }
-
-        /////////////        
-
-        
         displayMessagesFromFirebase(messages) {
             const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
             
             if (!messages) return;
             
@@ -226,61 +214,59 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-            sendMessage() {
-                const input = document.getElementById('messageInput');
-                const message = input.value.trim();
+        sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (!input) return;
             
-                if (message) {
-                    const messageData = {
-                        senderId: this.userId,
-                        senderName: this.userName,
-                        text: message,
-                        timestamp: Date.now(),
-                        avatarText: this.userAvatarText // Добавляем текстовый аватар!
-                    };
-                    
-                    messagesRef.push(messageData)
-                        .then(() => {
-                            console.log('✅ Сообщение отправлено с аватаром!');
-                            input.value = '';
-                        })
-                        .catch(error => {
-                            console.error('❌ Ошибка отправки:', error);
-                        });
-                }
-            }
+            const message = input.value.trim();
 
-        // НОВАЯ ФУНКЦИЯ: Сжатие изображения до 300x300
-        compressImage(file) {
+            if (message) {
+                const messageData = {
+                    senderId: this.userId,
+                    senderName: this.userName,
+                    text: message,
+                    timestamp: Date.now(),
+                    avatarText: this.userAvatarText
+                };
+                
+                messagesRef.push(messageData)
+                    .then(() => {
+                        console.log('✅ Сообщение отправлено в Firebase!');
+                        input.value = '';
+                    })
+                    .catch(error => {
+                        console.error('❌ Ошибка отправки:', error);
+                    });
+            }
+        }
+
+        // Функция сжатия и конвертации фото в текст
+        compressImageToText(file) {
             return new Promise((resolve, reject) => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 const img = new Image();
 
                 img.onload = () => {
-                    // Устанавливаем размер 300x300
-                    canvas.width = 300;
-                    canvas.height = 300;
+                    // Устанавливаем размер 100x100
+                    canvas.width = 100;
+                    canvas.height = 100;
 
                     // Сохраняем пропорции и центрируем
-                    const scale = Math.min(300 / img.width, 300 / img.height);
+                    const scale = Math.min(100 / img.width, 100 / img.height);
                     const width = img.width * scale;
                     const height = img.height * scale;
-                    const x = (300 - width) / 2;
-                    const y = (300 - height) / 2;
+                    const x = (100 - width) / 2;
+                    const y = (100 - height) / 2;
 
-                    // Рисуем сжатое изображение с белым фоном
+                    // Рисуем сжатое изображение
                     ctx.fillStyle = 'white';
-                    ctx.fillRect(0, 0, 300, 300);
+                    ctx.fillRect(0, 0, 100, 100);
                     ctx.drawImage(img, x, y, width, height);
 
-                    // Конвертируем в Blob
-                    canvas.toBlob(blob => {
-                        resolve(new File([blob], 'avatar.jpg', {
-                            type: 'image/jpeg',
-                            lastModified: Date.now()
-                        }));
-                    }, 'image/jpeg', 0.8);
+                    // Конвертируем в Base64 строку
+                    const base64String = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(base64String);
                 };
 
                 img.onerror = reject;
@@ -288,93 +274,98 @@
             });
         }
 
-        // Обновленная функция загрузки фото
-            async handlePhotoUpload(files) {
-                if (files.length === 0) return;
-                const file = files[0];
-                
-                if (!file.type.startsWith('image/')) {
-                    alert('Пожалуйста, выберите изображение!');
-                    return;
-                }
+        // Функция загрузки фото
+        async handlePhotoUpload(files) {
+            if (files.length === 0) return;
+            const file = files[0];
             
-                try {
-                    const uploadBtn = document.querySelector('.upload-btn');
-                    uploadBtn.textContent = '📷 Конвертируем...';
-                    uploadBtn.disabled = true;
-            
-                    // Конвертируем фото в текстовую строку
-                    const imageText = await this.compressImageToText(file);
-                    console.log('✅ Фото сконвертировано в текст:', imageText.substring(0, 50) + '...');
-                    
-                    // Сохраняем текстовую строку в базу данных
-                    await usersRef.child(this.userId).set({
-                        name: this.userName,
-                        avatarText: imageText, // Сохраняем как текст!
-                        lastSeen: Date.now()
-                    });
-                    
-                    // Обновляем локально
-                    this.userAvatarText = imageText;
-                    document.getElementById('userAvatar').src = imageText;
-                    
-                    this.userPhotos = [{
-                        id: this.userId,
-                        data: imageText,
-                        timestamp: new Date().toISOString()
-                    }];
-                    
-                    this.updatePhotoPreview();
-                    this.saveUserData();
-                    
-                    alert('✅ Фото успешно загружено как текст!');
-                    
-                } catch (error) {
-                    console.error('❌ Ошибка конвертации:', error);
-                    alert('Ошибка: ' + error.message);
-                } finally {
-                    const uploadBtn = document.querySelector('.upload-btn');
-                    uploadBtn.textContent = '📷 Загрузить фото (1 фото)';
-                    uploadBtn.disabled = false;
-                }
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите изображение!');
+                return;
             }
+
+            try {
+                const uploadBtn = document.querySelector('.upload-btn');
+                uploadBtn.textContent = '📷 Конвертируем...';
+                uploadBtn.disabled = true;
+
+                // Конвертируем фото в текстовую строку
+                const imageText = await this.compressImageToText(file);
+                console.log('✅ Фото сконвертировано в текст');
+                
+                // Сохраняем текстовую строку в базу данных
+                await usersRef.child(this.userId).set({
+                    name: this.userName,
+                    avatarText: imageText,
+                    lastSeen: Date.now()
+                });
+                
+                // Обновляем локально
+                this.userAvatarText = imageText;
+                const userAvatar = document.getElementById('userAvatar');
+                if (userAvatar) {
+                    userAvatar.src = imageText;
+                }
+                
+                this.userPhotos = [{
+                    id: this.userId,
+                    data: imageText,
+                    timestamp: new Date().toISOString()
+                }];
+                
+                this.updatePhotoPreview();
+                this.saveUserData();
+                
+                alert('✅ Фото успешно загружено как текст!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка конвертации:', error);
+                alert('Ошибка: ' + error.message);
+            } finally {
+                const uploadBtn = document.querySelector('.upload-btn');
+                uploadBtn.textContent = '📷 Загрузить фото (1 фото)';
+                uploadBtn.disabled = false;
+            }
+        }
 
         updatePhotoPreview() {
             const preview = document.getElementById('photoPreview');
+            if (!preview) return;
+            
             preview.innerHTML = '';
 
             this.userPhotos.forEach((photo, index) => {
                 const imgContainer = document.createElement('div');
                 imgContainer.className = 'photo-item';
                 imgContainer.innerHTML = `
-                    <img src="${photo.data}" alt="Аватар" style="width: 80px; height: 80px; border-radius: 10px;">
+                    <img src="${photo.data}" alt="Аватар" style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover;">
                     <button class="delete-photo" onclick="window.datingChat.deletePhoto()">×</button>
                 `;
                 preview.appendChild(imgContainer);
             });
 
             if (this.userPhotos.length > 0) {
-                document.getElementById('userAvatar').src = this.userPhotos[0].data;
+                const userAvatar = document.getElementById('userAvatar');
+                if (userAvatar) {
+                    userAvatar.src = this.userPhotos[0].data;
+                }
             }
         }
 
-        // НОВАЯ ФУНКЦИЯ: Удаление фото
-        async deletePhoto() {
+        deletePhoto() {
             if (!confirm('Удалить аватар?')) return;
 
             try {
                 // Удаляем из базы данных
-                await usersRef.child(this.userId).remove();
-                
-                // Удаляем из Storage (если есть файл)
-                if (this.userAvatarUrl) {
-                    // Можно добавить удаление файла из Storage если нужно
-                }
+                usersRef.child(this.userId).remove();
                 
                 // Очищаем локальные данные
                 this.userPhotos = [];
-                this.userAvatarUrl = '';
-                document.getElementById('userAvatar').src = '';
+                this.userAvatarText = '';
+                const userAvatar = document.getElementById('userAvatar');
+                if (userAvatar) {
+                    userAvatar.src = '';
+                }
                 this.updatePhotoPreview();
                 this.saveUserData();
                 
@@ -387,6 +378,8 @@
 
         addMessageToUI(sender, text, type) {
             const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
 
@@ -424,11 +417,16 @@
                 this.addParticipant(user.name, user.id);
             });
 
-            document.getElementById('onlineCount').textContent = this.participants.size + 1;
+            const onlineCount = document.getElementById('onlineCount');
+            if (onlineCount) {
+                onlineCount.textContent = this.participants.size + 1;
+            }
         }
 
         addParticipant(name, id) {
             const participantsList = document.getElementById('participantsList');
+            if (!participantsList) return;
+            
             const participantDiv = document.createElement('div');
             participantDiv.className = 'participant';
             participantDiv.id = `participant-${id}`;
@@ -447,6 +445,7 @@
         toggleEmojiPicker() {
             this.emojiPickerVisible = !this.emojiPickerVisible;
             const emojiGrid = document.getElementById('emojiGrid');
+            if (!emojiGrid) return;
             
             if (this.emojiPickerVisible) {
                 emojiGrid.classList.add('show');
@@ -457,11 +456,16 @@
 
         hideEmojiPicker() {
             this.emojiPickerVisible = false;
-            document.getElementById('emojiGrid').classList.remove('show');
+            const emojiGrid = document.getElementById('emojiGrid');
+            if (emojiGrid) {
+                emojiGrid.classList.remove('show');
+            }
         }
 
         addEmoji(emoji) {
             const input = document.getElementById('messageInput');
+            if (!input) return;
+            
             input.value += emoji;
             input.focus();
             this.hideEmojiPicker();
@@ -475,6 +479,8 @@
 
         createStarLayer(layerId, count, size) {
             const layer = document.getElementById(layerId);
+            if (!layer) return;
+            
             for (let i = 0; i < count; i++) {
                 const star = document.createElement('div');
                 star.style.cssText = `
@@ -495,7 +501,7 @@
         saveUserData() {
             const userData = {
                 photos: this.userPhotos,
-                avatarUrl: this.userAvatarUrl,
+                avatarText: this.userAvatarText,
                 userId: this.userId,
                 lastUpdated: new Date().toISOString()
             };
@@ -512,11 +518,14 @@
                 if (saved) {
                     const userData = JSON.parse(saved);
                     this.userPhotos = userData.photos || [];
-                    this.userAvatarUrl = userData.avatarUrl || '';
+                    this.userAvatarText = userData.avatarText || '';
                     this.userId = userData.userId || this.userId;
                     
-                    if (this.userAvatarUrl) {
-                        document.getElementById('userAvatar').src = this.userAvatarUrl;
+                    if (this.userAvatarText) {
+                        const userAvatar = document.getElementById('userAvatar');
+                        if (userAvatar) {
+                            userAvatar.src = this.userAvatarText;
+                        }
                     }
                     this.updatePhotoPreview();
                 }
@@ -533,62 +542,11 @@
         }
     }
 
-    // Глобальные функции
-    function toggleEmojiPicker() {
-        window.datingChat.toggleEmojiPicker();
-    }
-
-    function addEmoji(emoji) {
-        window.datingChat.addEmoji(emoji);
-    }
-
-    function sendMessage() {
-        window.datingChat.sendMessage();
-    }
-
-
-    ///R//
-
-compressImageToText(file) {
-    return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-
-        img.onload = () => {
-            // Устанавливаем размер 100x100
-            canvas.width = 100;
-            canvas.height = 100;
-
-            // Сохраняем пропорции и центрируем
-            const scale = Math.min(100 / img.width, 100 / img.height);
-            const width = img.width * scale;
-            const height = img.height * scale;
-            const x = (100 - width) / 2;
-            const y = (100 - height) / 2;
-
-            // Рисуем сжатое изображение
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, 100, 100);
-            ctx.drawImage(img, x, y, width, height);
-
-            // Конвертируем в Base64 строку
-            const base64String = canvas.toDataURL('image/jpeg', 0.7);
-            resolve(base64String);
-        };
-
-        img.onerror = reject;
-        img.src = URL.createObjectURL(file);
-    });
-}
-
-    
-    ///R//
-
-    // Инициализация
+    // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', () => {
         window.datingChat = new DatingChat();
         
+        // Кнопка очистки для отладки
         const clearBtn = document.createElement('button');
         clearBtn.textContent = '🧹 Очистить данные';
         clearBtn.style.cssText = `
