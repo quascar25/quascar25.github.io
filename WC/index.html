@@ -113,35 +113,31 @@
       const database = firebase.database();
 
       /////
-        // ... ваш код инициализации Firebase ...
-      // Тестовые функции
-      function testDatabase() {
-        // Пытаемся записать тестовые данные
-        const testRef = database.ref('test_connection');
+        // Ссылки на разделы базы данных
+        const messagesRef = database.ref('messages');
+        const usersRef = database.ref('users');
         
-        testRef.set({
-          message: 'Тестовое сообщение от JetChat',
-          timestamp: Date.now()
-        })
-        .then(() => {
-          console.log('✅ Данные успешно записаны в Firebase!');
-          // Проверяем чтение данных
-          return testRef.once('value');
-        })
-        .then((snapshot) => {
-          const data = snapshot.val();
-          console.log('✅ Данные успешно прочитаны:', data);
-          alert('Подключение к Firebase работает! Проверьте консоль браузера.');
-        })
-        .catch((error) => {
-          console.error('❌ Ошибка:', error);
-          alert('Ошибка подключения: ' + error.message);
-        });
-      }
-    
-      // Запускаем тест при загрузке страницы
-      window.addEventListener('load', testDatabase);
+        // Функция для отправки сообщения
+        function sendMessage(userId, userName, text) {
+          const message = {
+            senderId: userId,
+            senderName: userName,
+            text: text,
+            timestamp: Date.now()
+          };
+          
+          messagesRef.push(message);
+        }
         
+        // Функция для чтения сообщений в реальном времени
+        function setupChatListener() {
+          messagesRef.limitToLast(20).on('value', (snapshot) => {
+            console.log('📨 Новые сообщения:', snapshot.val());
+          });
+        }
+        
+        // Инициализируем прослушиватель сообщений
+        setupChatListener();
       /////
         
     </script>
