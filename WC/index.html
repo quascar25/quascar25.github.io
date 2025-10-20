@@ -124,7 +124,7 @@
             this.emojiPickerVisible = false;
             this.userId = 'user_' + Math.random().toString(36).substr(2, 9);
             this.userName = 'Аноним';
-            this.userAvatarUrl = '';
+            this.userAvatarText = ''; // Теперь храним текст вместо URL
             
             this.init();
         }
@@ -157,14 +157,51 @@
             });
         }
 
-        setupFirebaseListeners() {
-            // Слушаем новые сообщения из Firebase
-            messagesRef.limitToLast(50).on('value', (snapshot) => {
-                const messages = snapshot.val();
-                this.displayMessagesFromFirebase(messages);
-            });
-        }
+            // В функции setupFirebaseListeners добавляем:
+            setupFirebaseListeners() {
+                // Слушаем сообщения
+                messagesRef.limitToLast(50).on('value', (snapshot) => {
+                    const messages = snapshot.val();
+                    this.displayMessagesFromFirebase(messages);
+                });
+                
+                // Слушаем обновления пользователей (для аватаров)
+                usersRef.on('child_added', (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData.avatarText) {
+                        this.updateUserAvatar(snapshot.key, userData.avatarText);
+                    }
+                });
+            }
 
+                        
+                // Функция обновления аватара пользователя
+                updateUserAvatar(userId, avatarText) {
+                    // Если это текущий пользователь
+                    if (userId === this.userId) {
+                        document.getElementById('userAvatar').src = avatarText;
+                    }
+                    
+                    // Можно добавить отображение аватаров других пользователей в чате
+                    const userElement = document.getElementById(`participant-${userId}`);
+                    if (userElement) {
+                        const avatarElement = userElement.querySelector('.participant-avatar');
+                        if (avatarElement) {
+                            // Создаем маленькую версию аватара
+                            const smallImg = document.createElement('img');
+                            smallImg.src = avatarText;
+                            smallImg.style.width = '40px';
+                            smallImg.style.height = '40px';
+                            smallImg.style.borderRadius = '50%';
+                            avatarElement.innerHTML = '';
+                            avatarElement.appendChild(smallImg);
+                        }
+                    }
+                }
+
+        /////////////        
+
+        
         displayMessagesFromFirebase(messages) {
             const messagesContainer = document.getElementById('chatMessages');
             
@@ -189,29 +226,29 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-
-            if (message) {
-                const messageData = {
-                    senderId: this.userId,
-                    senderName: this.userName,
-                    text: message,
-                    timestamp: Date.now(),
-                    avatarUrl: this.userAvatarUrl // Добавляем аватар к сообщению
-                };
-                
-                messagesRef.push(messageData)
-                    .then(() => {
-                        console.log('✅ Сообщение отправлено в Firebase!');
-                        input.value = '';
-                    })
-                    .catch(error => {
-                        console.error('❌ Ошибка отправки:', error);
-                    });
+            sendMessage() {
+                const input = document.getElementById('messageInput');
+                const message = input.value.trim();
+            
+                if (message) {
+                    const messageData = {
+                        senderId: this.userId,
+                        senderName: this.userName,
+                        text: message,
+                        timestamp: Date.now(),
+                        avatarText: this.userAvatarText // Добавляем текстовый аватар!
+                    };
+                    
+                    messagesRef.push(messageData)
+                        .then(() => {
+                            console.log('✅ Сообщение отправлено с аватаром!');
+                            input.value = '';
+                        })
+                        .catch(error => {
+                            console.error('❌ Ошибка отправки:', error);
+                        });
+                }
             }
-        }
 
         // НОВАЯ ФУНКЦИЯ: Сжатие изображения до 300x300
         compressImage(file) {
@@ -251,71 +288,56 @@
             });
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ: Загрузка фото в Firebase Storage
-        async handlePhotoUpload(files) {
-            if (files.length === 0) return;
-
-            // Берем только первую фотографию
-            const file = files[0];
+        // Обновленная функция загрузки фото
+            async handlePhotoUpload(files) {
+                if (files.length === 0) return;
+                const file = files[0];
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Пожалуйста, выберите изображение!');
+                    return;
+                }
             
-            if (!file.type.startsWith('image/')) {
-                alert('Пожалуйста, выберите изображение!');
-                return;
+                try {
+                    const uploadBtn = document.querySelector('.upload-btn');
+                    uploadBtn.textContent = '📷 Конвертируем...';
+                    uploadBtn.disabled = true;
+            
+                    // Конвертируем фото в текстовую строку
+                    const imageText = await this.compressImageToText(file);
+                    console.log('✅ Фото сконвертировано в текст:', imageText.substring(0, 50) + '...');
+                    
+                    // Сохраняем текстовую строку в базу данных
+                    await usersRef.child(this.userId).set({
+                        name: this.userName,
+                        avatarText: imageText, // Сохраняем как текст!
+                        lastSeen: Date.now()
+                    });
+                    
+                    // Обновляем локально
+                    this.userAvatarText = imageText;
+                    document.getElementById('userAvatar').src = imageText;
+                    
+                    this.userPhotos = [{
+                        id: this.userId,
+                        data: imageText,
+                        timestamp: new Date().toISOString()
+                    }];
+                    
+                    this.updatePhotoPreview();
+                    this.saveUserData();
+                    
+                    alert('✅ Фото успешно загружено как текст!');
+                    
+                } catch (error) {
+                    console.error('❌ Ошибка конвертации:', error);
+                    alert('Ошибка: ' + error.message);
+                } finally {
+                    const uploadBtn = document.querySelector('.upload-btn');
+                    uploadBtn.textContent = '📷 Загрузить фото (1 фото)';
+                    uploadBtn.disabled = false;
+                }
             }
-
-            try {
-                // Показываем загрузку
-                const uploadBtn = document.querySelector('.upload-btn');
-                uploadBtn.textContent = '📷 Загружаем...';
-                uploadBtn.disabled = true;
-
-                // Сжимаем изображение
-                const compressedFile = await this.compressImage(file);
-                
-                // Создаем уникальное имя файла
-                const fileName = `avatars/${this.userId}_${Date.now()}.jpg`;
-                const storageRef = storage.ref().child(fileName);
-                
-                // Загружаем в Firebase Storage
-                const snapshot = await storageRef.put(compressedFile);
-                console.log('✅ Фото загружено в Storage');
-                
-                // Получаем URL для скачивания
-                const downloadURL = await snapshot.ref.getDownloadURL();
-                console.log('📷 URL фото:', downloadURL);
-                
-                // Сохраняем URL в базе данных
-                await usersRef.child(this.userId).set({
-                    name: this.userName,
-                    avatarUrl: downloadURL,
-                    lastSeen: Date.now()
-                });
-                
-                // Обновляем аватар локально
-                this.userAvatarUrl = downloadURL;
-                document.getElementById('userAvatar').src = downloadURL;
-                
-                // Сохраняем в локальное хранилище
-                this.userPhotos = [{
-                    id: this.userId,
-                    data: downloadURL,
-                    timestamp: new Date().toISOString()
-                }];
-                this.updatePhotoPreview();
-                this.saveUserData();
-                
-                alert('✅ Фото успешно загружено! Теперь все видят ваш аватар.');
-                
-            } catch (error) {
-                console.error('❌ Ошибка загрузки фото:', error);
-                alert('Ошибка при загрузке фото: ' + error.message);
-            } finally {
-                // Восстанавливаем кнопку
-                const uploadBtn = document.querySelector('.upload-btn');
-                uploadBtn.textContent = '📷 Загрузить фото (1 фото)';
-                uploadBtn.disabled = false;
-            }
-        }
 
         updatePhotoPreview() {
             const preview = document.getElementById('photoPreview');
@@ -523,6 +545,45 @@
     function sendMessage() {
         window.datingChat.sendMessage();
     }
+
+
+    ///R//
+
+compressImageToText(file) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+
+        img.onload = () => {
+            // Устанавливаем размер 100x100
+            canvas.width = 100;
+            canvas.height = 100;
+
+            // Сохраняем пропорции и центрируем
+            const scale = Math.min(100 / img.width, 100 / img.height);
+            const width = img.width * scale;
+            const height = img.height * scale;
+            const x = (100 - width) / 2;
+            const y = (100 - height) / 2;
+
+            // Рисуем сжатое изображение
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 100, 100);
+            ctx.drawImage(img, x, y, width, height);
+
+            // Конвертируем в Base64 строку
+            const base64String = canvas.toDataURL('image/jpeg', 0.7);
+            resolve(base64String);
+        };
+
+        img.onerror = reject;
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+    
+    ///R//
 
     // Инициализация
     document.addEventListener('DOMContentLoaded', () => {
