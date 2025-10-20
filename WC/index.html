@@ -139,6 +139,23 @@
                 .catch(error => console.error('❌ Ошибка отправки:', error));
             }
         
+///////
+// Тестовая функция с готовыми параметрами
+function testSendMessage() {
+  const userId = 'test_user_' + Date.now();
+  const userName = 'Тестовый Пользователь';
+  const text = 'Привет, это тестовое сообщение от ' + new Date().toLocaleTimeString();
+  
+  console.log('🔄 Тестовые параметры:', { userId, userName, text });
+  sendMessage(userId, userName, text);
+}
+
+// Вызываем тестовую функцию
+testSendMessage();
+//////////
+
+        
+        
         // Функция для чтения сообщений в реальном времени
         function setupChatListener() {
           messagesRef.limitToLast(20).on('value', (snapshot) => {
