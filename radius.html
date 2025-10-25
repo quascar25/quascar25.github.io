@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOAGI Movement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        #canvas3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .app-content {
+            position: absolute;
+            top: 100px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            animation: contentAppear 1s 4.5s forwards;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .app-content * {
+            pointer-events: auto;
+        }
+
+        @keyframes contentAppear {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #c0c0c0;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        /* Новые стили для интерфейса */
+        .slogan {
+            color: #c0c0c0;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+        }
+
+        .progress-container {
+            width: 80%;
+            max-width: 400px;
+            height: 4px;
+            background-color: #555;
+            margin: 0 auto 20px;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background-color: #aaa;
+            border-radius: 1px;
+            margin: 1px;
+            transition: width 0.3s ease;
+        }
+
+        .buttons-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .role-btn {
+            border: 1px solid #555;
+            background: transparent;
+            color: #c0c0c0;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .role-btn:active {
+            border-color: #aaa;
+            background-color: rgba(170, 170, 170, 0.1);
+        }
+
+        .role-btn.active {
+            border-color: #aaa;
+            background-color: rgba(170, 170, 170, 0.2);
+        }
+
+        .registration-container {
+            margin-bottom: 20px;
+        }
+
+        .reg-btn {
+            border: 1px solid #555;
+            background: transparent;
+            color: #c0c0c0;
+            padding: 12px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .reg-btn:active {
+            border-color: #aaa;
+        }
+
+        .reg-form {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #555;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .form-btn {
+            padding: 5px 15px;
+            border: 1px solid #555;
+            background: transparent;
+            color: #c0c0c0;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .form-btn:active {
+            border-color: #aaa;
+        }
+
+        .registration-result {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #0f0;
+            display: none;
+        }
+
+        .map-section {
+            margin: 20px 0;
+        }
+
+        .map-image {
+            max-width: 90%;
+            height: auto;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            border: 1px solid #555;
+            background: transparent;
+            color: #c0c0c0;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .action-btn:active {
+            border-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="loading" id="loading">Загрузка анимации...</div>
+    <canvas id="canvas3d"></canvas>
+    
+    <!-- Контент приложения -->
+    <div class="app-content">
+        <h2 style="color: #c0c0c0; margin-bottom: 10px;">NOAGI Movement</h2>
+        
+        <div class="slogan">
+            Все прогрессивные силы остановим новую угрозу, регистрируйтесь в "NOAGI"
+        </div>
+
+        <!-- Прогрессбар -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Кнопки выбора роли -->
+        <div class="buttons-row">
+            <button class="role-btn" data-role="member">Член $1K</button>
+            <button class="role-btn" data-role="expert">Эксперт $0</button>
+        </div>
+
+        <!-- Регистрация -->
+        <div class="registration-container">
+            <button class="reg-btn" id="registrationBtn">Регистрация</button>
+            
+            <div class="reg-form" id="registrationForm">
+                <input type="text" class="form-input" id="nameInput" placeholder="Имя">
+                <input type="email" class="form-input" id="emailInput" placeholder="Почта">
+                <input type="text" class="form-input" id="usernameInput" placeholder="Юзернейм">
+                
+                <div class="form-buttons">
+                    <button class="form-btn" id="confirmBtn">Да</button>
+                    <button class="form-btn" id="cancelBtn">Нет</button>
+                </div>
+            </div>
+
+            <div class="registration-result" id="registrationResult"></div>
+        </div>
+
+        <!-- Карта -->
+        <div class="map-section">
+            <img src="map.png" alt="Карта движения" class="map-image" onerror="this.style.display='none'">
+        </div>
+
+        <!-- Дополнительные кнопки -->
+        <div class="action-buttons">
+            <button class="action-btn">Наши эксперты</button>
+            <button class="action-btn">Контент NOAGI</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Создание звездного неба
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 1.5 + 0.5;
+                const delay = Math.random() * 4;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // OBJ данные перечеркнутой надписи
+        const objData = `v  258.394409 0.000000 144.246750
+        // ... (ваш OBJ данные остаются без изменений)
+        f 7 55 54
+        f 7 54 6`;
+
+        function parseOBJ(text) {
+            const vertices = [];
+            const faces = [];
+            
+            const lines = text.split('\n');
+            for (const line of lines) {
+                const parts = line.trim().split(/\s+/);
+                if (parts[0] === 'v') {
+                    vertices.push([
+                        parseFloat(parts[1]),
+                        parseFloat(parts[2]), 
+                        parseFloat(parts[3])
+                    ]);
+                } else if (parts[0] === 'f') {
+                    const face = [];
+                    for (let i = 1; i < parts.length; i++) {
+                        const indices = parts[i].split('/');
+                        face.push(parseInt(indices[0]) - 1);
+                    }
+                    faces.push(face);
+                }
+            }
+            
+            return { vertices, faces };
+        }
+
+        // Создание 3D сцены
+        let scene, camera, renderer, skullMesh, noagiMesh;
+        let animationCompleted = false;
+
+        function init() {
+            // Сцена
+            scene = new THREE.Scene();
+            // Убрали background чтобы было видно звезды
+
+            // Камера
+            const aspect = window.innerWidth / window.innerHeight;
+            camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            camera.position.z = 8;
+
+            // Рендерер
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('canvas3d'),
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Освещение
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight1 = new THREE.DirectionalLight(0xc0c0c0, 1);
+            directionalLight1.position.set(2, 2, 2);
+            scene.add(directionalLight1);
+
+            const directionalLight2 = new THREE.DirectionalLight(0x808080, 0.5);
+            directionalLight2.position.set(-2, -1, -1);
+            scene.add(directionalLight2);
+
+            // Создание мешей
+            createMeshes();
+            
+            // Скрываем загрузку
+            document.getElementById('loading').style.display = 'none';
+            
+            // Запуск анимации
+            startAnimation();
+
+            // Обработчик изменения размера
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createMeshes() {
+            // Создание черепа из текстуры TERM.png
+            const skullTextureLoader = new THREE.TextureLoader();
+            
+            const skullGeometry = new THREE.PlaneGeometry(2, 3.12);
+            const skullMaterial = new THREE.MeshBasicMaterial({ 
+                map: skullTextureLoader.load('TERM.png'),
+                transparent: true,
+                opacity: 0,
+                side: THREE.DoubleSide
+            });
+            
+            skullMesh = new THREE.Mesh(skullGeometry, skullMaterial);
+            skullMesh.scale.set(0, 0, 0);
+            scene.add(skullMesh);
+
+            // Создание надписи AGI из OBJ данных
+            const { vertices, faces } = parseOBJ(objData);
+            
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            for (const vertex of vertices) {
+                minX = Math.min(minX, vertex[0]);
+                maxX = Math.max(maxX, vertex[0]);
+                minY = Math.min(minY, vertex[2]);
+                maxY = Math.max(maxY, vertex[2]);
+            }
+            
+            const width = maxX - minX;
+            const height = maxY - minY;
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            const noagiGeometry = new THREE.BufferGeometry();
+            const positionArray = new Float32Array(vertices.length * 3);
+            
+            for (let i = 0; i < vertices.length; i++) {
+                const x = (vertices[i][0] - centerX) * 0.02;
+                const y = (vertices[i][2] - centerY) * 0.02;
+                
+                positionArray[i * 3] = x - width * 0.02 * 0.1;
+                positionArray[i * 3 + 1] = y + height * 0.02 * 0.18;
+                positionArray[i * 3 + 2] = vertices[i][1];
+            }
+            
+            noagiGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+            
+            const indices = [];
+            for (const face of faces) {
+                for (let i = 1; i < face.length - 1; i++) {
+                    indices.push(face[0], face[i], face[i + 1]);
+                }
+            }
+            noagiGeometry.setIndex(indices);
+            noagiGeometry.computeVertexNormals();
+
+            const noagiMaterial = new THREE.MeshPhongMaterial({
+                color: 0xc0c0c0,
+                shininess: 80,
+                transparent: true,
+                opacity: 0,
+                side: THREE.DoubleSide
+            });
+
+            noagiMesh = new THREE.Mesh(noagiGeometry, noagiMaterial);
+            noagiMesh.scale.set(22, 22, 22);
+            noagiMesh.rotation.x = Math.PI;
+            scene.add(noagiMesh);
+        }
+
+        function startAnimation() {
+            const timeline = [
+                { time: 0, skullScale: 1, noagiScale: 60, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
+                { time: 0.5, skullScale: 1, noagiScale: 60, skullOpacity: 1, noagiOpacity: 0, noagiY: 0 },
+                { time: 3, skullScale: 2, noagiScale: 2.5, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
+                { time: 4, skullScale: 2, noagiScale: 0.91, skullOpacity: 0, noagiOpacity: 0.8, noagiY: 3 }
+            ];
+
+            let startTime = Date.now();
+
+            function animate() {
+                const currentTime = (Date.now() - startTime) / 1000;
+                
+                if (currentTime > 4 && !animationCompleted) {
+                    animationCompleted = true;
+                    if (skullMesh) {
+                        skullMesh.visible = false;
+                    }
+                }
+                
+                if (!animationCompleted) {
+                    let currentFrame = timeline[0];
+                    let nextFrame = timeline[1];
+                    
+                    for (let i = 0; i < timeline.length - 1; i++) {
+                        if (currentTime >= timeline[i].time && currentTime <= timeline[i + 1].time) {
+                            currentFrame = timeline[i];
+                            nextFrame = timeline[i + 1];
+                            break;
+                        }
+                    }
+                    
+                    const progress = Math.max(0, Math.min(1, 
+                        (currentTime - currentFrame.time) / (nextFrame.time - currentFrame.time)
+                    ));
+                    
+                    if (skullMesh) {
+                        const skullScale = currentFrame.skullScale + (nextFrame.skullScale - currentFrame.skullScale) * progress;
+                        skullMesh.scale.set(skullScale, skullScale, skullScale);
+                        
+                        const skullOpacity = currentFrame.skullOpacity + (nextFrame.skullOpacity - currentFrame.skullOpacity) * progress;
+                        skullMesh.material.opacity = skullOpacity;
+                    }
+                    
+                    if (noagiMesh) {
+                        const noagiScale = currentFrame.noagiScale + (nextFrame.noagiScale - currentFrame.noagiScale) * progress;
+                        noagiMesh.scale.set(noagiScale, noagiScale, noagiScale);
+                        
+                        const noagiOpacity = currentFrame.noagiOpacity + (nextFrame.noagiOpacity - currentFrame.noagiOpacity) * progress;
+                        noagiMesh.material.opacity = noagiOpacity;
+                        
+                        const noagiY = currentFrame.noagiY + (nextFrame.noagiY - currentFrame.noagiY) * progress;
+                        noagiMesh.position.y = noagiY;
+                    }
+                }
+                
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Функции для интерфейса
+        function updateProgressBar() {
+            const startDate = new Date('2025-10-20');
+            const currentDate = new Date();
+            const daysPassed = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24));
+            const progressWidth = Math.min((daysPassed / 365) * 100, 100);
+            
+            document.getElementById('progressBar').style.width = progressWidth + '%';
+        }
+
+        function encryptData(data) {
+            // Простое шифрование для демонстрации
+            return btoa(JSON.stringify(data));
+        }
+
+        function setupEventListeners() {
+            // Кнопки ролей
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Кнопка регистрации
+            const regBtn = document.getElementById('registrationBtn');
+            const regForm = document.getElementById('registrationForm');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const resultDiv = document.getElementById('registrationResult');
+
+            regBtn.addEventListener('click', function() {
+                if (regForm.style.display === 'block') {
+                    regForm.style.display = 'none';
+                } else {
+                    regForm.style.display = 'block';
+                    regBtn.textContent = 'Регистрация';
+                    resultDiv.style.display = 'none';
+                }
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                const name = document.getElementById('nameInput').value;
+                const email = document.getElementById('emailInput').value;
+                const username = document.getElementById('usernameInput').value;
+                
+                if (name && email && username) {
+                    // Сохраняем в localStorage
+                    const userData = { name, email, username, timestamp: new Date() };
+                    const encrypted = encryptData(userData);
+                    localStorage.setItem('noagi_registration', encrypted);
+                    
+                    // Показываем результат
+                    const now = new Date();
+                    const id = `ID${now.getHours()}${now.getMinutes()}/${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+                    resultDiv.innerHTML = `${id} ✓`;
+                    resultDiv.style.display = 'block';
+                    
+                    // Сбрасываем форму
+                    regForm.style.display = 'none';
+                    regBtn.textContent = `${id} ✓`;
+                }
+            });
+
+            cancelBtn.addEventListener('click', function() {
+                regForm.style.display = 'none';
+                regBtn.textContent = 'Регистрация';
+                resultDiv.style.display = 'none';
+            });
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            setTimeout(() => {
+                init();
+                updateProgressBar();
+                setupEventListeners();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
