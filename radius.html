@@ -48,47 +48,6 @@
             height: 100%;
         }
 
-        .header {
-            position: absolute;
-            top: 30px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            opacity: 0;
-            animation: headerAppear 1s 4s forwards;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .header-content {
-            display: inline-block;
-            position: relative;
-        }
-
-        .header-noagi {
-            font-size: 42px;
-            font-weight: bold;
-            color: #c0c0c0;
-            opacity: 0.8;
-            text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-        }
-
-        .cross-line {
-            position: absolute;
-            top: 50%;
-            left: -5%;
-            width: 110%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #ff4444, transparent);
-            transform: translateY(-50%) rotate(-15deg);
-            box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
-        }
-
-        @keyframes headerAppear {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
         .app-content {
             position: absolute;
             bottom: 80px;
@@ -121,14 +80,6 @@
     <div class="stars" id="stars"></div>
     <div class="loading" id="loading">Загрузка анимации...</div>
     <canvas id="canvas3d"></canvas>
-    
-    <!-- Финальный заголовок -->
-    <div class="header">
-        <div class="header-content">
-            <div class="header-noagi">AGI</div>
-            <div class="cross-line"></div>
-        </div>
-    </div>
     
     <!-- Контент приложения -->
     <div class="app-content">
@@ -315,7 +266,7 @@ f 7 54 6`;
 
         // Создание 3D сцены
         let scene, camera, renderer, skullMesh, noagiMesh;
-        let skullTexture;
+        let animationCompleted = false;
 
         function init() {
             // Сцена
@@ -365,7 +316,7 @@ f 7 54 6`;
             // Создание черепа из текстуры TERM.png
             const skullTextureLoader = new THREE.TextureLoader();
             
-            // Создаем плоскость для черепа
+            // Создаем плоскость для черепа (ваши настройки)
             const skullGeometry = new THREE.PlaneGeometry(2, 3.12);
             const skullMaterial = new THREE.MeshBasicMaterial({ 
                 map: skullTextureLoader.load('TERM.png'),
@@ -381,12 +332,12 @@ f 7 54 6`;
             // Создание надписи AGI из OBJ данных
             const { vertices, faces } = parseOBJ(objData);
             
-            // Вычисляем границы для смещения на 5%
+            // Вычисляем границы для смещения
             let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
             for (const vertex of vertices) {
                 minX = Math.min(minX, vertex[0]);
                 maxX = Math.max(maxX, vertex[0]);
-                minY = Math.min(minY, vertex[2]); // Используем Z как Y в 2D
+                minY = Math.min(minY, vertex[2]);
                 maxY = Math.max(maxY, vertex[2]);
             }
             
@@ -399,16 +350,14 @@ f 7 54 6`;
             const noagiGeometry = new THREE.BufferGeometry();
             const positionArray = new Float32Array(vertices.length * 3);
             
-            // Нормализуем координаты, центрируем и смещаем на 5%
+            // Нормализуем координаты, центрируем и смещаем (ваши настройки)
             for (let i = 0; i < vertices.length; i++) {
-                // Нормализация и центрирование
                 const x = (vertices[i][0] - centerX) * 0.02;
                 const y = (vertices[i][2] - centerY) * 0.02;
                 
-                // Смещение на 5% влево и вверх
+                // Ваши настройки смещения
                 positionArray[i * 3] = x - width * 0.02 * 0.1;
-                positionArray[i * 3 + 1] = y + height * 0.02* 0.18;  //positionArray[i * 3 + 1] = y + height * 0.02 * 0.01;
-                
+                positionArray[i * 3 + 1] = y + height * 0.02 * 0.18;
                 positionArray[i * 3 + 2] = vertices[i][1];
             }
             
@@ -433,18 +382,18 @@ f 7 54 6`;
             });
 
             noagiMesh = new THREE.Mesh(noagiGeometry, noagiMaterial);
-            noagiMesh.scale.set(22, 22, 22); // Начальный размер в 20 раз больше
+            noagiMesh.scale.set(22, 22, 22); // Ваш начальный размер
             noagiMesh.rotation.x = Math.PI; // Поворот на 180 градусов по X
             scene.add(noagiMesh);
         }
 
         function startAnimation() {
             const timeline = [
-                // 0-0.5s: Появление объектов
+                // 0-0.5s: Появление объектов (ваши настройки)
                 { time: 0, skullScale: 1, noagiScale: 60, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
                 { time: 0.5, skullScale: 1, noagiScale: 60, skullOpacity: 1, noagiOpacity: 0, noagiY: 0 },
                 
-                // 0.5-3s: Масштабирование (3 секунды анимации)
+                // 0.5-3s: Масштабирование (ваши настройки)
                 { time: 3, skullScale: 2, noagiScale: 2.5, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
                 
                 // 3-4s: Исчезновение черепа и движение надписи вверх
@@ -456,42 +405,52 @@ f 7 54 6`;
             function animate() {
                 const currentTime = (Date.now() - startTime) / 1000;
                 
-                // Находим текущий и следующий ключевые кадры
-                let currentFrame = timeline[0];
-                let nextFrame = timeline[1];
-                
-                for (let i = 0; i < timeline.length - 1; i++) {
-                    if (currentTime >= timeline[i].time && currentTime <= timeline[i + 1].time) {
-                        currentFrame = timeline[i];
-                        nextFrame = timeline[i + 1];
-                        break;
+                // После завершения анимации скрываем череп
+                if (currentTime > 4 && !animationCompleted) {
+                    animationCompleted = true;
+                    if (skullMesh) {
+                        skullMesh.visible = false;
                     }
                 }
                 
-                // Интерполяция между кадрами
-                const progress = Math.max(0, Math.min(1, 
-                    (currentTime - currentFrame.time) / (nextFrame.time - currentFrame.time)
-                ));
-                
-                // Применение анимации к черепу
-                if (skullMesh) {
-                    const skullScale = currentFrame.skullScale + (nextFrame.skullScale - currentFrame.skullScale) * progress;
-                    skullMesh.scale.set(skullScale, skullScale, skullScale);
+                if (!animationCompleted) {
+                    // Находим текущий и следующий ключевые кадры
+                    let currentFrame = timeline[0];
+                    let nextFrame = timeline[1];
                     
-                    const skullOpacity = currentFrame.skullOpacity + (nextFrame.skullOpacity - currentFrame.skullOpacity) * progress;
-                    skullMesh.material.opacity = skullOpacity;
-                }
-                
-                // Применение анимации к надписи
-                if (noagiMesh) {
-                    const noagiScale = currentFrame.noagiScale + (nextFrame.noagiScale - currentFrame.noagiScale) * progress;
-                    noagiMesh.scale.set(noagiScale, noagiScale, noagiScale);
+                    for (let i = 0; i < timeline.length - 1; i++) {
+                        if (currentTime >= timeline[i].time && currentTime <= timeline[i + 1].time) {
+                            currentFrame = timeline[i];
+                            nextFrame = timeline[i + 1];
+                            break;
+                        }
+                    }
                     
-                    const noagiOpacity = currentFrame.noagiOpacity + (nextFrame.noagiOpacity - currentFrame.noagiOpacity) * progress;
-                    noagiMesh.material.opacity = noagiOpacity;
+                    // Интерполяция между кадрами
+                    const progress = Math.max(0, Math.min(1, 
+                        (currentTime - currentFrame.time) / (nextFrame.time - currentFrame.time)
+                    ));
                     
-                    const noagiY = currentFrame.noagiY + (nextFrame.noagiY - currentFrame.noagiY) * progress;
-                    noagiMesh.position.y = noagiY;
+                    // Применение анимации к черепу
+                    if (skullMesh) {
+                        const skullScale = currentFrame.skullScale + (nextFrame.skullScale - currentFrame.skullScale) * progress;
+                        skullMesh.scale.set(skullScale, skullScale, skullScale);
+                        
+                        const skullOpacity = currentFrame.skullOpacity + (nextFrame.skullOpacity - currentFrame.skullOpacity) * progress;
+                        skullMesh.material.opacity = skullOpacity;
+                    }
+                    
+                    // Применение анимации к надписи
+                    if (noagiMesh) {
+                        const noagiScale = currentFrame.noagiScale + (nextFrame.noagiScale - currentFrame.noagiScale) * progress;
+                        noagiMesh.scale.set(noagiScale, noagiScale, noagiScale);
+                        
+                        const noagiOpacity = currentFrame.noagiOpacity + (nextFrame.noagiOpacity - currentFrame.noagiOpacity) * progress;
+                        noagiMesh.material.opacity = noagiOpacity;
+                        
+                        const noagiY = currentFrame.noagiY + (nextFrame.noagiY - currentFrame.noagiY) * progress;
+                        noagiMesh.position.y = noagiY;
+                    }
                 }
                 
                 renderer.render(scene, camera);
@@ -510,7 +469,6 @@ f 7 54 6`;
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             createStars();
-            // Даем время на создание звездного неба перед запуском 3D
             setTimeout(init, 100);
         });
     </script>
