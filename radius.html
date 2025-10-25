@@ -46,6 +46,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 5; /* Добавляем это свойство */
         }
 
         .app-content {
@@ -271,7 +272,7 @@ f 7 54 6`;
         function init() {
             // Сцена
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000);
+            //scene.background = new THREE.Color(0x000000);
 
             // Камера
             const aspect = window.innerWidth / window.innerHeight;
