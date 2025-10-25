@@ -362,14 +362,18 @@ f 7 54 6`;
         }
 
         function createMeshes() {
-            // Создание черепа (используем простую геометрию как placeholder)
-            const skullGeometry = new THREE.SphereGeometry(1, 32, 32);
-            const skullMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0xc0c0c0,
-                shininess: 100,
+            // Создание черепа из текстуры TERM.png
+            const skullTextureLoader = new THREE.TextureLoader();
+            
+            // Создаем плоскость для черепа
+            const skullGeometry = new THREE.PlaneGeometry(2, 2);
+            const skullMaterial = new THREE.MeshBasicMaterial({ 
+                map: skullTextureLoader.load('TERM.png'),
                 transparent: true,
-                opacity: 0
+                opacity: 0,
+                side: THREE.DoubleSide
             });
+            
             skullMesh = new THREE.Mesh(skullGeometry, skullMaterial);
             skullMesh.scale.set(0, 0, 0);
             scene.add(skullMesh);
@@ -377,23 +381,33 @@ f 7 54 6`;
             // Создание надписи AGI из OBJ данных
             const { vertices, faces } = parseOBJ(objData);
             
-            // Вычисляем центр для позиционирования
-            let centerX = 0, centerY = 0;
+            // Вычисляем границы для смещения на 5%
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
             for (const vertex of vertices) {
-                centerX += vertex[0];
-                centerY += vertex[2]; // Используем Z как Y в 2D
+                minX = Math.min(minX, vertex[0]);
+                maxX = Math.max(maxX, vertex[0]);
+                minY = Math.min(minY, vertex[2]); // Используем Z как Y в 2D
+                maxY = Math.max(maxY, vertex[2]);
             }
-            centerX /= vertices.length;
-            centerY /= vertices.length;
+            
+            const width = maxX - minX;
+            const height = maxY - minY;
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
 
             // Создание геометрии из OBJ данных
             const noagiGeometry = new THREE.BufferGeometry();
             const positionArray = new Float32Array(vertices.length * 3);
             
-            // Нормализуем координаты и центрируем
+            // Нормализуем координаты, центрируем и смещаем на 5%
             for (let i = 0; i < vertices.length; i++) {
-                positionArray[i * 3] = (vertices[i][0] - centerX) * 0.02;
-                positionArray[i * 3 + 1] = (vertices[i][2] - centerY) * 0.02;
+                // Нормализация и центрирование
+                const x = (vertices[i][0] - centerX) * 0.02;
+                const y = (vertices[i][2] - centerY) * 0.02;
+                
+                // Смещение на 5% влево и вверх
+                positionArray[i * 3] = x - width * 0.02 * 0.05;
+                positionArray[i * 3 + 1] = y + height * 0.02 * 0.05;
                 positionArray[i * 3 + 2] = vertices[i][1];
             }
             
@@ -419,6 +433,7 @@ f 7 54 6`;
 
             noagiMesh = new THREE.Mesh(noagiGeometry, noagiMaterial);
             noagiMesh.scale.set(20, 20, 20); // Начальный размер в 20 раз больше
+            noagiMesh.rotation.x = Math.PI; // Поворот на 180 градусов по X
             scene.add(noagiMesh);
         }
 
