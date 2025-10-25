@@ -407,7 +407,7 @@ f 7 54 6`;
                 
                 // Смещение на 5% влево и вверх
                 positionArray[i * 3] = x - width * 0.02 * 0.1;
-                positionArray[i * 3 + 1] = y + height * 0.02 * 0.1;
+                positionArray[i * 3 + 1] = y + height * 0.02 * 0.05;
                 positionArray[i * 3 + 2] = vertices[i][1];
             }
             
@@ -440,8 +440,8 @@ f 7 54 6`;
         function startAnimation() {
             const timeline = [
                 // 0-0.5s: Появление объектов
-                { time: 0, skullScale: 1, noagiScale: 30, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
-                { time: 0.5, skullScale: 1, noagiScale: 30, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
+                { time: 0, skullScale: 1, noagiScale: 40, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
+                { time: 0.5, skullScale: 1, noagiScale: 40, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
                 
                 // 0.5-3s: Масштабирование (3 секунды анимации)
                 { time: 3, skullScale: 2.5, noagiScale: 0.91, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
