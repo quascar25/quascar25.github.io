@@ -407,7 +407,7 @@ f 7 54 6`;
                 
                 // Смещение на 5% влево и вверх
                 positionArray[i * 3] = x - width * 0.02 * 0.1;
-                positionArray[i * 3 + 1] = y + height * 0.02* 0.16;  //positionArray[i * 3 + 1] = y + height * 0.02 * 0.01;
+                positionArray[i * 3 + 1] = y + height * 0.02* 0.18;  //positionArray[i * 3 + 1] = y + height * 0.02 * 0.01;
                 
                 positionArray[i * 3 + 2] = vertices[i][1];
             }
@@ -441,11 +441,11 @@ f 7 54 6`;
         function startAnimation() {
             const timeline = [
                 // 0-0.5s: Появление объектов
-                { time: 0, skullScale: 1, noagiScale: 50, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
-                { time: 0.5, skullScale: 1, noagiScale: 50, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
+                { time: 0, skullScale: 1, noagiScale: 60, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
+                { time: 0.5, skullScale: 1, noagiScale: 60, skullOpacity: 1, noagiOpacity: 0.1, noagiY: 0 },
                 
                 // 0.5-3s: Масштабирование (3 секунды анимации)
-                { time: 3, skullScale: 2, noagiScale: 0.91, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
+                { time: 3, skullScale: 2, noagiScale: 2.5, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
                 
                 // 3-4s: Исчезновение черепа и движение надписи вверх
                 { time: 4, skullScale: 2, noagiScale: 0.91, skullOpacity: 0, noagiOpacity: 0.8, noagiY: 3 }
