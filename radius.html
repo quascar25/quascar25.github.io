@@ -440,14 +440,14 @@ f 7 54 6`;
         function startAnimation() {
             const timeline = [
                 // 0-0.5s: Появление объектов
-                { time: 0, skullScale: 0, noagiScale: 22, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
-                { time: 0.5, skullScale: 1, noagiScale: 22, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
+                { time: 0, skullScale: 1, noagiScale: 30, skullOpacity: 0, noagiOpacity: 0, noagiY: 0 },
+                { time: 0.5, skullScale: 1, noagiScale: 30, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
                 
                 // 0.5-3s: Масштабирование (3 секунды анимации)
-                { time: 3, skullScale: 1.396, noagiScale: 0.91, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
+                { time: 3, skullScale: 2.5, noagiScale: 0.91, skullOpacity: 1, noagiOpacity: 0.7, noagiY: 0 },
                 
                 // 3-4s: Исчезновение черепа и движение надписи вверх
-                { time: 4, skullScale: 3.396, noagiScale: 0.91, skullOpacity: 0, noagiOpacity: 0.8, noagiY: 3 }
+                { time: 4, skullScale: 2.5, noagiScale: 0.91, skullOpacity: 0, noagiOpacity: 0.8, noagiY: 3 }
             ];
 
             let startTime = Date.now();
