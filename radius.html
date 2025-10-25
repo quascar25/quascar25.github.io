@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGI Crossed</title>
+    <title>AGI Animation</title>
     <style>
         * {
             margin: 0;
@@ -17,11 +17,6 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
         }
 
         .stars {
@@ -45,112 +40,14 @@
             50% { opacity: 1; }
         }
 
-        /* Контейнер для анимации */
-        .animation-container {
+        #canvas3d {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        /* Череп в стиле Терминатора */
-        .skull {
-            position: absolute;
-            width: 200px;
-            height: 240px;
-            opacity: 0;
-            animation: skullAppear 1.5s forwards, skullDisappear 1.5s 1.5s forwards;
-        }
-
-        .skull-head {
-            width: 160px;
-            height: 180px;
-            background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
-            border-radius: 80px 80px 100px 100px;
-            position: relative;
-            box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
-        }
-
-        .skull-eye {
-            position: absolute;
-            width: 40px;
-            height: 25px;
-            background: #000;
-            border-radius: 10px;
-            top: 60px;
-        }
-
-        .skull-eye.left {
-            left: 30px;
-        }
-
-        .skull-eye.right {
-            right: 30px;
-        }
-
-        .skull-nose {
-            position: absolute;
-            width: 30px;
-            height: 20px;
-            background: #000;
-            border-radius: 15px;
-            top: 100px;
-            left: 65px;
-        }
-
-        .skull-teeth {
-            position: absolute;
-            width: 120px;
-            height: 40px;
-            background: #000;
-            border-radius: 10px;
-            top: 140px;
-            left: 20px;
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-        }
-
-        .tooth {
-            width: 14px;
-            height: 30px;
-            background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
-        }
-
-        /* Перечеркнутая надпись AGI */
-        .agi-text {
-            position: absolute;
-            font-size: 72px;
-            font-weight: bold;
-            color: transparent;
-            background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-            opacity: 0;
-            animation: agiAppear 2s 1.5s forwards, agiMoveUp 1s 3s forwards;
-            z-index: 10;
-        }
-
-        .cross-line {
-            position: absolute;
-            width: 0;
-            height: 8px;
-            background: linear-gradient(90deg, #ff0000, #ff3333);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            animation: crossLine 1s 2.5s forwards;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-            z-index: 11;
-        }
-
-        /* Финальное положение надписи */
         .header {
             position: absolute;
             top: 20px;
@@ -159,61 +56,14 @@
             text-align: center;
             opacity: 0;
             animation: headerAppear 1s 4s forwards;
+            z-index: 100;
         }
 
-        .header-agi {
+        .header-noagi {
             font-size: 36px;
             font-weight: bold;
-            color: transparent;
-            background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-            position: relative;
-            display: inline-block;
-        }
-
-        .header-cross {
-            position: absolute;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #ff0000, #ff3333);
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%) rotate(-15deg);
-            box-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
-        }
-
-        /* Анимации */
-        @keyframes skullAppear {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes skullDisappear {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
-        }
-
-        @keyframes agiAppear {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-
-        @keyframes crossLine {
-            0% { width: 0; }
-            100% { width: 220px; }
-        }
-
-        @keyframes agiMoveUp {
-            0% { 
-                opacity: 1; 
-                transform: translate(-50%, -50%) scale(1);
-            }
-            100% { 
-                opacity: 1; 
-                transform: translate(-50%, -200px) scale(0.7);
-            }
+            color: #c0c0c0;
+            opacity: 0.7;
         }
 
         @keyframes headerAppear {
@@ -221,12 +71,15 @@
             100% { opacity: 1; }
         }
 
-        /* Контент приложения (будет появляться после анимации) */
         .app-content {
-            margin-top: 100px;
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
             text-align: center;
             opacity: 0;
             animation: contentAppear 1s 4.5s forwards;
+            z-index: 100;
         }
 
         @keyframes contentAppear {
@@ -237,48 +90,20 @@
 </head>
 <body>
     <div class="stars" id="stars"></div>
-    
-    <!-- Анимация -->
-    <div class="animation-container">
-        <div class="skull">
-            <div class="skull-head">
-                <div class="skull-eye left"></div>
-                <div class="skull-eye right"></div>
-                <div class="skull-nose"></div>
-                <div class="skull-teeth">
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                    <div class="tooth"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="agi-text">AGI</div>
-        <div class="cross-line"></div>
-    </div>
+    <canvas id="canvas3d"></canvas>
     
     <!-- Финальный заголовок -->
     <div class="header">
-        <div class="header-agi">
-            AGI
-            <div class="header-cross"></div>
-        </div>
+        <div class="header-noagi">AGI</div>
     </div>
     
     <!-- Контент приложения -->
     <div class="app-content">
         <h2>Приложение AGI</h2>
-        <p>Контент вашего приложения появится здесь</p>
-        <button style="margin-top: 20px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 5px;">
-            Начать работу
-        </button>
+        <p>Контент вашего приложения</p>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Создание звездного неба
         function createStars() {
@@ -289,14 +114,9 @@
                 const star = document.createElement('div');
                 star.classList.add('star');
                 
-                // Случайные координаты
                 const x = Math.random() * 100;
                 const y = Math.random() * 100;
-                
-                // Случайный размер
                 const size = Math.random() * 2 + 1;
-                
-                // Случайная задержка анимации
                 const delay = Math.random() * 5;
                 
                 star.style.left = `${x}%`;
@@ -309,9 +129,206 @@
             }
         }
 
+        // Парсинг OBJ данных
+        const objData = `
+        # Ваш OBJ файл здесь (вставьте полное содержимое)
+        v  262.140961 0.000000 133.928848
+        v  263.764221 0.000000 129.445618
+        // ... остальные вершины
+        `;
+
+        function parseOBJ(text) {
+            const vertices = [];
+            const faces = [];
+            
+            const lines = text.split('\n');
+            for (const line of lines) {
+                const parts = line.trim().split(/\s+/);
+                if (parts[0] === 'v') {
+                    vertices.push([
+                        parseFloat(parts[1]),
+                        parseFloat(parts[2]), 
+                        parseFloat(parts[3])
+                    ]);
+                } else if (parts[0] === 'f') {
+                    const face = [];
+                    for (let i = 1; i < parts.length; i++) {
+                        const indices = parts[i].split('/');
+                        face.push(parseInt(indices[0]) - 1);
+                    }
+                    faces.push(face);
+                }
+            }
+            
+            return { vertices, faces };
+        }
+
+        // Создание 3D сцены
+        let scene, camera, renderer, skullMesh, noagiMesh;
+        let animationMixer;
+
+        function init() {
+            // Сцена
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+
+            // Камера
+            const aspect = window.innerWidth / window.innerHeight;
+            camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Рендерер
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('canvas3d'),
+                antialias: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Освещение
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xc0c0c0, 1);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Создание мешей
+            createMeshes();
+            
+            // Запуск анимации
+            startAnimation();
+
+            // Обработчик изменения размера
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createMeshes() {
+            // Создание черепа (упрощенная геометрия)
+            const skullGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const skullMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xc0c0c0,
+                shininess: 100,
+                transparent: true,
+                opacity: 1
+            });
+            skullMesh = new THREE.Mesh(skullGeometry, skullMaterial);
+            skullMesh.scale.set(0, 0, 0);
+            scene.add(skullMesh);
+
+            // Создание надписи AGI из OBJ данных
+            const { vertices, faces } = parseOBJ(objData);
+            
+            // Создание геометрии из OBJ данных
+            const noagiGeometry = new THREE.BufferGeometry();
+            const positionArray = new Float32Array(vertices.length * 3);
+            
+            for (let i = 0; i < vertices.length; i++) {
+                positionArray[i * 3] = vertices[i][0] / 100 - 2.8;
+                positionArray[i * 3 + 1] = vertices[i][2] / 100 - 1.3;
+                positionArray[i * 3 + 2] = vertices[i][1];
+            }
+            
+            noagiGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+            
+            // Создание индексов для faces
+            const indices = [];
+            for (const face of faces) {
+                for (let i = 1; i < face.length - 1; i++) {
+                    indices.push(face[0], face[i], face[i + 1]);
+                }
+            }
+            noagiGeometry.setIndex(indices);
+            noagiGeometry.computeVertexNormals();
+
+            const noagiMaterial = new THREE.MeshPhongMaterial({
+                color: 0xc0c0c0,
+                shininess: 50,
+                transparent: true,
+                opacity: 0.7,
+                side: THREE.DoubleSide
+            });
+
+            noagiMesh = new THREE.Mesh(noagiGeometry, noagiMaterial);
+            noagiMesh.scale.set(0.001, 0.001, 0.001);
+            scene.add(noagiMesh);
+        }
+
+        function startAnimation() {
+            const timeline = [
+                // 0-0.5s: Появление объектов
+                { time: 0, skullScale: 0, noagiScale: 0.05, skullOpacity: 0, noagiOpacity: 0 },
+                { time: 0.5, skullScale: 1, noagiScale: 0.05, skullOpacity: 1, noagiOpacity: 0.7 },
+                
+                // 0.5-3.5s: Масштабирование
+                { time: 3.5, skullScale: 1.2, noagiScale: 0.0023, skullOpacity: 1, noagiOpacity: 0.7 },
+                
+                // 3.5-4s: Исчезновение черепа и движение надписи
+                { time: 4, skullScale: 1.2, noagiScale: 0.0023, skullOpacity: 0, noagiOpacity: 0.7, noagiPosition: -3 }
+            ];
+
+            let startTime = Date.now();
+
+            function animate() {
+                const currentTime = (Date.now() - startTime) / 1000;
+                
+                // Находим текущий и следующий ключевые кадры
+                let currentFrame = timeline[0];
+                let nextFrame = timeline[1];
+                
+                for (let i = 0; i < timeline.length - 1; i++) {
+                    if (currentTime >= timeline[i].time && currentTime <= timeline[i + 1].time) {
+                        currentFrame = timeline[i];
+                        nextFrame = timeline[i + 1];
+                        break;
+                    }
+                }
+                
+                // Интерполяция между кадрами
+                const progress = (currentTime - currentFrame.time) / (nextFrame.time - currentFrame.time);
+                const clampedProgress = Math.max(0, Math.min(1, progress));
+                
+                // Применение анимации к черепу
+                if (skullMesh) {
+                    const skullScale = currentFrame.skullScale + (nextFrame.skullScale - currentFrame.skullScale) * clampedProgress;
+                    skullMesh.scale.set(skullScale, skullScale, skullScale);
+                    
+                    const skullOpacity = currentFrame.skullOpacity + (nextFrame.skullOpacity - currentFrame.skullOpacity) * clampedProgress;
+                    skullMesh.material.opacity = skullOpacity;
+                }
+                
+                // Применение анимации к надписи
+                if (noagiMesh) {
+                    const noagiScale = currentFrame.noagiScale + (nextFrame.noagiScale - currentFrame.noagiScale) * clampedProgress;
+                    noagiMesh.scale.set(noagiScale, noagiScale, noagiScale);
+                    
+                    const noagiOpacity = currentFrame.noagiOpacity + (nextFrame.noagiOpacity - currentFrame.noagiOpacity) * clampedProgress;
+                    noagiMesh.material.opacity = noagiOpacity;
+                    
+                    if (nextFrame.noagiPosition !== undefined) {
+                        const targetY = currentFrame.noagiPosition !== undefined ? 
+                            currentFrame.noagiPosition + (nextFrame.noagiPosition - currentFrame.noagiPosition) * clampedProgress : 0;
+                        noagiMesh.position.y = targetY;
+                    }
+                }
+                
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             createStars();
+            init();
         });
     </script>
 </body>
