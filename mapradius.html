@@ -8,6 +8,16 @@
 /* Отключаем все виды выделения на мобильных */
 .region {
 
+        fill: rgba(128, 128, 128, 0.5);
+    stroke: darkgray;
+    stroke-width: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* Отключаем тач-хайлайт */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
+
     
     /* Отключаем выделение текста */
     -webkit-user-select: none;
