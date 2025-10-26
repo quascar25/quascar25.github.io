@@ -52,7 +52,10 @@
             pointer-events: none;
             filter: url(#glow-effect);
         }
-
+        .text-background {
+            fill: url(#text-bg-gradient);
+            pointer-events: none;
+        }
         
     </style>
 </head>
@@ -88,16 +91,31 @@
                     <feMergeNode in="SourceGraphic"/>
                 </feMerge>
             </filter>
+
+            <!-- НОВЫЙ: Градиентный фон для букв -->
+            <radialGradient id="text-bg-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" stop-color="white" stop-opacity="0.7"/>
+                <stop offset="70%" stop-color="white" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+            </radialGradient>
+            
         </defs>
+
+        <circle class="text-background" cx="-530" cy="-52" r="15"/>
+        <circle class="text-background" cx="-380" cy="5" r="15"/>
+        <circle class="text-background" cx="-487" cy="37" r="15"/>
+        <circle class="text-background" cx="-400" cy="-50" r="15"/>
+        <circle class="text-background" cx="-317" cy="-68" r="15"/>
+        <circle class="text-background" cx="-295" cy="-32" r="15"/>        
         
         <!-- Метки для каждого региона -->
         <text class="region-label" x="-530" y="-52">EN</text>   <!-- -520" y="-50" -->
-        <text class="region-label" x="-380" y="5">FR</text>                     <!-- x="-360" y="10" -->
+        <text class="region-label" x="-380" y="5">FR</text>                      <!-- x="-360" y="10" -->
         <text class="region-label" x="-487" y="37">ES</text>                     <!-- x="-500" y="40" -->
         <text class="region-label" x="-400" y="-50">DE</text>                    <!-- x="-380" y="-50" -->
         <text class="region-label" x="-317" y="-68">RU</text>  <!-- <text class="region-label" x="-300" y="-60">RU</text>  -->
         <text class="region-label" x="-295" y="-32">ZN</text>                     <!-- x="-250" y="40" -->
-    
+   
     </svg>
 
     <script>
