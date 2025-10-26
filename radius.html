@@ -59,6 +59,7 @@
             animation: contentAppear 1s 4.5s forwards;
             z-index: 100;
             pointer-events: none;
+            overflow: hidden;
         }
 
         .app-content * {
@@ -473,7 +474,7 @@ f 7 54 6`;
                 
                 // 3-4s: Исчезновение черепа и движение надписи вверх
                 // ИСПРАВЛЕНИЕ: делаем надпись больше и ближе к центру
-                { time: 4, skullScale: 2, noagiScale: 0.91, skullOpacity: 0, noagiOpacity: 1.0, noagiY: 3 }
+                { time: 4, skullScale: 2, noagiScale: 0.91, skullOpacity: 0, noagiOpacity: 0.7, noagiY: 3 }
             ];
 
             let startTime = Date.now();
