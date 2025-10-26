@@ -196,25 +196,7 @@ svg {
             });
         });
 
-    // Активируем регион по умолчанию (например, EN)
-    const defaultRegion = document.getElementById('region-EN');
-    defaultRegion.classList.add('active');
-    wordDisplay.textContent = translations['EN'];
-    
-    regions.forEach(region => {
-        region.addEventListener('click', function() {
-            regions.forEach(r => {
-                r.classList.remove('active');
-            });
-            
-            this.classList.add('active');
-            
-            const regionId = this.id;
-            const lang = regionId.split('-')[1];
-            wordDisplay.textContent = translations[lang] || 'Регистрация';
-        });
-    });
-});
+
         
     </script>
 </body>
