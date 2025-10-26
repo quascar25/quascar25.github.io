@@ -196,9 +196,10 @@ svg {
             });
         });
 
-    const defaultRegion = document.getElementById('region-RU');
+    // Активируем регион по умолчанию (например, EN)
+    const defaultRegion = document.getElementById('region-EN');
     defaultRegion.classList.add('active');
-    wordDisplay.textContent = translations['RU'];
+    wordDisplay.textContent = translations['EN'];
     
     regions.forEach(region => {
         region.addEventListener('click', function() {
