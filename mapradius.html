@@ -1,8 +1,51 @@
 <!DOCTYPE html>
 <html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <head>
     <title>Интерактивная языковая карта</title>
     <style>
+
+/* Отключаем все виды выделения на мобильных */
+.region {
+    fill: rgba(128, 128, 128, 0.5);
+    stroke: darkgray;
+    stroke-width: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* Отключаем тач-хайлайт */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
+    
+    /* Отключаем выделение текста */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    
+    /* Отключаем контекстное меню */
+    -webkit-touch-callout: none;
+    
+    /* Убираем outline */
+    outline: none;
+}
+
+/* Для SVG контейнера */
+svg {
+    display: block;
+    margin: 0 auto;
+    background-color: black;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Для активного состояния тоже */
+.region:active {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+
+        
         
         body {
             margin: 0;
