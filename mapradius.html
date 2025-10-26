@@ -177,6 +177,10 @@ svg {
                 'RU': 'Регистрация',
                 'ZN': '注册'
             };
+
+            const defaultRegion = document.getElementById('region-EN');
+            defaultRegion.classList.add('active');
+            wordDisplay.textContent = translations['EN'];
             
             regions.forEach(region => {
                 region.addEventListener('click', function() {
