@@ -195,6 +195,26 @@ svg {
                 });
             });
         });
+
+    const defaultRegion = document.getElementById('region-RU');
+    defaultRegion.classList.add('active');
+    wordDisplay.textContent = translations['RU'];
+    
+    regions.forEach(region => {
+        region.addEventListener('click', function() {
+            regions.forEach(r => {
+                r.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+            
+            const regionId = this.id;
+            const lang = regionId.split('-')[1];
+            wordDisplay.textContent = translations[lang] || 'Регистрация';
+        });
+    });
+});
+        
     </script>
 </body>
 </html>
