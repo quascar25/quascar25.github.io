@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конвертер изображений в текст</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-button {
+            width: 500px;
+            height: 50px;
+            border: 1px solid #888;
+            background-color: transparent;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .file-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .text-output {
+            width: 500px;
+            height: 200px;
+            border: 1px solid #888;
+            background-color: transparent;
+            color: #fff;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow: auto;
+            resize: none;
+        }
+
+        .preview {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #888;
+            background-color: transparent;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <label class="file-button">
+            Выберите изображение
+            <input type="file" class="file-input" id="fileInput" accept=".jpg,.jpeg">
+        </label>
+        
+        <textarea class="text-output" id="textOutput" readonly placeholder="Здесь появится текст с цветами пикселей..."></textarea>
+        
+        <canvas id="previewCanvas" class="preview"></canvas>
+    </div>
+
+    <script>
+        // Создание мерцающих звезд
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Случайные позиции и размеры
+                const size = Math.random() * 3;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const delay = Math.random() * 5;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Обработка выбора файла
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Проверка размера изображения
+                    if (img.width !== 60 || img.height !== 60) {
+                        alert('Пожалуйста, выберите изображение размером 60x60 пикселей.');
+                        return;
+                    }
+                    
+                    // Создание временного canvas для обработки изображения
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 60;
+                    canvas.height = 60;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, 60, 60);
+                    
+                    // Получение данных пикселей
+                    const imageData = ctx.getImageData(0, 0, 60, 60);
+                    const pixels = imageData.data;
+                    
+                    // Преобразование пикселей в текстовую строку
+                    let result = '';
+                    for (let i = 0; i < pixels.length; i += 4) {
+                        const r = pixels[i];
+                        const g = pixels[i + 1];
+                        const b = pixels[i + 2];
+                        
+                        // Формат: RGB
+                        result += `${r},${g},${b} `;
+                        
+                        // Добавление переноса строки каждые 60 пикселей (одна строка изображения)
+                        if ((i / 4 + 1) % 60 === 0) {
+                            result += '\n';
+                        }
+                    }
+                    
+                    // Отображение результата
+                    document.getElementById('textOutput').value = result;
+                    
+                    // Отображение превью
+                    const previewCanvas = document.getElementById('previewCanvas');
+                    const previewCtx = previewCanvas.getContext('2d');
+                    previewCtx.drawImage(img, 0, 0, 60, 60);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Инициализация звездного неба
+        createStars();
+    </script>
+</body>
+</html>
