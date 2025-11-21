@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Experts Warnings</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        #continents {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+            border: 1px dashed #333;
+            border-radius: 4px;
+        }
+
+        .continent-btn {
+            position: absolute;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(to bottom, rgba(50,50,50,0.8), rgba(100,100,100,0.8));
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+
+        .continent-btn:hover {
+            background: linear-gradient(to bottom, rgba(70,70,70,0.9), rgba(120,120,120,0.9));
+        }
+
+        #main-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #111;
+            color: #ccc;
+            border: 1px solid #555;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background-color: #111;
+            border: 1px solid #555;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        #modal-header {
+            padding: 10px;
+            border-bottom: 1px solid #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #close-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #experts-list {
+            height: 200px;
+            overflow-y: auto;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .expert-item {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .expert-avatar {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            flex-shrink: 0;
+            image-rendering: pixelated;
+        }
+
+        .expert-quote {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.3;
+        }
+
+            #detail-modal {
+                display: none;
+                position: fixed;
+                z-index: 200;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #111;
+                border: 1px solid #555;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+                padding: 20px;
+            }
+            
+            .detail-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            #detail-avatar {
+                width: 120px;  /* В 2 раза больше */
+                height: 120px; /* В 2 раза больше */
+                image-rendering: pixelated;
+            }
+            
+            #detail-quote {
+                font-size: 24px; /* В 2 раза больше */
+                color: #ccc;
+                text-align: center;
+                line-height: 1.4;
+            }
+            
+            #detail-close {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background: none;
+                border: none;
+                color: #ccc;
+                font-size: 24px;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+    <div id="starfield"></div>
+
+    <div id="continents">
+        <!-- Континенты будут созданы скриптом -->
+    </div>
+
+    <button id="main-button">Эксперты</button>
+
+    <div id="modal">
+        <div id="modal-header">
+            <span id="modal-title">Мысли об опасности ИИ</span>
+            <button id="close-btn">&times;</button>
+        </div>
+        <ul id="experts-list">
+            <!-- Список экспертов будет заполнен скриптом -->
+        </ul>
+    </div>
+
+    <div id="detail-modal">
+        <button id="detail-close">&times;</button>
+        <div class="detail-content">
+            <img id="detail-avatar" src="" alt="Expert avatar">
+            <div id="detail-quote"></div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Создание звездного поля
+        const starfield = document.getElementById('starfield');
+        const starCount = 150;
+
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            const size = Math.random() * 2 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            
+            star.style.animationDuration = `${Math.random() * 5 + 3}s`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            
+            starfield.appendChild(star);
+        }
+
+        // 2. Создание кнопок-материков (упрощенные прямоугольники для примера)
+        const continentsContainer = document.getElementById('continents');
+        const continentData = [
+            { id: 'na', name: 'North America', left: '10%', top: '20%', width: '20%', height: '40%' },
+            { id: 'sa', name: 'South America', left: '15%', top: '60%', width: '15%', height: '30%' },
+            { id: 'eu', name: 'Europe', left: '45%', top: '20%', width: '15%', height: '20%' },
+            { id: 'as', name: 'Asia', left: '55%', top: '20%', width: '25%', height: '40%' },
+            { id: 'af', name: 'Africa', left: '40%', top: '40%', width: '15%', height: '40%' },
+            { id: 'au', name: 'Australia', left: '75%', top: '60%', width: '15%', height: '20%' }
+        ];
+
+        continentData.forEach(cont => {
+            const btn = document.createElement('button');
+            btn.className = 'continent-btn';
+            btn.id = cont.id;
+            btn.style.left = cont.left;
+            btn.style.top = cont.top;
+            btn.style.width = cont.width;
+            btn.style.height = cont.height;
+            btn.title = cont.name;
+            continentsContainer.appendChild(btn);
+        });
+
+        // 3. Данные для экспертов (цитаты на разных языках)
+        const expertsData = {
+            experts: [
+                { name: "S. Hawking", initals: "SH" },
+                { name: "M. Tegmark", initals: "MT" },
+                { name: "S. Russell ", initals: "SR" },
+                { name: "N. Bostrom", initals: "NB" },
+                { name: "B. Gates", initals: "BG" },
+                { name: "I. Sutskever", initals: "IS" },
+                { name: "E. Musk", initals: "EM" },
+                { name: "E. Yudkowsky", initals: "EY" },
+                { name: "S. Harris", initals: "SH" },
+                { name: "S. Altman", initals: "SA" },
+                { name: "Y. Noah Harari", initals: "YH" },
+                { name: "E. Brynjolfsson", initals: "EB" },
+                { name: "K. Kaspersky", initals: "KK" },
+                { name: "G. Hinton", initals: "GH" },
+                { name: "D. Amodei", initals: "DA" },
+                { name: "R. Yampolskiy", initals: "RY" },
+                { name: "J. Buolamwini", initals: "JB" },
+                { name: "L. Page", initals: "LP" },
+                { name: "M. Kirschner", initals: "MK" },
+                { name: "I. Devetyarov", initals: "ID" }
+            ],
+            quotes: {
+                RU: [
+                    "ИИ может стать последним изобретением человечества, если мы не научимся контролировать его.",
+                    "Мы подобны детям, играющим с бомбой. ИИ мощнее, чем мы можем осознать.",
+                    "Гонка ИИ без мер безопасности — это самоубийство для цивилизации.",
+                    "Главная опасность — не злой ИИ, а компетентный ИИ с неверными целями.",
+                    "ИИ превзойдет человеческий интеллект, и это может быть концом человеческой эры.",
+                    "Мы создаем бога, и этот бог может нас уничтожить.",
+                    "Проблема не в том, станет ли ИИ умнее нас, а в том, когда и что он решит с нами сделать.",
+                    "ИИ — это обоюдоострое оружие, которое может быть использовано против нас же.",
+                    "Мы строим машину, которая может принимать решения за нас, и это ужасающе.",
+                    "Без правильного регулирования ИИ приведет к катастрофическим последствиям.",
+                    "ИИ может создать тотальную систему surveillance, уничтожив приватность.",
+                    "Автономное оружие на основе ИИ — это кошмар, который уже становится реальностью.",
+                    "ИИ может манипулировать людьми в масштабах, которые мы не можем представить.",
+                    "Экономический коллапс из-за массовой автоматизации — лишь вопрос времени.",
+                    "ИИ может быть использован для создания изощренных кибератак.",
+                    "Мы не понимаем, как работают сложные ИИ-системы, а это опасно.",
+                    "ИИ усиливает человеческие предрассудки и делает их масштабируемыми.",
+                    "Концентрация власти ИИ в руках нескольких корпораций угрожает демократии.",
+                    "ИИ может сделать бессмысленной человеческую жизнь и труд.",
+                    "Мультипланетность не спасет, ИИ достигнет нас везде."
+                ],
+                EN: [
+                    "AI could be humanity's last invention if we don't learn to control it.", 
+                    "We are like children playing with a bomb. AI is more powerful than we realize.", 
+                    "An AI race without safety measures is suicide for civilization.", 
+                    "The main danger is not evil AI, but competent AI with the wrong goals.", 
+                    "AI will surpass human intelligence, and this could be the end of the human era.", 
+                    "We create a god, and this god can destroy us.", 
+                    "The problem is not whether AI will become smarter than us, but when and what it decides to do with us.", 
+                    "AI is a double-edged sword that can be used against us.", 
+                    "We're building a machine that can make decisions for us, and it's terrifying.", 
+                    "Without proper regulation, AI will lead to catastrophic consequences.", 
+                    "AI can create a total surveillance system, destroying privacy.", 
+                    "AI-powered autonomous weapons are a nightmare that is already becoming a reality.", 
+                    "AI can manipulate people on a scale we cannot imagine." ,
+                    "Economic collapse due to mass automation is only a matter of time.", 
+                    "AI can be used to create sophisticated cyber attacks.", 
+                    "We don't understand how complex AI systems work, and that's dangerous.", 
+                    "AI amplifies human biases and makes them scalable.", 
+                    "The concentration of AI power in the hands of a few corporations threatens democracy.", 
+                    "AI can make human life and work meaningless.", 
+                    "Multiplanetary will not save us, AI will reach us everywhere."
+                ],
+                DE: [ "KI könnte die letzte Erfindung der Menschheit sein, wenn wir nicht lernen, sie zu kontrollieren.",
+                    "Wir sind wie Kinder, die mit einer Bombe spielen. KI ist mächtiger, als uns bewusst ist.",
+                    "Ein KI-Wettlauf ohne Sicherheitsmaßnahmen ist Selbstmord für die Zivilisation.",
+                    "Die Hauptgefahr ist nicht die böse KI, sondern die kompetente KI mit den falschen Zielen.",
+                    "KI wird die menschliche Intelligenz übertreffen, und dies könnte das Ende der menschlichen Ära bedeuten.",
+                    "Wir erschaffen einen Gott, und dieser Gott kann uns zerstören.",
+                    "Das Problem ist nicht, ob KI schlauer wird als wir, sondern wann und was sie mit uns macht.",
+                    "KI ist ein zweischneidiges Schwert, das gegen uns eingesetzt werden kann.",
+                    "Wir bauen eine Maschine, die Entscheidungen für uns treffen kann, und das ist erschreckend.",
+                    "Ohne angemessene Regulierung wird KI katastrophale Folgen haben.",
+                    "KI kann ein umfassendes Überwachungssystem schaffen und die Privatsphäre zerstören.",
+                    "KI-betriebene autonome Waffen sind ein Albtraum, der bereits Realität wird.",
+                    "KI kann Menschen in einem Ausmaß manipulieren, das wir uns nicht vorstellen können.",
+                    "Wirtschaftlicher Zusammenbruch durch Massenautomatisierung ist nur eine Frage der Zeit.",
+                    "Mit KI lassen sich ausgefeilte Cyber-Angriffe realisieren.",
+                    "Wir verstehen nicht, wie komplexe KI-Systeme funktionieren, und das ist gefährlich.",
+                    "KI verstärkt menschliche Vorurteile und macht sie skalierbar.",
+                    "Die Konzentration der KI-Macht in den Händen einiger weniger Unternehmen bedroht die Demokratie.",
+                    "KI kann menschliches Leben und Arbeit bedeutungslos machen.",
+                    "Multiplanetare Systeme werden uns nicht retten, die KI wird uns überall erreichen."
+                ],
+                FR: [ 
+                    "L'IA pourrait être la dernière invention de l'humanité si nous n'apprenons pas à la contrôler.",
+                    "Nous sommes comme des enfants qui jouent avec une bombe. L'IA est plus puissante que nous ne le pensons.",
+                    "Une course à l'IA sans mesures de sécurité est un suicide pour la civilisation.",
+                    "Le principal danger n'est pas une IA maléfique, mais une IA compétente avec de mauvais objectifs.",
+                    "L'IA dépassera l'intelligence humaine, et cela pourrait signifier la fin de l'ère humaine.",
+                    "Nous créons un dieu, et ce dieu peut nous détruire.",
+                    "Le problème n'est pas de savoir si l'IA deviendra plus intelligente que nous, mais quand et ce qu'elle décidera de faire de nous.",
+                    "L'IA est une arme à double tranchant qui peut être utilisée contre nous.",
+                    "Nous construisons une machine qui peut prendre des décisions à notre place, et c'est terrifiant.",
+                    "Sans une réglementation appropriée, l'IA entraînera des conséquences catastrophiques.",
+                    "L'IA peut créer un système de surveillance totale, détruisant la vie privée.",
+                    "Les armes autonomes alimentées par l'IA sont un cauchemar qui est déjà en train de devenir une réalité.",
+                    "L'IA peut manipuler les gens à une échelle que nous ne pouvons pas imaginer.",
+                    "L'effondrement économique dû à l'automatisation de masse n'est qu'une question de temps.",
+                    "L'IA peut être utilisée pour créer des cyberattaques sophistiquées.",
+                    "Nous ne comprenons pas comment fonctionnent les systèmes complexes d'IA, et c'est dangereux.",
+                    "L'IA amplifie les préjugés humains et les rend évolutifs.",
+                    "La concentration du pouvoir de l'IA entre les mains de quelques entreprises menace la démocratie.",
+                    "L'IA peut rendre la vie humaine et le travail inutiles.",
+                    "Le multiplanétaire ne nous sauvera pas, l'IA nous atteindra partout."
+                ],
+                ES: [
+                    "La IA podría ser el último invento de la humanidad si no aprendemos a controlarla.",
+                    "Somos como niños jugando con una bomba. La IA es más poderosa de lo que creemos.",
+                    "Una carrera de IA sin medidas de seguridad es un suicidio para la civilización.",
+                    "El principal peligro no es la IA malvada, sino la IA competente con los objetivos equivocados.",
+                    "La IA superará la inteligencia humana y este podría ser el fin de la era humana.",
+                    "Creamos un dios y este dios puede destruirnos.",
+                    "El problema no es si la IA se volverá más inteligente que nosotros, sino cuándo y qué decidirá hacer con nosotros.",
+                    "La IA es un arma de doble filo que puede usarse contra nosotros.",
+                    "Estamos construyendo una máquina que puede tomar decisiones por nosotros y es aterrador.",
+                    "Sin una regulación adecuada, la IA tendrá consecuencias catastróficas.",
+                    "La IA puede crear un sistema de vigilancia total, destruyendo la privacidad.",
+                    "Las armas autónomas impulsadas por IA son una pesadilla que ya se está convirtiendo en realidad.",
+                    "La IA puede manipular a las personas a una escala que no podemos imaginar.",
+                    "El colapso económico debido a la automatización masiva es sólo cuestión de tiempo.",
+                    "La IA se puede utilizar para crear ciberataques sofisticados.",
+                    "No entendemos cómo funcionan los sistemas complejos de IA y eso es peligroso.",
+                    "La IA amplifica los prejuicios humanos y los hace escalables.",
+                    "La concentración del poder de la IA en manos de unas pocas corporaciones amenaza la democracia.",
+                    "La IA puede hacer que la vida y el trabajo humanos carezcan de sentido.",
+                    "La estrategia multiplanetaria no nos salvará, la IA nos alcanzará en todas partes."
+                ],
+                ZN: [
+                    "如果我们不学会控制人工智能，它可能是人类最后的发明。",
+                    "我们就像玩炸弹的孩子。人工智能比我们想象的更强大。",
+                    "没有安全措施的人工智能竞赛就是文明的自杀。",
+                    "主要的危险不是邪恶的人工智能，而是目标错误的有能力的人工智能。",
+                    "人工智能将超越人类智能，这可能是人类时代的终结。",
+                    "我们创造了一个神，这个神可以毁灭我们。",
+                    "问题不在于人工智能是否会变得比我们更聪明，而在于它何时决定对我们做什么。",
+                    "人工智能是一把双刃剑，可以用来对付我们。",
+                    "我们正在建造一台可以为我们做出决定的机器，这太可怕了。",
+                    "如果没有适当的监管，人工智能将导致灾难性的后果。",
+                    "人工智能可以创建一个全面的监控系统，从而破坏隐私。",
+                    "人工智能驱动的自主武器是一场噩梦，但它已经成为现实。",
+                    "人工智能可以以我们无法想象的规模操纵人类。",
+                    "大规模自动化导致的经济崩溃只是时间问题。",
+                    "人工智能可用于发起复杂的网络攻击。",
+                    "我们不了解复杂的人工智能系统是如何工作的，这很危险。",
+                    "人工智能放大了人类的偏见并使其具有可扩展性。",
+                    "人工智能权力集中在少数公司手中威胁着民主。",
+                    "人工智能会让人类的生活和工作变得毫无意义。",
+                    "多行星技术拯救不了我们，人工智能终将渗透到我们生活的方方面面。"
+                ]
+            },
+            ui: {
+                RU: { button: "Эксперты", title: "Мысли об опасности ИИ" },
+                EN: { button: "Experts", title: "Thoughts on AI Danger" },
+                DE: { button: "Experten", title: "Gedanken zur KI-Gefahr" },
+                FR: { button: "Experts", title: "Réflexions sur les dangers de l'IA" },
+                ES: { button: "Expertos", title: "Reflexiones sobre el peligro de la IA" },
+                ZN: { button: "专家", title: "关于人工智能危险的思考" }
+            }
+        };
+
+        // 4. Функция для создания изображения из текстовых данных пикселей
+        function createImageFromPixelData(pixelDataString) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 60;
+            canvas.height = 60;
+            const ctx = canvas.getContext('2d');
+            
+            // Очищаем canvas
+            ctx.clearRect(0, 0, 60, 60);
+            
+            // Разбиваем строку на отдельные пиксели
+            const lines = pixelDataString.trim().split('\n');
+            
+            for (let y = 0; y < lines.length; y++) {
+                const pixels = lines[y].trim().split(' ');
+                
+                for (let x = 0; x < pixels.length; x++) {
+                    if (pixels[x]) {
+                        const [r, g, b] = pixels[x].split(',').map(Number);
+                        ctx.fillStyle = `rgb(${r},${g},${b})`;
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+            
+            return canvas.toDataURL();
+        }
+
+        const expertPixelData = [ 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`, 
+        `3,0,0 2,0,0 1,0,1`,                         
+        `3,0,0 2,0,0 1,0,1`
+        ];
+
+        // 6. Инициализация данных
+        let currentLanguage = 'RU';
+        const mainButton = document.getElementById('main-button');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const expertsList = document.getElementById('experts-list');
+        const closeBtn = document.getElementById('close-btn');
+
+        const detailModal = document.getElementById('detail-modal');
+        const detailAvatar = document.getElementById('detail-avatar');
+        const detailQuote = document.getElementById('detail-quote');
+        const detailClose = document.getElementById('detail-close');
+
+        // Заполняем список экспертов
+        function renderExperts() {
+            expertsList.innerHTML = '';
+            const quotes = expertsData.quotes[currentLanguage];
+            
+            for (let i = 0; i < 20; i++) {
+                const li = document.createElement('li');
+                li.className = 'expert-item';
+                
+                const img = document.createElement('img');
+                img.className = 'expert-avatar';
+                
+                // ВАЖНО: Здесь мы используем реальные данные пикселей вместо цветных квадратиков
+                if (expertPixelData[i]) {
+                    // Используем реальные данные изображения
+                    img.src = createImageFromPixelData(expertPixelData[i]);
+                } else {
+                    // Заглушка, если данных нет (оставьте вашу текущую функцию)
+                    img.src = generatePixelAvatar();
+                }
+                
+                img.alt = `Expert ${i+1}`;
+                
+                const quote = document.createElement('div');
+                quote.className = 'expert-quote';
+                quote.textContent = `${expertsData.experts[i].name}: ${quotes[i]}`;
+
+                        // Добавляем обработчик клика на строку
+                        li.addEventListener('click', () => {
+                            // Показываем увеличенное изображение и текст
+                            detailAvatar.src = img.src; // Берем ту же самую картинку
+                            detailQuote.textContent = `${expertsData.experts[i].name}: ${quotes[i]}`;
+                            detailModal.style.display = 'block';
+                        });
+                
+                li.appendChild(img);
+                li.appendChild(quote);
+                expertsList.appendChild(li);
+            }
+        }
+
+                            // Обработчик закрытия детального окна
+                            detailClose.addEventListener('click', () => {
+                                detailModal.style.display = 'none';
+                            });
+                            
+                            // Закрытие при клике вне окна
+                            window.addEventListener('click', (event) => {
+                                if (event.target === modal) {
+                                    modal.style.display = 'none';
+                                }
+                                if (event.target === detailModal) {
+                                    detailModal.style.display = 'none';
+                                }
+                            });
+
+        // Старая функция для генерации аватарок (оставьте как резерв)
+        function generatePixelAvatar() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 30;
+            canvas.height = 30;
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 30, 30);
+            gradient.addColorStop(0, `hsl(${Math.random() * 360}, 70%, 50%)`);
+            gradient.addColorStop(1, `hsl(${Math.random() * 360}, 70%, 30%)`);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 30, 30);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            for (let i = 0; i < 20; i++) {
+                const x = Math.floor(Math.random() * 30);
+                const y = Math.floor(Math.random() * 30);
+                ctx.fillRect(x, y, 1, 1);
+            }
+            
+            return canvas.toDataURL();
+        }
+
+        // Обновляем язык интерфейса
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            const ui = expertsData.ui[lang];
+            mainButton.textContent = ui.button;
+            modalTitle.textContent = ui.title;
+            renderExperts();
+        }
+
+        // 7. Обработчики событий
+        const languages = ['RU', 'FR', 'EN', 'DE', 'ES', 'ZN'];
+        continentData.forEach((cont, index) => {
+            document.getElementById(cont.id).addEventListener('click', () => {
+                updateLanguage(languages[index]);
+            });
+        });
+
+        mainButton.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Инициализация
+        renderExperts();
+    </script>
+</body>
+</html>
