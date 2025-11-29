@@ -279,8 +279,8 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
 
     if (orientation === 'horizontal') {
         // Горизонтальная ориентация
-        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
-        pitch = 0; // Горизонтально
+        yaw = Math.atan2(deltaZ, deltaX) * (90 / Math.PI);   //180
+        pitch = 90; // Горизонтально  //0
     } else if (orientation === 'vertical') {
         // Вертикальная ориентация  
         yaw = 0;
