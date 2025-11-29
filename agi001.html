@@ -253,20 +253,18 @@ window.addEventListener('load', function() {
         
     ];
     
-  // Улучшенная функция для создания ребра с контролем ориентации
-function createEdge(startIndex, endIndex, orientation = 'auto') {
-    // orientation: 'auto', 'horizontal', 'vertical'
+// Улучшенная функция с контролем осей вращения
+function createEdge(startIndex, endIndex, rotationAxis = 'auto') {
+    // rotationAxis: 'auto', 'x', 'y', 'z'
     const start = vertices[startIndex];
     const end = vertices[endIndex];
     
-    // Вычисляем длину ребра
     const length = Math.sqrt(
         Math.pow(end[0] - start[0], 2) +
         Math.pow(end[1] - start[1], 2) + 
         Math.pow(end[2] - start[2], 2)
     );
     
-    // Середина ребра
     const centerX = (start[0] + end[0]) / 2;
     const centerY = (start[1] + end[1]) / 2; 
     const centerZ = (start[2] + end[2]) / 2;
@@ -275,20 +273,42 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
     const deltaY = end[1] - start[1];
     const deltaZ = end[2] - start[2];
     
-    let yaw, pitch;
+    let transform = '';
 
-    if (orientation === 'horizontal') {
-        // Горизонтальная ориентация
-        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);   //180
-        pitch = 0; // Горизонтально  //0
-    } else if (orientation === 'vertical') {
-        // Вертикальная ориентация  
-        yaw = 0;
-        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
+    if (rotationAxis === 'x') {
+        // Вращение вокруг оси X (вертикальные рёбра)
+        transform = `
+            translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
+            rotateX(90deg)
+            rotateZ(${Math.atan2(deltaY, deltaX) * (180 / Math.PI)}deg)
+            translateX(${-length/2}px)
+        `;
+    } else if (rotationAxis === 'y') {
+        // Вращение вокруг оси Y (горизонтальные рёбра)
+        transform = `
+            translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
+            rotateY(90deg)
+            rotateZ(${Math.atan2(deltaZ, deltaX) * (180 / Math.PI)}deg)
+            translateX(${-length/2}px)
+        `;
+    } else if (rotationAxis === 'z') {
+        // Вращение вокруг оси Z (рёбра в плоскости Z)
+        transform = `
+            translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
+            rotateZ(90deg)
+            rotateY(${Math.atan2(deltaZ, deltaY) * (180 / Math.PI)}deg)
+            translateX(${-length/2}px)
+        `;
     } else {
         // Автоматический расчет
-        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);   //180
-        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);   //180
+        const yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
+        const pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
+        transform = `
+            translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
+            rotateY(${yaw}deg)
+            rotateX(${-pitch}deg)
+            translateX(${-length/2}px)
+        `;
     }
     
     const edgeElement = document.createElement('div');
@@ -298,31 +318,25 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
     edgeElement.style.background = '#888';
     edgeElement.style.position = 'absolute';
     edgeElement.style.transformOrigin = '0 0';
-    
-    edgeElement.style.transform = `
-        translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
-        rotateY(${yaw}deg)
-        rotateX(${-pitch}deg)
-        translateX(${-length/2}px)
-    `;
+    edgeElement.style.transform = transform;
     
     cube.appendChild(edgeElement);
     return edgeElement;
 }
 
-
-createEdge(0, 1, 'horizontal');                   // автоматически
-createEdge(1, 2, 'horizontal');      // горизонтально
-createEdge(2, 3, 'horizontal');        // вертикально ← ТАК МОЖНО!
-createEdge(3, 0, 'vertical');      // горизонтально
-createEdge(4, 5, 'horizontal');                   // автоматически  
-createEdge(5, 6, 'horizontal');      // горизонтально
-createEdge(6, 7, 'horizontal');        // вертикально ← ТАК МОЖНО!
-createEdge(7, 4, 'horizontal');      // горизонтально
-createEdge(0, 4, 'horizontal');        // вертикально
-createEdge(1, 5, 'horizontal');        // вертикально
-createEdge(2, 6, 'horizontal');        // вертикально  
-createEdge(3, 7, 'horizontal');        // вертикально
+// Или для всех рёбер:
+createEdge(0, 1, 'y');    // горизонтальное
+createEdge(1, 2, 'x');    // вертикальное
+createEdge(2, 3, 'y');    // горизонтальное
+createEdge(3, 0, 'x');    // вертикальное
+createEdge(4, 5, 'y');    // горизонтальное
+createEdge(5, 6, 'x');    // вертикальное
+createEdge(6, 7, 'y');    // горизонтальное
+createEdge(7, 4, 'x');    // вертикальное
+createEdge(0, 4, 'z');    // глубина
+createEdge(1, 5, 'z');    // глубина
+createEdge(2, 6, 'z');    // глубина
+createEdge(3, 7, 'z');    // глубина
 
     
     // Создаем точки активации
