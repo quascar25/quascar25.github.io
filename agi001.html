@@ -311,18 +311,18 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
 }
 
 
-createEdge(0, 1);                    // автоматически
+createEdge(0, 1, 'horizontal');                   // автоматически
 createEdge(1, 2, 'horizontal');      // горизонтально
-createEdge(2, 3, 'vertical');        // вертикально ← ТАК МОЖНО!
+createEdge(2, 3, 'horizontal');        // вертикально ← ТАК МОЖНО!
 createEdge(3, 0, 'horizontal');      // горизонтально
-createEdge(4, 5);                    // автоматически  
+createEdge(4, 5, 'horizontal');                   // автоматически  
 createEdge(5, 6, 'horizontal');      // горизонтально
-createEdge(6, 7, 'vertical');        // вертикально ← ТАК МОЖНО!
+createEdge(6, 7, 'horizontal');        // вертикально ← ТАК МОЖНО!
 createEdge(7, 4, 'horizontal');      // горизонтально
-createEdge(0, 4, 'vertical');        // вертикально
-createEdge(1, 5, 'vertical');        // вертикально
-createEdge(2, 6, 'vertical');        // вертикально  
-createEdge(3, 7, 'vertical');        // вертикально
+createEdge(0, 4, 'horizontal');        // вертикально
+createEdge(1, 5, 'horizontal');        // вертикально
+createEdge(2, 6, 'horizontal');        // вертикально  
+createEdge(3, 7, 'horizontal');        // вертикально
 
     
     // Создаем точки активации
