@@ -253,8 +253,9 @@ window.addEventListener('load', function() {
         
     ];
     
-    // Функция для создания одного ребра
-  function createEdge(startIndex, endIndex, forceHorizontal = false) {
+  // Улучшенная функция для создания ребра с контролем ориентации
+function createEdge(startIndex, endIndex, orientation = 'auto') {
+    // orientation: 'auto', 'horizontal', 'vertical'
     const start = vertices[startIndex];
     const end = vertices[endIndex];
     
@@ -275,13 +276,17 @@ window.addEventListener('load', function() {
     const deltaZ = end[2] - start[2];
     
     let yaw, pitch;
-    
-    if (forceHorizontal) {
-        // Принудительно делаем горизонтальную ориентацию
+
+    if (orientation === 'horizontal') {
+        // Горизонтальная ориентация
         yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
         pitch = 0; // Горизонтально
+    } else if (orientation === 'vertical') {
+        // Вертикальная ориентация  
+        yaw = 0;
+        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
     } else {
-        // Автоматический расчет как раньше
+        // Автоматический расчет
         yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
         pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
     }
@@ -303,7 +308,7 @@ window.addEventListener('load', function() {
     
     cube.appendChild(edgeElement);
     return edgeElement;
-    }
+}
 
 
 // Создаём все рёбра с указанием ориентации
@@ -324,7 +329,8 @@ window.addEventListener('load', function() {
  //   createEdge(4, 5);   // автоматическая ориентация  
   //  createEdge(5, 6, true);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
  //   createEdge(6, 7);   // автоматическая ориентация
-    createEdge(4, 7);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
+    createEdge(6, 7, 'horizontal');        // вертикально ← ТАК МОЖНО!
+createEdge(7, 4, 'vertical');      // горизонтально
   //  createEdge(0, 4);   // автоматическая ориентация
   //  createEdge(1, 5);   // автоматическая ориентация
   //  createEdge(2, 6);   // автоматическая ориентация  
