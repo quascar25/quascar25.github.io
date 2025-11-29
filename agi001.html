@@ -279,16 +279,16 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
 
     if (orientation === 'horizontal') {
         // Горизонтальная ориентация
-        yaw = Math.atan2(deltaZ, deltaX) * (90 / Math.PI);   //180
-        pitch = 90; // Горизонтально  //0
+        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);   //180
+        pitch = 0; // Горизонтально  //0
     } else if (orientation === 'vertical') {
         // Вертикальная ориентация  
         yaw = 0;
         pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
     } else {
         // Автоматический расчет
-        yaw = Math.atan2(deltaZ, deltaX) * (90 / Math.PI);   //180
-        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (90 / Math.PI);   //180
+        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);   //180
+        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);   //180
     }
     
     const edgeElement = document.createElement('div');
@@ -311,37 +311,19 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
 }
 
 
-// Создаём все рёбра с указанием ориентации
-//edges.forEach(edge => {
-    // Для рёбер [7,4], [0,3], [1,2], [5,6] - делаем горизонтальными
-//    const horizontalEdges = [[7,4], [0,3], [1,2], [5,6]];
-//    const isHorizontal = horizontalEdges.some(he => 
-//        (he[0] === edge[0] && he[1] === edge[1]) || 
-//        (he[0] === edge[1] && he[1] === edge[0])
-  //  );
-    
-  //  createEdge(edge[0], edge[1], isHorizontal);
-    // Создаём рёбра по отдельности для полного контроля
-  //  createEdge(0, 1, true);   // автоматическая ориентация
-  //  createEdge(1, 2, false);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
-  //  createEdge(2, 3);   // автоматическая ориентация
-  //  createEdge(3, 0, true);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
- //   createEdge(4, 5);   // автоматическая ориентация  
-  //  createEdge(5, 6, true);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
- //   createEdge(6, 7);   // автоматическая ориентация
-    createEdge(6, 7, 'vertical');        // вертикально ← ТАК МОЖНО!    horizontal
-createEdge(7, 4, 'vertical');      // горизонтально
-  //  createEdge(0, 4);   // автоматическая ориентация
-  //  createEdge(1, 5);   // автоматическая ориентация
-  //  createEdge(2, 6);   // автоматическая ориентация  
-  //  createEdge(3, 7);   // автоматическая ориентация
-//});
-           
-    
-//    // Создаём все рёбра
-//    edges.forEach(edge => {
-//        createEdge(edge[0], edge[1]);
-//    });
+createEdge(0, 1);                    // автоматически
+createEdge(1, 2, 'horizontal');      // горизонтально
+createEdge(2, 3, 'vertical');        // вертикально ← ТАК МОЖНО!
+createEdge(3, 0, 'horizontal');      // горизонтально
+createEdge(4, 5);                    // автоматически  
+createEdge(5, 6, 'horizontal');      // горизонтально
+createEdge(6, 7, 'vertical');        // вертикально ← ТАК МОЖНО!
+createEdge(7, 4, 'horizontal');      // горизонтально
+createEdge(0, 4, 'vertical');        // вертикально
+createEdge(1, 5, 'vertical');        // вертикально
+createEdge(2, 6, 'vertical');        // вертикально  
+createEdge(3, 7, 'vertical');        // вертикально
+
     
     // Создаем точки активации
     createActivationPoints();
