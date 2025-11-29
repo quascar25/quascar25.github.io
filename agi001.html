@@ -12,9 +12,13 @@
             color: #888;
             font-family: Arial, sans-serif;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        /* Анимированное звёздное небо */
+        /* Звёздное небо */
         #stars {
             position: fixed;
             top: 0;
@@ -36,7 +40,7 @@
             50% { opacity: 1; }
         }
 
-        /* Основные стили интерфейса */
+        /* Основные стили */
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -103,6 +107,52 @@
             border: 1px solid white !important;
             transition: border 0.5s ease;
         }
+
+        /* 3D Куб */
+        #cubeContainer {
+            margin: 30px auto;
+            width: 100px;
+            height: 100px;
+            perspective: 600px;
+        }
+
+        #cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 15s infinite linear;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+
+        .vertex {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #888;
+            border-radius: 50%;
+            transform-style: preserve-3d;
+        }
+
+        .edge {
+            position: absolute;
+            background: #888;
+            transform-origin: 0 0;
+        }
+
+        .activation-point {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -111,6 +161,13 @@
 
     <div class="container">
         <div class="header">AGI 001</div>
+        
+        <!-- 3D Куб -->
+        <div id="cubeContainer">
+            <div id="cube">
+                <!-- Вершины будут созданы через JavaScript -->
+            </div>
+        </div>
         
         <!-- Поля для понятий -->
         <textarea class="concept-box" placeholder="Понятие 1">ощущение жжения от огня → отдернуть руку → избежание боли</textarea>
@@ -139,17 +196,112 @@
                 const star = document.createElement('div');
                 star.className = 'star';
                 
-                // Случайные координаты и размер
                 const size = Math.random() * 2;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
                 star.style.left = `${Math.random() * 100}vw`;
                 star.style.top = `${Math.random() * 100}vh`;
-                
-                // Случайная задержка анимации
                 star.style.animationDelay = `${Math.random() * 3}s`;
                 
                 starsContainer.appendChild(star);
+            }
+        }
+
+        // Создание 3D куба
+        function createCube() {
+            const cube = document.getElementById('cube');
+            const size = 50; // Половина размера куба
+            
+            // Координаты 8 вершин куба
+            const vertices = [
+                [-size, -size, -size], [ size, -size, -size],
+                [ size,  size, -size], [-size,  size, -size],
+                [-size, -size,  size], [ size, -size,  size],
+                [ size,  size,  size], [-size,  size,  size]
+            ];
+            
+            // Создаем вершины
+            vertices.forEach((vertex, index) => {
+                const vertexElement = document.createElement('div');
+                vertexElement.className = 'vertex';
+                vertexElement.style.transform = `translate3d(${vertex[0]}px, ${vertex[1]}px, ${vertex[2]}px)`;
+                cube.appendChild(vertexElement);
+            });
+            
+            // Рёбра куба (12 рёбер)
+            const edges = [
+                [0,1], [1,2], [2,3], [3,0], // нижняя грань
+                [4,5], [5,6], [6,7], [7,4], // верхняя грань
+                [0,4], [1,5], [2,6], [3,7]  // вертикальные рёбра
+            ];
+            
+            edges.forEach(edge => {
+                const p1 = vertices[edge[0]];
+                const p2 = vertices[edge[1]];
+                
+                // Вычисляем длину и угол для ребра
+                const dx = p2[0] - p1[0];
+                const dy = p2[1] - p1[1];
+                const dz = p2[2] - p1[2];
+                const length = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                
+                const edgeElement = document.createElement('div');
+                edgeElement.className = 'edge';
+                edgeElement.style.width = `${length}px`;
+                edgeElement.style.height = '1px';
+                edgeElement.style.transform = `
+                    translate3d(${p1[0]}px, ${p1[1]}px, ${p1[2]}px)
+                    rotateY(${Math.atan2(dz, dx)}rad)
+                    rotateX(${Math.atan2(dy, Math.sqrt(dx*dx + dz*dz))}rad)
+                `;
+                
+                cube.appendChild(edgeElement);
+            });
+            
+            // Создаем точки активации
+            createActivationPoints();
+        }
+        
+        // Создание точек активации на рёбрах куба
+        function createActivationPoints() {
+            const cube = document.getElementById('cube');
+            const pointCount = 20; // Количество потенциальных точек активации
+            
+            for (let i = 0; i < pointCount; i++) {
+                const point = document.createElement('div');
+                point.className = 'activation-point';
+                point.id = `activation-point-${i}`;
+                
+                // Случайная позиция на поверхности куба
+                const x = (Math.random() - 0.5) * 100;
+                const y = (Math.random() - 0.5) * 100;
+                const z = (Math.random() - 0.5) * 100;
+                
+                point.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+                cube.appendChild(point);
+            }
+        }
+        
+        // Активация случайных точек на кубе
+        function activateRandomPoints() {
+            // Сначала скрываем все точки
+            document.querySelectorAll('.activation-point').forEach(point => {
+                point.style.opacity = '0';
+            });
+            
+            // Активируем 3-5 случайных точек
+            const activeCount = 3 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < activeCount; i++) {
+                const randomIndex = Math.floor(Math.random() * 20);
+                const point = document.getElementById(`activation-point-${randomIndex}`);
+                if (point) {
+                    point.style.opacity = '1';
+                    
+                    // Автоматическое скрытие через 1 секунду
+                    setTimeout(() => {
+                        point.style.opacity = '0';
+                    }, 1000);
+                }
             }
         }
 
@@ -159,16 +311,16 @@
             const taskText = document.querySelector('.task-box').value.toLowerCase();
             const solutionOutput = document.getElementById('solutionOutput');
             
-            // Разбиваем текст задачи на слова
+            // Активируем точки на кубе
+            activateRandomPoints();
+            
             const taskWords = taskText.split(/\s+/).filter(word => word.length > 3);
             
             let bestMatch = null;
             let maxMatches = 0;
             
-            // Сбрасываем предыдущие совпадения
             concepts.forEach(concept => concept.classList.remove('matched'));
             
-            // Ищем лучшее совпадение
             concepts.forEach(concept => {
                 const conceptText = concept.value.toLowerCase();
                 let matchCount = 0;
@@ -185,7 +337,6 @@
                 }
             });
             
-            // Выводим результат
             if (bestMatch && maxMatches > 0) {
                 bestMatch.classList.add('matched');
                 const conceptParts = bestMatch.value.split('→');
@@ -203,11 +354,10 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
+            createCube();
             
-            // Назначаем обработчик кнопки
             document.querySelector('.solve-btn').addEventListener('click', findSolution);
             
-            // Добавляем возможность запуска по Enter в поле задачи
             document.querySelector('.task-box').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
