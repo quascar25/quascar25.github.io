@@ -247,58 +247,77 @@ window.addEventListener('load', function() {
     // Рёбра куба - каждая пара [начальная_вершина, конечная_вершина]
     const edges = [
         
-   // [0, 1], [2, 1], [2, 3], [0, 3],
-       [0, 1], [2, 3],
-    //[4, 5], [6, 5], [6, 7], [4, 7],
-        [6, 7], [4, 5], [4, 7],
+    [0, 1], [2, 1], [2, 3], [0, 3],
+    [6, 7], [4, 5], [4, 7], [5, 6],
     [0, 4], [1, 5], [2, 6], [3, 7]
         
     ];
     
     // Функция для создания одного ребра
-    function createEdge(startIndex, endIndex) {
-        const start = vertices[startIndex];
-        const end = vertices[endIndex];
-        
-        // Вычисляем длину ребра
-        const length = Math.sqrt(
-            Math.pow(end[0] - start[0], 2) +
-            Math.pow(end[1] - start[1], 2) + 
-            Math.pow(end[2] - start[2], 2)
-        );
-        
-        // Середина ребра (для позиционирования)
-        const centerX = (start[0] + end[0]) / 2;
-        const centerY = (start[1] + end[1]) / 2; 
-        const centerZ = (start[2] + end[2]) / 2;
-        
-        // Углы поворота
-        const deltaX = end[0] - start[0];
-        const deltaY = end[1] - start[1];
-        const deltaZ = end[2] - start[2];
-        
-        const yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
-        const pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
-        
-        const edgeElement = document.createElement('div');
-        edgeElement.className = 'edge';
-        edgeElement.style.width = `${length}px`;
-        edgeElement.style.height = '1px';
-        edgeElement.style.background = '#888';
-        edgeElement.style.position = 'absolute';
-        edgeElement.style.transformOrigin = '0 0';
-        
-        // Позиционируем и поворачиваем ребро
-        edgeElement.style.transform = `
-            translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
-            rotateY(${yaw}deg)
-            rotateX(${-pitch}deg)
-            translateX(${-length/2}px)
-        `;
-        
-        cube.appendChild(edgeElement);
-        return edgeElement;
+  function createEdge(startIndex, endIndex, forceHorizontal = false) {
+    const start = vertices[startIndex];
+    const end = vertices[endIndex];
+    
+    // Вычисляем длину ребра
+    const length = Math.sqrt(
+        Math.pow(end[0] - start[0], 2) +
+        Math.pow(end[1] - start[1], 2) + 
+        Math.pow(end[2] - start[2], 2)
+    );
+    
+    // Середина ребра
+    const centerX = (start[0] + end[0]) / 2;
+    const centerY = (start[1] + end[1]) / 2; 
+    const centerZ = (start[2] + end[2]) / 2;
+    
+    const deltaX = end[0] - start[0];
+    const deltaY = end[1] - start[1];
+    const deltaZ = end[2] - start[2];
+    
+    let yaw, pitch;
+    
+    if (forceHorizontal) {
+        // Принудительно делаем горизонтальную ориентацию
+        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
+        pitch = 0; // Горизонтально
+    } else {
+        // Автоматический расчет как раньше
+        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
+        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
     }
+    
+    const edgeElement = document.createElement('div');
+    edgeElement.className = 'edge';
+    edgeElement.style.width = `${length}px`;
+    edgeElement.style.height = '1px';
+    edgeElement.style.background = '#888';
+    edgeElement.style.position = 'absolute';
+    edgeElement.style.transformOrigin = '0 0';
+    
+    edgeElement.style.transform = `
+        translate3d(${centerX}px, ${centerY}px, ${centerZ}px)
+        rotateY(${yaw}deg)
+        rotateX(${-pitch}deg)
+        translateX(${-length/2}px)
+    `;
+    
+    cube.appendChild(edgeElement);
+    return edgeElement;
+    }
+
+
+// Создаём все рёбра с указанием ориентации
+edges.forEach(edge => {
+    // Для рёбер [7,4], [0,3], [1,2], [5,6] - делаем горизонтальными
+    const horizontalEdges = [[7,4], [0,3], [1,2], [5,6]];
+    const isHorizontal = horizontalEdges.some(he => 
+        (he[0] === edge[0] && he[1] === edge[1]) || 
+        (he[0] === edge[1] && he[1] === edge[0])
+    );
+    
+    createEdge(edge[0], edge[1], isHorizontal);
+});
+           
     
     // Создаём все рёбра
     edges.forEach(edge => {
