@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGI 001</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: black;
+            color: #888;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Анимированное звёздное небо */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Основные стили интерфейса */
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid #888;
+            padding: 20px;
+            background: transparent;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border: 1px solid #888;
+            padding: 10px;
+        }
+
+        .concept-box {
+            width: 100%;
+            height: 80px;
+            border: 1px solid #888;
+            margin-bottom: 15px;
+            padding: 10px;
+            resize: none;
+            background: transparent;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .task-box {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #888;
+            margin-bottom: 15px;
+            padding: 10px;
+            resize: none;
+            background: transparent;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .solve-btn {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #888;
+            background: transparent;
+            color: #888;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .solve-btn:hover {
+            background: rgba(136, 136, 136, 0.1);
+        }
+
+        .solution {
+            border: 1px solid #888;
+            padding: 15px;
+            min-height: 50px;
+            font-size: 14px;
+        }
+
+        .matched {
+            border: 1px solid white !important;
+            transition: border 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Звёздное небо -->
+    <div id="stars"></div>
+
+    <div class="container">
+        <div class="header">AGI 001</div>
+        
+        <!-- Поля для понятий -->
+        <textarea class="concept-box" placeholder="Понятие 1">ощущение жжения от огня → отдернуть руку → избежание боли</textarea>
+        <textarea class="concept-box" placeholder="Понятие 2">ощущение насыщения после еды → съесть яблоко → утоление голода</textarea>
+        <textarea class="concept-box" placeholder="Понятие 3">ощущение холода от льда → приложить лед к ране → снятие отека</textarea>
+        <textarea class="concept-box" placeholder="Понятие 4">ощущение опоры под ногами → встать на ящик → достижение высокой полки</textarea>
+        <textarea class="concept-box" placeholder="Понятие 5">ощущение мокрой одежды → надеть плащ → защита от дождя</textarea>
+        
+        <!-- Поле для задачи -->
+        <textarea class="task-box" placeholder="Введите задачу...">Я обжёг руку о горячую плиту, чувствую сильную боль</textarea>
+        
+        <!-- Кнопка решения -->
+        <button class="solve-btn">Решение</button>
+        
+        <!-- Область для вывода решения -->
+        <div class="solution" id="solutionOutput">Решение появится здесь...</div>
+    </div>
+
+    <script>
+        // Создание звёздного неба
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Случайные координаты и размер
+                const size = Math.random() * 2;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                
+                // Случайная задержка анимации
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Функция поиска решения
+        function findSolution() {
+            const concepts = document.querySelectorAll('.concept-box');
+            const taskText = document.querySelector('.task-box').value.toLowerCase();
+            const solutionOutput = document.getElementById('solutionOutput');
+            
+            // Разбиваем текст задачи на слова
+            const taskWords = taskText.split(/\s+/).filter(word => word.length > 3);
+            
+            let bestMatch = null;
+            let maxMatches = 0;
+            
+            // Сбрасываем предыдущие совпадения
+            concepts.forEach(concept => concept.classList.remove('matched'));
+            
+            // Ищем лучшее совпадение
+            concepts.forEach(concept => {
+                const conceptText = concept.value.toLowerCase();
+                let matchCount = 0;
+                
+                taskWords.forEach(word => {
+                    if (conceptText.includes(word)) {
+                        matchCount++;
+                    }
+                });
+                
+                if (matchCount > maxMatches) {
+                    maxMatches = matchCount;
+                    bestMatch = concept;
+                }
+            });
+            
+            // Выводим результат
+            if (bestMatch && maxMatches > 0) {
+                bestMatch.classList.add('matched');
+                const conceptParts = bestMatch.value.split('→');
+                solutionOutput.innerHTML = `
+                    <strong>Найдено решение:</strong><br>
+                    Опыт: ${conceptParts[0].trim()}<br>
+                    Действие: ${conceptParts[1].trim()}<br>
+                    Результат: ${conceptParts[2].trim()}
+                `;
+            } else {
+                solutionOutput.textContent = "Подходящего решения не найдено в базе понятий";
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            
+            // Назначаем обработчик кнопки
+            document.querySelector('.solve-btn').addEventListener('click', findSolution);
+            
+            // Добавляем возможность запуска по Enter в поле задачи
+            document.querySelector('.task-box').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    findSolution();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
