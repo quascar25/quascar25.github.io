@@ -287,8 +287,8 @@ function createEdge(startIndex, endIndex, orientation = 'auto') {
         pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
     } else {
         // Автоматический расчет
-        yaw = Math.atan2(deltaZ, deltaX) * (180 / Math.PI);
-        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (180 / Math.PI);
+        yaw = Math.atan2(deltaZ, deltaX) * (90 / Math.PI);   //180
+        pitch = Math.atan2(deltaY, Math.sqrt(deltaX * deltaX + deltaZ * deltaZ)) * (90 / Math.PI);   //180
     }
     
     const edgeElement = document.createElement('div');
