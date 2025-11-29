@@ -317,8 +317,8 @@ edges.forEach(edge => {
     
   //  createEdge(edge[0], edge[1], isHorizontal);
     // Создаём рёбра по отдельности для полного контроля
-    createEdge(0, 1);   // автоматическая ориентация
-    createEdge(1, 2, true);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
+    createEdge(0, 1, true);   // автоматическая ориентация
+    createEdge(1, 2, false);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
     createEdge(2, 3);   // автоматическая ориентация
     createEdge(3, 0, true);   // горизонтальная ориентация ← ИЗМЕНИТЕ НА true/false
     createEdge(4, 5);   // автоматическая ориентация  
