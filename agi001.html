@@ -126,9 +126,6 @@
         }
 
         @keyframes rotate {
-          /*   0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }*/
-          /*   100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }*/
-
             0% { transform: rotate3d(1, 1, 0, 0deg); }
             100% { transform: rotate3d(1, 1, 0, 360deg); }
         }
@@ -369,10 +366,10 @@ createEdge(3, 7, 'z');    // глубина
                 if (point) {
                     point.style.opacity = '1';
                     
-                    // Автоматическое скрытие через 4 секунду
+                    // Автоматическое скрытие через 5 секунду
                     setTimeout(() => {
                         point.style.opacity = '0';
-                    }, 3000);
+                    }, 5000);
                 }
             }
         }
