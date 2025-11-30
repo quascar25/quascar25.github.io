@@ -121,7 +121,7 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-          /*  animation: rotate 15s infinite linear;  */
+            animation: rotate 15s infinite linear;  
         }
 
         @keyframes rotate {
@@ -326,13 +326,13 @@ function createEdge(startIndex, endIndex, rotationAxis = 'auto') {
 
 // Или для всех рёбер:
 createEdge(0, 1, 'x');    // горизонтальное
-createEdge(1, 2, 'z');    // вертикальное
+createEdge(1, 2, 'z');    // глубина
 createEdge(2, 3, 'x');    // горизонтальное
-createEdge(3, 0, 'z');    // вертикальное
+createEdge(3, 0, 'z');    // глубина
 createEdge(4, 5, 'x');    // горизонтальное
-createEdge(5, 6, 'z');    // вертикальное
+createEdge(5, 6, 'z');    // глубина
 createEdge(6, 7, 'x');    // горизонтальное
-createEdge(7, 4, 'z');    // вертикальное
+createEdge(7, 4, 'z');    // глубина
 createEdge(0, 4, 'z');    // глубина
 createEdge(1, 5, 'z');    // глубина
 createEdge(2, 6, 'z');    // глубина
