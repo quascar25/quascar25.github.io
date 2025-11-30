@@ -236,13 +236,13 @@ window.addEventListener('load', function() {
         /* 7 */ [-size,  size,  size]  // лево-верх-перед
     ];
     
-    // Создаем вершины (точки)
+ /*   // Создаем вершины (точки)
     vertices.forEach((vertex, index) => {
         const vertexElement = document.createElement('div');
         vertexElement.className = 'vertex';
         vertexElement.style.transform = `translate3d(${vertex[0]}px, ${vertex[1]}px, ${vertex[2]}px)`;
         cube.appendChild(vertexElement);
-    });
+    });  */ 
     
 // Улучшенная функция с контролем осей вращения
 function createEdge(startIndex, endIndex, rotationAxis = 'auto') {
