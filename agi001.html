@@ -236,10 +236,10 @@ window.addEventListener('load', function() {
     vertices.forEach((vertex, index) => {
         const vertexElement = document.createElement('div');
         vertexElement.className = 'vertex';
-        vertexElement.textContent = index; // Показываем номера вершин для отладки
-        vertexElement.style.fontSize = '8px';
-        vertexElement.style.textAlign = 'center';
-        vertexElement.style.color = '#fff';
+      //  vertexElement.textContent = index; // Показываем номера вершин для отладки
+       // vertexElement.style.fontSize = '8px';
+       // vertexElement.style.textAlign = 'center';
+       // vertexElement.style.color = '#fff';
         vertexElement.style.transform = `translate3d(${vertex[0]}px, ${vertex[1]}px, ${vertex[2]}px)`;
         cube.appendChild(vertexElement);
     });
@@ -381,7 +381,7 @@ createEdge(3, 7, 'z');    // глубина
                     // Автоматическое скрытие через 1 секунду
                     setTimeout(() => {
                         point.style.opacity = '0';
-                    }, 1000);
+                    }, 3000);
                 }
             }
         }
