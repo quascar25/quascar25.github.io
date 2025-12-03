@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALLAGI - Сфера Слов</title>
+    <title>ALLAGI - Слово на сфере</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: #000;
+            background: #000;
             overflow: hidden;
             font-family: 'Arial', sans-serif;
             height: 100vh;
@@ -22,202 +18,141 @@
             perspective: 1200px;
         }
 
-        /* Звёздный фон (Canvas) */
-        #starfield {
+        /* Звёздный фон */
+        #stars {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
         }
 
-        /* Контейнер 3D-сцены */
+        /* 3D-сцена */
         .scene {
             position: relative;
-            width: 320px;
-            height: 320px;
+            width: 400px; height: 400px;
             transform-style: preserve-3d;
-            animation: rotateSphere 40s infinite linear;
+            animation: rotateScene 30s infinite linear;
         }
-
-        /* Анимация плавного вращения всей сцены */
-        @keyframes rotateSphere {
-            0% { transform: rotateY(0deg) rotateX(10deg); }
-            100% { transform: rotateY(360deg) rotateX(10deg); }
+        @keyframes rotateScene {
+            0% { transform: rotateY(0deg) rotateX(15deg); }
+            100% { transform: rotateY(360deg) rotateX(15deg); }
         }
 
         /* Контейнер сферы */
         .sphere {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             transform-style: preserve-3d;
         }
 
-        /* Стиль для каждого слова-контейнера */
-        .word-container {
+        /* Буква как 3D-объект */
+        .letter-3d {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform-style: preserve-3d;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Стиль для каждой буквы внутри слова */
-        .letter {
-            color: #888;
-            font-size: 22px;
+            top: 50%; left: 50%;
+            color: #aaa;
+            font-size: 32px;
             font-weight: bold;
-            text-transform: uppercase;
-            display: inline-block;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
-            position: relative;
+            transform-style: preserve-3d;
+            transition: color 0.3s;
+            user-select: none;
+            /* Центрируем исходную точку трансформации */
+            transform-origin: 0 0;
         }
-
-        /* Эффект при наведении на букву */
-        .letter:hover {
-            cursor: pointer;
-            color: #ccc;
-        }
-
-        /* Стиль для активной (нажатой) буквы */
-        .letter.active {
-            color: #fff;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
-        }
+        .letter-3d:hover { cursor: pointer; color: #ddd; }
+        .letter-3d.active { color: #fff; text-shadow: 0 0 10px white; }
     </style>
 </head>
 <body>
-    <!-- Холст для звёздного неба -->
-    <canvas id="starfield"></canvas>
-
-    <!-- 3D-сцена -->
+    <canvas id="stars"></canvas>
     <div class="scene">
-        <div class="sphere" id="sphereContainer">
-            <!-- Слова будут сгенерированы здесь скриптом -->
-        </div>
+        <div class="sphere" id="sphere"></div>
     </div>
 
     <script>
-        // ========== 1. ГЕНЕРАЦИЯ ЗВЁЗДНОГО ПОЛЯ ==========
-        const canvas = document.getElementById('starfield');
+        // ========== 1. ЗВЁЗДНОЕ НЕБО ==========
+        const canvas = document.getElementById('stars');
         const ctx = canvas.getContext('2d');
         let stars = [];
-        let animationId;
-
-        function initCanvas() {
+        function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-
-        function createStars() {
-            const starCount = 400;
+        function initStars() {
             stars = [];
-            for (let i = 0; i < starCount; i++) {
+            for (let i = 0; i < 300; i++) {
                 stars.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     r: Math.random() * 1.5,
-                    speed: Math.random() * 0.5,
-                    opacity: Math.random() * 0.7 + 0.3
+                    speed: Math.random() * 0.3 + 0.1,
+                    opacity: Math.random() * 0.5 + 0.3
                 });
             }
         }
-
         function drawStars() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let star of stars) {
+            for (let s of stars) {
+                ctx.globalAlpha = s.opacity;
+                ctx.fillStyle = '#fff';
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
                 ctx.fill();
-
-                // Движение и мерцание
-                star.x -= star.speed;
-                star.opacity += (Math.random() - 0.5) * 0.05;
-                star.opacity = Math.max(0.3, Math.min(1, star.opacity));
-
-                if (star.x < 0) {
-                    star.x = canvas.width;
-                    star.y = Math.random() * canvas.height;
-                }
+                s.x -= s.speed;
+                if (s.x < 0) { s.x = canvas.width; s.y = Math.random() * canvas.height; }
+                // Мерцание
+                s.opacity += (Math.random() - 0.5) * 0.02;
+                s.opacity = Math.max(0.2, Math.min(0.8, s.opacity));
             }
-            animationId = requestAnimationFrame(drawStars);
+            requestAnimationFrame(drawStars);
         }
+        resizeCanvas(); initStars(); drawStars();
+        window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
 
-        // Запуск звёздного неба
-        initCanvas();
-        createStars();
-        drawStars();
-        window.addEventListener('resize', () => {
-            cancelAnimationFrame(animationId);
-            initCanvas();
-            createStars();
-            drawStars();
-        });
+        // ========== 2. РАЗМЕЩЕНИЕ БУКВ СЛОВА "ПОЛЬЗА" НА СФЕРЕ ==========
+        const sphere = document.getElementById('sphere');
+        const word = "ПОЛЬЗА";
+        const letters = word.split('');
+        const radius = 150; // Радиус сферы
+        const totalLetters = letters.length;
 
-        // ========== 2. СОЗДАНИЕ 3D-СФЕРЫ ИЗ СЛОВ ==========
-        const sphereContainer = document.getElementById('sphereContainer');
-        const words = [
-            "ВОЛЯ", "ДОСТУП", "СИЛА", "ЗНАНИЕ", "РАВЕНСТВО",
-            "СВОБОДА", "БУДУЩЕЕ", "ЕДИНСТВО", "ДЕЙСТВИЕ", "АЛЬТРУИЗМ"
-        ];
-        const sphereRadius = 140; // Радиус сферы в пикселях
-        const totalWords = words.length;
+        // Параметры дуги: на какой части сферы разместить слово
+        const arcAngle = Math.PI * 0.7; // Длина дуги в радианах (~126 градусов)
+        const startAngle = -arcAngle / 2; // Начинаем с отрицательного угла, чтобы центрировать слово
 
-        // Функция для размещения слова на сфере
-        function placeWordOnSphere(word, index) {
-            // 1. Создаем контейнер для слова
-            const wordDiv = document.createElement('div');
-            wordDiv.className = 'word-container';
+        // Создаём и размещаем каждую букву
+        letters.forEach((letter, index) => {
+            const letterElem = document.createElement('div');
+            letterElem.className = 'letter-3d';
+            letterElem.textContent = letter;
 
-            // 2. Рассчитываем позицию контейнера на сфере (золотое сечение)
-            const phi = Math.acos(-1 + (2 * index) / totalWords);
-            const theta = Math.sqrt(totalWords * Math.PI) * phi;
+            // 1. Рассчитываем угол для текущей буквы вдоль дуги
+            const angle = startAngle + (index / (totalLetters - 1)) * arcAngle;
 
-            // 3. Конвертируем сферические координаты в 3D (x, y, z)
-            const posX = sphereRadius * Math.sin(phi) * Math.cos(theta);
-            const posY = sphereRadius * Math.sin(phi) * Math.sin(theta);
-            const posZ = sphereRadius * Math.cos(phi);
+            // 2. Координаты на плоскости дуги (X, Z) - это окружность в горизонтальной плоскости
+            const x = radius * Math.sin(angle);
+            const z = radius * Math.cos(angle);
 
-            // 4. Позиционируем контейнер слова в 3D-пространстве
-            wordDiv.style.transform = `
-                translate(-50%, -50%)
-                translate3d(${posX}px, ${posY}px, ${posZ}px)
-                rotateY(${theta}rad)
+            // 3. Добавляем небольшое смещение по Y, чтобы слово было не на экваторе, а чуть выше/ниже
+            const y = -30; // Поднимаем слово немного выше центра сферы
+
+            // 4. Поворачиваем саму букву так, чтобы она была "касательной" к сфере
+            //    Грубо говоря, поворачиваем её на тот же угол, под которым она стоит
+            const letterRotationY = -angle * (180 / Math.PI); // Конвертируем радианы в градусы
+
+            // 5. Применяем все трансформации
+            letterElem.style.transform = `
+                translate(-50%, -50%)           /* Центрируем исходную точку */
+                translate3d(${x}px, ${y}px, ${z}px) /* Ставим в 3D-пространство */
+                rotateY(${letterRotationY}deg)      /* Поворачиваем букву по Y */
             `;
 
-            // 5. Разбиваем слово на буквы и создаём для каждой свой элемент
-            const letters = word.split('');
-            letters.forEach((letter, letterIndex) => {
-                const letterSpan = document.createElement('span');
-                letterSpan.className = 'letter';
-                letterSpan.textContent = letter;
-
-                // Ключевой момент: размещаем каждую букву вдоль дуги.
-                // Смещение по оси X внутри контейнера создаёт эффект "выгнутости" слова.
-                const offset = (letterIndex - (letters.length - 1) / 2) * 15; // 15px - интервал между буквами
-                letterSpan.style.transform = `translateX(${offset}px)`;
-
-                // Добавляем обработчик клика для смены цвета
-                letterSpan.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                });
-
-                wordDiv.appendChild(letterSpan);
+            // Клик для смены цвета
+            letterElem.addEventListener('click', function() {
+                this.classList.toggle('active');
             });
 
-            sphereContainer.appendChild(wordDiv);
-        }
-
-        // 6. Размещаем все слова на сфере
-        words.forEach((word, index) => {
-            placeWordOnSphere(word, index);
+            sphere.appendChild(letterElem);
         });
-
     </script>
 </body>
 </html>
