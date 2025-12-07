@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор депозита</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #d3d3d3;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Анимированные звезды */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Контейнер калькулятора */
+        .calculator-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(20, 20, 20, 0.85);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(211, 211, 211, 0.1);
+        }
+
+        /* Заголовок */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 2.2rem;
+            color: #d3d3d3;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(211, 211, 211, 0.5);
+        }
+
+        /* Элементы калькулятора */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .calc-label {
+            width: 30%;
+            font-size: 1.2rem;
+            color: #d3d3d3;
+            text-shadow: 0 0 5px rgba(211, 211, 211, 0.3);
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 70%;
+        }
+
+        .calc-input {
+            background-color: transparent;
+            border: 1px solid #d3d3d3;
+            border-radius: 8px;
+            color: #d3d3d3;
+            font-size: 1.2rem;
+            padding: 12px 15px;
+            width: 70%;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: right;
+        }
+
+        .calc-input:focus {
+            box-shadow: 0 0 10px rgba(211, 211, 211, 0.5);
+            border-color: #fff;
+        }
+
+        .calc-unit {
+            margin-left: 15px;
+            font-size: 1.2rem;
+            color: #d3d3d3;
+            width: 30%;
+        }
+
+        /* Результаты */
+        .results {
+            margin-top: 40px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(211, 211, 211, 0.2);
+        }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #d3d3d3;
+            text-shadow: 0 0 5px rgba(211, 211, 211, 0.3);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .result-label {
+            color: #d3d3d3;
+        }
+
+        .result-value {
+            color: #ffffff;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 600px) {
+            .calc-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .calc-label {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .input-container {
+                width: 100%;
+            }
+
+            .calc-input {
+                width: 60%;
+            }
+
+            .calc-unit {
+                width: 40%;
+            }
+
+            .calculator-container {
+                padding: 20px;
+            }
+        }
+
+        /* Информация о приложении */
+        .app-info {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #888;
+            max-width: 500px;
+        }
+
+        /* Иконка обновления */
+        .refresh-icon {
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+            color: #d3d3d3;
+            transition: transform 0.3s ease;
+        }
+
+        .refresh-icon:hover {
+            transform: rotate(180deg);
+        }
+
+        /* Эффект свечения */
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #d3d3d3, 0 0 10px #d3d3d3;
+            }
+            to {
+                text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Фон со звездами -->
+    <div id="stars"></div>
+
+    <!-- Контейнер калькулятора -->
+    <div class="calculator-container">
+        <div class="header">
+            <h1 class="title glow">Депозит</h1>
+        </div>
+
+        <!-- Сумма -->
+        <div class="calc-row">
+            <div class="calc-label">Сумма</div>
+            <div class="input-container">
+                <input type="number" id="amount" class="calc-input" value="1400000" min="0">
+                <div class="calc-unit">руб.</div>
+            </div>
+        </div>
+
+        <!-- Процент -->
+        <div class="calc-row">
+            <div class="calc-label">Процент</div>
+            <div class="input-container">
+                <input type="number" id="percent" class="calc-input" value="14" min="0" max="100" step="0.1">
+                <div class="calc-unit">%</div>
+            </div>
+        </div>
+
+        <!-- Срок -->
+        <div class="calc-row">
+            <div class="calc-label">Срок</div>
+            <div class="input-container">
+                <input type="number" id="term" class="calc-input" value="3" min="1">
+                <div class="calc-unit">мес.</div>
+            </div>
+        </div>
+
+        <!-- Результаты -->
+        <div class="results">
+            <h2 class="results-title">Результаты расчета</h2>
+            <div class="result-row">
+                <div class="result-label">Начисленные проценты:</div>
+                <div class="result-value" id="interest-result">49 000 руб.</div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">Итоговая сумма:</div>
+                <div class="result-value" id="total-result">1 449 000 руб.</div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">Доход в месяц:</div>
+                <div class="result-value" id="monthly-result">16 333 руб.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Информация о приложении -->
+    <div class="app-info">
+        <p>Калькулятор депозита с анимированным звездным небом</p>
+        <p>Измените значения в полях ввода для пересчета</p>
+    </div>
+
+    <script>
+        // Создание звездного фона
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Случайный размер звезды
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Случайная позиция
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Случайная длительность анимации
+                const duration = Math.random() * 5 + 3;
+                star.style.animationDuration = `${duration}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Функция расчета депозита
+        function calculateDeposit() {
+            // Получаем значения из полей ввода
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const percent = parseFloat(document.getElementById('percent').value) || 0;
+            const term = parseFloat(document.getElementById('term').value) || 0;
+            
+            // Рассчитываем проценты (простая формула без капитализации)
+            const monthlyRate = percent / 100 / 12;
+            const interest = amount * monthlyRate * term;
+            const total = amount + interest;
+            const monthlyIncome = interest / term;
+            
+            // Форматируем числа с разделителями тысяч
+            function formatNumber(num) {
+                return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+            
+            // Обновляем результаты на странице
+            document.getElementById('interest-result').textContent = `${formatNumber(interest)} руб.`;
+            document.getElementById('total-result').textContent = `${formatNumber(total)} руб.`;
+            document.getElementById('monthly-result').textContent = `${formatNumber(monthlyIncome)} руб.`;
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Создаем звездный фон
+            createStars();
+            
+            // Расчет при загрузке
+            calculateDeposit();
+            
+            // Добавляем обработчики событий для полей ввода
+            document.getElementById('amount').addEventListener('input', calculateDeposit);
+            document.getElementById('percent').addEventListener('input', calculateDeposit);
+            document.getElementById('term').addEventListener('input', calculateDeposit);
+            
+            // Добавляем возможность сброса значений по двойному клику
+            const inputs = document.querySelectorAll('.calc-input');
+            inputs.forEach(input => {
+                input.addEventListener('dblclick', function() {
+                    this.value = this.defaultValue;
+                    calculateDeposit();
+                });
+            });
+        });
+
+        // Обновление звезд при изменении размера окна
+        window.addEventListener('resize', function() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            createStars();
+        });
+    </script>
+</body>
+</html>
