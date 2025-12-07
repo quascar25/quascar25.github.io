@@ -20,34 +20,64 @@
             font-size: 12px;
             z-index: 100;
         }
+        #controls {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            color: #aaa;
+            font-size: 11px;
+            z-index: 100;
+        }
         canvas {
             display: block;
         }
     </style>
 </head>
 <body>
-    <div id="info">
-        WASD - вращение | QE - приближение/отдаление | R - сброс
-    </div>
+    <div id="info">3D Каркас Самолёта с профилем NACA 0012</div>
+    <div id="controls">Используйте мышь для вращения</div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <canvas id="airplaneCanvas"></canvas>
     
     <script>
-        // Инициализация сцены
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000);
-        document.body.appendChild(renderer.domElement);
+        const canvas = document.getElementById('airplaneCanvas');
+        const ctx = canvas.getContext('2d');
         
-        // Орбитальные контролы
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         
-        // Функция для профиля NACA 0012
+        // Параметры камеры и проекции
+        let camera = {
+            x: 0, y: 0, z: 15,
+            angleX: 0.3,
+            angleY: 0.5
+        };
+        
+        // Функция проекции 3D -> 2D
+        function project(x, y, z) {
+            // Поворот вокруг осей
+            const cosX = Math.cos(camera.angleX);
+            const sinX = Math.sin(camera.angleX);
+            const cosY = Math.cos(camera.angleY);
+            const sinY = Math.sin(camera.angleY);
+            
+            // Вращение вокруг Y
+            let x1 = x * cosY - z * sinY;
+            let z1 = x * sinY + z * cosY;
+            
+            // Вращение вокруг X
+            let y1 = y * cosX - z1 * sinX;
+            z1 = y * sinX + z1 * cosX;
+            
+            // Перспективная проекция
+            const scale = 500 / (z1 + camera.z);
+            const screenX = canvas.width / 2 + x1 * scale;
+            const screenY = canvas.height / 2 - y1 * scale;
+            
+            return { x: screenX, y: screenY, depth: z1 };
+        }
+        
+        // Функция профиля NACA 0012
         function naca0012Thickness(x) {
             const t = 0.12;
             return 5 * t * (
@@ -59,200 +89,229 @@
             );
         }
         
-        // Генерация точек профиля
-        function generateProfilePoints(numPoints = 20) {
+        // Генерация точек крыла
+        function generateWingPoints() {
             const points = [];
-            for (let i = 0; i <= numPoints; i++) {
-                const x = i / numPoints;
-                const yUpper = naca0012Thickness(x);
-                const yLower = -naca0012Thickness(x);
-                
-                points.push(new THREE.Vector3(x, yUpper, 0));
-                if (i > 0 && i < numPoints) {
-                    points.push(new THREE.Vector3(x, yLower, 0));
+            const steps = 10;
+            
+            // Два профиля (передний и задний по Z)
+            for (let z = -2; z <= 2; z += 4) {
+                for (let i = 0; i <= steps; i++) {
+                    const x = i / steps;
+                    const yUpper = naca0012Thickness(x);
+                    const yLower = -naca0012Thickness(x);
+                    
+                    // Масштабируем крыло
+                    const scale = 8;
+                    points.push({
+                        x: x * scale - scale/2,
+                        y: yUpper * scale,
+                        z: z,
+                        type: 'upper'
+                    });
+                    
+                    if (i > 0 && i < steps) {
+                        points.push({
+                            x: x * scale - scale/2,
+                            y: yLower * scale,
+                            z: z,
+                            type: 'lower'
+                        });
+                    }
                 }
             }
+            
             return points;
         }
         
-        // Создание крыла
-        function createWing(profilePoints, length = 5, color = 0xaaaaaa) {
-            const geometry = new THREE.BufferGeometry();
-            const vertices = [];
-            const indices = [];
+        // Генерация точек фюзеляжа
+        function generateFuselagePoints() {
+            const points = [];
+            const length = 12;
+            const radius = 1.2;
+            const segments = 8;
             
-            // Создаём два профиля (передний и задний)
-            for (let z = 0; z <= length; z += length) {
-                for (let i = 0; i < profilePoints.length; i++) {
-                    const point = profilePoints[i];
-                    vertices.push(point.x, point.y, z);
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                // Нос и хвост
+                points.push({ x: -length/2, y, z: x, type: 'fuselage' });
+                points.push({ x: length/2, y: y * 0.4, z: x * 0.4, type: 'fuselage' });
+            }
+            
+            return points;
+        }
+        
+        // Генерация точек хвоста
+        function generateTailPoints() {
+            return [
+                // Горизонтальный стабилизатор
+                { x: 6, y: 0.5, z: -3, type: 'tail' },
+                { x: 6, y: 0.5, z: 3, type: 'tail' },
+                { x: 7, y: 0.5, z: -3, type: 'tail' },
+                { x: 7, y: 0.5, z: 3, type: 'tail' },
+                
+                // Вертикальный стабилизатор
+                { x: 6, y: 0.5, z: 0, type: 'tail' },
+                { x: 6, y: 2.5, z: 0, type: 'tail' },
+                { x: 7, y: 1.5, z: 0, type: 'tail' }
+            ];
+        }
+        
+        // Все точки самолета
+        const allPoints = [
+            ...generateWingPoints(),
+            ...generateFuselagePoints(),
+            ...generateTailPoints()
+        ];
+        
+        // Соединения для отрисовки линий
+        const connections = [];
+        
+        // Соединения для крыла
+        const wingPoints = generateWingPoints();
+        for (let i = 0; i < wingPoints.length - 1; i++) {
+            if (wingPoints[i].z === wingPoints[i+1]?.z) {
+                connections.push([i, i+1]);
+            }
+        }
+        
+        // Соединения между передним и задним профилем
+        const frontProfile = wingPoints.filter(p => p.z === -2);
+        const backProfile = wingPoints.filter(p => p.z === 2);
+        for (let i = 0; i < Math.min(frontProfile.length, backProfile.length); i++) {
+            connections.push([
+                allPoints.indexOf(frontProfile[i]),
+                allPoints.indexOf(backProfile[i])
+            ]);
+        }
+        
+        // Отрисовка
+        function draw() {
+            // Очистка
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Проекция всех точек
+            const projectedPoints = allPoints.map(p => ({
+                ...project(p.x, p.y, p.z),
+                type: p.type
+            }));
+            
+            // Рисуем соединения
+            ctx.strokeStyle = '#0f0';
+            ctx.lineWidth = 1;
+            
+            for (const [i, j] of connections) {
+                const p1 = projectedPoints[i];
+                const p2 = projectedPoints[j];
+                
+                if (p1 && p2) {
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
                 }
             }
             
-            // Создаём индексы для треугольников
-            const numPoints = profilePoints.length;
-            for (let i = 0; i < numPoints - 1; i++) {
-                indices.push(i, i + numPoints, i + 1);
-                indices.push(i + 1, i + numPoints, i + numPoints + 1);
-            }
-            
-            // Замыкаем профиль
-            indices.push(numPoints - 1, 2 * numPoints - 1, 0);
-            indices.push(0, 2 * numPoints - 1, numPoints);
-            
-            geometry.setIndex(indices);
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-            geometry.computeVertexNormals();
-            
-            const material = new THREE.MeshBasicMaterial({ 
-                color: color,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.8
+            // Рисуем точки разными цветами
+            projectedPoints.forEach((p, index) => {
+                if (!p) return;
+                
+                let color;
+                switch(allPoints[index].type) {
+                    case 'upper': color = '#00aaff'; break;
+                    case 'lower': color = '#0088cc'; break;
+                    case 'fuselage': color = '#aaaaaa'; break;
+                    case 'tail': color = '#00ff00'; break;
+                    default: color = '#ffffff';
+                }
+                
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Подписи для ключевых точек
+                if (index === 0 || index === 10 || index === wingPoints.length) {
+                    ctx.fillStyle = '#aaa';
+                    ctx.font = '10px monospace';
+                    ctx.fillText(`(${allPoints[index].x.toFixed(1)}, ${allPoints[index].y.toFixed(1)}, ${allPoints[index].z.toFixed(1)})`, p.x + 5, p.y - 5);
+                }
             });
             
-            return new THREE.Mesh(geometry, material);
+            // Информация о профиле
+            ctx.fillStyle = '#0f0';
+            ctx.font = '12px monospace';
+            ctx.fillText(`Профиль NACA 0012 | Макс. толщина: x=0.3, y=0.06`, 20, canvas.height - 40);
+            ctx.fillText(`Камера: X=${camera.angleX.toFixed(2)}, Y=${camera.angleY.toFixed(2)}`, 20, canvas.height - 20);
         }
         
-        // Создание фюзеляжа (упрощённый цилиндр)
-        function createFuselage(length = 10, radius = 0.8, color = 0x888888) {
-            const geometry = new THREE.CylinderGeometry(radius, radius * 0.7, length, 8, 1, true);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: color,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.6
-            });
-            const fuselage = new THREE.Mesh(geometry, material);
-            fuselage.rotation.z = Math.PI / 2;
-            return fuselage;
-        }
+        // Управление мышью
+        let isDragging = false;
+        let lastX = 0, lastY = 0;
         
-        // Создание хвостового оперения
-        function createTail(color = 0x666666) {
-            const group = new THREE.Group();
-            
-            // Горизонтальный стабилизатор
-            const horizStabGeometry = new THREE.BoxGeometry(4, 0.1, 1.5);
-            const horizStabMaterial = new THREE.MeshBasicMaterial({ 
-                color: color,
-                wireframe: true
-            });
-            const horizStab = new THREE.Mesh(horizStabGeometry, horizStabMaterial);
-            horizStab.position.set(0, 0.5, 4.5);
-            group.add(horizStab);
-            
-            // Вертикальный стабилизатор
-            const vertStabGeometry = new THREE.BoxGeometry(0.1, 1.5, 2);
-            const vertStab = new THREE.Mesh(vertStabGeometry, horizStabMaterial);
-            vertStab.position.set(0, 1, 4.5);
-            group.add(vertStab);
-            
-            return group;
-        }
-        
-        // Основные компоненты
-        const profilePoints = generateProfilePoints(15);
-        
-        // Левое крыло
-        const leftWing = createWing(profilePoints, 4, 0x00aaff);
-        leftWing.position.set(0, 0, 2);
-        leftWing.rotation.y = Math.PI;
-        scene.add(leftWing);
-        
-        // Правое крыло
-        const rightWing = createWing(profilePoints, 4, 0x00aaff);
-        rightWing.position.set(0, 0, -2);
-        scene.add(rightWing);
-        
-        // Фюзеляж
-        const fuselage = createFuselage(8, 0.6, 0xaaaaaa);
-        fuselage.position.set(4, 0, 0);
-        scene.add(fuselage);
-        
-        // Хвостовое оперение
-        const tail = createTail(0x666666);
-        tail.position.set(8, 0, 0);
-        scene.add(tail);
-        
-        // Двигатели (упрощённые цилиндры)
-        function createEngine(posX, posY, posZ) {
-            const geometry = new THREE.CylinderGeometry(0.3, 0.3, 1.5, 8);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: 0xff5500,
-                wireframe: true
-            });
-            const engine = new THREE.Mesh(geometry, material);
-            engine.position.set(posX, posY, posZ);
-            engine.rotation.x = Math.PI / 2;
-            return engine;
-        }
-        
-        scene.add(createEngine(3, 0, -1.2));
-        scene.add(createEngine(3, 0, 1.2));
-        
-        // Кабина (сфера)
-        const cockpitGeometry = new THREE.SphereGeometry(0.5, 8, 6);
-        const cockpitMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00ff00,
-            wireframe: true
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
         });
-        const cockpit = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
-        cockpit.position.set(0.5, 0.3, 0);
-        scene.add(cockpit);
         
-        // Оси координат для наглядности
-        const axesHelper = new THREE.AxesHelper(5);
-        scene.add(axesHelper);
-        
-        // Камера
-        camera.position.set(10, 5, 10);
-        camera.lookAt(0, 0, 0);
-        
-        // Анимация
-        function animate() {
-            requestAnimationFrame(animate);
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
             
-            // Медленное вращение для демонстрации 3D
-            if (!controls.enabled) {
-                scene.rotation.y += 0.005;
-            }
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
             
-            controls.update();
-            renderer.render(scene, camera);
-        }
+            camera.angleY += dx * 0.01;
+            camera.angleX += dy * 0.01;
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+            
+            draw();
+        });
         
-        // Управление с клавиатуры
-        document.addEventListener('keydown', (event) => {
-            switch(event.key.toLowerCase()) {
-                case 'r':
-                    // Сброс камеры
-                    camera.position.set(10, 5, 10);
-                    camera.lookAt(0, 0, 0);
-                    controls.reset();
-                    break;
-                case ' ':
-                    // Включение/выключение автовращения
-                    controls.enabled = !controls.enabled;
-                    break;
-            }
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            camera.z += e.deltaY * 0.1;
+            camera.z = Math.max(5, Math.min(50, camera.z));
+            draw();
         });
         
         // Адаптация к размеру окна
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            draw();
         });
+        
+        // Первая отрисовка
+        draw();
+        
+        // Автоматическое вращение
+        let autoRotate = true;
+        function animate() {
+            if (autoRotate && !isDragging) {
+                camera.angleY += 0.005;
+                draw();
+            }
+            requestAnimationFrame(animate);
+        }
         
         animate();
         
-        // Информация о модели
-        console.log("3D Каркас самолёта с профилем NACA 0012");
-        console.log("Крылья: два профиля NACA 0012, разнесённые по Z на 4 единицы");
-        console.log("Фюзеляж: упрощённый цилиндр");
-        console.log("Хвост: горизонтальный и вертикальный стабилизаторы");
-        console.log("Координаты профиля от (0,0,0) до (1,0,0) с максимальной толщиной при x=0.3");
+        // Переключение автовращения по клику
+        canvas.addEventListener('click', () => {
+            autoRotate = !autoRotate;
+            document.getElementById('controls').textContent = 
+                autoRotate ? 'Автовращение ВКЛ | Клик для остановки' : 'Автовращение ВЫКЛ | Клик для запуска';
+        });
     </script>
 </body>
 </html>
