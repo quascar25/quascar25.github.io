@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль крыла NACA 0012</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        canvas {
+            border: 1px solid #444;
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="wingCanvas" width="800" height="300"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('wingCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Функция для вычисления толщины профиля NACA 0012
+        function naca0012Thickness(x) {
+            // Стандартная формула для симметричного профиля NACA 00xx
+            const t = 0.12; // 12% толщины
+            return 5 * t * (
+                0.2969 * Math.sqrt(x) - 
+                0.1260 * x - 
+                0.3516 * Math.pow(x, 2) + 
+                0.2843 * Math.pow(x, 3) - 
+                0.1015 * Math.pow(x, 4)
+            );
+        }
+        
+        // Масштаб для отображения
+        const scale = 300;
+        const offsetX = 100;
+        const offsetY = 150;
+        
+        // Рисуем профиль
+        ctx.strokeStyle = '#aaa';
+        ctx.lineWidth = 2;
+        
+        // Верхняя поверхность профиля
+        ctx.beginPath();
+        for (let i = 0; i <= 10; i++) {
+            const x = i / 10; // 0, 0.1, 0.2, ..., 1.0
+            const y = naca0012Thickness(x);
+            const canvasX = offsetX + x * scale;
+            const canvasY = offsetY - y * scale;
+            
+            if (i === 0) {
+                ctx.moveTo(canvasX, canvasY);
+            } else {
+                ctx.lineTo(canvasX, canvasY);
+            }
+        }
+        
+        // Нижняя поверхность профиля (симметричная)
+        for (let i = 10; i >= 0; i--) {
+            const x = i / 10;
+            const y = -naca0012Thickness(x); // Отрицательное значение для нижней части
+            const canvasX = offsetX + x * scale;
+            const canvasY = offsetY - y * scale;
+            ctx.lineTo(canvasX, canvasY);
+        }
+        
+        ctx.closePath();
+        ctx.stroke();
+        
+        // Отметки и подписи
+        ctx.fillStyle = '#888';
+        ctx.font = '12px Arial';
+        
+        // Отмечаем точки
+        for (let i = 0; i <= 10; i++) {
+            const x = i / 10;
+            const y = naca0012Thickness(x);
+            const canvasX = offsetX + x * scale;
+            const canvasY = offsetY - y * scale;
+            
+            // Точки на верхней поверхности
+            ctx.beginPath();
+            ctx.arc(canvasX, canvasY, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Подписи координат
+            if (i % 2 === 0) {
+                ctx.fillText(`(${x.toFixed(1)}, ${y.toFixed(3)})`, canvasX - 25, canvasY - 15);
+            }
+        }
+        
+        // Подпись
+        ctx.fillStyle = '#aaa';
+        ctx.font = '16px Arial';
+        ctx.fillText('Профиль крыла NACA 0012', offsetX + scale/2 - 80, 30);
+        
+        // Оси
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 1;
+        
+        // Ось X
+        ctx.beginPath();
+        ctx.moveTo(offsetX - 20, offsetY);
+        ctx.lineTo(offsetX + scale + 20, offsetY);
+        ctx.stroke();
+        
+        // Ось Y
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY - scale * 0.15);
+        ctx.lineTo(offsetX, offsetY + scale * 0.15);
+        ctx.stroke();
+        
+        // Стрелки осей
+        ctx.fillStyle = '#666';
+        ctx.beginPath();
+        // Стрелка X
+        ctx.moveTo(offsetX + scale + 20, offsetY);
+        ctx.lineTo(offsetX + scale + 15, offsetY - 5);
+        ctx.lineTo(offsetX + scale + 15, offsetY + 5);
+        ctx.fill();
+        // Стрелка Y
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY - scale * 0.15);
+        ctx.lineTo(offsetX - 5, offsetY - scale * 0.15 + 5);
+        ctx.lineTo(offsetX + 5, offsetY - scale * 0.15 + 5);
+        ctx.fill();
+        
+        // Подписи осей
+        ctx.fillText('x (хорда)', offsetX + scale + 10, offsetY + 20);
+        ctx.fillText('y (толщина)', offsetX - 30, offsetY - scale * 0.15 - 10);
+    </script>
+</body>
+</html>
