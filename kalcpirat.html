@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пиратский калькулятор</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: #0a0a12;
+            color: #8a8a9e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(30, 30, 60, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(60, 30, 30, 0.2) 0%, transparent 50%);
+        }
+
+        /* Эффект старых пикселей и царапин */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.05) 0px,
+                    rgba(0, 0, 0, 0.05) 1px,
+                    transparent 1px,
+                    transparent 3px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.03) 0px,
+                    rgba(0, 0, 0, 0.03) 1px,
+                    transparent 1px,
+                    transparent 3px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Звезды */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #6a6a8a;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Контейнер калькулятора в стиле старого монитора */
+        .calculator-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(15, 15, 25, 0.9);
+            border-radius: 0;
+            padding: 20px;
+            border: 2px solid #3a3a4a;
+            box-shadow: 
+                0 0 20px rgba(100, 80, 120, 0.3),
+                inset 0 0 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Рамка как у старого терминала */
+        .calculator-container::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid #4a4a5a;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Заголовок */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #5a5a6a;
+            position: relative;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            color: #8a7a9a;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            font-weight: normal;
+        }
+
+        /* Иконка в стиле пиратского символа */
+        .pirate-icon {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 1.5rem;
+            color: #9a8a7a;
+            opacity: 0.7;
+            transform: rotate(15deg);
+        }
+
+        /* Элементы калькулятора */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .calc-label {
+            width: 30%;
+            font-size: 1.1rem;
+            color: #7a7a8a;
+            text-shadow: 1px 1px 0 #000;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            width: 70%;
+            gap: 8px;
+        }
+
+        /* Поля ввода в стиле старого терминала */
+        .calc-input {
+            background-color: rgba(10, 10, 20, 0.8);
+            border: 1px solid #4a4a5a;
+            border-radius: 0;
+            color: #9a9aaa;
+            font-size: 1.1rem;
+            padding: 10px 12px;
+            width: 60%;
+            outline: none;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .calc-input:focus {
+            border-color: #6a5a7a;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5), 0 0 5px rgba(100, 80, 120, 0.5);
+        }
+
+        .calc-unit {
+            font-size: 1.1rem;
+            color: #7a7a8a;
+            width: 15%;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        /* Кнопки управления в небрежном стиле */
+        .btn-group {
+            display: flex;
+            width: 25%;
+            min-width: 70px;
+        }
+
+        .btn-control {
+            background: rgba(30, 25, 35, 0.9);
+            border: 1px solid #5a5a6a;
+            color: #8a8a9a;
+            width: 50%;
+            height: 40px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s ease;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-control:first-child {
+            border-right: none;
+        }
+
+        .btn-control:hover {
+            background: rgba(40, 35, 45, 0.9);
+            border-color: #6a6a7a;
+        }
+
+        .btn-control:active {
+            background: rgba(50, 45, 55, 0.9);
+            transform: translateY(1px);
+        }
+
+        /* Эффект "потертости" на кнопках */
+        .btn-control::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(100, 90, 110, 0.1) 50%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        /* Результаты в стиле пиратского журнала */
+        .results {
+            margin-top: 30px;
+            background: rgba(20, 18, 28, 0.9);
+            padding: 15px;
+            border: 1px solid #4a4a5a;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .results::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%233a3a4a' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #8a7a9a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px dotted #5a5a6a;
+            padding-bottom: 5px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-label {
+            color: #7a7a8a;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .result-value {
+            color: #9a8a7a;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #000;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Нижняя панель с информацией */
+        .app-info {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #5a5a6a;
+            max-width: 500px;
+            padding: 10px;
+            border-top: 1px dashed #4a4a5a;
+            width: 100%;
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 600px) {
+            .calc-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .calc-label {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .input-group {
+                width: 100%;
+            }
+
+            .calc-input {
+                width: 50%;
+            }
+
+            .calc-unit {
+                width: 20%;
+            }
+
+            .btn-group {
+                width: 30%;
+            }
+
+            .calculator-container {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Эффект "глюка" при изменении значений */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .glitch {
+            animation: glitch 0.3s ease;
+        }
+
+        /* Декоративные элементы пиратского космоса */
+        .space-decoration {
+            position: fixed;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        #planet1 {
+            top: 10%;
+            left: 5%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle at 30% 30%, #3a2a4a, #1a1a2a);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(90, 60, 120, 0.2);
+        }
+
+        #planet2 {
+            bottom: 15%;
+            right: 8%;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 70% 30%, #4a3a2a, #2a2a1a);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(120, 90, 60, 0.2);
+        }
+
+        #ship {
+            top: 20%;
+            right: 15%;
+            width: 60px;
+            height: 30px;
+            background: #3a3a4a;
+            clip-path: polygon(0% 50%, 20% 0%, 100% 0%, 100% 100%, 20% 100%);
+            transform: rotate(20deg);
+        }
+
+        /* Стиль подсказок */
+        .step-hint {
+            font-size: 0.75rem;
+            color: #5a5a6a;
+            margin-top: 5px;
+            text-align: center;
+            width: 100%;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Декоративные космические объекты -->
+    <div class="space-decoration" id="planet1"></div>
+    <div class="space-decoration" id="planet2"></div>
+    <div class="space-decoration" id="ship"></div>
+
+    <!-- Фон со звездами -->
+    <div id="stars"></div>
+
+    <!-- Контейнер калькулятора -->
+    <div class="calculator-container">
+        <div class="header">
+            <div class="pirate-icon">☠</div>
+            <h1 class="title">Пиратский калькулятор</h1>
+        </div>
+
+        <!-- Сумма -->
+        <div class="calc-row">
+            <div class="calc-label">СУММА</div>
+            <div class="input-group">
+                <input type="number" id="amount" class="calc-input" value="1400000" min="0" step="10000">
+                <div class="btn-group">
+                    <div class="btn-control" id="amount-minus">−</div>
+                    <div class="btn-control" id="amount-plus">+</div>
+                </div>
+                <div class="calc-unit">руб.</div>
+            </div>
+            <div class="step-hint">шаг: 10.000</div>
+        </div>
+
+        <!-- Процент -->
+        <div class="calc-row">
+            <div class="calc-label">ПРОЦЕНТ</div>
+            <div class="input-group">
+                <input type="number" id="percent" class="calc-input" value="14" min="0" max="100" step="0.1">
+                <div class="btn-group">
+                    <div class="btn-control" id="percent-minus">−</div>
+                    <div class="btn-control" id="percent-plus">+</div>
+                </div>
+                <div class="calc-unit">%</div>
+            </div>
+            <div class="step-hint">шаг: 0.1</div>
+        </div>
+
+        <!-- Срок -->
+        <div class="calc-row">
+            <div class="calc-label">СРОК</div>
+            <div class="input-group">
+                <input type="number" id="term" class="calc-input" value="3" min="1" step="1">
+                <div class="btn-group">
+                    <div class="btn-control" id="term-minus">−</div>
+                    <div class="btn-control" id="term-plus">+</div>
+                </div>
+                <div class="calc-unit">мес.</div>
+            </div>
+            <div class="step-hint">шаг: 1</div>
+        </div>
+
+        <!-- Результаты -->
+        <div class="results">
+            <h2 class="results-title">Добыча</h2>
+            <div class="result-row">
+                <div class="result-label">Проценты:</div>
+                <div class="result-value" id="interest-result">49 000 руб.</div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">Итог:</div>
+                <div class="result-value" id="total-result">1 449 000 руб.</div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">В месяц:</div>
+                <div class="result-value" id="monthly-result">16 333 руб.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Информация о приложении -->
+    <div class="app-info">
+        <p>Пиратский калькулятор добычи • Используй кнопки для настройки</p>
+    </div>
+
+    <script>
+        // Создание звездного фона
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 120;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Случайный размер звезды
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Случайная позиция
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Случайная длительность анимации
+                const duration = Math.random() * 4 + 2;
+                star.style.animationDuration = `${duration}s`;
+                
+                // Случайный оттенок серого
+                const brightness = Math.random() * 60 + 90;
+                star.style.backgroundColor = `rgb(${brightness}, ${brightness}, ${brightness + 20})`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Функция расчета депозита
+        function calculateDeposit() {
+            // Получаем значения из полей ввода
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const percent = parseFloat(document.getElementById('percent').value) || 0;
+            const term = parseFloat(document.getElementById('term').value) || 0;
+            
+            // Рассчитываем проценты (простая формула без капитализации)
+            const monthlyRate = percent / 100 / 12;
+            const interest = amount * monthlyRate * term;
+            const total = amount + interest;
+            const monthlyIncome = interest / term;
+            
+            // Форматируем числа с разделителями тысяч
+            function formatNumber(num) {
+                return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+            
+            // Форматирование для отображения в полях ввода
+            document.getElementById('amount').value = amount;
+            document.getElementById('percent').value = percent;
+            document.getElementById('term').value = term;
+            
+            // Добавляем эффект "глюка" при изменении
+            const results = document.querySelectorAll('.result-value');
+            results.forEach(result => {
+                result.classList.add('glitch');
+                setTimeout(() => result.classList.remove('glitch'), 300);
+            });
+            
+            // Обновляем результаты на странице
+            document.getElementById('interest-result').textContent = `${formatNumber(interest)} руб.`;
+            document.getElementById('total-result').textContent = `${formatNumber(total)} руб.`;
+            document.getElementById('monthly-result').textContent = `${formatNumber(monthlyIncome)} руб.`;
+        }
+
+        // Функции для кнопок управления
+        function setupButtonControls() {
+            // Управление суммой
+            document.getElementById('amount-plus').addEventListener('click', function() {
+                const input = document.getElementById('amount');
+                let value = parseFloat(input.value) || 0;
+                value += 10000;
+                input.value = value;
+                calculateDeposit();
+                
+                // Эффект нажатия
+                this.style.background = 'rgba(40, 35, 45, 0.9)';
+                setTimeout(() => this.style.background = '', 100);
+            });
+            
+            document.getElementById('amount-minus').addEventListener('click', function() {
+                const input = document.getElementById('amount');
+                let value = parseFloat(input.value) || 0;
+                value = Math.max(0, value - 10000);
+                input.value = value;
+                calculateDeposit();
+                
+                // Эффект нажатия
+                this.style.background = 'rgba(40, 35, 45, 0.9)';
+                setTimeout(() => this.style.background = '', 100);
+            });
+            
+            // Управление процентом
+            document.getElementById('percent-plus').addEventListener('click', function() {
+                const input = document.getElementById('percent');
+                let value = parseFloat(input.value) || 0;
+                value += 0.1;
+                if (value > 100) value = 100;
+                input.value = value.toFixed(1);
+                calculateDeposit();
+                
+                // Эффект нажатия
+                this.style.background = 'rgba(40, 35, 45, 0.9)';
+                setTimeout(() => this.style.background = '', 100);
+            });
+            
+            document.getElementById('percent-minus').addEventListener('click', function() {
+                const input = document.getElementById('percent');
+                let value = parseFloat(input.value) || 0;
+                value = Math.max(0, value - 0.1);
+                input.value = value.toFixed(1);
+                calculateDeposit();
+                
+                // Эффект нажатия
+                this.style.background = 'rgba(40, 35, 45, 0.9)';
+                setTimeout(() => this.style.background = '', 100);
+            });
+            
+            // Управление сроком
+            document.getElementById('term-plus').addEventListener('click', function() {
+                const input = document.getElementById('term');
+                let value = parseFloat(input.value) || 0;
+                value += 1;
+                input.value = value;
+                calculateDeposit();
+                
+                // Эффект нажатия
+                this.style.background = 'rgba(40, 35, 45, 0.9)';
+                setTimeout(() => this.style.background = '', 100);
+            });
+            
+            document.getElementById('term-minus').addEventListener('click', function() {
+                const input = document.getElementById('term');
+                let value = parseFloat(input.value) || 0;
+                value = Math.max(1, value - 1);
+                input.value = value;
+                calculateDeposit();
+                
+                // Эффект нажатия
+                this.style.background = 'rgba(40, 35, 45, 0.9)';
+                setTimeout(() => this.style.background = '', 100);
+            });
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Создаем звездный фон
+            createStars();
+            
+            // Настраиваем кнопки управления
+            setupButtonControls();
+            
+            // Расчет при загрузке
+            calculateDeposit();
+            
+            // Добавляем обработчики событий для полей ввода
+            const inputs = document.querySelectorAll('.calc-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateDeposit);
+                
+                // Добавляем возможность сброса значений по двойному клику
+                input.addEventListener('dblclick', function() {
+                    if (this.id === 'amount') this.value = 1400000;
+                    if (this.id === 'percent') this.value = 14;
+                    if (this.id === 'term') this.value = 3;
+                    calculateDeposit();
+                });
+            });
+            
+            // Случайное мерцание пиратского символа
+            const pirateIcon = document.querySelector('.pirate-icon');
+            setInterval(() => {
+                pirateIcon.style.opacity = Math.random() > 0.5 ? '0.9' : '0.5';
+                setTimeout(() => pirateIcon.style.opacity = '0.7', 200);
+            }, 3000);
+            
+            // Случайное движение космических объектов
+            const planet1 = document.getElementById('planet1');
+            const planet2 = document.getElementById('planet2');
+            const ship = document.getElementById('ship');
+            
+            function moveObjects() {
+                // Планета 1
+                let top1 = parseInt(planet1.style.top) || 10;
+                let left1 = parseInt(planet1.style.left) || 5;
+                planet1.style.top = `${top1 + Math.sin(Date.now() / 10000) * 0.5}%`;
+                planet1.style.left = `${left1 + Math.cos(Date.now() / 12000) * 0.3}%`;
+                
+                // Планета 2
+                let top2 = parseInt(planet2.style.top) || 15;
+                let left2 = parseInt(planet2.style.left) || 8;
+                planet2.style.top = `${top2 + Math.sin(Date.now() / 15000) * 0.4}%`;
+                planet2.style.left = `${left2 + Math.cos(Date.now() / 18000) * 0.5}%`;
+                
+                // Корабль
+                let top3 = parseInt(ship.style.top) || 20;
+                let left3 = parseInt(ship.style.left) || 15;
+                ship.style.top = `${top3 + Math.sin(Date.now() / 8000) * 0.7}%`;
+                ship.style.left = `${left3 + Math.cos(Date.now() / 9000) * 0.6}%`;
+                
+                requestAnimationFrame(moveObjects);
+            }
+            
+            moveObjects();
+        });
+
+        // Обновление звезд при изменении размера окна
+        window.addEventListener('resize', function() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            createStars();
+        });
+    </script>
+</body>
+</html>
