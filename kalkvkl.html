@@ -44,33 +44,53 @@
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
+            0%, 100% { opacity: 0.2; }
             50% { opacity: 1; }
         }
 
         /* Контейнер калькулятора */
         .calculator-container {
             width: 100%;
-            max-width: 500px;
-            background: rgba(20, 20, 20, 0.85);
+            max-width: 550px;
+            background: rgba(10, 10, 10, 0.75);
             border-radius: 16px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(211, 211, 211, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(211, 211, 211, 0.15);
         }
 
         /* Заголовок */
         .header {
             text-align: center;
             margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: rgba(15, 15, 15, 0.6);
+            border-radius: 12px;
+            padding: 15px;
         }
 
         .title {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             color: #d3d3d3;
             letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(211, 211, 211, 0.5);
+            text-shadow: 0 0 10px rgba(211, 211, 211, 0.6);
+            margin: 0 15px;
+        }
+
+        .financial-icon {
+            font-size: 2.8rem;
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
 
         /* Элементы калькулятора */
@@ -82,47 +102,90 @@
         }
 
         .calc-label {
-            width: 30%;
-            font-size: 1.2rem;
+            width: 25%;
+            font-size: 1.25rem;
             color: #d3d3d3;
-            text-shadow: 0 0 5px rgba(211, 211, 211, 0.3);
+            text-shadow: 0 0 5px rgba(211, 211, 211, 0.4);
         }
 
-        .input-container {
+        .input-group {
             display: flex;
             align-items: center;
-            width: 70%;
+            width: 75%;
+            gap: 10px;
         }
 
         .calc-input {
-            background-color: transparent;
+            background-color: rgba(0, 0, 0, 0.4);
             border: 1px solid #d3d3d3;
             border-radius: 8px;
             color: #d3d3d3;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             padding: 12px 15px;
-            width: 70%;
+            width: 65%;
             outline: none;
             transition: all 0.3s ease;
             text-align: right;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
         }
 
         .calc-input:focus {
-            box-shadow: 0 0 10px rgba(211, 211, 211, 0.5);
+            box-shadow: 0 0 10px rgba(211, 211, 211, 0.6), inset 0 0 5px rgba(0, 0, 0, 0.5);
             border-color: #fff;
         }
 
         .calc-unit {
-            margin-left: 15px;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: #d3d3d3;
-            width: 30%;
+            width: 15%;
+            min-width: 60px;
+        }
+
+        /* Кнопки управления */
+        .btn-group {
+            display: flex;
+            width: 20%;
+            min-width: 80px;
+        }
+
+        .btn-control {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid #d3d3d3;
+            color: #d3d3d3;
+            width: 50%;
+            height: 46px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .btn-control:first-child {
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+        }
+
+        .btn-control:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .btn-control:hover {
+            background: rgba(50, 50, 50, 0.9);
+            box-shadow: 0 0 8px rgba(211, 211, 211, 0.4);
+        }
+
+        .btn-control:active {
+            background: rgba(211, 211, 211, 0.2);
+            transform: scale(0.95);
         }
 
         /* Результаты */
         .results {
             margin-top: 40px;
-            background: rgba(30, 30, 30, 0.8);
+            background: rgba(25, 25, 25, 0.7);
             border-radius: 12px;
             padding: 20px;
             border: 1px solid rgba(211, 211, 211, 0.2);
@@ -130,17 +193,17 @@
 
         .results-title {
             text-align: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             margin-bottom: 20px;
             color: #d3d3d3;
-            text-shadow: 0 0 5px rgba(211, 211, 211, 0.3);
+            text-shadow: 0 0 5px rgba(211, 211, 211, 0.4);
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
         }
 
         .result-label {
@@ -148,9 +211,9 @@
         }
 
         .result-value {
-            color: #ffffff;
+            color: #FFD700;
             font-weight: bold;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
         }
 
         /* Адаптивность для мобильных */
@@ -162,10 +225,10 @@
 
             .calc-label {
                 width: 100%;
-                margin-bottom: 8px;
+                margin-bottom: 10px;
             }
 
-            .input-container {
+            .input-group {
                 width: 100%;
             }
 
@@ -174,11 +237,23 @@
             }
 
             .calc-unit {
-                width: 40%;
+                width: 20%;
+            }
+
+            .btn-group {
+                width: 20%;
             }
 
             .calculator-container {
                 padding: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .financial-icon {
+                font-size: 2.2rem;
             }
         }
 
@@ -188,25 +263,19 @@
             margin-top: 30px;
             font-size: 0.9rem;
             color: #888;
-            max-width: 500px;
+            max-width: 550px;
+            background: rgba(15, 15, 15, 0.6);
+            padding: 15px;
+            border-radius: 10px;
         }
 
-        /* Иконка обновления */
-        .refresh-icon {
-            display: inline-block;
-            margin-left: 10px;
-            cursor: pointer;
-            color: #d3d3d3;
-            transition: transform 0.3s ease;
-        }
-
-        .refresh-icon:hover {
-            transform: rotate(180deg);
+        .app-info p {
+            margin-bottom: 8px;
         }
 
         /* Эффект свечения */
         .glow {
-            animation: glow 2s infinite alternate;
+            animation: glow 2.5s infinite alternate;
         }
 
         @keyframes glow {
@@ -214,8 +283,17 @@
                 text-shadow: 0 0 5px #d3d3d3, 0 0 10px #d3d3d3;
             }
             to {
-                text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
+                text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
             }
+        }
+
+        /* Подсказка по шагам */
+        .step-hint {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 5px;
+            text-align: center;
+            width: 100%;
         }
     </style>
 </head>
@@ -226,34 +304,51 @@
     <!-- Контейнер калькулятора -->
     <div class="calculator-container">
         <div class="header">
+            <div class="financial-icon">💰</div>
             <h1 class="title glow">Депозит</h1>
+            <div class="financial-icon">💎</div>
         </div>
 
         <!-- Сумма -->
         <div class="calc-row">
             <div class="calc-label">Сумма</div>
-            <div class="input-container">
-                <input type="number" id="amount" class="calc-input" value="1400000" min="0">
+            <div class="input-group">
+                <input type="number" id="amount" class="calc-input" value="1400000" min="0" step="10000">
+                <div class="btn-group">
+                    <div class="btn-control" id="amount-minus">−</div>
+                    <div class="btn-control" id="amount-plus">+</div>
+                </div>
                 <div class="calc-unit">руб.</div>
             </div>
+            <div class="step-hint">Шаг: 10 000 руб.</div>
         </div>
 
         <!-- Процент -->
         <div class="calc-row">
             <div class="calc-label">Процент</div>
-            <div class="input-container">
+            <div class="input-group">
                 <input type="number" id="percent" class="calc-input" value="14" min="0" max="100" step="0.1">
+                <div class="btn-group">
+                    <div class="btn-control" id="percent-minus">−</div>
+                    <div class="btn-control" id="percent-plus">+</div>
+                </div>
                 <div class="calc-unit">%</div>
             </div>
+            <div class="step-hint">Шаг: 0.1%</div>
         </div>
 
         <!-- Срок -->
         <div class="calc-row">
             <div class="calc-label">Срок</div>
-            <div class="input-container">
-                <input type="number" id="term" class="calc-input" value="3" min="1">
+            <div class="input-group">
+                <input type="number" id="term" class="calc-input" value="3" min="1" step="1">
+                <div class="btn-group">
+                    <div class="btn-control" id="term-minus">−</div>
+                    <div class="btn-control" id="term-plus">+</div>
+                </div>
                 <div class="calc-unit">мес.</div>
             </div>
+            <div class="step-hint">Шаг: 1 месяц</div>
         </div>
 
         <!-- Результаты -->
@@ -276,15 +371,16 @@
 
     <!-- Информация о приложении -->
     <div class="app-info">
-        <p>Калькулятор депозита с анимированным звездным небом</p>
-        <p>Измените значения в полях ввода для пересчета</p>
+        <p>Используйте кнопки + и − для быстрой корректировки значений</p>
+        <p>Двойной клик по полю ввода вернёт значение по умолчанию</p>
+        <p>Калькулятор адаптирован для использования на смартфоне</p>
     </div>
 
     <script>
         // Создание звездного фона
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const starsCount = 150;
+            const starsCount = 180;
             
             for (let i = 0; i < starsCount; i++) {
                 const star = document.createElement('div');
@@ -302,6 +398,10 @@
                 // Случайная длительность анимации
                 const duration = Math.random() * 5 + 3;
                 star.style.animationDuration = `${duration}s`;
+                
+                // Случайная яркость
+                const brightness = Math.random() * 0.7 + 0.3;
+                star.style.backgroundColor = `rgba(255, 255, 255, ${brightness})`;
                 
                 starsContainer.appendChild(star);
             }
@@ -325,16 +425,84 @@
                 return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             }
             
+            // Форматирование процентов
+            function formatPercent(num) {
+                return num.toFixed(1).replace('.', ',');
+            }
+            
+            // Форматирование для отображения в полях ввода
+            document.getElementById('amount').value = amount;
+            document.getElementById('percent').value = percent;
+            document.getElementById('term').value = term;
+            
             // Обновляем результаты на странице
             document.getElementById('interest-result').textContent = `${formatNumber(interest)} руб.`;
             document.getElementById('total-result').textContent = `${formatNumber(total)} руб.`;
             document.getElementById('monthly-result').textContent = `${formatNumber(monthlyIncome)} руб.`;
         }
 
+        // Функции для кнопок управления
+        function setupButtonControls() {
+            // Управление суммой
+            document.getElementById('amount-plus').addEventListener('click', function() {
+                const input = document.getElementById('amount');
+                let value = parseFloat(input.value) || 0;
+                value += 10000;
+                input.value = value;
+                calculateDeposit();
+            });
+            
+            document.getElementById('amount-minus').addEventListener('click', function() {
+                const input = document.getElementById('amount');
+                let value = parseFloat(input.value) || 0;
+                value = Math.max(0, value - 10000);
+                input.value = value;
+                calculateDeposit();
+            });
+            
+            // Управление процентом
+            document.getElementById('percent-plus').addEventListener('click', function() {
+                const input = document.getElementById('percent');
+                let value = parseFloat(input.value) || 0;
+                value += 0.1;
+                if (value > 100) value = 100;
+                input.value = value.toFixed(1);
+                calculateDeposit();
+            });
+            
+            document.getElementById('percent-minus').addEventListener('click', function() {
+                const input = document.getElementById('percent');
+                let value = parseFloat(input.value) || 0;
+                value = Math.max(0, value - 0.1);
+                input.value = value.toFixed(1);
+                calculateDeposit();
+            });
+            
+            // Управление сроком
+            document.getElementById('term-plus').addEventListener('click', function() {
+                const input = document.getElementById('term');
+                let value = parseFloat(input.value) || 0;
+                value += 1;
+                input.value = value;
+                calculateDeposit();
+            });
+            
+            document.getElementById('term-minus').addEventListener('click', function() {
+                const input = document.getElementById('term');
+                let value = parseFloat(input.value) || 0;
+                value = Math.max(1, value - 1);
+                input.value = value;
+                calculateDeposit();
+            });
+        }
+
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Создаем звездный фон
             createStars();
+            
+            // Настраиваем кнопки управления
+            setupButtonControls();
             
             // Расчет при загрузке
             calculateDeposit();
@@ -348,8 +516,26 @@
             const inputs = document.querySelectorAll('.calc-input');
             inputs.forEach(input => {
                 input.addEventListener('dblclick', function() {
-                    this.value = this.defaultValue;
+                    if (this.id === 'amount') this.value = 1400000;
+                    if (this.id === 'percent') this.value = 14;
+                    if (this.id === 'term') this.value = 3;
                     calculateDeposit();
+                });
+            });
+            
+            // Добавляем анимацию для кнопок при нажатии
+            const buttons = document.querySelectorAll('.btn-control');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.9)';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
                 });
             });
         });
