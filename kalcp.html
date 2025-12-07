@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Терминал Звёздного Пирата</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #0a0a12;
+            color: #8a8a9e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(50, 40, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(80, 40, 40, 0.15) 0%, transparent 50%);
+        }
+
+        /* Эффект старых пикселей и царапин */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.05) 0px,
+                    rgba(0, 0, 0, 0.05) 1px,
+                    transparent 1px,
+                    transparent 3px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.03) 0px,
+                    rgba(0, 0, 0, 0.03) 1px,
+                    transparent 1px,
+                    transparent 3px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Звезды */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #6a6a8a;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Контейнер калькулятора */
+        .terminal-container {
+            width: 100%;
+            max-width: 550px;
+            background: rgba(10, 10, 20, 0.95);
+            border-radius: 0;
+            padding: 20px;
+            border: 3px solid #3a3a4a;
+            box-shadow: 
+                0 0 40px rgba(100, 80, 120, 0.4),
+                inset 0 0 60px rgba(0, 0, 0, 0.9);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        /* Эффект сканирования как в старых радарах */
+        .terminal-container::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to bottom, 
+                transparent, 
+                rgba(100, 200, 255, 0.2), 
+                transparent);
+            animation: scan 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { top: -100%; }
+            100% { top: 200%; }
+        }
+
+        /* Заголовок с анимированным текстом */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #5a5a6a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-title {
+            font-size: 1.9rem;
+            color: #8a7a9a;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 
+                2px 2px 0 #000,
+                0 0 10px rgba(138, 122, 154, 0.5);
+            font-weight: normal;
+            position: relative;
+            animation: titleGlitch 10s infinite;
+        }
+
+        @keyframes titleGlitch {
+            0%, 100% { transform: translateX(0); }
+            96% { transform: translateX(0); }
+            97% { transform: translateX(-2px); }
+            98% { transform: translateX(2px); }
+            99% { transform: translateX(0); }
+        }
+
+        /* Анимированный пиратский символ */
+        .pirate-icon {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 1.8rem;
+            color: #9a8a7a;
+            animation: skullFloat 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 3px rgba(154, 138, 122, 0.7));
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        @keyframes skullFloat {
+            0%, 100% { transform: rotate(15deg) translateY(0); }
+            50% { transform: rotate(20deg) translateY(-5px); }
+        }
+
+        .pirate-icon:hover {
+            animation: skullSpin 1s ease;
+        }
+
+        @keyframes skullSpin {
+            0% { transform: rotate(15deg); }
+            100% { transform: rotate(375deg); }
+        }
+
+        /* Панель статуса */
+        .status-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(20, 20, 30, 0.8);
+            border: 1px solid #4a4a5a;
+            font-size: 0.9rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #5a5;
+            animation: ledPulse 2s infinite;
+            box-shadow: 0 0 5px #5a5;
+        }
+
+        @keyframes ledPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Элементы калькулятора */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .calc-label {
+            width: 30%;
+            font-size: 1.1rem;
+            color: #7a7a8a;
+            text-shadow: 1px 1px 0 #000;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .calc-label::after {
+            content: ">";
+            position: absolute;
+            right: 10px;
+            color: #5a5;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            width: 70%;
+            gap: 8px;
+        }
+
+        /* Поля ввода */
+        .terminal-input {
+            background-color: rgba(5, 5, 15, 0.9);
+            border: 2px solid #4a4a5a;
+            border-radius: 0;
+            color: #9a9aaa;
+            font-size: 1.1rem;
+            padding: 12px 15px;
+            width: 60%;
+            outline: none;
+            text-align: right;
+            font-family: 'Share Tech Mono', monospace;
+            box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .terminal-input:focus {
+            border-color: #6a5a7a;
+            box-shadow: 
+                inset 3px 3px 8px rgba(0, 0, 0, 0.7),
+                0 0 15px rgba(100, 80, 120, 0.6);
+            animation: inputPulse 1.5s infinite;
+        }
+
+        @keyframes inputPulse {
+            0%, 100% { border-color: #6a5a7a; }
+            50% { border-color: #8a7a9a; }
+        }
+
+        .calc-unit {
+            font-size: 1.1rem;
+            color: #7a7a8a;
+            width: 15%;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        /* Кнопки управления */
+        .btn-group {
+            display: flex;
+            width: 25%;
+            min-width: 70px;
+        }
+
+        .terminal-btn {
+            background: rgba(40, 35, 50, 0.9);
+            border: 2px solid #5a5a6a;
+            color: #8a8a9a;
+            width: 50%;
+            height: 44px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+        }
+
+        .terminal-btn:first-child {
+            border-right: 1px solid #4a4a5a;
+        }
+
+        .terminal-btn:last-child {
+            border-left: 1px solid #4a4a5a;
+        }
+
+        .terminal-btn:hover {
+            background: rgba(50, 45, 60, 0.9);
+            border-color: #7a7a8a;
+            color: #aaaabb;
+            text-shadow: 0 0 5px rgba(170, 170, 187, 0.5);
+        }
+
+        .terminal-btn:active {
+            background: rgba(60, 55, 70, 0.9);
+            transform: translateY(2px);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Эффект искр на кнопках */
+        .spark {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ffaa00;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* Журнал операций */
+        .log-panel {
+            margin-top: 25px;
+            background: rgba(15, 15, 25, 0.9);
+            border: 1px solid #4a4a5a;
+            padding: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+
+        .log-title {
+            color: #8a7a9a;
+            margin-bottom: 10px;
+            border-bottom: 1px dotted #5a5a6a;
+            padding-bottom: 5px;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px dashed rgba(90, 90, 106, 0.3);
+            animation: logEntry 0.5s ease;
+        }
+
+        @keyframes logEntry {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Результаты */
+        .results-panel {
+            margin-top: 20px;
+            background: rgba(25, 23, 35, 0.9);
+            padding: 20px;
+            border: 2px solid #4a4a5a;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .results-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%233a3a4a' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #8a7a9a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+            padding: 8px;
+            background: rgba(30, 28, 40, 0.5);
+            border-left: 3px solid #5a5a6a;
+            transition: all 0.3s;
+        }
+
+        .result-row:hover {
+            background: rgba(40, 38, 50, 0.7);
+            border-left-color: #8a7a9a;
+        }
+
+        .result-label {
+            color: #7a7a8a;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .result-value {
+            color: #9a8a7a;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #000;
+            font-family: 'Share Tech Mono', monospace;
+            animation: valueUpdate 0.5s;
+        }
+
+        @keyframes valueUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: #ffaa00; }
+            100% { transform: scale(1); }
+        }
+
+        /* Космические объекты */
+        .space-object {
+            position: fixed;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        #planet1 {
+            top: 10%;
+            left: 5%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #4a3a6a, #2a2a3a);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 40px rgba(90, 60, 120, 0.3),
+                inset 0 0 40px rgba(0, 0, 0, 0.7);
+            animation: planetRotate 60s linear infinite;
+        }
+
+        @keyframes planetRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #planet2 {
+            bottom: 15%;
+            right: 8%;
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle at 70% 30%, #6a4a3a, #3a2a2a);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px rgba(120, 90, 60, 0.3),
+                inset 0 0 30px rgba(0, 0, 0, 0.7);
+            animation: planetRotateReverse 80s linear infinite;
+        }
+
+        @keyframes planetRotateReverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        #ship {
+            top: 25%;
+            right: 15%;
+            width: 80px;
+            height: 40px;
+            background: #4a4a5a;
+            clip-path: polygon(0% 50%, 15% 0%, 100% 0%, 100% 100%, 15% 100%);
+            transform: rotate(20deg);
+            animation: shipFloat 12s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(90, 90, 120, 0.5);
+        }
+
+        @keyframes shipFloat {
+            0%, 100% { transform: rotate(20deg) translateY(0); }
+            50% { transform: rotate(25deg) translateY(-20px); }
+        }
+
+        /* Эффект двигателя корабля */
+        #engine {
+            position: fixed;
+            top: calc(25% + 15px);
+            right: calc(15% - 20px);
+            width: 30px;
+            height: 10px;
+            background: linear-gradient(to right, #ff6600, #ffaa00, #ffff00);
+            border-radius: 5px;
+            opacity: 0.6;
+            animation: enginePulse 1.5s infinite alternate;
+            filter: blur(1px);
+            z-index: -2;
+        }
+
+        @keyframes enginePulse {
+            0% { width: 20px; opacity: 0.4; }
+            100% { width: 40px; opacity: 0.7; }
+        }
+
+        /* Панель управления звуком */
+        .sound-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(20, 20, 30, 0.8);
+            padding: 10px;
+            border: 1px solid #5a5a6a;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sound-btn {
+            background: rgba(40, 40, 50, 0.9);
+            border: 1px solid #6a6a7a;
+            color: #8a8a9a;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .sound-btn:hover {
+            background: rgba(50, 50, 60, 0.9);
+            border-color: #8a8a9a;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            .calc-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .calc-label {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .input-group {
+                width: 100%;
+            }
+
+            .terminal-input {
+                width: 50%;
+            }
+
+            .calc-unit {
+                width: 20%;
+            }
+
+            .btn-group {
+                width: 30%;
+            }
+
+            .terminal-container {
+                padding: 15px;
+            }
+            
+            .terminal-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Космические объекты -->
+    <div class="space-object" id="planet1"></div>
+    <div class="space-object" id="planet2"></div>
+    <div class="space-object" id="ship"></div>
+    <div id="engine"></div>
+
+    <!-- Фон со звездами -->
+    <div id="stars"></div>
+
+    <!-- Панель управления звуком -->
+    <div class="sound-control">
+        <button class="sound-btn" id="toggleSound">🔈 Звук</button>
+        <button class="sound-btn" id="engineSound">🚀 Двигатель</button>
+        <button class="sound-btn" id="hailSound">📡 Сигнал</button>
+    </div>
+
+    <!-- Контейнер терминала -->
+    <div class="terminal-container">
+        <div class="header">
+            <div class="pirate-icon" id="pirateSkull">☠</div>
+            <h1 class="terminal-title">ТЕРМИНАЛ "ЧЁРНЫЙ КРЕСТ"</h1>
+        </div>
+
+        <!-- Панель статуса -->
+        <div class="status-panel">
+            <div class="status-item">
+                <div class="status-led"></div>
+                <span>СИСТЕМА АКТИВНА</span>
+            </div>
+            <div class="status-item">
+                <span>СЕКТОР: X-24</span>
+            </div>
+            <div class="status-item">
+                <span>ЭНЕРГИЯ: 94%</span>
+            </div>
+        </div>
+
+        <!-- Сумма -->
+        <div class="calc-row">
+            <div class="calc-label">КАПИТАЛ</div>
+            <div class="input-group">
+                <input type="number" id="amount" class="terminal-input" value="1400000" min="0" step="10000">
+                <div class="btn-group">
+                    <div class="terminal-btn" id="amount-minus">−</div>
+                    <div class="terminal-btn" id="amount-plus">+</div>
+                </div>
+                <div class="calc-unit">КРЕД.</div>
+            </div>
+        </div>
+
+        <!-- Процент -->
+        <div class="calc-row">
+            <div class="calc-label">ПРОЦЕНТ</div>
+            <div class="input-group">
+                <input type="number" id="percent" class="terminal-input" value="14" min="0" max="100" step="0.1">
+                <div class="btn-group">
+                    <div class="terminal-btn" id="percent-minus">−</div>
+                    <div class="terminal-btn" id="percent-plus">+</div>
+                </div>
+                <div class="calc-unit">%</div>
+            </div>
+        </div>
+
+        <!-- Срок -->
+        <div class="calc-row">
+            <div class="calc-label">СРОК</div>
+            <div class="input-group">
+                <input type="number" id="term" class="terminal-input" value="3" min="1" step="1">
+                <div class="btn-group">
+                    <div class="terminal-btn" id="term-minus">−</div>
+                    <div class="terminal-btn" id="term-plus">+</div>
+                </div>
+                <div class="calc-unit">ЦИКЛ.</div>
+            </div>
+        </div>
+
+        <!-- Журнал операций -->
+        <div class="log-panel" id="logPanel">
+            <div class="log-title">ЖУРНАЛ ОПЕРАЦИЙ:</div>
+            <div class="log-entry">> Инициализация терминала... УСПЕХ</div>
+            <div class="log-entry">> Загрузка финансового модуля...</div>
+            <div class="log-entry">> Готов к вычислениям</div>
+        </div>
+
+        <!-- Результаты -->
+        <div class="results-panel">
+            <h2 class="results-title">ПРОГНОЗ ДОХОДА</h2>
+            <div class="result-row">
+                <div class="result-label">НАЧИСЛЕНИЯ:</div>
+                <div class="result-value" id="interest-result">49 000 КРЕД.</div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">ИТОГО:</div>
+                <div class="result-value" id="total-result">1 449 000 КРЕД.</div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">В ЦИКЛ:</div>
+                <div class="result-value" id="monthly-result">16 333 КРЕД.</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="clickSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
+    </audio>
+
+    <audio id="beepSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
+    </audio>
+
+    <script>
+        // Генерация простых звуков для веб-аудио
+        function generateBeep(frequency, duration) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function generateClick() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.1, audioContext.sampleRate);
+            const channelData = buffer.getChannelData(0);
+            
+            for (let i = 0; i < buffer.length; i++) {
+                channelData[i] = Math.random() * 2 - 1;
+            }
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            source.start();
+        }
+
+        function generateEngineSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 80;
+            oscillator.type = 'sawtooth';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            
+            // Модуляция для эффекта двигателя
+            const lfo = audioContext.createOscillator();
+            const lfoGain = audioContext.createGain();
+            lfo.frequency.value = 5;
+            lfoGain.gain.value = 20;
+            lfo.connect(lfoGain);
+            lfoGain.connect(oscillator.frequency);
+            
+            oscillator.start();
+            lfo.start();
+            
+            return {oscillator, gainNode, lfo};
+        }
+
+        // Глобальные переменные для звуков
+        let soundEnabled = true;
+        let engineSound = null;
+        let enginePlaying = false;
+
+        // Создание звездного фона
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 2.5 + 0.5;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                const duration = Math.random() * 4 + 2;
+                star.style.animationDuration = `${duration}s`;
+                
+                const brightness = Math.random() * 60 + 90;
+                star.style.backgroundColor = `rgb(${brightness}, ${brightness}, ${brightness + 20})`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Функция расчета депозита
+        function calculateDeposit() {
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const percent = parseFloat(document.getElementById('percent').value) || 0;
+            const term = parseFloat(document.getElementById('term').value) || 0;
+            
+            const monthlyRate = percent / 100 / 12;
+            const interest = amount * monthlyRate * term;
+            const total = amount + interest;
+            const monthlyIncome = interest / term;
+            
+            function formatNumber(num) {
+                return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+            
+            // Обновление полей ввода
+            document.getElementById('amount').value = amount;
+            document.getElementById('percent').value = percent;
+            document.getElementById('term').value = term;
+            
+            // Звуковой эффект обновления
+            if (soundEnabled) {
+                generateBeep(800 + interest/1000, 0.1);
+            }
+            
+            // Эффект искр
+            createSparks();
+            
+            // Обновление результатов с анимацией
+            const interestElem = document.getElementById('interest-result');
+            const totalElem = document.getElementById('total-result');
+            const monthlyElem = document.getElementById('monthly-result');
+            
+            animateValueUpdate(interestElem, `${formatNumber(interest)} КРЕД.`);
+            animateValueUpdate(totalElem, `${formatNumber(total)} КРЕД.`);
+            animateValueUpdate(monthlyElem, `${formatNumber(monthlyIncome)} КРЕД.`);
+            
+            // Добавление записи в журнал
+            addLogEntry(`> Расчет: ${formatNumber(amount)}К под ${percent}% на ${term} циклов`);
+        }
+
+        // Анимация обновления значений
+        function animateValueUpdate(element, newValue) {
+            element.style.animation = 'none';
+            setTimeout(() => {
+                element.textContent = newValue;
+                element.style.animation = 'valueUpdate 0.5s';
+            }, 10);
+        }
+
+        // Создание эффекта искр
+        function createSparks() {
+            const buttons = document.querySelectorAll('.terminal-btn');
+            buttons.forEach(btn => {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const spark = document.createElement('div');
+                        spark.classList.add('spark');
+                        spark.style.left = `${Math.random() * 100}%`;
+                        spark.style.top = `${Math.random() * 100}%`;
+                        btn.appendChild(spark);
+                        
+                        // Анимация искры
+                        spark.animate([
+                            { opacity: 1, transform: 'scale(1)' },
+                            { 
+                                opacity: 0, 
+                                transform: `scale(0) translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px)` 
+                            }
+                        ], {
+                            duration: 500,
+                            easing: 'ease-out'
+                        });
+                        
+                        setTimeout(() => spark.remove(), 500);
+                    }, i * 100);
+                }
+            });
+        }
+
+        // Добавление записи в журнал
+        function addLogEntry(text) {
+            const logPanel = document.getElementById('logPanel');
+            const entry = document.createElement('div');
+            entry.classList.add('log-entry');
+            entry.textContent = text;
+            
+            logPanel.appendChild(entry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+            
+            // Ограничение количества записей
+            const entries = logPanel.querySelectorAll('.log-entry');
+            if (entries.length > 10) {
+                entries[0].remove();
+            }
+            
+            // Звук печати
+            if (soundEnabled) {
+                generateClick();
+            }
+        }
+
+        // Настройка кнопок управления
+        function setupButtonControls() {
+            // Массив кнопок
+            const buttons = [
+                {id: 'amount-plus', step: 10000},
+                {id: 'amount-minus', step: -10000},
+                {id: 'percent-plus', step: 0.1},
+                {id: 'percent-minus', step: -0.1},
+                {id: 'term-plus', step: 1},
+                {id: 'term-minus', step: -1}
+            ];
+            
+            buttons.forEach(btnConfig => {
+                const button = document.getElementById(btnConfig.id);
+                button.addEventListener('click', function() {
+                    const inputId = btnConfig.id.split('-')[0];
+                    const input = document.getElementById(inputId);
+                    let value = parseFloat(input.value) || 0;
+                    
+                    value += btnConfig.step;
+                    
+                    // Ограничения
+                    if (inputId === 'amount') value = Math.max(0, value);
+                    if (inputId === 'percent') {
+                        if (value > 100) value = 100;
+                        if (value < 0) value = 0;
+                    }
+                    if (inputId === 'term') value = Math.max(1, value);
+                    
+                    input.value = inputId === 'percent' ? value.toFixed(1) : value;
+                    
+                    // Звук кнопки
+                    if (soundEnabled) {
+                        generateBeep(600, 0.05);
+                    }
+                    
+                    // Эффект нажатия
+                    this.style.background = 'rgba(60, 55, 70, 0.9)';
+                    setTimeout(() => {
+                        this.style.background = '';
+                    }, 100);
+                    
+                    calculateDeposit();
+                });
+            });
+            
+            // Обработка пиратского символа
+            document.getElementById('pirateSkull').addEventListener('click', function() {
+                if (soundEnabled) {
+                    generateBeep(300, 0.3);
+                    generateBeep(200, 0.3);
+                }
+                addLogEntry('> Активирован пиратский протокол... АРГХ!');
+                
+                // Специальный эффект
+                document.body.style.animation = 'none';
+                setTimeout(() => {
+                    document.body.style.animation = 'titleGlitch 0.5s';
+                }, 10);
+            });
+        }
+
+        // Управление звуками
+        function setupSoundControls() {
+            document.getElementById('toggleSound').addEventListener('click', function() {
+                soundEnabled = !soundEnabled;
+                this.textContent = soundEnabled ? '🔈 Звук ВКЛ' : '🔇 Звук ВЫКЛ';
+                generateBeep(soundEnabled ? 800 : 400, 0.1);
+                addLogEntry(soundEnabled ? '> Аудиосистема активирована' : '> Аудиосистема отключена');
+            });
+            
+            document.getElementById('engineSound').addEventListener('click', function() {
+                if (!enginePlaying) {
+                    engineSound = generateEngineSound();
+                    enginePlaying = true;
+                    this.textContent = '🚀 Двигатель ВКЛ';
+                    addLogEntry('> Двигатели запущены');
+                } else {
+                    if (engineSound) {
+                        engineSound.gainNode.gain.exponentialRampToValueAtTime(0.001, 
+                            engineSound.gainNode.context.currentTime + 0.5);
+                        setTimeout(() => {
+                            engineSound.oscillator.stop();
+                            engineSound.lfo.stop();
+                        }, 500);
+                    }
+                    enginePlaying = false;
+                    this.textContent = '🚀 Двигатель ВЫКЛ';
+                    addLogEntry('> Двигатели остановлены');
+                }
+            });
+            
+            document.getElementById('hailSound').addEventListener('click', function() {
+                if (soundEnabled) {
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            generateBeep(1000 - i * 100, 0.1);
+                        }, i * 200);
+                    }
+                }
+                addLogEntry('> Отправлен сигнал бедствия...');
+            });
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            setupButtonControls();
+            setupSoundControls();
+            calculateDeposit();
+            
+            // Обработка полей ввода
+            const inputs = document.querySelectorAll('.terminal-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateDeposit);
+                input.addEventListener('dblclick', function() {
+                    if (this.id === 'amount') this.value = 1400000;
+                    if (this.id === 'percent') this.value = 14;
+                    if (this.id === 'term') this.value = 3;
+                    if (soundEnabled) generateBeep(1200, 0.2);
+                    calculateDeposit();
+                    addLogEntry('> Сброс к значениям по умолчанию');
+                });
+            });
+            
+            // Движение космических объектов
+            function moveObjects() {
+                const planet1 = document.getElementById('planet1');
+                const planet2 = document.getElementById('planet2');
+                const ship = document.getElementById('ship');
+                const engine = document.getElementById('engine');
+                
+                if (planet1 && planet2 && ship && engine) {
+                    const time = Date.now() / 1000;
+                    
+                    planet1.style.top = `${10 + Math.sin(time / 10) * 2}%`;
+                    planet1.style.left = `${5 + Math.cos(time / 12) * 1}%`;
+                    
+                    planet2.style.top = `${15 + Math.sin(time / 8) * 3}%`;
+                    planet2.style.left = `${8 + Math.cos(time / 15) * 2}%`;
+                    
+                    ship.style.top = `${25 + Math.sin(time / 6) * 4}%`;
+                    ship.style.right = `${15 + Math.cos(time / 8) * 2}%`;
+                    
+                    engine.style.top = `calc(${25 + Math.sin(time / 6) * 4}% + 15px)`;
+                    engine.style.right = `calc(${15 + Math.cos(time / 8) * 2}% - 20px)`;
+                }
+                
+                requestAnimationFrame(moveObjects);
+            }
+            
+            moveObjects();
+            
+            // Периодические системные сообщения
+            setInterval(() => {
+                const messages = [
+                    '> Сканирование сектора...',
+                    '> Статус корабля: НОРМА',
+                    '> Навигационные системы активны',
+                    '> Связь: УСТАНОВЛЕНА',
+                    '> Защитные поля: 100%'
+                ];
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                addLogEntry(randomMsg);
+            }, 15000);
+            
+            // Начальное сообщение
+            setTimeout(() => {
+                addLogEntry('> Добро пожаловать, капитан. Система готова.');
+            }, 1000);
+        });
+
+        window.addEventListener('resize', function() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            createStars();
+        });
+    </script>
+</body>
+</html>
