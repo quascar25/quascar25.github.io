@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Кредитный калькулятор - Пиратский звездолет</title>
+<style>
+  /* Общие стили */
+  body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    font-family: 'Arial', sans-serif;
+    color: #ccc;
+    overflow: hidden;
+  }
+
+  /* Мигающие звезды на фоне */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: 
+      radial-gradient(white 1px, transparent 1px),
+      radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: starfield 50s linear infinite;
+    opacity: 0.5;
+    z-index: -1;
+  }
+
+  @keyframes starfield {
+    from {background-position: 0 0, 25px 25px;}
+    to {background-position: 50px 50px, 75px 75px;}
+  }
+
+  /* Заголовок */
+  h1 {
+    text-align: center;
+    margin: 20px;
+    font-family: 'Pirate', cursive;
+    font-size: 2em;
+    color: #88c;
+    text-shadow: 0 0 10px #88c;
+    animation: flicker 2s infinite alternate;
+  }
+
+  /* Контейнер формы */
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(20, 20, 20, 0.7);
+    border-radius: 15px;
+    box-shadow: 0 0 20px #444;
+    border: 2px solid #88c;
+    animation: glow 3s infinite alternate;
+  }
+
+  /* Ввод и кнопки
