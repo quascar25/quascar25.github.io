@@ -68,21 +68,21 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            animation: wheelRotate 20s linear infinite;
         }
         .wheel-number {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 18px; /* Уменьшено в 2 раза */
+            height: 18px; /* Уменьшено в 2 раза */
             background: #222;
             border: 1px solid #0af;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 9px; /* Уменьшено в 2 раза */
             font-weight: bold;
             transform-origin: center;
+            z-index: 1;
         }
         /* Статистика */
         .stats-panel {
@@ -118,6 +118,9 @@
             justify-content: center;
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
         }
+        .stat-number.red { color: #ff6666; }
+        .stat-number.black { color: #00aaff; }
+        .stat-number.green { color: #33ff66; }
         /* Баланс */
         .balance-panel {
             background: rgba(0, 0, 0, 0.9);
@@ -141,6 +144,13 @@
             font-weight: bold;
             color: #ff0;
             text-shadow: 0 0 8px #ff0;
+        }
+        .balance-panel.win {
+            animation: winPulse 1s ease-out;
+        }
+        @keyframes winPulse {
+            0% { box-shadow: 0 0 20px #ff0, 0 0 40px #ff0; transform: scale(1.05); }
+            100% { box-shadow: 0 0 15px #ff0; transform: scale(1); }
         }
         /* Кнопки ставок */
         .bets-panel {
@@ -168,6 +178,11 @@
             background: linear-gradient(135deg, #003355, #005588);
             box-shadow: 0 0 10px #0af;
         }
+        .bet-button.active {
+            background: linear-gradient(135deg, #005588, #00aaff);
+            box-shadow: 0 0 15px #00f7ff;
+            color: white;
+        }
         /* Таблица рулетки */
         .table-container {
             background: rgba(0, 20, 40, 0.85);
@@ -192,6 +207,11 @@
             font-size: 0.8em;
             position: relative;
             transition: all 0.2s;
+            cursor: pointer;
+        }
+        .table-cell:hover {
+            background: rgba(0, 50, 100, 0.8);
+            box-shadow: 0 0 8px #0af;
         }
         .table-cell.red {
             background: rgba(80, 0, 0, 0.7);
@@ -252,6 +272,7 @@
             height: 35px;
             z-index: 10;
             display: none;
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .vader-head {
             position: absolute;
@@ -319,13 +340,39 @@
             text-shadow: 0 0 5px #ff3366;
             animation: flicker 1s infinite;
         }
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .control-btn {
+            padding: 5px 10px;
+            font-size: 0.7em;
+            cursor: pointer;
+            clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+            transition: all 0.2s;
+        }
+        .spin-btn {
+            background: rgba(80, 0, 80, 0.7);
+            border: 1px solid #f0f;
+            color: #f0f;
+        }
+        .clear-btn {
+            background: rgba(60, 0, 0, 0.7);
+            border: 1px solid #ff3366;
+            color: #ff3366;
+        }
+        .control-btn:hover {
+            box-shadow: 0 0 8px currentColor;
+        }
         @keyframes flicker {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
-        @keyframes wheelRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes wheelSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(1440deg); }
         }
     </style>
 </head>
@@ -348,19 +395,19 @@
         </div>
         
         <!-- Баланс -->
-        <div class="balance-panel">
+        <div class="balance-panel" id="balancePanel">
             <div class="balance-label">БАЛАНС</div>
-            <div class="balance-amount">1000</div>
+            <div class="balance-amount" id="balanceAmount">1000</div>
         </div>
         
         <!-- Кнопки ставок -->
         <div class="bets-panel">
-            <div class="bet-button">1</div>
-            <div class="bet-button">5</div>
-            <div class="bet-button">10</div>
-            <div class="bet-button">25</div>
-            <div class="bet-button">50</div>
-            <div class="bet-button">100</div>
+            <div class="bet-button active" data-bet="1">1</div>
+            <div class="bet-button" data-bet="5">5</div>
+            <div class="bet-button" data-bet="10">10</div>
+            <div class="bet-button" data-bet="25">25</div>
+            <div class="bet-button" data-bet="50">50</div>
+            <div class="bet-button" data-bet="100">100</div>
         </div>
         
         <!-- Таблица рулетки -->
@@ -382,11 +429,47 @@
         <div class="info-panel">
             <div class="info-text current-bet">ТЕКУЩАЯ СТАВКА: <span id="betAmount">0</span></div>
             <div class="info-text last-number">ПОСЛЕДНЕЕ ЧИСЛО: <span id="lastNum">–</span></div>
-            <div class="info-text message">ВЫБЕРИТЕ РАЗМЕР СТАВКИ И КЛИКНИТЕ НА ЯЧЕЙКУ</div>
+            <div class="info-text message" id="message">ВЫБЕРИТЕ РАЗМЕР СТАВКИ И КЛИКНИТЕ НА ЯЧЕЙКУ</div>
+            <div class="control-buttons">
+                <div class="control-btn clear-btn" id="clearBtn">ОЧИСТИТЬ</div>
+                <div class="control-btn spin-btn" id="spinBtn">КРУТИТЬ</div>
+            </div>
         </div>
     </div>
 
     <script>
+        // Игровые переменные
+        let balance = 1000;
+        let currentBetSize = 1;
+        let bets = {};
+        let lastNumbers = [];
+        let isSpinning = false;
+        let resultNumber = null;
+        
+        // Цвета чисел
+        const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+        const colors = {};
+        for (let i = 0; i <= 36; i++) {
+            colors[i] = i === 0 ? 'green' : redNumbers.includes(i) ? 'red' : 'black';
+        }
+        
+        // Коэффициенты выигрыша
+        const betMultipliers = {
+            straight: 35,    // Ставка на число
+            split: 17,       // 2 числа
+            street: 11,      // 3 числа
+            corner: 8,       // 4 числа
+            line: 5,         // 6 чисел
+            dozen: 2,        // дюжина
+            column: 2,       // колонка
+            even: 1,         // четные
+            odd: 1,          // нечетные
+            red: 1,          // красные
+            black: 1,        // черные
+            low: 1,          // 1-18
+            high: 1          // 19-36
+        };
+
         // Звездное поле
         const starfield = document.getElementById('starfield');
         const starCtx = starfield.getContext('2d');
@@ -415,7 +498,6 @@
                     starCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                     starCtx.fill();
                     
-                    // Мерцание
                     star.brightness = 0.3 + Math.abs(Math.sin(Date.now() / 1000 + star.x * 0.01)) * 0.7;
                 });
                 
@@ -438,8 +520,6 @@
                 const numberDiv = document.createElement('div');
                 numberDiv.className = 'wheel-number';
                 
-                // Цвет числа
-                const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
                 if (num === 0) {
                     numberDiv.style.background = '#003300';
                     numberDiv.style.color = '#33ff66';
@@ -452,144 +532,393 @@
                 }
                 
                 numberDiv.textContent = num;
+                numberDiv.dataset.number = num;
                 
-                // Расположение по кругу
                 const angle = (index / 37) * 360;
-                const radius = 70;
+                const radius = 75;
                 const x = 90 + Math.cos(angle * Math.PI / 180) * radius;
                 const y = 90 + Math.sin(angle * Math.PI / 180) * radius;
                 
-                numberDiv.style.left = (x - 15) + 'px';
-                numberDiv.style.top = (y - 15) + 'px';
+                numberDiv.style.left = (x - 9) + 'px'; // 18/2 = 9
+                numberDiv.style.top = (y - 9) + 'px'; // 18/2 = 9
                 
                 wheelNumbers.appendChild(numberDiv);
             });
         }
         
-        // Статистика (30 случайных чисел)
-        function createStats() {
+        // Статистика
+        function updateStats() {
             const statsNumbers = document.getElementById('statsNumbers');
-            const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+            statsNumbers.innerHTML = '';
             
-            for (let i = 0; i < 15; i++) {
-                const num = Math.floor(Math.random() * 37);
+            lastNumbers.slice(-15).forEach(num => {
                 const statDiv = document.createElement('div');
-                statDiv.className = 'stat-number';
+                statDiv.className = `stat-number ${colors[num]}`;
                 statDiv.textContent = num;
-                
-                if (num === 0) {
-                    statDiv.style.color = '#33ff66';
-                } else if (redNumbers.includes(num)) {
-                    statDiv.style.color = '#ff6666';
-                } else {
-                    statDiv.style.color = '#00aaff';
-                }
-                
                 statsNumbers.appendChild(statDiv);
-            }
+            });
         }
         
         // Создаем таблицу рулетки
         function createRouletteTable() {
             const table = document.getElementById('rouletteTable');
             
-            // Ноль (зеленый)
-            const zeroCell = createTableCell('0', 'cell zero green');
+            // Ноль
+            const zeroCell = createTableCell('0', 'cell zero green', '0');
             zeroCell.style.gridColumn = '1';
             zeroCell.style.gridRow = '2 / 8';
             table.appendChild(zeroCell);
             
-            // Основные числа (3 ряда по 12)
+            // Основные числа
             const numbers = [
                 [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36],
                 [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35],
                 [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]
             ];
             
-            const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-            
             for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 12; col++) {
                     const num = numbers[row][col];
                     const colorClass = redNumbers.includes(num) ? 'red' : 'black';
-                    const cell = createTableCell(num, `cell ${colorClass}`);
+                    const cell = createTableCell(num, `cell ${colorClass}`, `num_${num}`);
                     cell.style.gridColumn = col + 2;
                     cell.style.gridRow = row + 2;
+                    cell.dataset.number = num;
+                    cell.dataset.type = 'straight';
                     table.appendChild(cell);
                 }
             }
             
-            // Дюжины сверху
-            const dozens = ['1-12', '13-24', '25-36'];
-            for (let i = 0; i < 3; i++) {
-                const cell = createTableCell(dozens[i], 'cell dozen');
-                cell.style.gridColumn = `${2 + i*4} / span 4`;
-                cell.style.gridRow = '1';
-                table.appendChild(cell);
-            }
-            
-            // Колонки справа
-            for (let i = 0; i < 3; i++) {
-                const cell = createTableCell('2:1', 'cell column');
-                cell.style.gridColumn = '14';
-                cell.style.gridRow = `${2 + i*2} / span 2`;
-                table.appendChild(cell);
-            }
-            
-            // Внешние ставки внизу
-            const outsideBets = [
-                {text: '1-18', col: 2, span: 2},
-                {text: 'ЧЕТ', col: 4, span: 2},
-                {text: 'КРАС', col: 6, span: 2},
-                {text: 'ЧЕРН', col: 8, span: 2},
-                {text: 'НЕЧЕТ', col: 10, span: 2},
-                {text: '19-36', col: 12, span: 2}
+            // Дюжины
+            const dozens = [
+                {text: '1-12', id: 'doz_1', start: 1, end: 12},
+                {text: '13-24', id: 'doz_2', start: 13, end: 24},
+                {text: '25-36', id: 'doz_3', start: 25, end: 36}
             ];
             
-            outsideBets.forEach(bet => {
-                const cell = createTableCell(bet.text, 'cell outside');
-                cell.style.gridColumn = `${bet.col} / span ${bet.span}`;
+            for (let i = 0; i < 3; i++) {
+                const cell = createTableCell(dozens[i].text, 'cell dozen', dozens[i].id);
+                cell.style.gridColumn = `${2 + i*4} / span 4`;
+                cell.style.gridRow = '1';
+                cell.dataset.type = 'dozen';
+                cell.dataset.range = `${dozens[i].start}-${dozens[i].end}`;
+                table.appendChild(cell);
+            }
+            
+            // Колонки
+            for (let i = 0; i < 3; i++) {
+                const cell = createTableCell('2:1', 'cell column', `col_${i+1}`);
+                cell.style.gridColumn = '14';
+                cell.style.gridRow = `${2 + i*2} / span 2`;
+                cell.dataset.type = 'column';
+                cell.dataset.index = i;
+                table.appendChild(cell);
+            }
+            
+            // Внешние ставки
+            const outsideBets = [
+                {text: '1-18', id: 'low', type: 'low'},
+                {text: 'ЧЕТ', id: 'even', type: 'even'},
+                {text: 'КРАС', id: 'red', type: 'red'},
+                {text: 'ЧЕРН', id: 'black', type: 'black'},
+                {text: 'НЕЧЕТ', id: 'odd', type: 'odd'},
+                {text: '19-36', id: 'high', type: 'high'}
+            ];
+            
+            outsideBets.forEach((bet, index) => {
+                const cell = createTableCell(bet.text, 'cell outside', bet.id);
+                cell.style.gridColumn = `${2 + index*2} / span 2`;
                 cell.style.gridRow = '7';
+                cell.dataset.type = bet.type;
                 table.appendChild(cell);
             });
-            
-            // Добавляем несколько фишек для демо
-            addDemoChips();
         }
         
-        function createTableCell(text, className) {
+        function createTableCell(text, className, id) {
             const cell = document.createElement('div');
             cell.className = `table-cell ${className}`;
             cell.textContent = text;
+            cell.dataset.id = id;
+            
+            cell.addEventListener('click', () => {
+                if (isSpinning) {
+                    showMessage('Дождитесь окончания вращения!');
+                    return;
+                }
+                placeBet(id);
+            });
+            
             return cell;
         }
         
-        function addDemoChips() {
-            const table = document.getElementById('rouletteTable');
+        // Размещение ставки
+        function placeBet(cellId) {
+            if (balance < currentBetSize) {
+                showMessage('Недостаточно средств!');
+                return;
+            }
             
-            // Фишка на 17
-            const chip1 = document.createElement('div');
-            chip1.className = 'chip';
-            chip1.textContent = '10';
-            chip1.style.left = 'calc(50% - 11px)';
-            chip1.style.top = 'calc(50% - 11px)';
-            table.appendChild(chip1);
+            if (!bets[cellId]) {
+                bets[cellId] = 0;
+            }
             
-            // Фишка на красное
-            const chip2 = document.createElement('div');
-            chip2.className = 'chip';
-            chip2.textContent = '25';
-            chip2.style.left = '70%';
-            chip2.style.top = '85%';
-            table.appendChild(chip2);
+            bets[cellId] += currentBetSize;
+            balance -= currentBetSize;
+            
+            updateBalance();
+            updateBetsDisplay();
+            showMessage(`Ставка ${currentBetSize} на ${getBetName(cellId)}`);
+        }
+        
+        function getBetName(cellId) {
+            if (cellId === '0') return 'Ноль';
+            if (cellId.startsWith('num_')) {
+                return `Число ${cellId.split('_')[1]}`;
+            }
+            if (cellId === 'low') return '1-18';
+            if (cellId === 'high') return '19-36';
+            if (cellId === 'even') return 'Четные';
+            if (cellId === 'odd') return 'Нечетные';
+            if (cellId === 'red') return 'Красные';
+            if (cellId === 'black') return 'Черные';
+            if (cellId.startsWith('doz_')) {
+                const num = cellId.split('_')[1];
+                const ranges = ['1-12', '13-24', '25-36'];
+                return `Дюжина ${ranges[num-1]}`;
+            }
+            if (cellId.startsWith('col_')) {
+                const num = cellId.split('_')[1];
+                return `Колонка ${num}`;
+            }
+            return cellId;
+        }
+        
+        // Отображение фишек
+        function updateBetsDisplay() {
+            document.querySelectorAll('.chip').forEach(chip => chip.remove());
+            
+            let totalBet = 0;
+            
+            for (const [cellId, amount] of Object.entries(bets)) {
+                if (amount > 0) {
+                    totalBet += amount;
+                    const cell = document.querySelector(`[data-id="${cellId}"]`);
+                    if (cell) {
+                        const chip = document.createElement('div');
+                        chip.className = 'chip';
+                        chip.textContent = amount;
+                        chip.style.top = '50%';
+                        chip.style.left = '50%';
+                        chip.style.transform = 'translate(-50%, -50%)';
+                        cell.appendChild(chip);
+                    }
+                }
+            }
+            
+            document.getElementById('betAmount').textContent = totalBet;
+        }
+        
+        // Обновление баланса
+        function updateBalance() {
+            document.getElementById('balanceAmount').textContent = balance;
+        }
+        
+        // Показ сообщения
+        function showMessage(text) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+        }
+        
+        // Вращение рулетки
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            const totalBet = Object.values(bets).reduce((sum, val) => sum + val, 0);
+            if (totalBet === 0) {
+                showMessage('Сделайте ставку перед вращением!');
+                return;
+            }
+            
+            isSpinning = true;
+            showMessage('Вращение...');
+            
+            // Анимация вращения барабана
+            const wheelNumbers = document.getElementById('wheelNumbers');
+            wheelNumbers.style.animation = 'wheelSpin 3s ease-out';
+            
+            // Случайный результат
+            setTimeout(() => {
+                resultNumber = Math.floor(Math.random() * 37);
+                finishSpin();
+            }, 3000);
+        }
+        
+        // Завершение вращения
+        function finishSpin() {
+            isSpinning = false;
+            
+            // Останавливаем анимацию
+            const wheelNumbers = document.getElementById('wheelNumbers');
+            wheelNumbers.style.animation = '';
+            
+            // Добавляем число в статистику
+            lastNumbers.push(resultNumber);
+            if (lastNumbers.length > 30) lastNumbers.shift();
+            updateStats();
+            
+            // Показываем результат
+            document.getElementById('lastNum').textContent = resultNumber;
+            document.getElementById('lastNum').className = colors[resultNumber];
+            
+            // Расчет выигрыша
+            const winAmount = calculateWin(resultNumber);
+            
+            if (winAmount > 0) {
+                balance += winAmount;
+                const balancePanel = document.getElementById('balancePanel');
+                balancePanel.classList.add('win');
+                setTimeout(() => balancePanel.classList.remove('win'), 1000);
+                showMessage(`Выигрыш! +${winAmount}`);
+            } else {
+                showMessage(`Выпало ${resultNumber} - Вы проиграли`);
+            }
+            
+            updateBalance();
+            
+            // Показываем Вейдера на выпавшем числе
+            placeVader(resultNumber);
+            
+            // Очищаем ставки
+            bets = {};
+            updateBetsDisplay();
+        }
+        
+        // Расчет выигрыша
+        function calculateWin(number) {
+            let totalWin = 0;
+            
+            for (const [cellId, amount] of Object.entries(bets)) {
+                if (isWinningBet(cellId, number)) {
+                    const multiplier = getMultiplier(cellId);
+                    totalWin += amount * multiplier;
+                }
+            }
+            
+            return totalWin;
+        }
+        
+        function isWinningBet(cellId, number) {
+            if (cellId === '0') return number === 0;
+            
+            if (cellId.startsWith('num_')) {
+                const betNumber = parseInt(cellId.split('_')[1]);
+                return betNumber === number;
+            }
+            
+            if (cellId === 'low') return number >= 1 && number <= 18;
+            if (cellId === 'high') return number >= 19 && number <= 36;
+            if (cellId === 'even') return number !== 0 && number % 2 === 0;
+            if (cellId === 'odd') return number !== 0 && number % 2 === 1;
+            if (cellId === 'red') return redNumbers.includes(number);
+            if (cellId === 'black') return number !== 0 && !redNumbers.includes(number);
+            
+            if (cellId.startsWith('doz_')) {
+                const dozenNum = parseInt(cellId.split('_')[1]);
+                if (dozenNum === 1) return number >= 1 && number <= 12;
+                if (dozenNum === 2) return number >= 13 && number <= 24;
+                if (dozenNum === 3) return number >= 25 && number <= 36;
+            }
+            
+            if (cellId.startsWith('col_')) {
+                const colNum = parseInt(cellId.split('_')[1]);
+                const col1 = [3,6,9,12,15,18,21,24,27,30,33,36];
+                const col2 = [2,5,8,11,14,17,20,23,26,29,32,35];
+                const col3 = [1,4,7,10,13,16,19,22,25,28,31,34];
+                
+                if (colNum === 1) return col1.includes(number);
+                if (colNum === 2) return col2.includes(number);
+                if (colNum === 3) return col3.includes(number);
+            }
+            
+            return false;
+        }
+        
+        function getMultiplier(cellId) {
+            if (cellId === '0' || cellId.startsWith('num_')) return betMultipliers.straight;
+            if (cellId.startsWith('doz_') || cellId.startsWith('col_')) return betMultipliers.dozen;
+            return 1; // Для чет/нечет, красное/черное и т.д.
+        }
+        
+        // Размещение Вейдера
+        function placeVader(number) {
+            const vader = document.getElementById('vader');
+            
+            if (number === null) {
+                vader.style.display = 'none';
+                return;
+            }
+            
+            // Находим ячейку с этим числом
+            let targetCell;
+            if (number === 0) {
+                targetCell = document.querySelector('[data-id="0"]');
+            } else {
+                targetCell = document.querySelector(`[data-id="num_${number}"]`);
+            }
+            
+            if (targetCell) {
+                const rect = targetCell.getBoundingClientRect();
+                const tableRect = document.getElementById('rouletteTable').getBoundingClientRect();
+                
+                vader.style.left = (rect.left - tableRect.left + rect.width/2 - 12.5) + 'px';
+                vader.style.top = (rect.top - tableRect.top + rect.height/2 - 17.5) + 'px';
+                vader.style.display = 'block';
+            }
+        }
+        
+        // Очистка ставок
+        function clearBets() {
+            if (isSpinning) {
+                showMessage('Дождитесь окончания вращения!');
+                return;
+            }
+            
+            // Возвращаем деньги
+            const totalBet = Object.values(bets).reduce((sum, val) => sum + val, 0);
+            balance += totalBet;
+            
+            bets = {};
+            updateBetsDisplay();
+            updateBalance();
+            showMessage('Ставки очищены');
         }
         
         // Инициализация
         function init() {
             initStars();
             createWheelNumbers();
-            createStats();
             createRouletteTable();
+            updateStats();
+            updateBalance();
+            
+            // Кнопки размера ставки
+            document.querySelectorAll('.bet-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.bet-button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentBetSize = parseInt(btn.dataset.bet);
+                    showMessage(`Размер ставки: ${currentBetSize}`);
+                });
+            });
+            
+            // Кнопка вращения
+            document.getElementById('spinBtn').addEventListener('click', spinWheel);
+            
+            // Кнопка очистки
+            document.getElementById('clearBtn').addEventListener('click', clearBets);
+            
+            // Клик на барабан
+            document.querySelector('.wheel').addEventListener('click', spinWheel);
             
             window.addEventListener('resize', initStars);
         }
