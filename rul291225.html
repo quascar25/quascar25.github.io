@@ -1027,41 +1027,44 @@
         }
 
 
-// Размещение Вейдера на таблице
-function placeVaderOnTable(number) {
-    const vader = document.getElementById('vader');
-    
-    if (number === null) {
-        hideVader();
-        return;
-    }
-    
-    // Находим ячейку с этим числом
-    let targetCell;
-    if (number === 0) {
-        targetCell = document.querySelector('[data-id="0"]');
-    } else {
-        targetCell = document.querySelector(`[data-id="num_${number}"]`);
-    }
-    
-    if (targetCell) {
-        const rect = targetCell.getBoundingClientRect();
-        const tableRect = document.getElementById('rouletteTable').getBoundingClientRect();
-        
-        // Позиционируем Вейдера точно по центру ячейки
-        vader.style.left = (rect.left - tableRect.left + rect.width / 2) + 'px';
-        vader.style.top = (rect.top - tableRect.top + rect.height / 2) + 'px';
-        vader.style.display = 'block';
-        vaderVisible = true;
-    }
-}
+        // Размещение Вейдера на таблице
+        function placeVaderOnTable(number) {
+            const pyramid = document.getElementById('vader');
+            pyramid.style.display = 'none';
+            
+            if (number === null) return;
+            
+            let targetCell = document.querySelector(
+                number === 0 ? '[data-id="0"]' : `[data-id="num_${number}"]`
+            );
+            
+            if (!targetCell) return;
+            
+            // САМЫЙ ПРОСТОЙ СПОСОБ - позиционируем пирамидку прямо внутри ячейки
+            // Очищаем ячейку от фишек и добавляем пирамидку
+            targetCell.innerHTML = '';
+            
+            // Меняем класс пирамидки для нового позиционирования
+            pyramid.className = 'pyramid-in-cell';
+            pyramid.style.position = 'relative';
+            pyramid.style.left = '0';
+            pyramid.style.top = '0';
+            pyramid.style.transform = 'translate(0, 0)';
+            pyramid.style.display = 'block';
+            
+            // Помещаем пирамидку прямо в ячейку
+            targetCell.appendChild(pyramid);
+            vaderVisible = true;
+            
+            console.log('Пирамидка помещена внутрь ячейки с числом', number);
+        }
 
-// Скрытие Вейдера
-function hideVader() {
-    const vader = document.getElementById('vader');
-    vader.style.display = 'none';
-    vaderVisible = false;
-}
+            // Скрытие Вейдера
+            function hideVader() {
+                const vader = document.getElementById('vader');
+                vader.style.display = 'none';
+                vaderVisible = false;
+            }
 
 
         
