@@ -466,16 +466,7 @@
         
 
 
-// Размер пирамидки (берем из CSS - 15px высота, 16px ширина)
-const PYRAMID_HEIGHT = 15;  // border-bottom: 15px
-const PYRAMID_WIDTH = 16;   // border-left + border-right: 8px + 8px
-
-// Сдвиг на полкорпуса вправо и вниз
-const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2) - (targetCell.offsetWidth / 4) + (PYRAMID_WIDTH / 2);
-const top = targetCell.offsetTop + (targetCell.offsetHeight / 2) - (targetCell.offsetHeight / 3) + (PYRAMID_HEIGHT / 2);
-
-
-        // Цвета чисел
+       // Цвета чисел
         
         const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
         const colors = {};
@@ -937,9 +928,7 @@ const top = targetCell.offsetTop + (targetCell.offsetHeight / 2) - (targetCell.o
                 // const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2);
                 // const top = targetCell.offsetTop + (targetCell.offsetHeight / 2);
                 
-                // ИСПРАВЛЕННЫЕ КООРДИНАТЫ (сдвиг на 1/4 влево и 1/3 вверх):
-                const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2) - (targetCell.offsetWidth / 4);
-                const top = targetCell.offsetTop + (targetCell.offsetHeight / 2) - (targetCell.offsetHeight / 3);
+
                 
                 console.log('Координаты:', left, 'px,', top, 'px');
                 console.log('Размеры ячейки:', targetCell.offsetWidth, 'x', targetCell.offsetHeight);
