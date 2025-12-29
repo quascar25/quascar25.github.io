@@ -283,16 +283,16 @@
         /* НОВЫЕ стили для пирамидки */
         .pyramid {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 15px;    /* Было 30px */
+            height: 15px;   /* Было 30px */
             background: #FF0000;
             border-radius: 50%;
-            border: 3px solid #FFFF00;
-            box-shadow: 0 0 15px #FF0000;
+            border: 2px solid #FFFF00; /* Уменьшил с 3px */
+            box-shadow: 0 0 8px #FF0000; /* Уменьшил свечение */
             z-index: 9999;
             display: none;
             pointer-events: none;
-            transform: translate(-50%, -50%); /* Центрируем по середине */
+            transform: translate(-50%, -50%);
         }
         
         .pyramid::before {
@@ -307,16 +307,16 @@
             animation: pyramidGlow 1s infinite alternate;
         }
 
-        .pyramid-in-cell {
-            width: 30px;
-            height: 30px;
-            background: #FF0000;
-            border-radius: 50%;
-            border: 3px solid #FFFF00;
-            box-shadow: 0 0 15px #FF0000;
-            display: block;
-            margin: 0 auto; /* Центрируем внутри ячейки */
-        }
+            .pyramid-in-cell {
+                width: 15px;    /* Было 30px */
+                height: 15px;   /* Было 30px */
+                background: #FF0000;
+                border-radius: 50%;
+                border: 2px solid #FFFF00; /* Уменьшил с 3px */
+                box-shadow: 0 0 8px #FF0000; /* Уменьшил свечение */
+                display: block;
+                margin: 0 auto;
+            }
         
         @keyframes pyramidGlow {
             0% { opacity: 0.8; filter: drop-shadow(0 0 5px #FFD700); }
