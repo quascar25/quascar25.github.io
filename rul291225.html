@@ -281,31 +281,15 @@
         }
 
         /* НОВЫЕ стили для пирамидки */
-        .pyramid {
-            position: absolute;
-            width: 15px;    /* Было 30px */
-            height: 15px;   /* Было 30px */
-            background: #FF0000;
-            border-radius: 50%;
-            border: 2px solid #FFFF00; /* Уменьшил с 3px */
-            box-shadow: 0 0 8px #FF0000; /* Уменьшил свечение */
-            z-index: 9999;
-            display: none;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
-        
-        .pyramid::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 11px solid transparent;
-            border-right: 11px solid transparent;
-            border-bottom: 22px solid #FFD700; /* Желтый цвет */
-            filter: drop-shadow(0 0 8px #FFD700);
-            animation: pyramidGlow 1s infinite alternate;
-        }
+            .pyramid {
+                position: absolute;
+                width: 0;       ← ИЗМЕНИТЬ с 15px на 0
+                height: 0;      ← ИЗМЕНИТЬ с 15px на 0
+                z-index: 9999;
+                display: none;
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+            }
 
             .pyramid-in-cell {
                 width: 15px;    /* Было 30px */
