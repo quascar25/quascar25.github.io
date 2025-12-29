@@ -25,12 +25,11 @@
             z-index: -1;
         }
 
-        /* Добавьте или убедитесь, что эти стили есть */
+        /* Временно добавить в CSS для отладки */
         #rouletteTable {
-            position: relative !important; /* Ключевое свойство */
+            box-shadow: 0 0 0 3px #ff00ff !important; /* Яркая розовая рамка */
         }
 
-        
         .container {
             width: 100%;
             max-width: 400px;
@@ -1028,48 +1027,43 @@
 
 
         // Размещение Вейдера на таблице
-      function placeVaderOnTable(number) {
-    const pyramid = document.getElementById('vader');
-    
-    if (number === null) {
-        pyramid.style.display = 'none';
-        return;
-    }
-    
-    // Находим ячейку с этим числом
-    let targetCell;
-    if (number === 0) {
-        targetCell = document.querySelector('[data-id="0"]');
-    } else {
-        targetCell = document.querySelector(`[data-id="num_${number}"]`);
-    }
-    
-    if (targetCell) {
-        // Самый простой способ: используем относительное позиционирование
-        const cellRect = targetCell.getBoundingClientRect();
-        const table = document.getElementById('rouletteTable');
-        
-        // Процентные координаты внутри таблицы
-        const leftPercent = (cellRect.left / window.innerWidth) * 100;
-        const topPercent = (cellRect.top / window.innerHeight) * 100;
-        
-        // Или фиксированные координаты от угла таблицы
-        const tableStyle = window.getComputedStyle(table);
-        const tablePaddingLeft = parseInt(tableStyle.paddingLeft) || 0;
-        const tablePaddingTop = parseInt(tableStyle.paddingTop) || 0;
-        
-        const left = targetCell.offsetLeft - tablePaddingLeft + (targetCell.offsetWidth / 2);
-        const top = targetCell.offsetTop - tablePaddingTop + (targetCell.offsetHeight / 2);
-        
-        console.log('Способ 2 - offset:', {left: left, top: top});
-        
-        pyramid.style.left = left + 'px';
-        pyramid.style.top = top + 'px';
-        pyramid.style.display = 'block';
-        vaderVisible = true;
-    }
-}
-
+            function placeVaderOnTable(number) {
+                const pyramid = document.getElementById('vader');
+                
+                if (number === null) {
+                    pyramid.style.display = 'none';
+                    return;
+                }
+                
+                // Находим ячейку с этим числом
+                let targetCell;
+                if (number === 0) {
+                    targetCell = document.querySelector('[data-id="0"]');
+                } else {
+                    targetCell = document.querySelector(`[data-id="num_${number}"]`);
+                }
+                
+                if (targetCell) {
+                    // Получаем позицию ячейки ОТНОСИТЕЛЬНО таблицы
+                    const cellRect = targetCell.getBoundingClientRect();
+                    const table = document.getElementById('rouletteTable');
+                    const tableRect = table.getBoundingClientRect();
+                    
+                    // Ключевое исправление:
+                    // left = позиция_ячейки_относительно_окна - позиция_таблицы_относительно_окна
+                    const left = (cellRect.left - tableRect.left) + (cellRect.width / 2);
+                    const top = (cellRect.top - tableRect.top) + (cellRect.height / 2);
+                    
+                    console.log('Номер:', number, 'Left:', left, 'Top:', top);
+                    console.log('cellRect:', {left: cellRect.left, top: cellRect.top});
+                    console.log('tableRect:', {left: tableRect.left, top: tableRect.top});
+                    
+                    pyramid.style.left = left + 'px';
+                    pyramid.style.top = top + 'px';
+                    pyramid.style.display = 'block';
+                    vaderVisible = true;
+                }
+            }
 
             // Скрытие Вейдера
             function hideVader() {
