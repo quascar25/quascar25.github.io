@@ -273,55 +273,36 @@
             box-shadow: 0 0 8px #00aaff;
             z-index: 2;
         }
-        /* Дарт Вейдер */
-        .vader {
+
+        /* НОВЫЕ стили для пирамидки */
+        .pyramid {
             position: absolute;
-            width: 25px;
-            height: 35px;
+            width: 22px;    /* Размер как у фишки */
+            height: 22px;
             z-index: 15;
             display: none;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.9));
         }
-        .vader-head {
+        
+        .pyramid::before {
+            content: '';
             position: absolute;
-            width: 25px;
-            height: 15px;
-            background: #000;
-            clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
-            top: -10px;
-            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 11px solid transparent;
+            border-right: 11px solid transparent;
+            border-bottom: 22px solid #FFD700; /* Желтый цвет */
+            filter: drop-shadow(0 0 8px #FFD700);
+            animation: pyramidGlow 1s infinite alternate;
         }
-        .vader-body {
-            position: absolute;
-            width: 20px;
-            height: 25px;
-            background: #000;
-            clip-path: polygon(20% 0, 80% 0, 100% 20%, 100% 100%, 0 100%, 0 20%);
-            top: 5px;
-            left: 2.5px;
+        
+        @keyframes pyramidGlow {
+            0% { opacity: 0.8; filter: drop-shadow(0 0 5px #FFD700); }
+            100% { opacity: 1; filter: drop-shadow(0 0 12px #FFD700); }
         }
-        .vader-eyes {
-            position: absolute;
-            width: 100%;
-            height: 6px;
-            top: 4px;
-            display: flex;
-            justify-content: space-around;
-        }
-        .eye {
-            width: 4px;
-            height: 4px;
-            background: #ff0033;
-            border-radius: 50%;
-            animation: eyeGlow 0.5s infinite alternate;
-            box-shadow: 0 0 12px red, 0 0 24px red;
-        }
-        @keyframes eyeGlow {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
-        }
+
+
         /* Инфо панель */
         .info-panel {
             background: rgba(0, 20, 40, 0.85);
@@ -423,15 +404,18 @@
             <!-- Таблица будет сгенерирована -->
         </div>
         
-        <!-- Дарт Вейдер -->
-        <div class="vader" id="vader">
+        <!-- Старая версия (замените на новую) -->
+        <!-- <div class="vader" id="vader">
             <div class="vader-head"></div>
             <div class="vader-body"></div>
             <div class="vader-eyes">
                 <div class="eye"></div>
                 <div class="eye"></div>
             </div>
-        </div>
+        </div> -->
+        
+        <!-- Новая версия - пирамидка -->
+        <div class="pyramid" id="vader"></div>
         
         <!-- Инфо панель -->
         <div class="info-panel">
@@ -806,8 +790,9 @@
             
             updateBalance();
             
-            // ВАЖНО: Показываем Вейдера на выпавшем числе на таблице
+            // ВАЖНО: Показываем пирамидку на выпавшем числе на таблице
             placeVaderOnTable(resultNumber);
+            
             
             // Очищаем ставки
             bets = {};
@@ -882,11 +867,12 @@
         }
         
         // ВАЖНО: Функция размещения Вейдера на таблице
-        function placeVaderOnTable(number) {
-            const vader = document.getElementById('vader');
+            function placeVaderOnTable(number) {
+            const pyramid = document.getElementById('vader'); // Теперь это пирамидка
+            pyramid.className = 'pyramid'; // Убедимся, что правильный класс
             
             if (number === null) {
-                hideVader();
+                pyramid.style.display = 'none';
                 return;
             }
             
@@ -902,25 +888,20 @@
                 const rect = targetCell.getBoundingClientRect();
                 const tableRect = document.getElementById('rouletteTable').getBoundingClientRect();
                 
-                // Позиционируем Вейдера точно по центру ячейки
-                const x = rect.left - tableRect.left + rect.width / 2;
-                const y = rect.top - tableRect.top + rect.height / 2;
+                // Простое позиционирование - центр ячейки
+                pyramid.style.left = (rect.left - tableRect.left + rect.width/2) + 'px';
+                pyramid.style.top = (rect.top - tableRect.top + rect.height/2) + 'px';
+                pyramid.style.display = 'block';
+                vaderVisible = true; // Переменная уже должна быть объявлена
                 
-                vader.style.left = x + 'px';
-                vader.style.top = y + 'px';
-                vader.style.display = 'block';
-                vaderVisible = true;
-                
-                console.log('Vader placed at:', x, y, 'for number:', number);
-            } else {
-                console.log('Cell not found for number:', number);
+                console.log('Пирамидка на числе:', number, 'Координаты:', pyramid.style.left, pyramid.style.top);
             }
         }
         
         // Скрытие Вейдера
         function hideVader() {
-            const vader = document.getElementById('vader');
-            vader.style.display = 'none';
+            const pyramid = document.getElementById('vader');
+            pyramid.style.display = 'none';
             vaderVisible = false;
         }
         
