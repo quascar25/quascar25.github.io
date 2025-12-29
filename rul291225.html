@@ -142,13 +142,39 @@
             box-shadow: 0 0 15px #00f7ff;
             color: white;
         }
+        .multiplier-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 3px 0;
+        }
+        .mult-btn {
+            width: 35px;
+            height: 30px;
+            background: linear-gradient(135deg, #002200, #005500);
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-size: 0.7em;
+            font-weight: bold;
+            cursor: pointer;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .mult-btn.active {
+            background: linear-gradient(135deg, #008800, #00cc00);
+            box-shadow: 0 0 10px #0f0;
+            color: white;
+        }
         .roulette-table {
             background: rgba(0, 20, 40, 0.9);
             border: 2px solid #0af;
             padding: 5px;
             flex-grow: 1;
             display: grid;
-            grid-template-columns: repeat(14, 1fr);
+            grid-template-columns: repeat(13, 1fr);
             grid-template-rows: repeat(7, 1fr);
             gap: 3px;
             position: relative;
@@ -163,11 +189,12 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.8em;
+            font-size: 0.7em;
             cursor: pointer;
             position: relative;
             transition: all 0.2s;
             text-align: center;
+            padding: 2px;
         }
         .number-cell {
             color: white;
@@ -175,7 +202,7 @@
         }
         .outside-bet {
             background: rgba(0, 40, 80, 0.7);
-            font-size: 0.7em;
+            font-size: 0.6em;
             padding: 2px;
             clip-path: polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%);
         }
@@ -183,43 +210,43 @@
         .black-bg { background: rgba(0, 0, 40, 0.7); }
         .green-bg { background: rgba(0, 40, 0, 0.7); }
         .zero-cell {
-            grid-column: 1 / 3;
+            grid-column: 1 / 2;
             grid-row: 2 / 8;
-            font-size: 1.2em;
+            font-size: 1em;
             background: rgba(0, 60, 0, 0.8);
         }
         .dozen { grid-row: 1; }
-        .column { grid-row: span 6; }
+        .column { grid-row: 2 / 8; }
         .even-odd, .red-black, .half {
             grid-row: 7;
-            font-size: 0.65em;
+            font-size: 0.55em;
             padding: 1px;
         }
         .chip {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: radial-gradient(circle at 30% 30%, #00aaff, #0055aa);
             border: 2px solid #00f7ff;
             border-radius: 50%;
             color: white;
-            font-size: 0.6em;
+            font-size: 0.5em;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 6px #00aaff;
+            box-shadow: 0 0 5px #00aaff;
             z-index: 5;
         }
         .multiplier-badge {
             position: absolute;
-            bottom: 1px;
-            right: 1px;
-            font-size: 0.5em;
+            bottom: 0;
+            right: 0;
+            font-size: 0.4em;
             color: #ff0;
             background: rgba(0,0,0,0.5);
-            padding: 1px 3px;
-            border-radius: 2px;
+            padding: 1px 2px;
+            border-radius: 1px;
         }
         #vader {
             position: absolute;
@@ -321,6 +348,11 @@
             border-color: #0af;
             color: #0af;
         }
+        .action-btn.spin {
+            background: rgba(80, 0, 80, 0.7);
+            border-color: #f0f;
+            color: #f0f;
+        }
         @keyframes flicker {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
@@ -345,25 +377,33 @@
         </div>
         
         <div class="bet-buttons">
-            <div class="bet-btn" data-mult="1">×1</div>
-            <div class="bet-btn" data-mult="5">×5</div>
-            <div class="bet-btn active" data-mult="10">×10</div>
-            <div class="bet-btn" data-mult="25">×25</div>
-            <div class="bet-btn" data-mult="50">×50</div>
-            <div class="bet-btn" data-mult="100">×100</div>
+            <div class="bet-btn" data-bet="1">1</div>
+            <div class="bet-btn" data-bet="5">5</div>
+            <div class="bet-btn active" data-bet="10">10</div>
+            <div class="bet-btn" data-bet="25">25</div>
+            <div class="bet-btn" data-bet="50">50</div>
+            <div class="bet-btn" data-bet="100">100</div>
+        </div>
+        
+        <div class="multiplier-buttons">
+            <div class="mult-btn active" data-mult="1">×1</div>
+            <div class="mult-btn" data-mult="5">×5</div>
+            <div class="mult-btn" data-mult="10">×10</div>
+            <div class="mult-btn" data-mult="25">×25</div>
+            <div class="mult-btn" data-mult="50">×50</div>
         </div>
         
         <div class="roulette-table" id="rouletteTable">
-            <!-- Классическая рулеточная таблица -->
+            <!-- Таблица рулетки будет сгенерирована скриптом -->
         </div>
         
         <div class="info-panel">
-            <div>СТАВКА: <span id="currentBet">0</span> × <span id="multiplier">10</span> = <span id="totalBetAmount">0</span></div>
+            <div>СТАВКА: <span id="currentBet">0</span> × <span id="multiplier">1</span> = <span id="totalBetAmount">0</span></div>
             <div>ПОСЛЕДНЕЕ: <span id="lastNumber">–</span></div>
             <div id="message">КЛИКНИТЕ НА ЯЧЕЙКУ ДЛЯ СТАВКИ</div>
             <div class="control-buttons">
                 <div class="action-btn clear" id="clearBtn">ОЧИСТИТЬ</div>
-                <div class="action-btn" id="spinBtn">КРУТИТЬ</div>
+                <div class="action-btn spin" id="spinBtn">КРУТИТЬ</div>
             </div>
         </div>
     </div>
@@ -394,9 +434,11 @@
         const clearBtn = document.getElementById('clearBtn');
         const spinBtn = document.getElementById('spinBtn');
         const betButtons = document.querySelectorAll('.bet-btn');
+        const multButtons = document.querySelectorAll('.mult-btn');
 
         let balance = 1000;
-        let currentMultiplier = 10;
+        let currentBetAmount = 10; // Размер ставки по умолчанию
+        let currentMultiplier = 1; // Множитель ставки по умолчанию
         let bets = {}; // {cellId: amount}
         let lastNumbers = [];
         let isSpinning = false;
@@ -433,10 +475,11 @@
         function createTable() {
             rouletteTable.innerHTML = '';
             
-            // Ноль
+            // Ноль (зеленая ячейка слева)
             const zeroCell = createCell('0', 'zero-cell green-bg', '0');
-            zeroCell.style.gridColumn = '1 / 3';
+            zeroCell.style.gridColumn = '1';
             zeroCell.style.gridRow = '2 / 8';
+            zeroCell.title = 'Ноль';
             
             // Основные числа (3 строки по 12 чисел)
             const numbers = [
@@ -449,47 +492,48 @@
                 for (let col = 0; col < 12; col++) {
                     const num = numbers[row][col];
                     const cell = createCell(num.toString(), `number-cell ${colors[num]}-bg`, `num_${num}`);
-                    cell.style.gridColumn = col + 3;
+                    cell.style.gridColumn = col + 2; // Смещаем на 2 из-за нуля
                     cell.style.gridRow = row + 2;
+                    cell.title = `Число ${num}`;
                 }
             }
             
-            // Дюжины
+            // Дюжины (над числами)
             const dozens = [
-                {text: '1-12', id: 'doz_1', row: 1, col: 3, span: 4},
-                {text: '13-24', id: 'doz_2', row: 1, col: 7, span: 4},
-                {text: '25-36', id: 'doz_3', row: 1, col: 11, span: 4}
+                {text: '1-12', id: 'doz_1', row: 1, col: 2, span: 4},
+                {text: '13-24', id: 'doz_2', row: 1, col: 6, span: 4},
+                {text: '25-36', id: 'doz_3', row: 1, col: 10, span: 4}
             ];
             
             dozens.forEach(doz => {
                 const cell = createCell(doz.text, 'outside-bet', doz.id);
                 cell.style.gridColumn = `${doz.col} / span ${doz.span}`;
                 cell.style.gridRow = doz.row;
-                cell.title = `Дюжина: ${doz.text}`;
+                cell.title = `Дюжина: ${doz.text} (выигрыш 2:1)`;
             });
             
-            // Колонки
+            // Колонки (справа от чисел)
             const columns = [
-                {text: '2 к 1', id: 'col_1', col: 15, startRow: 2, mult: '2:1'},
-                {text: '2 к 1', id: 'col_2', col: 15, startRow: 4, mult: '2:1'},
-                {text: '2 к 1', id: 'col_3', col: 15, startRow: 6, mult: '2:1'}
+                {text: '2:1', id: 'col_1', col: 14, row: 2, span: 1, height: 6},
+                {text: '2:1', id: 'col_2', col: 14, row: 4, span: 1, height: 6},
+                {text: '2:1', id: 'col_3', col: 14, row: 6, span: 1, height: 6}
             ];
             
             columns.forEach(col => {
                 const cell = createCell(col.text, 'outside-bet column', col.id);
                 cell.style.gridColumn = col.col;
-                cell.style.gridRow = `${col.startRow} / span 2`;
-                cell.title = 'Колонка (ставка 2:1)';
+                cell.style.gridRow = `${col.row} / span ${col.height}`;
+                cell.title = 'Колонка (выигрыш 2:1)';
             });
             
-            // Чет/Нечет, Красное/Черное, 1-18/19-36
+            // Внешние ставки (внизу)
             const outsideBets = [
-                {text: '1-18', id: 'low', col: 3, span: 2, type: 'half'},
-                {text: 'ЧЕТ', id: 'even', col: 5, span: 2, type: 'even-odd'},
-                {text: 'КРАС', id: 'red', col: 7, span: 2, type: 'red-black', class: 'red-bg'},
-                {text: 'ЧЕРН', id: 'black', col: 9, span: 2, type: 'red-black', class: 'black-bg'},
-                {text: 'НЕЧЕТ', id: 'odd', col: 11, span: 2, type: 'even-odd'},
-                {text: '19-36', id: 'high', col: 13, span: 2, type: 'half'}
+                {text: '1-18', id: 'low', col: 2, span: 2, type: 'half'},
+                {text: 'ЧЕТ', id: 'even', col: 4, span: 2, type: 'even-odd'},
+                {text: 'КРАС', id: 'red', col: 6, span: 2, type: 'red-black', class: 'red-bg'},
+                {text: 'ЧЕРН', id: 'black', col: 8, span: 2, type: 'red-black', class: 'black-bg'},
+                {text: 'НЕЧЕТ', id: 'odd', col: 10, span: 2, type: 'even-odd'},
+                {text: '19-36', id: 'high', col: 12, span: 2, type: 'half'}
             ];
             
             outsideBets.forEach(bet => {
@@ -508,6 +552,7 @@
             cell.textContent = text;
             cell.dataset.id = id;
             
+            // Определяем тип ставки и множитель
             if (id.startsWith('num_')) {
                 const num = parseInt(id.split('_')[1]);
                 cell.dataset.number = num;
@@ -538,12 +583,12 @@
         
         function getBetTitle(id) {
             const titles = {
-                'low': 'Малые числа (1-18)',
-                'high': 'Большие числа (19-36)',
-                'even': 'Четные числа',
-                'odd': 'Нечетные числа',
-                'red': 'Красные числа',
-                'black': 'Черные числа'
+                'low': 'Малые числа (1-18), выигрыш 1:1',
+                'high': 'Большие числа (19-36), выигрыш 1:1',
+                'even': 'Четные числа, выигрыш 1:1',
+                'odd': 'Нечетные числа, выигрыш 1:1',
+                'red': 'Красные числа, выигрыш 1:1',
+                'black': 'Черные числа, выигрыш 1:1'
             };
             return titles[id] || '';
         }
@@ -554,7 +599,7 @@
                 return;
             }
             
-            const betCost = currentMultiplier;
+            const betCost = currentBetAmount * currentMultiplier;
             if (balance < betCost) {
                 messageEl.textContent = 'НЕДОСТАТОЧНО СРЕДСТВ';
                 return;
@@ -570,6 +615,7 @@
         }
         
         function getBetName(cellId) {
+            if (cellId === '0') return 'НУЛЬ';
             if (cellId.startsWith('num_')) {
                 return `ЧИСЛО ${cellId.split('_')[1]}`;
             } else if (cellId === 'low') return '1-18';
@@ -580,7 +626,8 @@
             else if (cellId === 'black') return 'ЧЕРНОЕ';
             else if (cellId.startsWith('doz_')) {
                 const dozNum = cellId.split('_')[1];
-                return `ДЮЖИНА ${dozNum}`;
+                const ranges = ['1-12', '13-24', '25-36'];
+                return `ДЮЖИНА ${ranges[dozNum-1]}`;
             } else if (cellId.startsWith('col_')) {
                 const colNum = cellId.split('_')[1];
                 return `КОЛОНКА ${colNum}`;
@@ -610,7 +657,7 @@
                 }
             }
             
-            currentBetEl.textContent = totalBet;
+            currentBetEl.textContent = totalBet / currentMultiplier;
             totalBetAmountEl.textContent = totalBet;
         }
         
@@ -720,7 +767,10 @@
                         const multiplier = parseInt(cell.dataset.multiplier);
                         let isWin = false;
                         
-                        if (betType === 'straight') {
+                        if (cellId === '0') {
+                            // Ставка на ноль
+                            isWin = (number === 0);
+                        } else if (betType === 'straight') {
                             const betNumber = parseInt(cell.dataset.number);
                             isWin = (betNumber === number);
                         } else if (betType === 'dozen') {
@@ -844,14 +894,26 @@
             updateStats();
             updateBalance();
             
-            // Кнопки множителей
+            // Кнопки размера ставки
             betButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     betButtons.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
+                    currentBetAmount = parseInt(btn.dataset.bet);
+                    messageEl.textContent = `РАЗМЕР СТАВКИ: ${currentBetAmount}`;
+                    updateBetsDisplay();
+                });
+            });
+            
+            // Кнопки множителей
+            multButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    multButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
                     currentMultiplier = parseInt(btn.dataset.mult);
                     multiplierEl.textContent = currentMultiplier;
                     messageEl.textContent = `МНОЖИТЕЛЬ СТАВКИ: ×${currentMultiplier}`;
+                    updateBetsDisplay();
                 });
             });
             
@@ -869,6 +931,9 @@
                 updateBalance();
                 messageEl.textContent = 'СТАВКИ ОЧИЩЕНЫ';
             });
+            
+            // Клик на колесо для вращения
+            canvas.addEventListener('click', spinWheel);
             
             window.addEventListener('resize', initStarfield);
         }
