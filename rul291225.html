@@ -280,15 +280,20 @@
             z-index: 2;
         }
 
-        /* НОВЫЕ стили для пирамидки */
+                    /* НОВЫЕ стили для пирамидки */
             .pyramid {
                 position: absolute;
-                width: 0;       ← ИЗМЕНИТЬ с 15px на 0
-                height: 0;      ← ИЗМЕНИТЬ с 15px на 0
+                width: 0;
+                height: 0;
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-bottom: 15px solid #FFD700;
+                filter: drop-shadow(0 0 4px #FFD700);
                 z-index: 9999;
                 display: none;
                 pointer-events: none;
                 transform: translate(-50%, -50%);
+                animation: pyramidGlow 1s infinite alternate; /* Добавлено */
             }
 
             .pyramid-in-cell {
@@ -302,10 +307,19 @@
                 margin: 0 auto;
             }
         
-        @keyframes pyramidGlow {
-            0% { opacity: 0.8; filter: drop-shadow(0 0 5px #FFD700); }
-            100% { opacity: 1; filter: drop-shadow(0 0 12px #FFD700); }
-        }
+
+            @keyframes pyramidGlow {
+                0% { 
+                    opacity: 0.8; 
+                    filter: drop-shadow(0 0 3px #FFD700);
+                    border-bottom-color: #FFD700;
+                }
+                100% { 
+                    opacity: 1; 
+                    filter: drop-shadow(0 0 8px #FFD700);
+                    border-bottom-color: #FFFF00; /* Светлее в пике */
+                }
+            }
 
         
 
