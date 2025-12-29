@@ -25,10 +25,10 @@
             z-index: -1;
         }
 
-/* Добавьте или убедитесь, что эти стили есть */
-#rouletteTable {
-    position: relative !important; /* Ключевое свойство */
-}
+        /* Добавьте или убедитесь, что эти стили есть */
+        #rouletteTable {
+            position: relative !important; /* Ключевое свойство */
+        }
 
         
         .container {
@@ -893,37 +893,53 @@
         }
         
         // ВАЖНО: Функция размещения Вейдера на таблице
-function placeVaderOnTable(number) {
-    const pyramid = document.getElementById('vader');
-    pyramid.style.display = 'none';
-    
-    if (number === null) return;
-    
-    let targetCell = document.querySelector(
-        number === 0 ? '[data-id="0"]' : `[data-id="num_${number}"]`
-    );
-    
-    if (!targetCell) return;
-    
-    // САМЫЙ ПРОСТОЙ СПОСОБ - позиционируем пирамидку прямо внутри ячейки
-    // Очищаем ячейку от фишек и добавляем пирамидку
-    targetCell.innerHTML = '';
-    
-    // Меняем класс пирамидки для нового позиционирования
-    pyramid.className = 'pyramid-in-cell';
-    pyramid.style.position = 'relative';
-    pyramid.style.left = '0';
-    pyramid.style.top = '0';
-    pyramid.style.transform = 'translate(0, 0)';
-    pyramid.style.display = 'block';
-    
-    // Помещаем пирамидку прямо в ячейку
-    targetCell.appendChild(pyramid);
-    vaderVisible = true;
-    
-    console.log('Пирамидка помещена внутрь ячейки с числом', number);
-}
-}
+        function placeVaderOnTable(number) {
+            const pyramid = document.getElementById('vader');
+            
+            if (number === null) {
+                pyramid.style.display = 'none';
+                return;
+            }
+            
+            // Находим ячейку с этим числом
+            let targetCell;
+            if (number === 0) {
+                targetCell = document.querySelector('[data-id="0"]');
+            } else {
+                targetCell = document.querySelector(`[data-id="num_${number}"]`);
+            }
+            
+            if (targetCell && targetCell.parentElement) {
+                // Убедимся, что таблица имеет position: relative
+                const table = document.getElementById('rouletteTable');
+                if (window.getComputedStyle(table).position === 'static') {
+                    table.style.position = 'relative';
+                }
+                
+                // Убедимся, что пирамидка находится внутри таблицы
+                if (!table.contains(pyramid)) {
+                    table.appendChild(pyramid);
+                }
+                
+                // Получаем позицию ячейки относительно таблицы
+                // offsetLeft/Top дают позицию относительно offsetParent (таблицы)
+                const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2);
+                const top = targetCell.offsetTop + (targetCell.offsetHeight / 2);
+                
+                console.log('Номер:', number, 
+                           'offsetLeft:', targetCell.offsetLeft, 
+                           'offsetTop:', targetCell.offsetTop,
+                           'Ширина:', targetCell.offsetWidth,
+                           'Высота:', targetCell.offsetHeight,
+                           'Центр:', left, top);
+                
+                pyramid.style.left = left + 'px';
+                pyramid.style.top = top + 'px';
+                pyramid.style.display = 'block';
+                pyramid.style.position = 'absolute'; // На всякий случай
+                vaderVisible = true;
+            }
+        
         
         // Скрытие Вейдера
         function hideVader() {
