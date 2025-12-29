@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Космическая Рулетка</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            color: #0af;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #starfield {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 30px;
+            padding: 20px;
+            max-width: 1400px;
+            width: 100%;
+            align-items: start;
+        }
+        .left-panel {
+            background: rgba(0, 20, 40, 0.85);
+            border: 3px solid #0af;
+            padding: 25px;
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+            box-shadow: 0 0 25px #0088ff;
+        }
+        .title {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 30px;
+            color: #00f7ff;
+            text-shadow: 0 0 10px #00f7ff;
+            letter-spacing: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .stats {
+            background: rgba(0, 10, 30, 0.9);
+            border: 2px solid #0af;
+            padding: 20px;
+            margin-bottom: 25px;
+            min-height: 380px;
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+        }
+        .stats h3 {
+            color: #00f7ff;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.8em;
+            text-shadow: 0 0 8px #00f7ff;
+        }
+        #statsGrid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+        .stat-number {
+            padding: 12px 5px;
+            background: rgba(0, 30, 60, 0.7);
+            border: 1px solid #0af;
+            color: #fff;
+            font-weight: bold;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+            text-shadow: 0 0 5px white;
+            animation: flicker 3s infinite alternate;
+        }
+        .red { color: #ff3366; }
+        .black { color: #00f7ff; }
+        .green { color: #33ff66; }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .bets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .bet-btn {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #001122, #003355);
+            border: 3px solid #0af;
+            color: #00f7ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            cursor: pointer;
+            clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 10px #00f7ff;
+        }
+        .bet-btn:hover {
+            background: linear-gradient(135deg, #003355, #005588);
+            box-shadow: 0 0 25px #0af;
+        }
+        .bet-btn.active {
+            background: linear-gradient(135deg, #005588, #00aaff);
+            box-shadow: 0 0 30px #00f7ff;
+            color: white;
+        }
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        .wheel-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+        }
+        #wheelCanvas {
+            background: radial-gradient(circle at center, #001122, #000);
+            border-radius: 50%;
+            border: 8px solid #0af;
+            box-shadow: 0 0 50px #0088ff, inset 0 0 50px #001133;
+            cursor: pointer;
+        }
+        #vader {
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px red);
+        }
+        .vader-body {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background: #111;
+            clip-path: polygon(20% 0, 80% 0, 100% 20%, 100% 100%, 0 100%, 0 20%);
+            left: 5px;
+            top: 0;
+        }
+        .vader-head {
+            position: absolute;
+            width: 50px;
+            height: 25px;
+            background: #000;
+            clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+            top: -20px;
+        }
+        .vader-eyes {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            top: 8px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .eye {
+            width: 8px;
+            height: 8px;
+            background: #ff0033;
+            border-radius: 50%;
+            animation: eyeGlow 0.8s infinite alternate;
+            box-shadow: 0 0 15px red;
+        }
+        @keyframes eyeGlow {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .info-panel {
+            background: rgba(0, 20, 40, 0.85);
+            border: 3px solid #0af;
+            padding: 20px;
+            text-align: center;
+            min-width: 300px;
+            clip-path: polygon(10% 0, 90% 0, 100% 30%, 100% 100%, 0 100%, 0 30%);
+        }
+        #currentBet, #lastNumber {
+            font-size: 1.8em;
+            margin: 15px 0;
+            color: #00f7ff;
+            text-shadow: 0 0 10px #00f7ff;
+            min-height: 1.5em;
+        }
+        #message {
+            color: #ff3366;
+            font-size: 1.3em;
+            min-height: 1.5em;
+            text-shadow: 0 0 8px #ff3366;
+            animation: flicker 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+    <div class="container">
+        <div class="left-panel">
+            <h1 class="title">▄︻デ══━一 РУЛЕТКА</h1>
+            <div class="stats">
+                <h3>ПОСЛЕДНИЕ 30 ЧИСЕЛ</h3>
+                <div id="statsGrid"></div>
+            </div>
+            <div class="bets">
+                <div class="bet-btn" data-bet="1">1</div>
+                <div class="bet-btn" data-bet="2">2</div>
+                <div class="bet-btn" data-bet="3">3</div>
+                <div class="bet-btn" data-bet="4">4</div>
+                <div class="bet-btn" data-bet="5">5</div>
+                <div class="bet-btn" data-bet="6">6</div>
+                <div class="bet-btn" data-bet="7">7</div>
+                <div class="bet-btn" data-bet="8">8</div>
+                <div class="bet-btn" data-bet="9">9</div>
+                <div class="bet-btn" data-bet="10">10</div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="wheel-container">
+                <canvas id="wheelCanvas" width="500" height="500"></canvas>
+                <div id="vader" style="display: none;">
+                    <div class="vader-head"></div>
+                    <div class="vader-body"></div>
+                    <div class="vader-eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-panel">
+                <div>ТЕКУЩАЯ СТАВКА: <span id="currentBet">1</span></div>
+                <div>ПОСЛЕДНИЙ РЕЗУЛЬТАТ: <span id="lastNumber">–</span></div>
+                <div id="message">ВЫБЕРИ СТАВКУ И КЛИКНИ НА РУЛЕТКУ</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const starfield = document.getElementById('starfield');
+        const statsGrid = document.getElementById('statsGrid');
+        const currentBetEl = document.getElementById('currentBet');
+        const lastNumberEl = document.getElementById('lastNumber');
+        const messageEl = document.getElementById('message');
+        const vader = document.getElementById('vader');
+        const betButtons = document.querySelectorAll('.bet-btn');
+
+        let currentBet = 1;
+        let lastNumbers = [];
+        let isSpinning = false;
+        let wheelAngle = 0;
+        let targetAngle = 0;
+        let spinAnimationId = null;
+        let resultNumber = null;
+
+        const numbers = [];
+        for (let i = 0; i <= 36; i++) numbers.push(i);
+
+        const colors = {};
+        for (let i = 1; i <= 36; i++) {
+            colors[i] = (i % 2 === 0) ? 'red' : 'black';
+        }
+        colors[0] = 'green';
+
+        function initStarfield() {
+            starfield.width = window.innerWidth;
+            starfield.height = window.innerHeight;
+            const starCtx = starfield.getContext('2d');
+            const stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * starfield.width,
+                    y: Math.random() * starfield.height,
+                    size: Math.random() * 1.5,
+                    brightness: Math.random()
+                });
+            }
+            function drawStars() {
+                starCtx.fillStyle = 'black';
+                starCtx.fillRect(0, 0, starfield.width, starfield.height);
+                stars.forEach(star => {
+                    starCtx.beginPath();
+                    starCtx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                    starCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    starCtx.fill();
+                    star.brightness = 0.3 + Math.abs(Math.sin(Date.now() / 1000 + star.x)) * 0.7;
+                });
+                requestAnimationFrame(drawStars);
+            }
+            drawStars();
+        }
+
+        function drawWheel(angle = 0) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 230;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle);
+
+            const sliceAngle = (2 * Math.PI) / numbers.length;
+            numbers.forEach((num, i) => {
+                const startAngle = i * sliceAngle;
+                const endAngle = startAngle + sliceAngle;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[num] === 'red' ? '#550000' : 
+                               colors[num] === 'black' ? '#111133' : '#005500';
+                ctx.fill();
+                ctx.strokeStyle = '#0af';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.translate(radius * 0.7, 0);
+                ctx.rotate(Math.PI / 2);
+                ctx.fillStyle = colors[num] === 'red' ? '#ff3366' : 
+                               colors[num] === 'black' ? '#00f7ff' : '#33ff66';
+                ctx.font = 'bold 20px Courier New';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(num.toString(), 0, 0);
+                ctx.restore();
+            });
+
+            ctx.restore();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#0af';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - 20);
+            ctx.lineTo(centerX, centerY - radius + 20);
+            ctx.lineTo(centerX + 15, centerY - radius + 40);
+            ctx.lineTo(centerX - 15, centerY - radius + 40);
+            ctx.closePath();
+            ctx.fillStyle = '#ff3300';
+            ctx.fill();
+        }
+
+        function updateStats() {
+            statsGrid.innerHTML = '';
+            lastNumbers.slice(-30).forEach(num => {
+                const div = document.createElement('div');
+                div.className = `stat-number ${colors[num]}`;
+                div.textContent = num;
+                statsGrid.appendChild(div);
+            });
+        }
+
+        function placeVader(number) {
+            if (number === null) {
+                vader.style.display = 'none';
+                return;
+            }
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 230;
+            const sliceAngle = (2 * Math.PI) / numbers.length;
+            const index = numbers.indexOf(number);
+            const angle = index * sliceAngle + sliceAngle / 2 - wheelAngle;
+            const x = centerX + Math.cos(angle) * radius * 0.85;
+            const y = centerY + Math.sin(angle) * radius * 0.85;
+            vader.style.left = (x - 25) + 'px';
+            vader.style.top = (y - 40) + 'px';
+            vader.style.display = 'block';
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            vader.style.display = 'none';
+            messageEl.textContent = 'ВРАЩЕНИЕ...';
+
+            resultNumber = Math.floor(Math.random() * 37);
+            const index = numbers.indexOf(resultNumber);
+            const sliceAngle = (2 * Math.PI) / numbers.length;
+            targetAngle = wheelAngle + 10 * Math.PI + (index * sliceAngle + sliceAngle / 2);
+
+            function animate() {
+                const diff = targetAngle - wheelAngle;
+                if (Math.abs(diff) < 0.01) {
+                    wheelAngle = targetAngle;
+                    drawWheel(wheelAngle);
+                    finishSpin();
+                    return;
+                }
+                wheelAngle += diff * 0.03;
+                drawWheel(wheelAngle);
+                spinAnimationId = requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function finishSpin() {
+            isSpinning = false;
+            lastNumbers.push(resultNumber);
+            if (lastNumbers.length > 30) lastNumbers.shift();
+            updateStats();
+            lastNumberEl.textContent = resultNumber;
+            lastNumberEl.className = colors[resultNumber];
+            messageEl.textContent = `ВЫПАЛО: ${resultNumber} | СТАВКА: ${currentBet}`;
+            placeVader(resultNumber);
+        }
+
+        function init() {
+            initStarfield();
+            drawWheel();
+            updateStats();
+            betButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (isSpinning) return;
+                    betButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentBet = parseInt(btn.dataset.bet);
+                    currentBetEl.textContent = currentBet;
+                    vader.style.display = 'none';
+                    messageEl.textContent = `СТАВКА: ${currentBet} | КЛИКНИ НА РУЛЕТКУ`;
+                });
+            });
+            betButtons[0].classList.add('active');
+            canvas.addEventListener('click', () => {
+                if (isSpinning) return;
+                spinWheel();
+            });
+            window.addEventListener('resize', initStarfield);
+        }
+
+        init();
+    </script>
+</body>
+</html>
