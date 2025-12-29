@@ -891,53 +891,54 @@
             return 1;
         }
         
-       function placeVaderOnTable(number) {
-    const pyramid = document.getElementById('vader');
-    
-    if (number === null) {
-        pyramid.style.display = 'none';
-        return;
-    }
-    
-    // Находим ячейку с этим числом
-    let targetCell;
-    if (number === 0) {
-        targetCell = document.querySelector('[data-id="0"]');
-    } else {
-        targetCell = document.querySelector(`[data-id="num_${number}"]`);
-    }
-    
-    if (targetCell && targetCell.parentElement) {
-        // Убедимся, что таблица имеет position: relative
-        const table = document.getElementById('rouletteTable');
-        if (window.getComputedStyle(table).position === 'static') {
-            table.style.position = 'relative';
+          function placeVaderOnTable(number) {
+            console.log('placeVaderOnTable вызвана с number =', number);
+            
+            const pyramid = document.getElementById('vader');
+            
+            if (number === null) {
+                pyramid.style.display = 'none';
+                return;
+            }
+            
+            // Находим ячейку с этим числом
+            let targetCell;
+            if (number === 0) {
+                targetCell = document.querySelector('[data-id="0"]');
+            } else {
+                targetCell = document.querySelector(`[data-id="num_${number}"]`);
+            }
+            
+            console.log('targetCell найден?', !!targetCell);
+            
+            if (targetCell) {
+                // Самый простой способ - используем offsetParent
+                const table = document.getElementById('rouletteTable');
+                
+                // Убедимся, что пирамидка внутри таблицы
+                if (pyramid.parentElement !== table) {
+                    table.appendChild(pyramid);
+                }
+                
+                // Позиция относительно таблицы
+                // ОРИГИНАЛЬНЫЕ КООРДИНАТЫ (центр ячейки):
+                // const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2);
+                // const top = targetCell.offsetTop + (targetCell.offsetHeight / 2);
+                
+                // ИСПРАВЛЕННЫЕ КООРДИНАТЫ (сдвиг на 1/4 влево и 1/3 вверх):
+                const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2) - (targetCell.offsetWidth / 4);
+                const top = targetCell.offsetTop + (targetCell.offsetHeight / 2) - (targetCell.offsetHeight / 3);
+                
+                console.log('Координаты:', left, 'px,', top, 'px');
+                console.log('Размеры ячейки:', targetCell.offsetWidth, 'x', targetCell.offsetHeight);
+                
+                pyramid.style.left = left + 'px';
+                pyramid.style.top = top + 'px';
+                pyramid.style.display = 'block';
+                pyramid.style.position = 'absolute';
+                vaderVisible = true;
+            }
         }
-        
-        // Убедимся, что пирамидка находится внутри таблицы
-        if (!table.contains(pyramid)) {
-            table.appendChild(pyramid);
-        }
-        
-        // Получаем позицию ячейки относительно таблицы
-        // offsetLeft/Top дают позицию относительно offsetParent (таблицы)
-        const left = targetCell.offsetLeft + (targetCell.offsetWidth / 2);
-        const top = targetCell.offsetTop + (targetCell.offsetHeight / 2);
-        
-        console.log('Номер:', number, 
-                   'offsetLeft:', targetCell.offsetLeft, 
-                   'offsetTop:', targetCell.offsetTop,
-                   'Ширина:', targetCell.offsetWidth,
-                   'Высота:', targetCell.offsetHeight,
-                   'Центр:', left, top);
-        
-        pyramid.style.left = left + 'px';
-        pyramid.style.top = top + 'px';
-        pyramid.style.display = 'block';
-        pyramid.style.position = 'absolute'; // На всякий случай
-        vaderVisible = true;
-    }
-}
         
         
         // Скрытие Вейдера
