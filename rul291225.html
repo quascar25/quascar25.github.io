@@ -867,7 +867,7 @@
         }
         
         // ВАЖНО: Функция размещения Вейдера на таблице
-         function placeVaderOnTable(number) {
+      function placeVaderOnTable(number) {
     const pyramid = document.getElementById('vader');
     
     if (number === null) {
@@ -884,19 +884,23 @@
     }
     
     if (targetCell) {
-        // Получаем позицию ячейки ОТНОСИТЕЛЬНО таблицы
+        // Самый простой способ: используем относительное позиционирование
         const cellRect = targetCell.getBoundingClientRect();
         const table = document.getElementById('rouletteTable');
-        const tableRect = table.getBoundingClientRect();
         
-        // Ключевое исправление:
-        // left = позиция_ячейки_относительно_окна - позиция_таблицы_относительно_окна
-        const left = (cellRect.left - tableRect.left) + (cellRect.width / 2);
-        const top = (cellRect.top - tableRect.top) + (cellRect.height / 2);
+        // Процентные координаты внутри таблицы
+        const leftPercent = (cellRect.left / window.innerWidth) * 100;
+        const topPercent = (cellRect.top / window.innerHeight) * 100;
         
-        console.log('Номер:', number, 'Left:', left, 'Top:', top);
-        console.log('cellRect:', {left: cellRect.left, top: cellRect.top});
-        console.log('tableRect:', {left: tableRect.left, top: tableRect.top});
+        // Или фиксированные координаты от угла таблицы
+        const tableStyle = window.getComputedStyle(table);
+        const tablePaddingLeft = parseInt(tableStyle.paddingLeft) || 0;
+        const tablePaddingTop = parseInt(tableStyle.paddingTop) || 0;
+        
+        const left = targetCell.offsetLeft - tablePaddingLeft + (targetCell.offsetWidth / 2);
+        const top = targetCell.offsetTop - tablePaddingTop + (targetCell.offsetHeight / 2);
+        
+        console.log('Способ 2 - offset:', {left: left, top: top});
         
         pyramid.style.left = left + 'px';
         pyramid.style.top = top + 'px';
