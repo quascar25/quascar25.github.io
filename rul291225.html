@@ -274,6 +274,7 @@
             z-index: 2;
         }
         /* Дарт Вейдер */
+      /* Дарт Вейдер */
         .vader {
             position: absolute;
             width: 25px;
@@ -281,6 +282,7 @@
             z-index: 10;
             display: none;
             pointer-events: none;
+            transform: translate(-50%, -50%);
         }
         .vader-head {
             position: absolute;
@@ -318,7 +320,7 @@
         }
         .vader-active .vader-head,
         .vader-active .vader-body {
-            box-shadow: 0 0 20px rgba(255,0,0,0.9);
+            box-shadow: 0 0 20px rgba(255,0,0,0.9), 0 0 40px rgba(255,0,0,0.6);
         }
         @keyframes eyeGlow {
             0% { opacity: 0.3; }
@@ -485,6 +487,53 @@
         const starfield = document.getElementById('starfield');
         const starCtx = starfield.getContext('2d');
         const stars = [];
+
+
+
+/////////////
+
+   // Размещение Вейдера на таблице
+        function placeVaderOnTable(number) {
+            const vader = document.getElementById('vader');
+            
+            if (number === null) {
+                hideVader();
+                return;
+            }
+            
+            // Находим ячейку с этим числом
+            let targetCell;
+            if (number === 0) {
+                targetCell = document.querySelector('[data-id="0"]');
+            } else {
+                targetCell = document.querySelector(`[data-id="num_${number}"]`);
+            }
+            
+            if (targetCell) {
+                const rect = targetCell.getBoundingClientRect();
+                const tableRect = document.getElementById('rouletteTable').getBoundingClientRect();
+                
+                // Позиционируем Вейдера точно по центру ячейки
+                vader.style.left = (rect.left - tableRect.left + rect.width / 2) + 'px';
+                vader.style.top = (rect.top - tableRect.top + rect.height / 2) + 'px';
+                vader.style.display = 'block';
+                vader.classList.add('vader-active');
+                vaderVisible = true;
+            }
+        }
+        
+        // Скрытие Вейдера
+        function hideVader() {
+            const vader = document.getElementById('vader');
+            vader.style.display = 'none';
+            vader.classList.remove('vader-active');
+            vaderVisible = false;
+        }
+        
+/////////////
+
+
+        
         
         function initStars() {
             starfield.width = window.innerWidth;
@@ -768,6 +817,7 @@
         }
         
         // Завершение вращения
+        // Модифицированная функция finishSpin - ВАЖНОЕ ИЗМЕНЕНИЕ
         function finishSpin() {
             isSpinning = false;
             
@@ -803,8 +853,8 @@
             
             updateBalance();
             
-            // Показываем Вейдера на выпавшем числе
-            placeVader(resultNumber);
+            // ВАЖНО: Показываем Вейдера на выпавшем числе на таблице
+            placeVaderOnTable(resultNumber);
             
             // Очищаем ставки
             bets = {};
@@ -933,6 +983,7 @@
         }
         
         // Инициализация
+        // Модифицированная функция инициализации - ВАЖНОЕ ДОБАВЛЕНИЕ
         function init() {
             initStars();
             createWheelNumbers();
@@ -943,6 +994,9 @@
             // Кнопки размера ставки
             document.querySelectorAll('.bet-button').forEach(btn => {
                 btn.addEventListener('click', () => {
+                    // Скрываем Вейдера при выборе размера ставки
+                    hideVader();
+                    
                     document.querySelectorAll('.bet-button').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentBetSize = parseInt(btn.dataset.bet);
@@ -950,29 +1004,61 @@
                 });
             });
             
-            // Кнопка вращения
-            document.getElementById('spinBtn').addEventListener('click', spinWheel);
+            // Кнопка вращения - скрывает Вейдера
+            document.getElementById('spinBtn').addEventListener('click', () => {
+                if (vaderVisible) {
+                    hideVader();
+                    return; // Если Вейдер виден, просто скрываем его
+                }
+                spinWheel(); // Если Вейдера нет - запускаем вращение
+            });
             
             // Кнопка очистки
-            document.getElementById('clearBtn').addEventListener('click', clearBets);
-            
-            // Клик на барабан
-            document.querySelector('.wheel').addEventListener('click', () => {
+            document.getElementById('clearBtn').addEventListener('click', () => {
                 if (vaderVisible) {
                     hideVader();
                 } else {
+                    clearBets();
+                }
+            });
+            
+            // Клик на барабан - скрывает Вейдера или запускает вращение
+            document.querySelector('.wheel').addEventListener('click', () => {
+                if (vaderVisible) {
+                    hideVader();
+                } else if (!isSpinning) {
                     spinWheel();
                 }
             });
             
-            // Клик по таблице или кнопке "Крутить" скрывает Вейдера
-            document.querySelector('.table-container').addEventListener('click', () => {
+            // Клик на таблицу (ставку) - скрывает Вейдера
+            document.querySelector('.table-container').addEventListener('click', (e) => {
+                // Если клик по ячейке таблицы (ставка)
+                if (e.target.closest('.table-cell') && vaderVisible && !isSpinning) {
+                    hideVader();
+                }
+            });
+            
+            // Добавляем обработчик для клика по кнопкам ставок в панели
+            document.querySelector('.bets-panel').addEventListener('click', () => {
                 if (vaderVisible && !isSpinning) {
                     hideVader();
                 }
             });
             
             window.addEventListener('resize', initStars);
+            
+            // Скрываем Вейдера при клике в любое другое место (опционально)
+            document.addEventListener('click', (e) => {
+                // Если Вейдер виден и клик не по барабану, не по кнопке "Крутить" и не по ставкам
+                if (vaderVisible && 
+                    !e.target.closest('.wheel') && 
+                    !e.target.closest('#spinBtn') && 
+                    !e.target.closest('.bet-button') &&
+                    !e.target.closest('.table-cell')) {
+                    hideVader();
+                }
+            });
         }
         
         init();
