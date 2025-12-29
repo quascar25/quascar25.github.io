@@ -922,6 +922,11 @@
                 if (pyramid.parentElement !== table) {
                     table.appendChild(pyramid);
                 }
+
+        // Позиция относительно таблицы
+        const left = targetCell.offsetLeft + (targetCell.offsetWidth / 4);
+        const top = targetCell.offsetTop + (targetCell.offsetHeight / 4);
+
                 
                 // Позиция относительно таблицы
                 // ОРИГИНАЛЬНЫЕ КООРДИНАТЫ (центр ячейки):
