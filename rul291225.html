@@ -25,9 +25,9 @@
             z-index: -1;
         }
 
-/* Временно добавить в CSS для отладки */
+/* Добавьте или убедитесь, что эти стили есть */
 #rouletteTable {
-    box-shadow: 0 0 0 3px #ff00ff !important; /* Яркая розовая рамка */
+    position: relative !important; /* Ключевое свойство */
 }
 
         
@@ -284,12 +284,16 @@
         /* НОВЫЕ стили для пирамидки */
         .pyramid {
             position: absolute;
-            width: 22px;    /* Размер как у фишки */
-            height: 22px;
-            z-index: 15;
+            width: 30px;
+            height: 30px;
+            background: #FF0000;
+            border-radius: 50%;
+            border: 3px solid #FFFF00;
+            box-shadow: 0 0 15px #FF0000;
+            z-index: 9999;
             display: none;
             pointer-events: none;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* Центрируем по середине */
         }
         
         .pyramid::before {
