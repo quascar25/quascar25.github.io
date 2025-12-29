@@ -924,8 +924,8 @@
                 }
 
         // Позиция относительно таблицы
-        const left = targetCell.offsetLeft;
-        const top = targetCell.offsetTop;
+        const left = targetCell.offsetLeft + (targetCell.offsetWidth);
+        const top = targetCell.offsetTop + (targetCell.offsetHeight);
 
                 
                 // Позиция относительно таблицы
