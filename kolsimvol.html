@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Счётчик символов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 25px;
+            background-color: #ffffff;
+        }
+        
+        .counter-box {
+            margin-bottom: 30px;
+        }
+        
+        .label {
+            color: #a0a0a0;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+        
+        .text-display {
+            width: 100%;
+            min-height: 80px;
+            padding: 15px;
+            border: 1px solid #606060;
+            border-radius: 4px;
+            background-color: #ffffff;
+            font-size: 18px;
+            color: #333333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #count-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333333;
+        }
+        
+        #text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #606060;
+            border-radius: 4px;
+            background-color: #ffffff;
+            font-size: 16px;
+            color: #333333;
+            resize: vertical;
+            outline: none;
+            line-height: 1.5;
+        }
+        
+        #text-input:focus {
+            border-color: #404040;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #a0a0a0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="counter-box">
+            <div class="label">Количество символов в тексте</div>
+            <div class="text-display">
+                <span id="count-display">0</span>
+            </div>
+        </div>
+        
+        <div class="counter-box">
+            <div class="label">Текст</div>
+            <textarea 
+                id="text-input" 
+                placeholder="Введите или вставьте ваш текст здесь..."
+            ></textarea>
+        </div>
+        
+        <div class="footer">
+            Счётчик обновляется автоматически при вводе текста
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы страницы
+        const textInput = document.getElementById('text-input');
+        const countDisplay = document.getElementById('count-display');
+        
+        // Функция для подсчета символов
+        function updateCharCount() {
+            const text = textInput.value;
+            const count = text.length;
+            countDisplay.textContent = count;
+        }
+        
+        // Слушаем события ввода текста
+        textInput.addEventListener('input', updateCharCount);
+        textInput.addEventListener('paste', updateCharCount);
+        textInput.addEventListener('cut', updateCharCount);
+        
+        // Инициализация при загрузке страницы
+        window.addEventListener('load', updateCharCount);
+    </script>
+</body>
+</html>
