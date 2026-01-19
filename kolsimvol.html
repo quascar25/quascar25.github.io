@@ -51,12 +51,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
         }
         
-        #count-display {
-            font-size: 32px;
+        .counter-text {
+            font-size: 24px;
             font-weight: bold;
             color: #333333;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .counter-detail {
+            font-size: 14px;
+            color: #606060;
+            font-weight: normal;
         }
         
         #text-input {
@@ -90,7 +99,11 @@
         <div class="counter-box">
             <div class="label">Количество символов в тексте</div>
             <div class="text-display">
-                <span id="count-display">0</span>
+                <div id="count-display" class="counter-text">
+                    0<span class="counter-detail">(без пробелов)</span>, 
+                    0<span class="counter-detail">(пробелы)</span>, 
+                    0<span class="counter-detail">(все символы)</span>
+                </div>
             </div>
         </div>
         
@@ -115,8 +128,22 @@
         // Функция для подсчета символов
         function updateCharCount() {
             const text = textInput.value;
-            const count = text.length;
-            countDisplay.textContent = count;
+            
+            // Подсчет символов без пробелов
+            const charsWithoutSpaces = text.replace(/\s/g, '').length;
+            
+            // Подсчет пробелов
+            const spaceCount = (text.match(/\s/g) || []).length;
+            
+            // Общее количество символов
+            const totalChars = text.length;
+            
+            // Обновление отображения
+            countDisplay.innerHTML = `
+                ${charsWithoutSpaces}<span class="counter-detail">(без пробелов)</span>, 
+                ${spaceCount}<span class="counter-detail">(пробелы)</span>, 
+                ${totalChars}<span class="counter-detail">(все символы)</span>
+            `;
         }
         
         // Слушаем события ввода текста
