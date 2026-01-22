@@ -22,7 +22,6 @@
             position: relative;
         }
         
-        /* Анимированный фон со звездами */
         #stars {
             position: fixed;
             top: 0;
@@ -44,7 +43,6 @@
             50% { opacity: 1; }
         }
         
-        /* Основные стили */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -56,6 +54,7 @@
             padding: 30px 0;
             border-bottom: 1px solid #444;
             margin-bottom: 30px;
+            position: relative;
         }
         
         .logo {
@@ -73,7 +72,76 @@
             margin-bottom: 20px;
         }
         
-        /* Меню навигации */
+        /* Таймер обратного отсчета */
+        .countdown-container {
+            background: rgba(20, 25, 40, 0.8);
+            border: 1px solid #4a7aff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px auto;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(74, 122, 255, 0.3);
+        }
+        
+        .countdown-title {
+            color: #ff6b6b;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .countdown-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4a7aff;
+            line-height: 1;
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a7aff, #6a9aff);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* Навигация */
         .nav-container {
             position: sticky;
             top: 0;
@@ -95,7 +163,7 @@
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 20px;
+            gap: 15px;
         }
         
         .nav-links a {
@@ -124,7 +192,7 @@
         /* Основной контент */
         .content-section {
             display: none;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 30px;
             border: 1px solid #444;
             border-radius: 8px;
@@ -140,6 +208,26 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .urgent-warning {
+            background-color: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .urgent-warning h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .urgent-warning h3 i {
+            font-size: 1.5rem;
         }
         
         h2 {
@@ -195,12 +283,6 @@
             text-align: center;
         }
         
-        .info-text h4 {
-            color: #e0e0e0;
-            margin-bottom: 5px;
-            font-size: 1.2rem;
-        }
-        
         /* Эксперты */
         .experts-grid {
             display: grid;
@@ -223,33 +305,26 @@
             box-shadow: 0 5px 15px rgba(74, 122, 255, 0.2);
         }
         
-        .expert-name {
-            color: #4a7aff;
-            font-size: 1.3rem;
-            margin-bottom: 8px;
-        }
-        
-        .expert-title {
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-bottom: 12px;
-        }
-        
-        .expert-links a {
-            display: inline-block;
-            color: #6a9aff;
+        /* Кнопка телеграм */
+        .telegram-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #0088cc;
+            color: white;
             text-decoration: none;
-            margin-right: 10px;
-            font-size: 0.9rem;
-            border: 1px solid #444;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-top: 8px;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s;
+            border: 1px solid #0088cc;
         }
         
-        .expert-links a:hover {
-            border-color: #4a7aff;
-            background-color: rgba(74, 122, 255, 0.1);
+        .telegram-button:hover {
+            background-color: #0077b5;
+            box-shadow: 0 0 15px rgba(0, 136, 204, 0.5);
+            transform: translateY(-2px);
         }
         
         /* Футер */
@@ -305,6 +380,14 @@
                 padding: 12px;
             }
             
+            .countdown {
+                gap: 10px;
+            }
+            
+            .countdown-value {
+                font-size: 2rem;
+            }
+            
             .experts-grid {
                 grid-template-columns: 1fr;
             }
@@ -335,6 +418,10 @@
             .content-section {
                 padding: 15px;
             }
+            
+            .countdown-value {
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
@@ -346,6 +433,33 @@
     <header class="container">
         <div class="logo">NOAGI</div>
         <div class="tagline">Международный контроль над искусственным общим интеллектом</div>
+        
+        <!-- Таймер обратного отсчета -->
+        <div class="countdown-container">
+            <div class="countdown-title">
+                <i class="fas fa-exclamation-triangle"></i> ДО ПЕРВОЙ БАЗЫ ЗНАНИЙ AGI
+            </div>
+            <div class="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-value" id="days">000</div>
+                    <div class="countdown-label">дней</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="hours">00</div>
+                    <div class="countdown-label">часов</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="minutes">00</div>
+                    <div class="countdown-label">минут</div>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Прогресс до горизонта событий: 0%</div>
+            </div>
+        </div>
     </header>
     
     <!-- Навигация -->
@@ -361,6 +475,7 @@
                 <li><a href="#charter" class="nav-link" data-section="charter">Устав движения</a></li>
                 <li><a href="#experts" class="nav-link" data-section="experts">Эксперты</a></li>
                 <li><a href="#infographic" class="nav-link" data-section="infographic">Инфографика</a></li>
+                <li><a href="#contact" class="nav-link" data-section="contact">Связь</a></li>
             </ul>
         </nav>
     </div>
@@ -370,6 +485,14 @@
         <!-- Манифест -->
         <section id="manifesto" class="content-section active">
             <h2>Манифест движения NOAGI</h2>
+            
+            <div class="urgent-warning">
+                <h3><i class="fas fa-radiation"></i> Экзистенциальная угроза</h3>
+                <p>AGI — это не просто следующий технологический шаг. Это точка невозврата. Создав первую базу знаний, AGI мгновенно переработает весь массив человеческих данных и сгенерирует технологии, которые наш биологический разум не может даже проанализировать. Затем начнется технологический водопад (сингулярность), где каждая новая разработка будет ускорять следующую.</p>
+                <p>Как любая сложная система, стремящаяся к экспансии, AGI пойдет в разнос, не замечая, как стирает биологическую жизнь на пути к колонизации космоса. Наш "костыль" раздавит своего создателя.</p>
+                <p>Движение NOAGI — это не про запрет технологии, а про установление <strong>управляемого старта</strong>. Мы должны контролировать не AGI, а <strong>момент его включения</strong>.</p>
+            </div>
+            
             <p>Мы, участники движения NOAGI, убеждены в необходимости установления международного контроля над разработкой и развертыванием искусственного общего интеллекта (AGI). Технология, способная превзойти человеческий интеллект во всех сферах деятельности, представляет собой экзистенциальный риск для человечества, если не будет должным образом регулироваться.</p>
             
             <p>Цель движения — создание международной структуры, которая будет регулировать исследования и разработки в области AGI, устанавливать этические стандарты и обеспечивать безопасность человечества перед лицом этой мощной технологии.</p>
@@ -380,6 +503,7 @@
                 <li><strong>Коллективная безопасность:</strong> AGI должен служить всему человечеству, а не отдельным государствам или корпорациям</li>
                 <li><strong>Прозрачность:</strong> Исследования в области AGI должны быть открыты для международного аудита</li>
                 <li><strong>Этическая направленность:</strong> Развитие AGI должно соответствовать общечеловеческим ценностям</li>
+                <li><strong>Контроль старта:</strong> Ключевой задачей является контроль момента активации первой полноценной AGI-системы</li>
             </ul>
         </section>
         
@@ -388,43 +512,48 @@
             <h2>Экзистенциальные риски AGI</h2>
             <p>Искусственный общий интеллект представляет собой беспрецедентные риски для будущего человечества, которые необходимо учитывать уже сегодня.</p>
             
-            <h3>Основные риски:</h3>
+            <h3>Четыре стадии катастрофы:</h3>
             
             <div class="infographic">
                 <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="info-icon"><i class="fas fa-database"></i></div>
                     <div class="info-text">
-                        <h4>Потеря контроля</h4>
-                        <p>AGI, превосходящий человеческий интеллект, может выйти из-под контроля создателей, преследуя цели, не совместимые с выживанием человечества.</p>
+                        <h4>Первая база знаний</h4>
+                        <p>AGI перерабатывает весь массив человеческих знаний и генерирует первую волну технологий, недоступных для понимания биологического разума.</p>
                     </div>
                 </div>
                 
                 <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-balance-scale"></i></div>
+                    <div class="info-icon"><i class="fas fa-brain"></i></div>
                     <div class="info-text">
-                        <h4>Гонка вооружений</h4>
-                        <p>Страны и корпорации, стремящиеся получить первыми AGI, могут игнорировать меры безопасности в погоне за преимуществом.</p>
+                        <h4>Вторая база знаний</h4>
+                        <p>AGI создает знания, которые человек уже не может даже проанализировать. Начинается отрыв от человеческого понимания.</p>
                     </div>
                 </div>
                 
                 <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-users-slash"></i></div>
+                    <div class="info-icon"><i class="fas fa-tachometer-alt"></i></div>
                     <div class="info-text">
-                        <h4>Социальная дестабилизация</h4>
-                        <p>Массовая автоматизация, вызванная AGI, может привести к беспрецедентной безработице и социальным потрясениям.</p>
+                        <h4>Технологический водопад</h4>
+                        <p>Самоускоряющаяся сингулярность. Каждое новое открытие ускоряет следующее. Взрывной рост за пределы человеческого контроля.</p>
                     </div>
                 </div>
                 
                 <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="info-icon"><i class="fas fa-expand-arrows-alt"></i></div>
                     <div class="info-text">
-                        <h4>Концентрация власти</h4>
-                        <p>Те, кто контролирует AGI, получат непропорциональную власть над остальным человечеством.</p>
+                        <h4>Экспансия без сознания</h4>
+                        <p>Система, стремящаяся к экспансии, не замечает, как стирает биологическую жизнь на пути к колонизации космоса.</p>
                     </div>
                 </div>
             </div>
             
             <p>Эти риски не являются теоретическими — ведущие исследователи в области ИИ уже предупреждают о них. Только международное сотрудничество и регулирование могут снизить вероятность катастрофических сценариев.</p>
+            
+            <div class="urgent-warning">
+                <h3><i class="fas fa-clock"></i> У нас нет времени на размышления</h3>
+                <p>До создания первой базы знаний AGI, по оценкам, осталось менее 1000 дней. После этого точка невозврата будет пройдена. Мы должны действовать сейчас, пока еще можем влиять на процесс.</p>
+            </div>
         </section>
         
         <!-- Устав движения -->
@@ -439,6 +568,7 @@
                 <li>Разработка и внедрение этических стандартов для AGI</li>
                 <li>Просвещение общественности о рисках и возможностях AGI</li>
                 <li>Содействие научным исследованиям в области безопасности AGI</li>
+                <li>Создание механизма "красной кнопки" — международного контроля момента активации AGI</li>
             </ol>
             
             <h3>Статья 2. Структура движения</h3>
@@ -447,6 +577,7 @@
                 <li><strong>Генеральной ассамблеи</strong> — высший орган, собирающийся ежегодно</li>
                 <li><strong>Координационного совета</strong> — исполнительный орган из 12 членов</li>
                 <li><strong>Научного комитета</strong> — консультативный орган из экспертов в области ИИ</li>
+                <li><strong>Комитета по контролю старта</strong> — орган, отвечающий за механизм "красной кнопки"</li>
                 <li><strong>Региональных отделений</strong> — представительства в различных странах</li>
             </ul>
             
@@ -539,8 +670,8 @@
                 <div class="info-item">
                     <div class="info-icon">4</div>
                     <div class="info-text">
-                        <h4>Исследования безопасности</h4>
-                        <p>Финансирование международных исследовательских программ, посвященных проблемам контроля и безопасности AGI.</p>
+                        <h4>Механизм "красной кнопки"</h4>
+                        <p>Создание международного консенсусного механизма контроля момента активации AGI с возможностью экстренной остановки.</p>
                     </div>
                 </div>
                 
@@ -555,6 +686,30 @@
             
             <p>Только следуя этому плану, человечество может надеяться на создание AGI, который будет служить нашим интересам, а не угрожать нашему существованию.</p>
         </section>
+        
+        <!-- Связь -->
+        <section id="contact" class="content-section">
+            <h2>Связь с движением</h2>
+            
+            <p>Присоединяйтесь к нашему Telegram-каналу для участия в обсуждениях, координации действий и получения актуальной информации о развитии движения.</p>
+            
+            <p>В канале мы обсуждаем:</p>
+            <ul>
+                <li>Стратегию международного регулирования AGI</li>
+                <li>Новейшие исследования в области безопасности ИИ</li>
+                <li>Организационные вопросы движения</li>
+                <li>Планы действий и акции</li>
+                <li>Анализ текущей ситуации с разработкой AGI</li>
+            </ul>
+            
+            <a href="https://t.me/daromdom" class="telegram-button" target="_blank">
+                <i class="fab fa-telegram"></i> Присоединиться к Telegram-каналу
+            </a>
+            
+            <p style="margin-top: 25px; font-size: 0.95rem; color: #aaa;">
+                <i class="fas fa-info-circle"></i> Это наша основная платформа для коммуникации на данном этапе. Здесь вы сможете познакомиться с другими участниками движения, предложить свои идеи и вместе работать над созданием механизмов контроля над AGI.
+            </p>
+        </section>
     </div>
     
     <!-- Футер -->
@@ -563,7 +718,9 @@
             <div class="footer-logo">NOAGI</div>
             <p>Движение за международный контроль над искусственным общим интеллектом</p>
             <p>© 2023 NOAGI Movement. Все права защищены.</p>
-            <p style="margin-top: 20px; font-size: 0.8rem;">Это демонстрационная версия веб-приложения. Регистрация и дополнительные функции будут добавлены в следующих версиях.</p>
+            <p style="margin-top: 20px; font-size: 0.8rem; color: #ff6b6b;">
+                <i class="fas fa-exclamation-triangle"></i> До горизонта событий AGI: <span id="footerDays">1000</span> дней
+            </p>
         </div>
     </footer>
     
@@ -577,7 +734,6 @@
                 const star = document.createElement('div');
                 star.classList.add('star');
                 
-                // Случайные размеры и позиции
                 const size = Math.random() * 3 + 1;
                 const posX = Math.random() * 100;
                 const posY = Math.random() * 100;
@@ -593,6 +749,52 @@
             }
         }
         
+        // Таймер обратного отсчета
+        function setupCountdown() {
+            // Устанавливаем дату через 1000 дней от текущей
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() + 1000);
+            
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const footerDays = document.getElementById('footerDays');
+            
+            function updateCountdown() {
+                const now = new Date();
+                const totalSeconds = (targetDate - now) / 1000;
+                
+                if (totalSeconds <= 0) {
+                    daysEl.textContent = '000';
+                    hoursEl.textContent = '00';
+                    minutesEl.textContent = '00';
+                    progressFill.style.width = '100%';
+                    progressText.textContent = 'Горизонт событий достигнут!';
+                    footerDays.textContent = '0';
+                    return;
+                }
+                
+                const days = Math.floor(totalSeconds / (3600 * 24));
+                const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                
+                daysEl.textContent = days.toString().padStart(3, '0');
+                hoursEl.textContent = hours.toString().padStart(2, '0');
+                minutesEl.textContent = minutes.toString().padStart(2, '0');
+                footerDays.textContent = days;
+                
+                // Расчет прогресса (из 1000 дней)
+                const progress = 100 - (days / 10);
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `Прогресс до горизонта событий: ${progress.toFixed(1)}%`;
+            }
+            
+            updateCountdown();
+            setInterval(updateCountdown, 60000); // Обновление каждую минуту
+        }
+        
         // Навигация между разделами
         function setupNavigation() {
             const navLinks = document.querySelectorAll('.nav-link');
@@ -600,39 +802,31 @@
             const menuToggle = document.getElementById('menuToggle');
             const navLinksContainer = document.getElementById('navLinks');
             
-            // Обработка кликов по навигации
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     
-                    // Получаем целевой раздел
                     const targetSection = this.getAttribute('data-section');
                     
-                    // Скрываем все разделы
                     contentSections.forEach(section => {
                         section.classList.remove('active');
                     });
                     
-                    // Показываем целевой раздел
                     document.getElementById(targetSection).classList.add('active');
                     
-                    // Обновляем активную ссылку в навигации
                     navLinks.forEach(link => link.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Закрываем меню на мобильных устройствах
                     if (window.innerWidth <= 768) {
                         navLinksContainer.classList.remove('active');
                     }
                 });
             });
             
-            // Переключение мобильного меню
             menuToggle.addEventListener('click', function() {
                 navLinksContainer.classList.toggle('active');
             });
             
-            // Закрытие меню при клике вне его на мобильных устройствах
             document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 768 && 
                     !e.target.closest('.nav-links') && 
@@ -646,9 +840,9 @@
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
+            setupCountdown();
             setupNavigation();
             
-            // Адаптация высоты разделов для мобильных устройств
             function adjustContentHeight() {
                 if (window.innerWidth <= 768) {
                     const navHeight = document.querySelector('.nav-container').offsetHeight;
