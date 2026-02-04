@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Гадание на картах</title>
     <style>
         * {
@@ -11,12 +11,31 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            overflow: hidden;
+            height: 100%;
+        }
+
         body {
             background: #000;
             color: #ffd700;
             font-family: 'Segoe UI', Tahoma, sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+        @media screen and (orientation: landscape) {
+            .container {
+                transform: rotate(0deg);
+                transform-origin: center center;
+                width: 100%;
+                height: 100%;
+            }
         }
 
         .container {
@@ -202,6 +221,19 @@
             '6 пик': 'Трудный период завершается. После преодоления препятствий - облегчение.',
             '9 червей': 'Исполнение заветного желания. Карта исполнения мечты и радости.'
         };
+
+        // Блокировка ориентации через JavaScript
+        function lockOrientation() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(() => {
+                    // Игнорируем ошибку если браузер не поддерживает
+                });
+            }
+        }
+
+        // Попытка блокировки при загрузке
+        window.addEventListener('load', lockOrientation);
+        window.addEventListener('resize', lockOrientation);
 
         document.querySelectorAll('.btn').forEach(btn => {
             btn.addEventListener('click', function() {
