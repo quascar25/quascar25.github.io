@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Анонимная регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3a 100%);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(20, 20, 40, 0.85);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 10, 30, 0.7);
+            border: 1px solid #3a3a6a;
+            text-align: center;
+        }
+
+        h1 {
+            color: #6ee7ff;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(110, 231, 255, 0.5);
+        }
+
+        .warning {
+            background: rgba(255, 100, 100, 0.15);
+            border: 1px solid #ff6464;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .code-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a4a8a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            word-break: break-all;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0e0ff;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .digit-input {
+            width: 100%;
+            aspect-ratio: 1;
+            text-align: center;
+            font-size: 1.8rem;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #5a5a9a;
+            border-radius: 6px;
+            color: #ffffff;
+            outline: none;
+        }
+
+        .digit-input.blink {
+            animation: blink 1s infinite;
+            border-color: #6ee7ff;
+            background: rgba(110, 231, 255, 0.1);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .button {
+            background: linear-gradient(to bottom, #2a2a5a, #1a1a3a);
+            color: #c0d0ff;
+            border: 1px solid #5a5a9a;
+            border-radius: 8px;
+            padding: 16px 30px;
+            margin: 10px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #3a3a6a, #2a2a5a);
+            border-color: #6ee7ff;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .success {
+            color: #6eff8f;
+            font-size: 3rem;
+        }
+
+        .instruction {
+            color: #a0b0ff;
+            margin: 15px 0;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .code-display {
+                font-size: 1.1rem;
+                padding: 15px;
+            }
+            .digit-input {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌀 Анонимная регистрация</h1>
+        
+        <div class="warning">
+            ⚠️ <strong>Код — единственный ключ.</strong><br>
+            Его потеря невосстановима. Вы несете за него полную ответственность.
+        </div>
+
+        <!-- Шаг 1: Создание кода -->
+        <div id="step1">
+            <div class="instruction">
+                Нажмите кнопку, чтобы сгенерировать ваш уникальный код. Тщательно перепишите его на бумагу.
+            </div>
+            <button id="generateBtn" class="button">СОЗДАТЬ КОД</button>
+        </div>
+
+        <!-- Шаг 2: Отображение кода и подтверждение записи -->
+        <div id="step2" class="hidden">
+            <div class="instruction">
+                Ваш код (перепишите его на бумагу сейчас):
+            </div>
+            <div id="codeDisplay" class="code-display"></div>
+            <button id="copiedBtn" class="button">ВЫПИСАЛ НА БУМАГУ</button>
+        </div>
+
+        <!-- Шаг 3: Проверка записи по мигающим позициям -->
+        <div id="step3" class="hidden">
+            <div class="instruction">
+                Введите цифры с вашей бумаги <strong>только в мигающие поля</strong> (остальные оставьте пустыми).
+            </div>
+            
+            <div id="inputContainer" class="input-grid">
+                <!-- 50 полей ввода генерируются скриптом -->
+            </div>
+            
+            <div class="instruction" id="hintText"></div>
+            <button id="verifyBtn" class="button" disabled>ПРОВЕРИТЬ ВВОД</button>
+        </div>
+
+        <!-- Шаг 4: Результат -->
+        <div id="step4" class="hidden">
+            <div class="status" id="statusMessage"></div>
+            <button id="restartBtn" class="button">НАЧАТЬ НОВУЮ РЕГИСТРАЦИЮ</button>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация
+        const CODE_LENGTH = 50;
+        const CHECK_DIGITS = 10; // сколько позиций проверяем
+
+        // Состояние
+        let currentCode = '';
+        let positionsToCheck = [];
+        let userInputs = [];
+
+        // Элементы
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const generateBtn = document.getElementById('generateBtn');
+        const codeDisplay = document.getElementById('codeDisplay');
+        const copiedBtn = document.getElementById('copiedBtn');
+        const inputContainer = document.getElementById('inputContainer');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const restartBtn = document.getElementById('restartBtn');
+        const hintText = document.getElementById('hintText');
+
+        // 1. Генерация кода
+        generateBtn.addEventListener('click', () => {
+            // Генерация случайной части (40 цифр)
+            let randomPart = '';
+            for (let i = 0; i < 40; i++) {
+                randomPart += Math.floor(Math.random() * 10);
+            }
+            
+            // Добавление даты и времени (10 цифр: ДДММГГЧЧММ)
+            const now = new Date();
+            const dateTimePart = 
+                String(now.getDate()).padStart(2, '0') +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                String(now.getFullYear()).slice(-2) +
+                String(now.getHours()).padStart(2, '0') +
+                String(now.getMinutes()).padStart(2, '0');
+            
+            currentCode = randomPart + dateTimePart; // 50 цифр
+            
+            // Показываем код
+            codeDisplay.textContent = formatCode(currentCode);
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+        });
+
+        // Форматирование кода с пробелами для удобства чтения
+        function formatCode(code) {
+            return code.match(/.{1,5}/g).join(' ');
+        }
+
+        // 2. Подтверждение записи
+        copiedBtn.addEventListener('click', () => {
+            step2.classList.add('hidden');
+            initVerificationStep();
+            step3.classList.remove('hidden');
+        });
+
+        // Инициализация шага проверки
+        function initVerificationStep() {
+            // Очищаем предыдущие поля
+            inputContainer.innerHTML = '';
+            userInputs = [];
+            positionsToCheck = [];
+            
+            // Выбираем случайные позиции для проверки
+            const allPositions = Array.from({length: CODE_LENGTH}, (_, i) => i);
+            for (let i = 0; i < CHECK_DIGITS; i++) {
+                const randomIndex = Math.floor(Math.random() * allPositions.length);
+                positionsToCheck.push(allPositions.splice(randomIndex, 1)[0]);
+            }
+            positionsToCheck.sort((a, b) => a - b);
+            
+            // Создаем 50 полей ввода
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 1;
+                input.inputMode = 'numeric';
+                input.pattern = '[0-9]*';
+                input.className = 'digit-input';
+                
+                if (positionsToCheck.includes(i)) {
+                    input.classList.add('blink');
+                    input.dataset.position = i;
+                    input.placeholder = '?';
+                } else {
+                    input.disabled = true;
+                    input.placeholder = '-';
+                }
+                
+                // Обработчик ввода
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    e.target.value = value;
+                    
+                    if (value && e.target.nextElementSibling && e.target.nextElementSibling.classList.contains('blink')) {
+                        e.target.nextElementSibling.focus();
+                    }
+                    
+                    updateVerifyButton();
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && e.target.previousElementSibling) {
+                        e.target.previousElementSibling.focus();
+                    }
+                });
+                
+                inputContainer.appendChild(input);
+                userInputs.push(input);
+            }
+            
+            // Обновляем подсказку
+            hintText.textContent = `Введите цифры на позициях: ${positionsToCheck.map(p => p + 1).join(', ')}`;
+            
+            // Фокусируемся на первом мигающем поле
+            const firstBlink = inputContainer.querySelector('.blink');
+            if (firstBlink) firstBlink.focus();
+        }
+
+        // Активация кнопки проверки
+        function updateVerifyButton() {
+            const allFilled = positionsToCheck.every(pos => {
+                return userInputs[pos].value.trim() !== '';
+            });
+            verifyBtn.disabled = !allFilled;
+        }
+
+        // 3. Проверка ввода
+        verifyBtn.addEventListener('click', () => {
+            let allCorrect = true;
+            
+            positionsToCheck.forEach(pos => {
+                const input = userInputs[pos];
+                if (input.value === currentCode[pos]) {
+                    input.style.borderColor = '#6eff8f';
+                    input.style.background = 'rgba(110, 255, 143, 0.1)';
+                } else {
+                    input.style.borderColor = '#ff6464';
+                    input.style.background = 'rgba(255, 100, 100, 0.1)';
+                    allCorrect = false;
+                }
+            });
+            
+            if (allCorrect) {
+                // Успех
+                step3.classList.add('hidden');
+                statusMessage.innerHTML = '<div class="success">✓</div><div style="margin-top:10px;">Регистрация успешно завершена!</div>';
+                statusMessage.innerHTML += '<div style="margin-top:20px; color:#a0e0ff; font-size:0.9rem;">Сохраните бумагу с кодом в безопасном месте.</div>';
+                step4.classList.remove('hidden');
+            } else {
+                // Ошибка
+                hintText.innerHTML = '<span style="color:#ff6464">Найдены ошибки. Проверьте бумагу и попробуйте снова.</span>';
+                verifyBtn.textContent = 'ПОВТОРИТЬ ПРОВЕРКУ';
+                
+                // Через 3 секунды перезапускаем проверку
+                setTimeout(() => {
+                    step3.classList.add('hidden');
+                    step2.classList.remove('hidden');
+                    codeDisplay.textContent = formatCode(currentCode);
+                }, 3000);
+            }
+        });
+
+        // 4. Перезапуск
+        restartBtn.addEventListener('click', () => {
+            // Сброс состояния
+            currentCode = '';
+            positionsToCheck = [];
+            userInputs = [];
+            
+            // Сброс отображения
+            step4.classList.add('hidden');
+            step1.classList.remove('hidden');
+            
+            // Сброс кнопки
+            verifyBtn.textContent = 'ПРОВЕРИТЬ ВВОД';
+            verifyBtn.disabled = true;
+            
+            // Сброс полей ввода
+            document.querySelectorAll('.digit-input').forEach(input => {
+                input.value = '';
+                input.style.borderColor = '';
+                input.style.background = '';
+            });
+        });
+    </script>
+</body>
+</html>
