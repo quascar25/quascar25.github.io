@@ -83,7 +83,7 @@
             height: 100%;
             background-color: black;
             z-index: 10;
-            display: none;
+            display: none;          /* изначально скрыт */
             align-items: center;
             justify-content: center;
         }
@@ -93,7 +93,7 @@
             max-height: 100%;
             width: auto;
             height: auto;
-            object-fit: contain;
+            object-fit: contain;    /* сохраняет пропорции, вписывая в экран */
             background: black;
             display: block;
             margin: 0 auto;
@@ -104,7 +104,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 180, 255, 0.2);
+            background: rgba(0, 180, 255, 0.2);         /* полупрозрачный голубой */
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(0, 255, 255, 0.5);
@@ -208,20 +208,49 @@
 
             let hidePanelTimer = null;
             
-            // ВАЖНО: Укажите правильные имена файлов (с учетом регистра!)
+            // ВАЖНО: Укажите правильные имена файлов
             const videoFiles = ['f001.mp4', 'f002.mp4'];
             let currentIndex = 0;
 
-            // Функция для получения полного URL файла на GitHub
-            function getVideoUrl(filename) {
-                // Получаем текущий URL страницы
-                const baseUrl = window.location.origin + window.location.pathname;
-                // Поднимаемся на уровень выше (если html в корне) и добавляем папку viliv
-                const basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
-                return basePath + 'viliv/' + filename;
+            // ----- Функции для Fullscreen API -----
+            function enterFullScreen() {
+                const elem = videoContainer; // Переводим в полноэкранный режим весь контейнер с видео
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                    elem.msRequestFullscreen();
+                }
             }
 
-            // Звездный фон
+            function exitFullScreen() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE/Edge */
+                    document.msExitFullscreen();
+                }
+            }
+
+            // Слушатель для отслеживания изменения полноэкранного режима
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // Для Safari
+            document.addEventListener('msfullscreenchange', handleFullscreenChange); // Для IE/Edge
+
+            function handleFullscreenChange() {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                    // Если мы вышли из полноэкранного режима (например, нажали системную кнопку "назад" или свайп)
+                    // и видео-контейнер всё ещё виден, то... что делать?
+                    // По логике, можно либо ничего не делать, либо закрыть видео. Закроем видео для чистоты интерфейса.
+                    if (videoContainer.style.display === 'flex') {
+                        closeVideo(); // Закрываем видео, возвращаясь к звёздам
+                    }
+                }
+            }
+
+            // ----- Звездный фон -----
             let stars = [];
             const ctx = starsCanvas.getContext('2d');
             const STAR_COUNT = 180;
@@ -275,7 +304,7 @@
             resizeHandler();
             drawStars();
 
-            // Функции управления
+            // ----- Функции управления панелью и видео -----
             function showControlPanel() {
                 controlPanel.classList.add('visible');
                 resetHidePanelTimer();
@@ -294,15 +323,17 @@
 
             function loadVideoByIndex(index) {
                 if (index >= 0 && index < videoFiles.length) {
+                    // Формируем правильный URL для GitHub Pages
+                    // Учитываем, что HTML лежит в корне, а видео — в папке viliv
+                    const baseUrl = window.location.origin + '/viliv/';
                     const fileName = videoFiles[index];
-                    const videoUrl = getVideoUrl(fileName);
+                    const videoUrl = baseUrl + fileName;
                     
-                    console.log('Загрузка видео:', videoUrl); // Для отладки
+                    console.log('Загрузка видео:', videoUrl);
                     
                     playerVideo.src = videoUrl;
                     playerVideo.load();
                     
-                    // Проверка загрузки
                     playerVideo.oncanplaythrough = function() {
                         videoError.style.display = 'none';
                     };
@@ -319,6 +350,8 @@
 
             function closeVideo() {
                 playerVideo.pause();
+                // Выходим из полноэкранного режима, если активен
+                exitFullScreen();
                 videoContainer.style.display = 'none';
                 hideControlPanel();
                 if (hidePanelTimer) {
@@ -329,12 +362,14 @@
                 loadVideoByIndex(0);
             }
 
-            // Обработчики событий
+            // ----- Обработчики событий -----
             startBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 videoContainer.style.display = 'flex';
                 currentIndex = 0;
                 loadVideoByIndex(0);
+                // Пытаемся войти в полноэкранный режим
+                enterFullScreen();
                 showControlPanel();
             });
 
@@ -404,26 +439,7 @@
 
             // Инициализация
             hideControlPanel();
-            
-            // Проверяем доступность файлов при загрузке
-            setTimeout(() => {
-                if (videoFiles.length > 0) {
-                    const testUrl = getVideoUrl(videoFiles[0]);
-                    fetch(testUrl, { method: 'HEAD' })
-                        .then(response => {
-                            if (!response.ok) {
-                                console.warn('Файл не найден:', testUrl);
-                                videoError.style.display = 'block';
-                                setTimeout(() => {
-                                    videoError.style.display = 'none';
-                                }, 4000);
-                            }
-                        })
-                        .catch(() => {
-                            console.warn('Не удалось проверить файл:', testUrl);
-                        });
-                }
-            }, 1000);
+            loadVideoByIndex(0);
         })();
     </script>
 </body>
