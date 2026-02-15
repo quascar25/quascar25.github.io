@@ -168,14 +168,82 @@
             text-align: center;
             display: none;
         }
+
+        /* YouTube-стиль кнопка */
+        .youtube-btn {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 20px; /* Делает кнопку более вытянутой, как у YouTube */
+            width: 180px;
+            height: 120px; /* Приплюснутая форма */
+            max-width: 65vw;
+            max-height: 40vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            cursor: pointer;
+            -webkit-touch-callout: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Белая стрелка как на YouTube */
+        .youtube-play-icon {
+            width: 0;
+            height: 0;
+            border-left: 40px solid white;
+            border-top: 24px solid transparent;
+            border-bottom: 24px solid transparent;
+            margin-left: 8px; /* Небольшой сдвиг для центрирования треугольника */
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+            transition: transform 0.2s, filter 0.2s;
+        }
+        
+        /* Альтернативный вариант стрелки (если треугольник кажется слишком большим) */
+        .youtube-btn.smaller-arrow .youtube-play-icon {
+            border-left: 32px solid white;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+        }
+        
+        /* Эффект при нажатии */
+        .youtube-btn:active {
+            transform: scale(0.96);
+            border-color: white;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+        }
+        
+        .youtube-btn:active .youtube-play-icon {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 12px white);
+        }
+        
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .youtube-btn {
+                width: 140px;
+                height: 94px;
+            }
+            .youtube-play-icon {
+                border-left: 30px solid white;
+                border-top: 18px solid transparent;
+                border-bottom: 18px solid transparent;
+            }
+        }
+
+        
     </style>
 </head>
 <body>
     <div class="app">
         <canvas id="starsCanvas"></canvas>
 
-        <div class="center-btn" id="startVideoBtn" role="button" tabindex="0" aria-label="Запустить видео">
-            <span>⋆⍟⋆</span>
+        <div class="youtube-btn" id="startVideoBtn" role="button" tabindex="0" aria-label="Запустить видео">
+            <div class="youtube-play-icon">
+                <div class="play-triangle"></div>
+            </div>
         </div>
 
         <div class="video-container" id="videoContainer">
