@@ -21,7 +21,6 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* главный контейнер занимает весь экран */
         .app {
             position: relative;
             width: 100%;
@@ -31,7 +30,6 @@
             justify-content: center;
         }
 
-        /* ----- ЧЁРНЫЙ ФОН + МЕРЦАЮЩИЕ ЗВЁЗДЫ (canvas) ----- */
         #starsCanvas {
             position: absolute;
             top: 0;
@@ -39,17 +37,16 @@
             width: 100%;
             height: 100%;
             display: block;
-            background-color: black; /* подложка */
-            pointer-events: none;    /* чтобы кнопка под ним была доступна */
+            background-color: black;
+            pointer-events: none;
             z-index: 1;
         }
 
-        /* центральная кнопка (поверх звёзд) */
         .center-btn {
             position: relative;
             z-index: 2;
             background: transparent;
-            border: 1px solid rgba(0, 255, 255, 0.9);    /* голубой контур */
+            border: 1px solid rgba(0, 255, 255, 0.9);
             border-radius: 10px;
             width: 160px;
             height: 160px;
@@ -72,14 +69,12 @@
             border-color: cyan;
             box-shadow: 0 0 20px cyan;
         }
-        /* имитация простого текста внутри, можно и без текста */
         .center-btn span {
             opacity: 0.8;
             font-weight: 300;
             letter-spacing: 1px;
         }
 
-        /* ВИДЕО-КОНТЕЙНЕР (заполняет экран поверх всего, когда активно) */
         .video-container {
             position: absolute;
             top: 0;
@@ -88,30 +83,28 @@
             height: 100%;
             background-color: black;
             z-index: 10;
-            display: none;          /* изначально скрыт */
+            display: none;
             align-items: center;
             justify-content: center;
         }
 
-        /* само видео — ориентация большей стороной к длинной стороне */
         #playerVideo {
             max-width: 100%;
             max-height: 100%;
             width: auto;
             height: auto;
-            object-fit: contain;    /* сохраняет пропорции, вписывая в экран */
+            object-fit: contain;
             background: black;
             display: block;
             margin: 0 auto;
         }
 
-        /* ПАНЕЛЬ УПРАВЛЕНИЯ (полупрозрачная голубая) */
         .control-panel {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 180, 255, 0.2);         /* полупрозрачный голубой */
+            background: rgba(0, 180, 255, 0.2);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(0, 255, 255, 0.5);
@@ -130,7 +123,6 @@
             opacity: 1;
         }
 
-        /* стили иконок (сделаем их через простые SVG-подобные символы, но для простоты — юникод + жирные точки) */
         .icon-btn {
             background: transparent;
             border: none;
@@ -153,42 +145,49 @@
             transform: scale(1.2);
             text-shadow: 0 0 16px white, 0 0 26px cyan;
         }
-        /* подсказка для иконок, если нужно */
-        .icon-btn[aria-label] {
-            position: relative;
-        }
-
-        /* крестик чуть меньше размером, но тоже хорошо */
         .icon-btn.close {
             font-size: 38px;
             font-weight: 300;
         }
 
-        /* скрытый класс */
         .hidden {
             display: none !important;
         }
-
+        
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: cyan;
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid cyan;
+            z-index: 30;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Звёздный фон (canvas) -->
         <canvas id="starsCanvas"></canvas>
 
-        <!-- Главная голубая кнопка по центру -->
         <div class="center-btn" id="startVideoBtn" role="button" tabindex="0" aria-label="Запустить видео">
             <span>⋆⍟⋆</span>
         </div>
 
-        <!-- Контейнер для видео и панели (появляется после нажатия) -->
         <div class="video-container" id="videoContainer">
-            <video id="playerVideo" playsinline webkit-playsinline preload="auto" src="viliv/f001.mp4"></video>
-            <!-- Панель управления -->
+            <div class="error-message" id="videoError">
+                Ошибка загрузки видео<br>
+                Проверьте наличие файлов в папке viliv/
+            </div>
+            <video id="playerVideo" playsinline webkit-playsinline preload="auto"></video>
             <div class="control-panel" id="controlPanel">
                 <button class="icon-btn play" id="playBtn" aria-label="Воспроизвести">▶</button>
                 <button class="icon-btn pause" id="pauseBtn" aria-label="Пауза">⏸️</button>
-                <button class="icon-btn next" id="nextBtn" aria-label="Следующий (f002.mp4)">⏭️</button>
+                <button class="icon-btn next" id="nextBtn" aria-label="Следующий">⏭️</button>
                 <button class="icon-btn close" id="closeBtn" aria-label="Закрыть видео">✕</button>
             </div>
         </div>
@@ -196,7 +195,6 @@
 
     <script>
         (function() {
-            // ------ элементы ------
             const starsCanvas = document.getElementById('starsCanvas');
             const startBtn = document.getElementById('startVideoBtn');
             const videoContainer = document.getElementById('videoContainer');
@@ -206,13 +204,24 @@
             const pauseBtn = document.getElementById('pauseBtn');
             const nextBtn = document.getElementById('nextBtn');
             const closeBtn = document.getElementById('closeBtn');
+            const videoError = document.getElementById('videoError');
 
-            // ------ состояние ------
             let hidePanelTimer = null;
-            const videoFiles = ['f001.mp4', 'f002.mp4'];      // в папке viliv, можно расширить
-            let currentIndex = 0;      // 0 = f001.mp4
+            
+            // ВАЖНО: Укажите правильные имена файлов (с учетом регистра!)
+            const videoFiles = ['f001.mp4', 'f002.mp4'];
+            let currentIndex = 0;
 
-            // ------ звездный фон (мерцание) ------
+            // Функция для получения полного URL файла на GitHub
+            function getVideoUrl(filename) {
+                // Получаем текущий URL страницы
+                const baseUrl = window.location.origin + window.location.pathname;
+                // Поднимаемся на уровень выше (если html в корне) и добавляем папку viliv
+                const basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+                return basePath + 'viliv/' + filename;
+            }
+
+            // Звездный фон
             let stars = [];
             const ctx = starsCanvas.getContext('2d');
             const STAR_COUNT = 180;
@@ -240,22 +249,20 @@
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, w, h);
 
-                const now = Date.now() * 0.002; // для мерцания
+                const now = Date.now() * 0.002;
                 for (let s of stars) {
-                    // мерцание: синусоида от времени + базовая альфа
                     const twinkle = Math.sin(now * s.speed * 10 + s.x * 0.02) * 0.35 + 0.65;
                     let alpha = s.baseAlpha * twinkle;
                     alpha = Math.min(1, Math.max(0.2, alpha));
                     
                     ctx.beginPath();
                     ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255, 255, 200, ${alpha})`; // теплый белый
+                    ctx.fillStyle = `rgba(255, 255, 200, ${alpha})`;
                     ctx.fill();
                 }
                 requestAnimationFrame(drawStars);
             }
 
-            // подстройка размера холста при изменении окна
             function resizeHandler() {
                 if (starsCanvas) {
                     starsCanvas.width = window.innerWidth;
@@ -263,159 +270,160 @@
                 }
                 initStars();
             }
+            
             window.addEventListener('resize', resizeHandler);
-            resizeHandler(); // первый запуск
-            drawStars();     // старт анимации
+            resizeHandler();
+            drawStars();
 
-            // ------ функции управления видео и панелью ------
+            // Функции управления
             function showControlPanel() {
-                if (!controlPanel) return;
                 controlPanel.classList.add('visible');
-                // сброс таймера скрытия
                 resetHidePanelTimer();
             }
 
             function hideControlPanel() {
-                if (controlPanel) controlPanel.classList.remove('visible');
+                controlPanel.classList.remove('visible');
             }
 
             function resetHidePanelTimer() {
                 if (hidePanelTimer) clearTimeout(hidePanelTimer);
                 hidePanelTimer = setTimeout(() => {
                     controlPanel.classList.remove('visible');
-                }, 3000); // 3 секунды
+                }, 3000);
             }
 
-            // обновить источник видео по индексу
             function loadVideoByIndex(index) {
                 if (index >= 0 && index < videoFiles.length) {
                     const fileName = videoFiles[index];
-                    playerVideo.src = `viliv/${fileName}`;
-                    playerVideo.load();    // подгрузить
-                    // после загрузки можно auto-play? но по спецификации нужно взаимодействие.
-                    // однако панель уже есть, и пользователь нажмёт play.
-                    // автоматическое воспроизведение после смены только если было до этого воспроизведение?
-                    // оставим без авто, пусть жмёт play.
+                    const videoUrl = getVideoUrl(fileName);
+                    
+                    console.log('Загрузка видео:', videoUrl); // Для отладки
+                    
+                    playerVideo.src = videoUrl;
+                    playerVideo.load();
+                    
+                    // Проверка загрузки
+                    playerVideo.oncanplaythrough = function() {
+                        videoError.style.display = 'none';
+                    };
+                    
+                    playerVideo.onerror = function(e) {
+                        console.error('Ошибка загрузки видео:', videoUrl);
+                        videoError.style.display = 'block';
+                        setTimeout(() => {
+                            videoError.style.display = 'none';
+                        }, 3000);
+                    };
                 }
             }
 
-            // закрыть видео (вернуться к звёздам и кнопке)
             function closeVideo() {
                 playerVideo.pause();
-                videoContainer.style.display = 'none'; // скрыть контейнер
-                hideControlPanel(); // спрятать панель
+                videoContainer.style.display = 'none';
+                hideControlPanel();
                 if (hidePanelTimer) {
                     clearTimeout(hidePanelTimer);
                     hidePanelTimer = null;
                 }
-                // сбросить индекс на f001? по желанию — оставим как есть (текущий индекс сохраняется)
-                // но можно при закрытии сбрасывать на первый, но по тз не сказано. сохраним.
-                // однако при следующем открытии через кнопку — покажем тот же индекс? лучше сбросить на f001.
                 currentIndex = 0;
                 loadVideoByIndex(0);
             }
 
-            // ------ обработчики кнопок ------
+            // Обработчики событий
             startBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // показать контейнер с видео
-                videoContainer.style.display = 'flex';  // flex из CSS
-                // убедимся, что плеер показывает текущее видео (f001)
+                videoContainer.style.display = 'flex';
                 currentIndex = 0;
                 loadVideoByIndex(0);
-                // после показа видео панель можно показать автоматически?
-                // по логике: нажали кнопку — видео открылось, панель видна 3 сек
                 showControlPanel();
-                // Не запускаем видео автоматически (ожидание нажатия play)
-                // но чтобы видео не висело чёрным, можно показать постер? не требуется.
             });
 
-            // play
             playBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 playerVideo.play()
                     .then(() => {
-                        showControlPanel(); // показать панель и сбросить таймер
+                        showControlPanel();
                     })
-                    .catch(err => console.warn('autoplay blocked?', err));
+                    .catch(err => {
+                        console.warn('Автовоспроизведение не удалось:', err);
+                        // Пробуем воспроизвести после взаимодействия
+                        setTimeout(() => {
+                            playerVideo.play().catch(e => {});
+                        }, 100);
+                    });
             });
 
-            // pause
             pauseBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 playerVideo.pause();
-                showControlPanel(); // панель появляется при нажатии, потом скроется
-            });
-
-            // next (f002.mp4)
-            nextBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // переключение между f001 и f002 (циклически? пусть будет два)
-                if (videoFiles.length === 0) return;
-                currentIndex = (currentIndex + 1) % videoFiles.length; // 0->1, 1->0
-                loadVideoByIndex(currentIndex);
-                // после смены видео автоматически не играет, ждём play
-                // показать панель
                 showControlPanel();
             });
 
-            // close
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (videoFiles.length === 0) return;
+                currentIndex = (currentIndex + 1) % videoFiles.length;
+                loadVideoByIndex(currentIndex);
+                showControlPanel();
+                
+                // Пытаемся воспроизвести автоматически после смены
+                setTimeout(() => {
+                    playerVideo.play().catch(e => {});
+                }, 200);
+            });
+
             closeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 closeVideo();
             });
 
-            // касание/клик по видео — показать панель и перезапустить таймер
             playerVideo.addEventListener('click', (e) => {
                 e.stopPropagation();
                 showControlPanel();
             });
 
-            // также касание самого контейнера (чтобы поймать клик вне панели) — показываем панель
+            playerVideo.addEventListener('ended', () => {
+                showControlPanel();
+            });
+
             videoContainer.addEventListener('click', (e) => {
-                // если кликнули не на кнопке панели, и не на панели
                 if (!controlPanel.contains(e.target)) {
                     showControlPanel();
                 }
             });
 
-            // предотвращаем скрытие, если клик именно внутри панели (не даем таймеру сразу сброситься)
             controlPanel.addEventListener('click', (e) => {
-                e.stopPropagation();  // не передаём контейнеру
-                resetHidePanelTimer(); // нажали на кнопку → таймер обновлён
+                e.stopPropagation();
+                resetHidePanelTimer();
             });
 
-            // также наведение мыши на панель (для отладки на десктопе, но смартфон)
             controlPanel.addEventListener('touchstart', (e) => {
                 e.stopPropagation();
                 resetHidePanelTimer();
             });
 
-            // дополнительно: если видео закончилось — можно показать панель, но не обязательно
-            playerVideo.addEventListener('ended', () => {
-                showControlPanel(); // даём возможность нажать next или replay
-            });
-
-            // обработаем изменение файла/источника: принудительно сбрасываем play? ничего
-            // также обработаем ориентацию: видео уже подстраивается через object-fit: contain
-
-            // При открытии на смартфоне важно чтобы видео не перекрывало интерфейс
-            // скрыть панель при скролле? не требуется.
-
-            // небольшая защита – скрываем панель при первом запуске, если вдруг
+            // Инициализация
             hideControlPanel();
-
-            // на случай, если загрузка видео медленная
-            // но интерфейс и так работает
-
-            // также добавим обработку ошибок загрузки файла (например файла нет)
-            playerVideo.addEventListener('error', (e) => {
-                console.warn('видео не загрузилось, проверьте путь viliv/' + videoFiles[currentIndex]);
-                // можно показать уведомление, но не обязательно
-            });
-
-            // инициализация индекса и пути
-            loadVideoByIndex(0);
+            
+            // Проверяем доступность файлов при загрузке
+            setTimeout(() => {
+                if (videoFiles.length > 0) {
+                    const testUrl = getVideoUrl(videoFiles[0]);
+                    fetch(testUrl, { method: 'HEAD' })
+                        .then(response => {
+                            if (!response.ok) {
+                                console.warn('Файл не найден:', testUrl);
+                                videoError.style.display = 'block';
+                                setTimeout(() => {
+                                    videoError.style.display = 'none';
+                                }, 4000);
+                            }
+                        })
+                        .catch(() => {
+                            console.warn('Не удалось проверить файл:', testUrl);
+                        });
+                }
+            }, 1000);
         })();
     </script>
 </body>
