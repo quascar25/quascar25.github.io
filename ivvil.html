@@ -239,26 +239,58 @@
         /* Контейнер полоски загрузки */
         .loading-bar-container {
             position: absolute;
-            bottom: 100px;  /* Расположим над панелью управления */
-            left: 20px;
-            right: 20px;
+            bottom: 82px;  /* Поднял на 4 пикселя (было 86) */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 260px;  /* Фиксированная ширина, как у панели */
             height: 3px;
-            background-color: rgba(128, 128, 128, 0.5); /* серая полоска */
+            background-color: rgba(128, 128, 128, 0.5);
             border-radius: 2px;
             z-index: 25;
             overflow: hidden;
             backdrop-filter: blur(2px);
+            opacity: 0;  /* По умолчанию скрыта */
+            transition: opacity 0.2s ease;
+            pointer-events: none; /* Чтобы не мешала нажимать на кнопки */
         }
-        
-        /* Бегущая белая полоска */
-        .loading-bar-progress {
-            width: 0%;
-            height: 100%;
-            background-color: white;
-            border-radius: 2px;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
-        }
+
+
+                 /* Показываем полоску вместе с панелью */
+            .control-panel.visible ~ .loading-bar-container,
+            .loading-bar-container.visible {
+                opacity: 1;
+            }
+            
+            /* Бегущая белая полоска */
+            .loading-bar-progress {
+                width: 0%;
+                height: 100%;
+                background-color: white;
+                border-radius: 2px;
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            }
+            
+            /* При полной загрузке - зелёная и потом исчезает */
+            .loading-bar-progress.complete {
+                background-color: #4caf50;
+                animation: fadeOut 0.5s forwards;
+                animation-delay: 0.3s;
+            }
+            
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                }
+            }
+            
+            /* Для мобильных экранов */
+            @media (max-width: 480px) {
+                .loading-bar-container {
+                    width: 220px;  /* Чуть уже на маленьких экранах */
+                    bottom: 78px;
+                }
+            }
 
         <div class="fullscreen-hint" id="fullscreenHint">
          👆 Свайпните сверху для выхода
@@ -297,8 +329,6 @@
                     visibility: hidden;
                 }
             }
-
-        
         
     </style>
 </head>
@@ -452,13 +482,17 @@
             drawStars();
 
             // ----- Функции управления панелью и видео -----
+            // Измените функцию showControlPanel
             function showControlPanel() {
                 controlPanel.classList.add('visible');
+                updateLoadingBarVisibility(true); // Показываем полоску
                 resetHidePanelTimer();
             }
-
+            
+            // Измените функцию hideControlPanel
             function hideControlPanel() {
                 controlPanel.classList.remove('visible');
+                updateLoadingBarVisibility(false); // Скрываем полоску
             }
 
                                 let isFirstOpen = true; // Добавьте эту переменную в начало скрипта (рядом с другими let)
@@ -503,42 +537,76 @@
             }
 
             //// dil 
-                // ----- Функция отслеживания загрузки видео -----
-                const loadingProgress = document.getElementById('loadingProgress');
-                
-                function setupProgressTracking(videoElement) {
-                    // При обновлении данных о загрузке
-                    videoElement.addEventListener('progress', function() {
-                        if (videoElement.buffered.length > 0) {
-                            // Сколько уже загружено (в секундах)
-                            const bufferedEnd = videoElement.buffered.end(videoElement.buffered.length - 1);
-                            // Общая длительность видео
-                            const duration = videoElement.duration;
-                            
-                            if (duration > 0) {
-                                const percent = (bufferedEnd / duration) * 100;
-                                loadingProgress.style.width = percent + '%';
+                                       // ----- Обновлённая функция отслеживания загрузки -----
+                                const loadingProgress = document.getElementById('loadingProgress');
+                                const loadingContainer = document.querySelector('.loading-bar-container');
+                                let isFullyLoaded = false; // Добавьте эту переменную в начало скрипта
                                 
-                                // Если загрузили достаточно для воспроизведения до конца
-                                if (percent >= 99.9) {
-                                    loadingProgress.style.backgroundColor = '#4caf50'; // зелёный оттенок при полной загрузке
+                                function setupProgressTracking(videoElement) {
+                                    // При обновлении данных о загрузке
+                                    videoElement.addEventListener('progress', function() {
+                                        if (videoElement.buffered.length > 0 && videoElement.duration > 0) {
+                                            const bufferedEnd = videoElement.buffered.end(videoElement.buffered.length - 1);
+                                            const duration = videoElement.duration;
+                                            
+                                            if (duration > 0) {
+                                                const percent = (bufferedEnd / duration) * 100;
+                                                loadingProgress.style.width = percent + '%';
+                                                
+                                                // Если видео полностью загружено и ещё не отмечали
+                                                if (percent >= 99.9 && !isFullyLoaded) {
+                                                    isFullyLoaded = true;
+                                                    loadingProgress.classList.add('complete');
+                                                    
+                                                    // Полностью скрываем контейнер после анимации
+                                                    setTimeout(() => {
+                                                        if (!controlPanel.classList.contains('visible')) {
+                                                            loadingContainer.style.opacity = '0';
+                                                        }
+                                                    }, 1000);
+                                                }
+                                            }
+                                        }
+                                    });
+                                
+                                    // Когда видео полностью загружено (событие canplaythrough)
+                                    videoElement.addEventListener('canplaythrough', function() {
+                                        if (!isFullyLoaded) {
+                                            isFullyLoaded = true;
+                                            loadingProgress.style.width = '100%';
+                                            loadingProgress.classList.add('complete');
+                                            
+                                            setTimeout(() => {
+                                                if (!controlPanel.classList.contains('visible')) {
+                                                    loadingContainer.style.opacity = '0';
+                                                }
+                                            }, 1000);
+                                        }
+                                    });
+                                
+                                    // При смене источника сбрасываем всё
+                                    videoElement.addEventListener('loadstart', function() {
+                                        resetLoadingIndicator();
+                                    });
                                 }
-                            }
-                        }
-                    });
-                
-                    // Когда видео полностью загружено
-                    videoElement.addEventListener('canplaythrough', function() {
-                        loadingProgress.style.width = '100%';
-                        loadingProgress.style.backgroundColor = '#4caf50';
-                    });
-                
-                    // При смене источника сбрасываем прогресс
-                    videoElement.addEventListener('loadstart', function() {
-                        loadingProgress.style.width = '0%';
-                        loadingProgress.style.backgroundColor = 'white';
-                    });
-                }
+                                
+                                // Функция сброса индикатора
+                                function resetLoadingIndicator() {
+                                    isFullyLoaded = false;
+                                    loadingProgress.style.width = '0%';
+                                    loadingProgress.classList.remove('complete');
+                                    loadingContainer.style.opacity = '0';
+                                }
+                                
+                                // Функция показа/скрытия полоски вместе с панелью
+                                function updateLoadingBarVisibility(show) {
+                                    if (!isFullyLoaded) {
+                                        loadingContainer.style.opacity = show ? '1' : '0';
+                                    } else {
+                                        loadingContainer.style.opacity = '0';
+                                    }
+                                }
+                                                
 
                 // Вызовите эту функцию после создания видео элемента
                 setupProgressTracking(playerVideo);
@@ -558,6 +626,7 @@
                 currentIndex = 0;
                 loadVideoByIndex(0);
                 isFirstOpen = true; // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+                resetLoadingIndicator(); // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
             }
 
             // ----- Обработчики событий -----
@@ -639,7 +708,8 @@
             // Инициализация
             hideControlPanel();
             loadVideoByIndex(0);
-        })();
+          })();
+        setupProgressTracking(playerVideo);
     </script>
 </body>
 </html>
