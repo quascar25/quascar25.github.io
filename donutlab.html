@@ -2,14 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Donut Lab • симулятор VTT • мобильный</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+    <title>Donut Lab • VTT симулятор • full zoom</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
 
         body {
@@ -48,12 +48,12 @@
             100% { opacity: 0.2; transform: scale(1); }
         }
 
-        /* главный контейнер — адаптивный */
+        /* главный контейнер — масштабируемый */
         .donut-panel {
             position: relative;
             z-index: 20;
             width: 100%;
-            max-width: 480px; /* комфортно для смартфона */
+            max-width: 500px;
             background: rgba(8, 16, 30, 0.75);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -62,9 +62,41 @@
             padding: 18px 16px 24px;
             box-shadow: 0 20px 40px -10px #000000, 0 0 0 1px #273c60 inset, 0 0 40px #142b4b;
             color: #d0e4ff;
+            transition: all 0.2s;
+            resize: both;
+            overflow: auto;
+            min-width: 320px;
+            min-height: 600px;
         }
 
-        /* заголовок компактный */
+        /* кнопка полноэкранного режима */
+        .fullscreen-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #1a2f50;
+            border: 1px solid #3f68a0;
+            color: #b0ccff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 30;
+            box-shadow: 0 4px 8px #00000060;
+            transition: 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        .fullscreen-btn:hover {
+            background: #254b80;
+            transform: scale(1.1);
+        }
+
+        /* заголовок */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -73,6 +105,7 @@
             padding-bottom: 10px;
             margin-bottom: 14px;
             flex-wrap: wrap;
+            padding-right: 40px;
         }
 
         .top-bar h2 {
@@ -90,7 +123,7 @@
             border: 1px solid #37588a;
         }
 
-        /* блок аккумулятора + параметры */
+        /* блок аккумулятора */
         .cell-block {
             background: #051020cc;
             border-radius: 34px;
@@ -105,9 +138,16 @@
             padding: 14px 10px;
             border: 1px solid #3b5f90;
             box-shadow: inset 0 -3px 8px #1d3455, 0 8px 12px #00000080;
+            transition: 0.3s;
         }
 
-        /* электроды (более отзывчивые) */
+        /* анимация перегрева */
+        .cell-rect.overheat {
+            box-shadow: 0 0 40px #ff5e00, inset 0 0 20px #ff4500;
+            border-color: #ff9933;
+            transition: 0.2s;
+        }
+
         .electrodes {
             display: flex;
             flex-wrap: wrap;
@@ -148,7 +188,7 @@
             filter: drop-shadow(0 0 6px #3c7bc0);
         }
 
-        /* панель управления режимами (сетка) */
+        /* панель управления */
         .mode-grid {
             display: flex;
             flex-wrap: wrap;
@@ -187,11 +227,6 @@
             border-color: #5380c0;
         }
 
-        .c-btn:active {
-            background: #253f68;
-        }
-
-        /* кнопки охлаждения с иконками (текст/эмоджи) */
         .cool-row {
             display: flex;
             gap: 15px;
@@ -225,12 +260,7 @@
             line-height: 1.2;
         }
 
-        .cool-card small {
-            font-size: 0.8rem;
-            color: #adc6ff;
-        }
-
-        /* виджет графиков */
+        /* график */
         .graph-area {
             background: #071129;
             border-radius: 32px;
@@ -262,7 +292,7 @@
             font-size: 1rem;
         }
 
-        /* большая кнопка СТАРТ/СТОП */
+        /* большая кнопка */
         .big-test-btn {
             background: linear-gradient(145deg, #1f314f, #0e1d33);
             border: 2px solid #3d6bb0;
@@ -277,7 +307,6 @@
             cursor: pointer;
             box-shadow: 0 8px 0 #09121f, 0 0 35px #25467a;
             transition: 0.1s ease;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .big-test-btn:active {
@@ -316,15 +345,18 @@
 <body>
 <div class="stars" id="starfield"></div>
 
-<div class="donut-panel">
+<div class="donut-panel" id="mainPanel">
+    <!-- кнопка fullscreen -->
+    <div class="fullscreen-btn" id="fullscreenBtn" title="На весь экран (зум)">⛶</div>
+
     <div class="top-bar">
         <h2>⚡ DONUT·VTT</h2>
         <span>MX 26Ah · 4.3V</span>
     </div>
 
-    <!-- батарея с радиатором -->
+    <!-- батарея -->
     <div class="cell-block">
-        <div class="cell-rect">
+        <div class="cell-rect" id="batteryRect">
             <div class="electrodes">
                 <div class="electrode"></div>
                 <div class="electrode small"></div>
@@ -341,7 +373,7 @@
         </div>
     </div>
 
-    <!-- блок переключения С-режимов -->
+    <!-- C-режимы -->
     <div class="mode-grid">
         <div class="c-rate-box">
             <button class="c-btn" id="rate1C">1C</button>
@@ -350,7 +382,7 @@
         </div>
     </div>
 
-    <!-- охлаждение: мотоцикл (воздух) / автомобиль (вода) -->
+    <!-- охлаждение -->
     <div class="cool-row">
         <div class="cool-card" id="coolAir">
             <span>🏍️</span>
@@ -362,7 +394,7 @@
         </div>
     </div>
 
-    <!-- график температуры + показатели -->
+    <!-- график -->
     <div class="graph-area">
         <div class="graph-header">
             <span>📈 термопрофиль T1/T2</span>
@@ -381,7 +413,7 @@
     <!-- кнопка пуск/стоп -->
     <div class="big-test-btn" id="testToggleBtn">▶ ПУСК</div>
 
-    <!-- нижние цифровые параметры -->
+    <!-- нижние метрики -->
     <div class="footer-metrics">
         <div class="metric-item"># цикл <span id="cycleVal">6</span></div>
         <div class="metric-item">⚡ емк <span id="capVal">26.19</span> Ah</div>
@@ -412,19 +444,21 @@
         // ---------- симуляция ----------
         const canvas = document.getElementById('tempCanvas');
         const ctx = canvas.getContext('2d');
+        const batteryRect = document.getElementById('batteryRect');
 
-        // переменные состояния
-        let testActive = false;              // тест включен/выключен
-        let currentRate = '5C';               // 1C / 5C / 11C
-        let coolingMode = 'air';               // 'air' или 'water'
+        // переменные
+        let testActive = false;
+        let currentRate = '5C';
+        let coolingMode = 'air';
         let cycle = 6, capacity = 26.19, energy = 92.8, soc = 98;
         let t1 = 24.5, t2 = 23.2;
+        let overheat = false; // для анимации
 
-        // история для графика (20 точек)
+        // история
         let histT1 = new Array(20).fill(t1);
         let histT2 = new Array(20).fill(t2);
 
-        // элементы интерфейса
+        // элементы
         const t1Span = document.getElementById('t1Val');
         const t2Span = document.getElementById('t2Val');
         const avgSpan = document.getElementById('avgTempLabel');
@@ -440,8 +474,22 @@
         const coolAir = document.getElementById('coolAir');
         const coolWater = document.getElementById('coolWater');
         const testBtn = document.getElementById('testToggleBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const panel = document.getElementById('mainPanel');
 
-        // охлаждение active класс
+        // полноэкранный режим
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                panel.requestFullscreen().catch(err => {
+                    // мобильный fallback
+                    if (panel.requestFullscreen) panel.requestFullscreen();
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // охлаждение UI
         function updateCoolUI() {
             if (coolingMode === 'air') {
                 coolAir.classList.add('active-cool');
@@ -453,7 +501,7 @@
         }
         updateCoolUI();
 
-        // подсветка C-rate
+        // C-rate активный
         function setActiveRate(rate) {
             btn1C.classList.remove('active');
             btn5C.classList.remove('active');
@@ -471,7 +519,7 @@
             else if (currentRate === '11C') currentModeSpan.innerText = '⚡ 286A (11C)';
         }
 
-        // обновление показателей на экране
+        // обновление цифр
         function refreshDisplay() {
             t1Span.innerHTML = `🔥 T1 ${t1.toFixed(1)}°C`;
             t2Span.innerHTML = `❄️ T2 ${t2.toFixed(1)}°C`;
@@ -484,12 +532,11 @@
             socSpan.innerText = Math.floor(soc);
         }
 
-        // отрисовка графика
+        // график
         function drawTempChart() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const w = canvas.width, h = canvas.height;
 
-            // сетка
             ctx.strokeStyle = '#2f4770';
             ctx.setLineDash([4, 5]);
             ctx.lineWidth = 0.8;
@@ -502,13 +549,13 @@
             }
             ctx.setLineDash([]);
 
-            // T1 (синий)
+            // T1
             ctx.strokeStyle = '#5f9eff';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
             for (let i=0; i<histT1.length; i++) {
                 let x = 15 + (i * (w-30) / (histT1.length-1));
-                let y = h - 25 - (histT1[i] - 15) * 3.2; // примерный масштаб
+                let y = h - 25 - (histT1[i] - 15) * 3.2;
                 if (y<10) y=10;
                 if (y>h-15) y=h-15;
                 if (i===0) ctx.moveTo(x, y);
@@ -516,7 +563,7 @@
             }
             ctx.stroke();
 
-            // T2 (голубой)
+            // T2
             ctx.strokeStyle = '#7fc9ff';
             ctx.lineWidth = 2.2;
             ctx.beginPath();
@@ -531,29 +578,37 @@
             ctx.stroke();
         }
 
-        // ----- логика теста (вызывается через requestAnimationFrame) -----
+        // проверка перегрева
+        function checkOverheat() {
+            const maxTemp = Math.max(t1, t2);
+            if (maxTemp > 57) {
+                batteryRect.classList.add('overheat');
+                overheat = true;
+            } else {
+                batteryRect.classList.remove('overheat');
+                overheat = false;
+            }
+        }
+
+        // шаг симуляции
         function simulationStep() {
             if (!testActive) return;
 
-            // изменение температур в зависимости от режима и охлаждения
-            let heatFactor = (currentRate === '11C') ? 1.3 : (currentRate === '5C' ? 0.9 : 0.4);
-            let coolFactor = (coolingMode === 'water') ? 0.45 : 0.7;  // вода охлаждает эффективнее
+            let heatFactor = (currentRate === '11C') ? 1.4 : (currentRate === '5C' ? 0.95 : 0.45);
+            let coolFactor = (coolingMode === 'water') ? 0.4 : 0.7;
 
             t1 += (Math.random() - 0.48) * heatFactor * 0.9 - (coolFactor * 0.05);
             t2 += (Math.random() - 0.52) * heatFactor * 0.8 - (coolFactor * 0.06);
 
-            // ограничения
-            t1 = Math.min(62, Math.max(20, t1));
-            t2 = Math.min(58, Math.max(19, t2));
+            t1 = Math.min(68, Math.max(20, t1));
+            t2 = Math.min(64, Math.max(19, t2));
 
-            // слегка меняем емкость / энергию
             capacity += (Math.random() - 0.5) * 0.04;
             capacity = Math.min(26.8, Math.max(25.6, capacity));
             energy = capacity * 3.52 + (Math.random() - 0.5);
             soc = 90 + (Math.random() * 8);
             if (Math.random() > 0.8) cycle = (cycle % 15) + 1;
 
-            // обновляем историю
             histT1.push(t1);
             histT2.push(t2);
             histT1.shift();
@@ -561,11 +616,12 @@
 
             refreshDisplay();
             drawTempChart();
+            checkOverheat();
 
             requestAnimationFrame(simulationStep);
         }
 
-        // запуск / остановка теста
+        // пуск/стоп
         function setTestState(active) {
             testActive = active;
             if (active) {
@@ -575,10 +631,11 @@
             } else {
                 testBtn.innerText = '▶ ПУСК';
                 testBtn.classList.remove('running');
+                batteryRect.classList.remove('overheat');
             }
         }
 
-        // обработчики кнопок
+        // обработчики
         btn1C.addEventListener('click', ()=>{
             currentRate = '1C';
             setActiveRate('1C');
@@ -610,7 +667,7 @@
         drawTempChart();
         updateCurrentLabel();
 
-        // небольшой "вживление" - предзаполнение графика
+        // подмешаем истории
         for (let i=0; i<5; i++) {
             histT1.push(24 + Math.random()*1.5);
             histT2.push(22.5 + Math.random()*2);
@@ -618,6 +675,7 @@
         histT1.splice(0,5);
         histT2.splice(0,5);
         drawTempChart();
+        checkOverheat();
     })();
 </script>
 </body>
