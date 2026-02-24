@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donut Lab • симуляция теста VTT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 40%, #0a0f1e, #03050a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* мерцающие звёзды */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: transparent;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #b0ccff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px 2px rgba(100, 160, 255, 0.5);
+            animation: twinkle 4s infinite ease-in-out;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 20px 4px #7aa9ff; }
+        }
+
+        /* главная карточка */
+        .testlab {
+            position: relative;
+            z-index: 10;
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(10, 18, 30, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #2f3b5c;
+            border-radius: 42px;
+            padding: 30px 30px 40px;
+            box-shadow: 0 25px 45px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px #2a3750 inset, 0 0 25px #1e3b5f;
+            color: #d6e6ff;
+        }
+
+        /* заголовок */
+        .header h1 {
+            font-weight: 400;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            color: #9bbaff;
+            text-transform: uppercase;
+            border-bottom: 1px solid #2a3f60;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 span {
+            font-weight: 300;
+            color: #6080b0;
+            font-size: 1rem;
+            margin-left: auto;
+        }
+
+        /* сетка основная */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr;
+            gap: 24px;
+            margin: 30px 0 25px;
+        }
+
+        /* левая панель — батарея */
+        .battery-3d {
+            background: rgba(0, 8, 20, 0.7);
+            border-radius: 32px;
+            padding: 22px 18px 18px;
+            border: 1px solid #31476b;
+            box-shadow: 0 10px 20px -5px #00000080, inset 0 0 30px #0f1a2b;
+        }
+
+        .cell-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            color: #95adde;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* корпус аккумулятора (прямоугольник с электродами) */
+        .cell-rect {
+            background: linear-gradient(145deg, #19273c, #0f1a2a);
+            border-radius: 28px;
+            padding: 18px 20px;
+            border: 1px solid #385074;
+            box-shadow: 0 15px 20px -8px black, inset 0 -2px 5px #2f4468;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* радиатор / электроды — схематичные линии */
+        .electrode-grid {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .electrode {
+            background: #2e4a70;
+            width: 14px;
+            height: 45px;
+            border-radius: 20px;
+            box-shadow: 0 5px 0 #0c1a30, 0 8px 8px #00000080;
+            transform: rotate(2deg);
+            border-left: 2px solid #6080b0;
+            border-right: 2px solid #1d314a;
+        }
+
+        .electrode:nth-child(odd) {
+            height: 55px;
+            background: #3d5f8a;
+        }
+
+        .electrode-row {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+            margin: 5px 0;
+        }
+
+        .plus-sign, .minus-sign {
+            color: #90b0f0;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 5px;
+        }
+
+        .anode-cathode {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            background: #0b1423;
+            border-radius: 40px;
+            padding: 8px 15px;
+            border: 1px dashed #3d5780;
+            color: #aac3ff;
+            font-size: 0.9rem;
+        }
+
+        /* правая панель — графики темп */
+        .graph-panel {
+            background: #08111ecc;
+            border-radius: 28px;
+            padding: 20px 18px;
+            border: 1px solid #2b3f62;
+        }
+
+        .graph-header {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            border-bottom: 1px solid #203452;
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+        }
+
+        .temp-indicator {
+            background: #112438;
+            border-radius: 40px;
+            padding: 5px 14px;
+            font-size: 1.3rem;
+            font-weight: 300;
+            color: #c0dcff;
+            border: 1px solid #3165a0;
+            box-shadow: 0 0 8px #2f5590;
+        }
+
+        .temp-indicator span {
+            font-size: 0.8rem;
+            color: #8aa0d0;
+            margin-left: 5px;
+        }
+
+        /* график canvas */
+        .chart-container {
+            background: #030c16;
+            border-radius: 30px;
+            padding: 15px 10px 5px 10px;
+            border: 1px solid #284569;
+            margin-bottom: 15px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #020a12;
+            border-radius: 16px;
+        }
+
+        .temp-live {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0 15px;
+            font-size: 1.1rem;
+        }
+
+        .temp-live div {
+            background: #142439;
+            padding: 5px 18px;
+            border-radius: 40px;
+            border: 1px solid #33537c;
+        }
+
+        /* кнопка пуска */
+        .start-area {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 5px;
+        }
+
+        .start-button {
+            background: linear-gradient(145deg, #18273f, #0d1a2d);
+            border: 2px solid #3a6090;
+            color: #ccdeff;
+            font-size: 2.2rem;
+            font-weight: 400;
+            padding: 16px 60px;
+            border-radius: 80px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px #00000080, 0 0 25px #2f5faf;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(10px);
+            width: fit-content;
+        }
+
+        .start-button:hover {
+            background: #1f314f;
+            border-color: #5d89d0;
+            box-shadow: 0 0 35px #3d75c4;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .start-button:active {
+            transform: scale(0.98);
+            background: #14263f;
+        }
+
+        /* footer цифры */
+        .footer-stats {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 25px;
+            color: #7c9bd0;
+            font-size: 0.9rem;
+            border-top: 1px solid #253b58;
+            padding-top: 18px;
+        }
+
+        .metric {
+            background: #0e1f30;
+            padding: 8px 14px;
+            border-radius: 28px;
+            border: 1px solid #2e4a77;
+            font-weight: 300;
+        }
+
+        .metric strong {
+            color: #e1efff;
+            font-weight: 500;
+            margin-right: 6px;
+        }
+
+        .blink-value {
+            color: #b8d2ff;
+            transition: 0.1s;
+        }
+    </style>
+</head>
+<body>
+<!-- слой звезд -->
+<div class="stars" id="stars"></div>
+
+<div class="testlab">
+    <div class="header">
+        <h1>
+            ⚡ DONUT LAB • VTT CR-00092-26
+            <span>твердотельный / 26 Ah</span>
+        </h1>
+    </div>
+
+    <div class="dashboard">
+        <!-- левая часть: аккумулятор -->
+        <div class="battery-3d">
+            <div class="cell-title">
+                <span>🔋 ячейка (D1628)</span>
+                <span>прототип MX</span>
+            </div>
+            <div class="cell-rect">
+                <div class="electrode-grid">
+                    <div class="electrode-row">
+                        <span class="plus-sign">⨁</span>
+                        <div class="electrode"></div>
+                        <div class="electrode"></div>
+                        <div class="electrode"></div>
+                        <div class="electrode"></div>
+                        <span class="minus-sign">⨀</span>
+                    </div>
+                </div>
+                <!-- радиатор / охлаждение схематично -->
+                <div style="display: flex; justify-content: center; gap: 15px; margin: 15px 0 10px;">
+                    <div style="width: 40px; height: 8px; background: #3466a0; border-radius: 20px; filter: drop-shadow(0 0 6px #369);"></div>
+                    <div style="width: 40px; height: 8px; background: #3466a0; border-radius: 20px; filter: drop-shadow(0 0 6px #369);"></div>
+                    <div style="width: 40px; height: 8px; background: #3466a0; border-radius: 20px; filter: drop-shadow(0 0 6px #369);"></div>
+                </div>
+                <div class="anode-cathode">
+                    <span>⏤ катод (NMC)</span>
+                    <span>анод (кремний) ⏤</span>
+                </div>
+            </div>
+            <!-- доп параметры -->
+            <div style="display: flex; gap: 10px; justify-content: space-between; background: #0d1a2c; border-radius: 30px; padding: 8px 12px; margin-top: 6px;">
+                <span>🔹 26 Ah</span>
+                <span>⚡ 4.3 V</span>
+                <span>🌀 5C / 11C</span>
+            </div>
+        </div>
+
+        <!-- правая часть: графики температур -->
+        <div class="graph-panel">
+            <div class="graph-header">
+                <div style="font-weight: 300; color: #a1beff;">ТЕРМОПРОФИЛЬ · T1/T2</div>
+                <div class="temp-indicator" id="tempNow">23.5 <span>°C</span></div>
+            </div>
+
+            <!-- canvas для графиков (живая линия) -->
+            <div class="chart-container">
+                <canvas id="tempChart" width="300" height="120" style="width:100%; height:auto; background:#020a12"></canvas>
+            </div>
+
+            <div class="temp-live">
+                <div id="t1display">🔥 T1: 24.1°C</div>
+                <div id="t2display">❄️ T2: 22.8°C</div>
+            </div>
+            <!-- микроиндикация заряда/тока -->
+            <div style="background:#0b172a; border-radius: 20px; padding: 8px 10px; font-size:0.9rem; display: flex; justify-content: space-between;">
+                <span>🔌 5C быстрый заряд</span>
+                <span id="currentLabel">130 A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- центральная кнопка запуска -->
+    <div class="start-area">
+        <div class="start-button" id="startTestBtn">▶ ПУСК ТЕСТА</div>
+    </div>
+
+    <!-- нижние показатели (цифры) -->
+    <div class="footer-stats">
+        <div class="metric"><strong>цикл #</strong><span id="cycleNum" class="blink-value">4</span></div>
+        <div class="metric"><strong>емкость</strong><span id="capacityDisp">26.12</span> Ah</div>
+        <div class="metric"><strong>энергия</strong><span id="energyDisp">92.4</span> Wh</div>
+        <div class="metric"><strong>SOC</strong><span id="socDisp">98</span>%</div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ————— звезды —————
+        function createStars(container, count = 100) {
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1.5; // px
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = (Math.random() * 5) + 's';
+                star.style.animationDuration = (Math.random() * 4 + 3) + 's';
+                container.appendChild(star);
+            }
+        }
+        const starsContainer = document.getElementById('stars');
+        createStars(starsContainer, 130);
+
+        // ————— симуляция теста (живые графики, цифры) —————
+        const canvas = document.getElementById('tempChart');
+        const ctx = canvas.getContext('2d');
+
+        // текущие показатели
+        let cycle = 4;
+        let capacity = 26.12;
+        let energy = 92.4;
+        let soc = 98;
+        let t1 = 24.1;
+        let t2 = 22.8;
+        let testRunning = false;
+        let animationFrame = null;
+        let time = 0;
+
+        // элементы
+        const cycleSpan = document.getElementById('cycleNum');
+        const capacitySpan = document.getElementById('capacityDisp');
+        const energySpan = document.getElementById('energyDisp');
+        const socSpan = document.getElementById('socDisp');
+        const t1disp = document.getElementById('t1display');
+        const t2disp = document.getElementById('t2display');
+        const tempNowSpan = document.getElementById('tempNow');
+        const currentLabel = document.getElementById('currentLabel');
+
+        // история для графика (20 точек)
+        const histT1 = new Array(20).fill(t1);
+        const histT2 = new Array(20).fill(t2);
+
+        function updateDisplay() {
+            cycleSpan.innerText = cycle;
+            capacitySpan.innerText = capacity.toFixed(2);
+            energySpan.innerText = energy.toFixed(1);
+            socSpan.innerText = Math.min(100, Math.floor(soc));
+            t1disp.innerHTML = `🔥 T1: ${t1.toFixed(1)}°C`;
+            t2disp.innerHTML = `❄️ T2: ${t2.toFixed(1)}°C`;
+            const avgTemp = ((t1 + t2) / 2).toFixed(1);
+            tempNowSpan.innerHTML = `${avgTemp} <span>°C</span>`;
+        }
+
+        // отрисовка графика
+        function drawChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width, h = canvas.height;
+            ctx.strokeStyle = '#3f75c0';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            // сетка пунктир
+            ctx.setLineDash([3, 5]);
+            ctx.strokeStyle = '#2a3e60';
+            ctx.beginPath();
+            for (let i = 0; i <= 4; i++) {
+                let y = 15 + (i * 25);
+                ctx.moveTo(10, y);
+                ctx.lineTo(w - 10, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // t1 синий
+            ctx.strokeStyle = '#59a0ff';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < histT1.length; i++) {
+                let x = 10 + (i * (w - 20) / (histT1.length - 1));
+                let y = h - 20 - ((histT1[i] - 15) * 2.5); // примерный масштаб 15-50°C
+                if (y < 8) y = 8;
+                if (y > h - 12) y = h - 12;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // t2 голубой / бирюзовый
+            ctx.strokeStyle = '#6fc9ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < histT2.length; i++) {
+                let x = 10 + (i * (w - 20) / (histT2.length - 1));
+                let y = h - 20 - ((histT2[i] - 15) * 2.5);
+                if (y < 8) y = 8;
+                if (y > h - 12) y = h - 12;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // подписи
+            ctx.font = '7px "Segoe UI"';
+            ctx.fillStyle = '#6090c0';
+            ctx.fillText('T1', 20, 30);
+            ctx.fillStyle = '#80c0f0';
+            ctx.fillText('T2', 20, 45);
+        }
+
+        // обновление симуляции при беге теста
+        function updateSimulation() {
+            if (!testRunning) return;
+
+            // случайные колебания в духе теста VTT
+            t1 += (Math.random() - 0.45) * 0.9;
+            t2 += (Math.random() - 0.55) * 0.7;
+            // ограничим
+            t1 = Math.min(58, Math.max(21, t1));
+            t2 = Math.min(53, Math.max(20, t2));
+
+            // небольшая динамика capacity/energy
+            capacity += (Math.random() - 0.5) * 0.03;
+            capacity = Math.min(26.6, Math.max(25.8, capacity));
+            energy = capacity * 3.55 + (Math.random() - 0.5) * 0.5;
+            soc = 94 + (Math.random() * 4);
+            if (Math.random() > 0.7) cycle = cycle + (Math.random() > 0.7 ? 1 : 0);
+            if (cycle > 12) cycle = 5; // имитация сброса
+
+            // обновим ток
+            if (Math.random() > 0.5) {
+                currentLabel.innerText = '130 A (5C)';
+            } else {
+                currentLabel.innerText = '286 A (11C)';
+            }
+
+            // двигаем историю
+            histT1.push(t1);
+            histT2.push(t2);
+            histT1.shift();
+            histT2.shift();
+
+            updateDisplay();
+            drawChart();
+
+            animationFrame = requestAnimationFrame(updateSimulation);
+        }
+
+        // запуск теста по кнопке
+        document.getElementById('startTestBtn').addEventListener('click', function() {
+            if (testRunning) {
+                // если уже бежит, не запускаем повторно (или можно сбросить)
+                return;
+            }
+            testRunning = true;
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            // сбросим немного показатели для реализма
+            t1 = 24.5;
+            t2 = 23.0;
+            capacity = 26.20;
+            energy = 92.8;
+            soc = 99;
+            cycle = 5;
+            // заполним историю
+            for (let i = 0; i < histT1.length; i++) {
+                histT1[i] = t1 + (Math.random() - 0.5) * 1.5;
+                histT2[i] = t2 + (Math.random() - 0.5) * 1.2;
+            }
+            updateDisplay();
+            drawChart();
+            animationFrame = requestAnimationFrame(updateSimulation);
+        });
+
+        // начальная прорисовка (без запуска)
+        drawChart();
+        updateDisplay();
+        // дополнительно для имитации — можно сразу через полсекунды запустить как демо, но оставим ручной старт.
+        // Чтобы был живой вид при загрузке, поставим таймер предварительного заполнения
+        function warmup() {
+            for (let i=0;i<5;i++) {
+                histT1.push(24 + Math.random()*2);
+                histT2.push(22 + Math.random()*2.5);
+            }
+            histT1.splice(0,5);
+            histT2.splice(0,5);
+            drawChart();
+        }
+        warmup();
+    })();
+</script>
+</body>
+</html>
