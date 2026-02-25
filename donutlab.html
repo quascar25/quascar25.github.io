@@ -622,9 +622,9 @@
             // процент от 0 до 100
             const percent = Math.min(100, Math.max(0, chargePercent));
             batteryFill.style.width = percent + '%';
-            batteryPercentSpan.innerText = percent + '%';
+            batteryPercentSpan.innerText = percent.toFixed(1) + '%';
             progressFill.style.width = percent + '%';
-            progressPercentSpan.innerText = percent + '%';
+            progressPercentSpan.innerText = percent.toFixed(1) + '%';
         }
 
         function updateTimerDisplay() {
