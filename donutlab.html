@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
-    <title>Donut Lab • VTT • полный цикл • инвестор</title>
+    <title>Donut Lab · Батарея · Пончик зарядка</title>
     <style>
         * {
             margin: 0;
@@ -64,7 +64,7 @@
             resize: both;
             overflow: auto;
             min-width: 320px;
-            min-height: 600px;
+            min-height: 700px;
         }
 
         .fullscreen-btn {
@@ -118,6 +118,158 @@
             padding-right: 100px;
         }
 
+        /* ----- НОВЫЙ ВЕРХНИЙ БЛОК: зарядка с пончиком ----- */
+        .donut-charge-area {
+            background: #071932;
+            border-radius: 42px;
+            padding: 20px 16px;
+            border: 1px solid #3f6bb0;
+            box-shadow: inset 0 -2px 12px #1a3460, 0 12px 18px #00000060;
+            margin-bottom: 20px;
+        }
+
+        .charge-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* батарея + зарядник */
+        .battery-charger-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .battery-visual {
+            background: #0e2648;
+            border-radius: 40px;
+            padding: 10px 25px;
+            border: 2px solid #4070b0;
+            box-shadow: 0 0 30px #2d6bbb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .battery-body {
+            width: 100px;
+            height: 48px;
+            background: #204020;
+            border-radius: 20px;
+            position: relative;
+            border: 2px solid #80c080;
+            box-shadow: inset 0 -3px 6px #102810;
+            margin: 8px 0;
+            transition: background 0.3s;
+        }
+        .battery-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8aff8a, #30f030);
+            border-radius: 16px;
+            box-shadow: 0 0 20px #00ff80;
+            transition: width 0.2s ease-out;
+        }
+        .battery-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #b0ffb0;
+        }
+
+        .charger-unit {
+            background: #1c3158;
+            border-radius: 60px;
+            padding: 14px 22px;
+            border: 2px solid #e0b070;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 25px #f0b060;
+            transition: box-shadow 0.1s, background 0.1s;
+        }
+        .charger-unit.blink {
+            background: #c09a40;
+            box-shadow: 0 0 40px #ffcc66, 0 0 80px #ffaa33;
+        }
+        .charger-symbol {
+            font-size: 2.8rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 10px gold);
+        }
+        .charger-text {
+            font-size: 0.8rem;
+            color: #ffdd99;
+        }
+
+        /* горизонтальный индикатор (PROGRESS BAR) */
+        .progress-horizontal {
+            background: #0a1f38;
+            border-radius: 60px;
+            padding: 12px 20px;
+            border: 1px solid #4f7ec0;
+        }
+        .percent-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #c0e0ff;
+        }
+        .track {
+            width: 100%;
+            height: 28px;
+            background: #102a44;
+            border-radius: 40px;
+            border: 1px solid #3e6aa0;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .track:hover {
+            border-color: #aac9ff;
+            box-shadow: 0 0 18px #3f9eff;
+        }
+        .fill-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ffbb33, #ffdd88);
+            box-shadow: 0 0 30px #ffcc66;
+            border-radius: 40px;
+            transition: width 0.2s ease-out;
+        }
+
+        /* таймер */
+        .timer-block {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0e2342;
+            border-radius: 60px;
+            padding: 14px 24px;
+            gap: 25px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            border: 1px solid #5f8fd0;
+            box-shadow: inset 0 2px 8px #142f55;
+        }
+        .timer-digits {
+            font-family: 'Courier New', monospace;
+            background: #030f1f;
+            padding: 8px 24px;
+            border-radius: 70px;
+            border: 1px solid #6080b0;
+        }
+        .timer-label {
+            font-size: 0.9rem;
+            color: #9abdf5;
+        }
+
+        /* ОСТАЛЬНАЯ ЧАСТЬ (как в исходном коде, но немного сдвинута) */
         .cell-block {
             background: #051020cc;
             border-radius: 34px;
@@ -135,12 +287,6 @@
             transition: 0.3s;
         }
 
-        .cell-rect.overheat {
-            box-shadow: 0 0 40px #ff5e00, inset 0 0 20px #ff4500;
-            border-color: #ff9933;
-        }
-
-        /* кнопки тестов */
         .test-grid {
             display: flex;
             flex-wrap: wrap;
@@ -247,7 +393,6 @@
             background: #3f6080;
         }
 
-        /* всплывающие подсказки (формула, цена) */
         .floating-secret {
             position: fixed;
             top: 50%;
@@ -275,7 +420,6 @@
             transition: opacity 0.2s;
         }
 
-        /* остальное как было */
         .graph-area {
             background: #071129;
             border-radius: 32px;
@@ -339,40 +483,58 @@
 <div class="stars" id="starfield"></div>
 
 <div class="donut-panel" id="mainPanel">
-    <!-- верхние кнопки -->
     <div class="fullscreen-btn" id="fullscreenBtn" title="Fullscreen">⛶</div>
     <div class="lang-switch" id="langBtn" title="Language">🌐</div>
 
     <div class="top-bar">
-        <h2 id="headerTitle">⚡ DONUT·VTT</h2>
-        <span id="headerSub">MX 26Ah · 4.3V</span>
+        <h2 id="headerTitle">⚡ DONUT·CHARGE</h2>
+        <span id="headerSub">8 min · пончик</span>
     </div>
 
-    <!-- батарея -->
-    <div class="cell-block">
-        <div class="cell-rect" id="batteryRect">
-            <div class="electrodes" style="display: flex; flex-wrap: wrap; justify-content: center; gap:8px;">
-                <div style="width:14px;height:48px;background:#2c4b7a;border-radius:30px;"></div>
-                <div style="width:14px;height:38px;background:#345f93;border-radius:30px;"></div>
-                <div style="width:14px;height:48px;background:#2c4b7a;border-radius:30px;"></div>
-                <div style="width:14px;height:38px;background:#345f93;border-radius:30px;"></div>
-                <div style="width:14px;height:48px;background:#2c4b7a;border-radius:30px;"></div>
+    <!-- ────────────────────────────── НОВЫЙ ВЕРХНИЙ БЛОК ────────────────────────────── -->
+    <div class="donut-charge-area">
+        <div class="charge-grid">
+            <!-- строка: батарея и зарядник -->
+            <div class="battery-charger-row">
+                <div class="battery-visual">
+                    <div class="battery-label">🔋 BATTERY</div>
+                    <div class="battery-body">
+                        <div class="battery-fill" id="batteryFillLevel" style="width: 0%;"></div>
+                    </div>
+                    <div class="battery-label" id="batteryPercent">0%</div>
+                </div>
+                <div class="charger-unit" id="chargerBlink">
+                    <span class="charger-symbol">⚡🔌</span>
+                    <span class="charger-text">CHARGER</span>
+                </div>
             </div>
-            <div style="display:flex; justify-content:center; gap:18px; margin:12px 0;">
-                <div style="width:45px;height:10px;background:#2b5580;border-radius:20px;"></div>
-                <div style="width:45px;height:10px;background:#2b5580;border-radius:20px;"></div>
+
+            <!-- горизонтальный индикатор-полоса (кликабельный) -->
+            <div class="progress-horizontal">
+                <div class="percent-label">
+                    <span>🔋 заряд</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="track" id="clickableTrack">
+                    <div class="fill-bar" id="progressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- таймер реального времени -->
+            <div class="timer-block">
+                <span class="timer-label">⏱️ таймер</span>
+                <span class="timer-digits" id="timerDisplay">00:00</span>
             </div>
         </div>
     </div>
 
-    <!-- С-режимы (оставим для тока) -->
+    <!-- старые C-режимы (оставим для тока) -->
     <div style="display:flex; gap:8px; margin:10px 0;" id="cRates">
         <button class="test-btn" id="rate1C">1C</button>
         <button class="test-btn active-test" id="rate5C">5C</button>
         <button class="test-btn" id="rate11C">11C</button>
     </div>
 
-    <!-- новые кнопки: Циклы, Плотность, Состав, Цена -->
     <div class="test-grid">
         <button class="test-btn" id="cycleTestBtn">🔁 100k циклов</button>
         <button class="test-btn" id="densityTestBtn">🔋 405–422 Вт·ч/кг</button>
@@ -387,7 +549,6 @@
         <span id="tempValue">+25°C</span>
     </div>
 
-    <!-- график и температура -->
     <div class="graph-area">
         <div class="graph-header">
             <span id="graphTitle">📈 термопрофиль T1/T2</span>
@@ -400,15 +561,12 @@
         </div>
     </div>
 
-    <!-- кнопка ПУСК/СТОП -->
     <div class="big-test-btn" id="testToggleBtn">▶ ПУСК</div>
 
-    <!-- кнопка ИНВЕСТИРОВАТЬ -->
     <div class="invest-row">
         <div class="invest-btn" id="investBtn">💰 ИНВЕСТИРОВАТЬ</div>
     </div>
 
-    <!-- нижние метрики -->
     <div class="footer-metrics" id="footerMetrics">
         <div class="metric-item"># цикл <span id="cycleVal">6</span></div>
         <div class="metric-item">⚡ емк <span id="capVal">26.19</span> Ah</div>
@@ -417,14 +575,14 @@
     </div>
 </div>
 
-<!-- всплывающие окошки для секретов -->
+<!-- всплывающие окошки -->
 <div class="floating-secret" id="formulaPopup">⚗️ Li·Ti·Gr·Al·S + конденсатор</div>
 <div class="floating-secret" id="pricePopup">💰 цена = Li-ion · 1.0 (паритет)</div>
 <div class="floating-secret" id="investPopup">🚀 ВЫ ИНВЕСТОР +1000%</div>
 
 <script>
     (function() {
-        // --- звезды ---
+        // ---- звезды ----
         function initStars(container, count=90) {
             for (let i=0; i<count; i++) {
                 let s = document.createElement('div');
@@ -441,26 +599,118 @@
         }
         initStars(document.getElementById('starfield'));
 
-        // --- элементы ---
+        // ---- элементы новой зарядки ----
+        const batteryFill = document.getElementById('batteryFillLevel');
+        const batteryPercentSpan = document.getElementById('batteryPercent');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentSpan = document.getElementById('progressPercent');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const chargerDiv = document.getElementById('chargerBlink');
+        const clickableTrack = document.getElementById('clickableTrack');
+
+        // ---- состояние зарядки ----
+        let charging = false;              // идёт ли процесс
+        let chargePercent = 0;              // 0 .. 100
+        let elapsedSeconds = 0;              // секунд от старта
+        const TOTAL_SECONDS = 8 * 60;        // 8 минут = 480 секунд
+
+        let timerInterval = null;
+        let blinkInterval = null;
+
+        // ---- функция обновления UI (проценты, ширина заливки, таймер) ----
+        function updateChargeUI() {
+            // процент от 0 до 100
+            const percent = Math.min(100, Math.max(0, chargePercent));
+            batteryFill.style.width = percent + '%';
+            batteryPercentSpan.innerText = percent + '%';
+            progressFill.style.width = percent + '%';
+            progressPercentSpan.innerText = percent + '%';
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(elapsedSeconds / 60);
+            const secs = elapsedSeconds % 60;
+            timerDisplay.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        }
+
+        // ---- запуск зарядки с нуля ----
+        function startCharging() {
+            if (charging) return; // уже идёт
+            charging = true;
+            chargePercent = 0;
+            elapsedSeconds = 0;
+            updateChargeUI();
+            updateTimerDisplay();
+
+            // мигание зарядника
+            if (blinkInterval) clearInterval(blinkInterval);
+            blinkInterval = setInterval(() => {
+                chargerDiv.classList.toggle('blink');
+            }, 300);
+
+            // таймер (секунды)
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!charging) return;
+
+                if (chargePercent < 100) {
+                    elapsedSeconds++;
+                    // процент растёт линейно: прошло секунд * (100/480)
+                    // но не перепрыгиваем 100
+                    let rawPercent = (elapsedSeconds / TOTAL_SECONDS) * 100;
+                    chargePercent = Math.min(100, Math.max(0, rawPercent));
+                    updateChargeUI();
+                    updateTimerDisplay();
+
+                    // если дошли до 100% — остановить всё
+                    if (chargePercent >= 100) {
+                        stopCharging();
+                    }
+                } else {
+                    stopCharging();
+                }
+            }, 1000);
+        }
+
+        function stopCharging() {
+            charging = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            if (blinkInterval) {
+                clearInterval(blinkInterval);
+                blinkInterval = null;
+            }
+            chargerDiv.classList.remove('blink');
+            // не сбрасываем проценты, остаёмся на 100
+        }
+
+        // при клике на трек (индикатор) запускаем зарядку с 0
+        clickableTrack.addEventListener('click', () => {
+            // если уже заряжается — можно либо прервать, либо перезапустить. Прервём и запустим снова.
+            if (charging) {
+                stopCharging();
+            }
+            startCharging();
+        });
+
+        // ---- остальной код (как в исходном, совмещённый) ----
         const canvas = document.getElementById('tempCanvas');
         const ctx = canvas.getContext('2d');
-        const batteryRect = document.getElementById('batteryRect');
 
-        // переменные симуляции
         let testActive = false;
         let currentRate = '5C';
         let cycle = 6, capacity = 26.19, energy = 92.8, soc = 98;
         let t1 = 24.5, t2 = 23.2;
-        let ambientTemp = 25; // от слайдера
+        let ambientTemp = 25;
 
-        // история графиков
         let histT1 = new Array(20).fill(t1);
         let histT2 = new Array(20).fill(t2);
 
-        // Язык (0-русский, 1-английский, 2-китайский)
         let lang = 0;
         const langData = {
-            header: ['⚡ DONUT·VTT', '⚡ DONUT·VTT', '⚡ 多纳·实验室'],
+            header: ['⚡ DONUT·CHARGE', '⚡ DONUT·CHARGE', '⚡ 多纳·充电'],
             cycleBtn: ['🔁 100k циклов', '🔁 100k cycles', '🔁 10万次循环'],
             densityBtn: ['🔋 405–422 Вт·ч/кг', '🔋 405–422 Wh/kg', '🔋 405–422 瓦时/千克'],
             formulaBtn: ['⚗️ формула 🔒', '⚗️ formula 🔒', '⚗️ 配方 🔒'],
@@ -468,74 +718,34 @@
             investBtn: ['💰 ИНВЕСТИРОВАТЬ', '💰 INVEST NOW', '💰 立即投资'],
             startBtn: ['▶ ПУСК', '▶ START', '▶ 启动'],
             stopBtn: ['⏹️ СТОП', '⏹️ STOP', '⏹️ 停止'],
-            temp: ['🌡️', '🌡️', '🌡️'],
             graph: ['📈 термопрофиль T1/T2', '📈 thermal T1/T2', '📈 热曲线 T1/T2'],
-            cycleLabel: ['# цикл', 'cycle', '循环'],
-            capLabel: ['⚡ емк', '⚡ cap', '⚡ 容量'],
-            energyLabel: ['🔋 энерг', '🔋 energy', '🔋 能量'],
-            socLabel: ['📊 SOC', '📊 SOC', '📊 电荷'],
         };
 
-        // --- функции обновления языка ---
-        function updateLangUI() {
-            document.getElementById('headerTitle').innerText = langData.header[lang];
-            document.getElementById('cycleTestBtn').innerText = langData.cycleBtn[lang];
-            document.getElementById('densityTestBtn').innerText = langData.densityBtn[lang];
-            document.getElementById('formulaBtn').innerText = langData.formulaBtn[lang];
-            document.getElementById('priceBtn').innerText = langData.priceBtn[lang];
-            document.getElementById('investBtn').innerText = langData.investBtn[lang];
-            document.getElementById('graphTitle').innerText = langData.graph[lang];
-            if (!testActive) {
-                document.getElementById('testToggleBtn').innerText = langData.startBtn[lang];
-            } else {
-                document.getElementById('testToggleBtn').innerText = langData.stopBtn[lang];
-            }
-            // нижние метрики (через обновление цифр)
-        }
-
-        // --- всплывашки ---
         function showPopup(popupId) {
             const popup = document.getElementById(popupId);
             popup.classList.add('show');
-            setTimeout(() => {
-                popup.classList.remove('show');
-            }, 5000);
+            setTimeout(() => popup.classList.remove('show'), 5000);
         }
 
-        // --- кнопки тестов ---
-        document.getElementById('cycleTestBtn').addEventListener('click', ()=>{
-            // имитация успешного теста на 100k циклов
-            showPopup('formulaPopup'); // просто используем формульное окно для демо
-            // можно добавить изменение метрик
-        });
+        document.getElementById('cycleTestBtn').addEventListener('click', ()=>{ showPopup('formulaPopup'); });
         document.getElementById('densityTestBtn').addEventListener('click', ()=>{
-            // показываем плотность (число)
             const popup = document.getElementById('formulaPopup');
             popup.innerText = '🔋 418 Вт·ч/кг (успех)';
             showPopup('formulaPopup');
             setTimeout(()=> popup.innerText = '⚗️ Li·Ti·Gr·Al·S + конденсатор', 5000);
         });
-        document.getElementById('formulaBtn').addEventListener('click', ()=>{
-            showPopup('formulaPopup');
-        });
-        document.getElementById('priceBtn').addEventListener('click', ()=>{
-            showPopup('pricePopup');
-        });
-        document.getElementById('investBtn').addEventListener('click', ()=>{
-            showPopup('investPopup');
-        });
+        document.getElementById('formulaBtn').addEventListener('click', ()=> showPopup('formulaPopup'));
+        document.getElementById('priceBtn').addEventListener('click', ()=> showPopup('pricePopup'));
+        document.getElementById('investBtn').addEventListener('click', ()=> showPopup('investPopup'));
 
-        // --- слайдер температуры ---
         const tempSlider = document.getElementById('tempSlider');
         const tempValueSpan = document.getElementById('tempValue');
         tempSlider.addEventListener('input', (e)=>{
             let val = e.target.value;
             tempValueSpan.innerText = (val>0?'+':'') + val + '°C';
             ambientTemp = parseInt(val);
-            // влияет на базовую температуру
         });
 
-        // --- остальная симуляция (как в предыдущей версии) ---
         function setActiveRate(rate) {
             document.getElementById('rate1C').classList.remove('active-test');
             document.getElementById('rate5C').classList.remove('active-test');
@@ -549,7 +759,6 @@
         document.getElementById('rate5C').addEventListener('click',()=> setActiveRate('5C'));
         document.getElementById('rate11C').addEventListener('click',()=> setActiveRate('11C'));
 
-        // обновление дисплеев
         function refreshDisplay() {
             document.getElementById('t1Val').innerHTML = `🔥 T1 ${t1.toFixed(1)}°C`;
             document.getElementById('t2Val').innerHTML = `❄️ T2 ${t2.toFixed(1)}°C`;
@@ -560,7 +769,6 @@
             document.getElementById('socVal').innerText = Math.floor(soc);
         }
 
-        // график
         function drawChart() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
             ctx.strokeStyle = '#5f9eff';
@@ -616,13 +824,11 @@
             }
         });
 
-        // язык
         document.getElementById('langBtn').addEventListener('click', ()=>{
             lang = (lang + 1) % 3;
             updateLangUI();
         });
 
-        // fullscreen
         document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
             if (!document.fullscreenElement) {
                 document.getElementById('mainPanel').requestFullscreen();
@@ -631,7 +837,19 @@
             }
         });
 
-        // инициализация
+        function updateLangUI() {
+            document.getElementById('headerTitle').innerText = langData.header[lang];
+            document.getElementById('cycleTestBtn').innerText = langData.cycleBtn[lang];
+            document.getElementById('densityTestBtn').innerText = langData.densityBtn[lang];
+            document.getElementById('formulaBtn').innerText = langData.formulaBtn[lang];
+            document.getElementById('priceBtn').innerText = langData.priceBtn[lang];
+            document.getElementById('investBtn').innerText = langData.investBtn[lang];
+            document.getElementById('graphTitle').innerText = langData.graph[lang];
+            const toggle = document.getElementById('testToggleBtn');
+            toggle.innerText = testActive ? langData.stopBtn[lang] : langData.startBtn[lang];
+        }
+
+        // стартовые обновления
         refreshDisplay();
         drawChart();
         updateLangUI();
@@ -641,6 +859,8 @@
         }
         histT1.splice(0,5); histT2.splice(0,5);
         drawChart();
+        updateChargeUI();
+        updateTimerDisplay();
     })();
 </script>
 </body>
