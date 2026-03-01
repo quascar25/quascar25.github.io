@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Companion · Локальный прототип</title>
+    <!-- Простой стиль, чтобы было похоже на рабочий инструмент -->
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 1300px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -10px rgba(0,20,40,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* шапка */
+        .toolbar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e9f2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            background: #0052cc;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .logo-text {
+            font-weight: 600;
+            font-size: 18px;
+            color: #1a2639;
+            letter-spacing: -0.02em;
+        }
+        .badge-solo {
+            background: #ecf0f4;
+            color: #3a4b60;
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #cddae9;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #1f2a41;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .btn:hover {
+            background: #f6f9ff;
+            border-color: #7f9bc2;
+        }
+        .btn-primary {
+            background: #0052cc;
+            border-color: #0052cc;
+            color: white;
+            box-shadow: 0 6px 12px -6px rgba(0,82,204,0.3);
+        }
+        .btn-primary:hover {
+            background: #0042b3;
+        }
+        /* основная часть — три колонки (для наглядности) */
+        .main-layout {
+            display: flex;
+            padding: 24px;
+            gap: 24px;
+            background: #fafcff;
+            flex-wrap: wrap;
+        }
+        .panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,20,40,0.04);
+            border: 1px solid #eaeff7;
+            overflow: hidden;
+            flex: 1 1 240px;
+        }
+        .panel-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid #edf2f9;
+            font-weight: 600;
+            color: #1f2a41;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-header span {
+            font-size: 13px;
+            background: #e9eff8;
+            padding: 3px 10px;
+            border-radius: 30px;
+            color: #2f3e5a;
+            font-weight: 400;
+        }
+        .checklist-placeholder {
+            padding: 12px;
+        }
+        .checklist-item {
+            padding: 12px 14px;
+            background: #f9fcff;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            border: 1px solid #e5ecf5;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .checkbox-dummy {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 2px solid #9bb1cc;
+            border-radius: 6px;
+            margin-top: 2px;
+        }
+        .item-text {
+            flex:1;
+            font-size: 14px;
+            color: #1f2a41;
+        }
+        .item-note {
+            font-size: 12px;
+            color: #6f7d98;
+            margin-top: 4px;
+        }
+        .badge-pass {
+            background: #e2f0e6;
+            color: #1e7b4c;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .case-row {
+            display: flex;
+            padding: 14px 16px;
+            border-bottom: 1px solid #edf2f9;
+            font-size: 14px;
+            gap: 16px;
+        }
+        .case-name {
+            flex: 2;
+            color: #1f2a41;
+            font-weight: 500;
+        }
+        .case-status {
+            flex: 1;
+            color: #59739c;
+        }
+        /* область отчёта — самая правая колонка */
+        .report-preview {
+            flex: 2 1 380px;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #eaeff7;
+            box-shadow: 0 4px 12px rgba(0,20,40,0.04);
+            display: flex;
+            flex-direction: column;
+        }
+        .report-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #edf2f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-header h3 {
+            font-weight: 600;
+            font-size: 16px;
+            color: #121b2b;
+        }
+        .report-content {
+            padding: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: white;
+            border-radius: 16px;
+            border-style: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f1f6fd;
+            color: #1f2a41;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9eff5;
+            color: #25415d;
+        }
+        .table-caption-note {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #617e9e;
+            background: #f5faff;
+            padding: 12px 16px;
+            border-radius: 14px;
+        }
+        .footer-hint {
+            padding: 14px 24px;
+            background: #f1f9fe;
+            color: #1f4977;
+            font-size: 14px;
+            border-top: 1px solid #dde5f0;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- верхняя панель с кнопками (только интерфейс, кроме кнопки "Отчёт") -->
+    <div class="toolbar">
+        <div class="logo-area">
+            <div class="logo-icon">QA</div>
+            <div class="logo-text">TestCompanion</div>
+            <span class="badge-solo">локальный · соло</span>
+        </div>
+        <div class="action-buttons">
+            <button class="btn" disabled style="opacity:0.8; pointer-events:none;">📋 Чек-листы</button>
+            <button class="btn" disabled style="opacity:0.8; pointer-events:none;">✏️ Тест-кейсы</button>
+            <button class="btn" disabled style="opacity:0.8; pointer-events:none;">🐞 Баг-репорты</button>
+            <!-- единственная рабочая кнопка -->
+            <button class="btn btn-primary" id="generateReportBtn">📊 Сформировать отчёт</button>
+        </div>
+    </div>
+
+    <!-- три воображаемые колонки — показывают структуру, но не активны -->
+    <div class="main-layout">
+        <!-- левая колонка: чек-лист (демо) -->
+        <div class="panel">
+            <div class="panel-header">
+                Чек-лист (пример)
+                <span>4 пункта</span>
+            </div>
+            <div class="checklist-placeholder">
+                <div class="checklist-item">
+                    <div class="checkbox-dummy"></div>
+                    <div class="item-text">
+                        Проверка авторизации
+                        <div class="item-note">passed</div>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox-dummy" style="background:#1e7b4c; border-color:#1e7b4c;"></div>
+                    <div class="item-text">
+                        Загрузка файла
+                        <div class="item-note">passed</div>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox-dummy"></div>
+                    <div class="item-text">
+                        Отправка формы
+                        <div class="item-note">failed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- средняя колонка: тест-кейсы (пример) -->
+        <div class="panel">
+            <div class="panel-header">
+                Последние тест-кейсы
+                <span>3</span>
+            </div>
+            <div class="case-row">
+                <div class="case-name">TC-101 Логин</div>
+                <div class="case-status">🟢 пройден</div>
+            </div>
+            <div class="case-row">
+                <div class="case-name">TC-102 Регистрация</div>
+                <div class="case-status">🟡 заблокирован</div>
+            </div>
+            <div class="case-row">
+                <div class="case-name">TC-103 Восстановление пароля</div>
+                <div class="case-status">🔴 провал</div>
+            </div>
+            <div style="padding:16px; font-size:13px; color:#6b7b97; border-top:1px dashed #dee7f2;">
+                ID бага: BUG-3 · открыт
+            </div>
+        </div>
+
+        <!-- правая колонка — ОТЧЁТ (здесь будет живая таблица) -->
+        <div class="report-preview" id="reportSection">
+            <div class="report-header">
+                <h3>📋 Отчёт по тестированию</h3>
+                <span style="font-size:13px; background:#edf4ff; padding:4px 12px; border-radius:30px;">v.0.1</span>
+            </div>
+            <div class="report-content" id="reportTableContainer">
+                <!-- начальная таблица-пример, она заменится при клике -->
+                <table id="reportTable">
+                    <thead>
+                        <tr><th>ID</th><th>Название</th><th>Статус</th><th>Комментарий</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>TC-101</td><td>Авторизация (valid)</td><td>✅ PASS</td><td>ок</td></tr>
+                        <tr><td>TC-102</td><td>Загрузка аватара</td><td>✅ PASS</td><td>файл <2MB</td></tr>
+                        <tr><td>TC-103</td><td>Выход из системы</td><td>❌ FAIL</td><td>сессия не сбрасывается</td></tr>
+                    </tbody>
+                </table>
+                <div class="table-caption-note">
+                    ⚡ Выделите таблицу → Ctrl+C (Cmd+C) → вставьте в Excel — формат сохранится.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- подсказка снизу (нефункциональная) -->
+    <div class="footer-hint">
+        <span>📌 прототип интерфейса</span>
+        <span>• кнопка «Отчёт» обновляет таблицу</span>
+        <span>• копирование в Excel работает</span>
+    </div>
+</div>
+
+<!-- небольшой скрипт для демонстрации: по клику меняем таблицу на свежий пример -->
+<script>
+    (function() {
+        const btn = document.getElementById('generateReportBtn');
+        const table = document.getElementById('reportTable');
+
+        // функция для генерации новой таблицы с тестовыми данными
+        function generateNewReport() {
+            // создаём свежий набор строк (можно заменить на любой другой)
+            const possibleRows = [
+                { id: 'TC-201', name: 'Проверка поиска', status: '✅ PASS', comment: 'результаты релевантны' },
+                { id: 'TC-202', name: 'Фильтр по дате', status: '✅ PASS', comment: 'работает' },
+                { id: 'TC-203', name: 'Сортировка таблицы', status: '❌ FAIL', comment: 'ошибка при повторном клике' },
+                { id: 'TC-204', name: 'Чек-лист: установка', status: '⚠️ BLOCKED', comment: 'окружение не готово' },
+                { id: 'BUG-7',  name: 'Баг: не грузятся стили', status: '🐞 OPEN', comment: 'прикреплён скриншот' },
+            ];
+
+            let tbody = table.querySelector('tbody');
+            if (!tbody) {
+                tbody = document.createElement('tbody');
+                table.appendChild(tbody);
+            } else {
+                tbody.innerHTML = ''; // очищаем
+            }
+
+            // заполняем новыми строками
+            possibleRows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.id}</td><td>${row.name}</td><td>${row.status}</td><td>${row.comment}</td>`;
+                tbody.appendChild(tr);
+            });
+
+            // дополнительно можно обновить заголовок отчёта (просто для атмосферы)
+            const reportHeader = document.querySelector('.report-header h3');
+            if (reportHeader) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+                reportHeader.innerHTML = `📋 Отчёт по тестированию <span style="font-weight:normal; font-size:14px; margin-left:8px; color:#2f5670;">обновлён ${timeStr}</span>`;
+            }
+        }
+
+        // вешаем обработчик на кнопку
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            generateNewReport();
+        });
+
+        // небольшой штрих: при загрузке страницы тоже можно показать, что кнопка работает
+        // но оставим начальную таблицу как есть — она уже есть в HTML.
+        // Для демонстрации сбросим через 0.5 сек на тот же набор? или не трогаем.
+        // добавим только "живой" пример, но не перезапишем сразу, чтобы было видно исходную.
+        // можно просто оставить как есть.
+    })();
+</script>
+
+<!-- примечание: остальные кнопки неактивны (disabled) — это только демо интерфейса -->
+</body>
+</html>
