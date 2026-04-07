@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="full-screen" content="yes">
+    <title>viliv · звёздное видео</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #starsCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            background-color: black;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .center-btn {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            border: 1px solid rgba(0, 255, 255, 0.9);
+            border-radius: 10px;
+            width: 160px;
+            height: 160px;
+            max-width: 70vw;
+            max-height: 70vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0, 255, 255, 0.7);
+            font-size: 1.2rem;
+            text-decoration: none;
+            backdrop-filter: blur(1px);
+            transition: border-color 0.2s, transform 0.1s;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+            cursor: pointer;
+            -webkit-touch-callout: none;
+        }
+        .center-btn:active {
+            transform: scale(0.98);
+            border-color: cyan;
+            box-shadow: 0 0 20px cyan;
+        }
+        .center-btn span {
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 10;
+            display: none;          /* изначально скрыт */
+            align-items: center;
+            justify-content: center;
+        }
+
+        #playerVideo {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;    /* сохраняет пропорции, вписывая в экран */
+            background: black;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .control-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 180, 255, 0.2);         /* полупрозрачный голубой */
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            border-radius: 10px;
+            padding: 14px 22px;
+            display: flex;
+            gap: 28px;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        .control-panel.visible {
+            opacity: 1;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 32px;
+            line-height: 1;
+            min-width: 50px;
+            text-align: center;
+            padding: 8px 0;
+            border-radius: 8px;
+            text-shadow: 0 0 8px cyan;
+            transition: transform 0.1s, text-shadow 0.2s;
+            cursor: pointer;
+            -webkit-touch-callout: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:active {
+            transform: scale(1.2);
+            text-shadow: 0 0 16px white, 0 0 26px cyan;
+        }
+        .icon-btn.close {
+            font-size: 38px;
+            font-weight: 300;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: cyan;
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid cyan;
+            z-index: 30;
+            text-align: center;
+            display: none;
+        }
+
+        /* YouTube-стиль кнопка */
+        .youtube-btn {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 20px; /* Делает кнопку более вытянутой, как у YouTube */
+            width: 180px;
+            height: 120px; /* Приплюснутая форма */
+            max-width: 65vw;
+            max-height: 40vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            cursor: pointer;
+            -webkit-touch-callout: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Белая стрелка как на YouTube */
+        .youtube-play-icon {
+            width: 0;
+            height: 0;
+            border-left: 40px solid white;
+            border-top: 24px solid transparent;
+            border-bottom: 24px solid transparent;
+            margin-left: 8px; /* Небольшой сдвиг для центрирования треугольника */
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+            transition: transform 0.2s, filter 0.2s;
+        }
+        
+        /* Альтернативный вариант стрелки (если треугольник кажется слишком большим) */
+        .youtube-btn.smaller-arrow .youtube-play-icon {
+            border-left: 32px solid white;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+        }
+        
+        /* Эффект при нажатии */
+        .youtube-btn:active {
+            transform: scale(0.96);
+            border-color: white;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+        }
+        
+        .youtube-btn:active .youtube-play-icon {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 12px white);
+        }
+        
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .youtube-btn {
+                width: 140px;
+                height: 94px;
+            }
+            .youtube-play-icon {
+                border-left: 30px solid white;
+                border-top: 18px solid transparent;
+                border-bottom: 18px solid transparent;
+            }
+        }
+
+        
+        /* ////dil */
+        /* Контейнер полоски загрузки */
+        .loading-bar-container {
+            position: absolute;
+            bottom: 118px;  /* Поднял на 4 пикселя (было 86) 82*/
+            left: 50%;
+            transform: translateX(-50%);
+            width: 260px;  /* Фиксированная ширина, как у панели */
+            height: 3px;
+            background-color: rgba(128, 128, 128, 0.5);
+            border-radius: 2px;
+            z-index: 25;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+            opacity: 0;  /* По умолчанию скрыта */
+            transition: opacity 0.2s ease;
+            pointer-events: none; /* Чтобы не мешала нажимать на кнопки */
+        }
+
+
+                 /* Показываем полоску вместе с панелью */
+            .control-panel.visible ~ .loading-bar-container,
+            .loading-bar-container.visible {
+                opacity: 1;
+            }
+            
+            /* Бегущая белая полоска */
+            .loading-bar-progress {
+                width: 0%;
+                height: 100%;
+                background-color: white;
+                border-radius: 2px;
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            }
+            
+            /* При полной загрузке - зелёная и потом исчезает */
+            .loading-bar-progress.complete {
+                background-color: #4caf50;
+                animation: fadeOut 0.5s forwards;
+                animation-delay: 0.3s;
+            }
+            
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                }
+            }
+            
+            /* Для мобильных экранов */
+            @media (max-width: 480px) {
+                .loading-bar-container {
+                    width: 220px;  /* Чуть уже на маленьких экранах */
+                    bottom: 78px;
+                }
+            }
+
+        <div class="fullscreen-hint" id="fullscreenHint">
+         👆 Свайпните сверху для выхода
+        </div>
+        
+        /* На маленьких экранах поднимем повыше */
+        @media (max-width: 600px) {
+            .loading-bar-container {
+                bottom: 90px;
+            }
+        }
+        /* ////dil */
+
+
+
+            .fullscreen-hint {
+                position: absolute;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: rgba(255, 255, 255, 0.8);
+                background: rgba(0,0,0,0.5);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 14px;
+                z-index: 26;
+                backdrop-filter: blur(4px);
+                border: 1px solid rgba(255,255,255,0.3);
+                animation: fadeOut 3s forwards;
+                animation-delay: 2s;
+            }
+            
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    visibility: hidden;
+                }
+            }
+
+    
+    </style>
+</head>
+<body>
+    <div class="app">
+        <canvas id="starsCanvas"></canvas>
+
+        <div class="youtube-btn smaller-arrow" id="startVideoBtn" role="button" tabindex="0" aria-label="Запустить видео">
+            <div class="youtube-play-icon">
+                <div class="play-triangle"></div>
+            </div>
+        </div>
+
+        <div class="video-container" id="videoContainer">
+            
+            
+            <div class="loading-bar-container">
+                <div class="loading-bar-progress" id="loadingProgress"></div>
+            </div>
+            
+            <div class="error-message" id="videoError">
+                Ошибка загрузки видео<br>
+                Проверьте наличие файлов в папке viliv/
+            </div>
+            
+
+            
+            <div class="error-message" id="videoError">
+                Ошибка загрузки видео<br>
+                Проверьте наличие файлов в папке viliv/
+            </div>
+            <video id="playerVideo" playsinline webkit-playsinline preload="auto"></video>
+            <div class="control-panel" id="controlPanel">
+                <button class="icon-btn play" id="playBtn" aria-label="Воспроизвести">▶</button>
+                <button class="icon-btn pause" id="pauseBtn" aria-label="Пауза">⏸️</button>
+                <button class="icon-btn next" id="nextBtn" aria-label="Следующий">⏭️</button>
+                <button class="icon-btn close" id="closeBtn" aria-label="Закрыть видео">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const starsCanvas = document.getElementById('starsCanvas');
+            const startBtn = document.getElementById('startVideoBtn');
+            const videoContainer = document.getElementById('videoContainer');
+            const playerVideo = document.getElementById('playerVideo');
+            const controlPanel = document.getElementById('controlPanel');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const videoError = document.getElementById('videoError');
+
+            let hidePanelTimer = null;
+            
+            // ВАЖНО: Укажите правильные имена файлов
+            const videoFiles = ['f000.mp4', 'f000.mp4'];
+            let currentIndex = 0;
+
+            // ----- Функции для Fullscreen API -----
+            function enterFullScreen() {
+                const elem = videoContainer; // Переводим в полноэкранный режим весь контейнер с видео
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                    elem.msRequestFullscreen();
+                }
+            }
+
+            function exitFullScreen() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE/Edge */
+                    document.msExitFullscreen();
+                }
+            }
+
+            // Слушатель для отслеживания изменения полноэкранного режима
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // Для Safari
+            document.addEventListener('msfullscreenchange', handleFullscreenChange); // Для IE/Edge
+
+            function handleFullscreenChange() {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                    // Если мы вышли из полноэкранного режима (например, нажали системную кнопку "назад" или свайп)
+                    // и видео-контейнер всё ещё виден, то... что делать?
+                    // По логике, можно либо ничего не делать, либо закрыть видео. Закроем видео для чистоты интерфейса.
+                    if (videoContainer.style.display === 'flex') {
+                        closeVideo(); // Закрываем видео, возвращаясь к звёздам
+                    }
+                }
+            }
+
+            // ----- Звездный фон -----
+            let stars = [];
+            const ctx = starsCanvas.getContext('2d');
+            const STAR_COUNT = 180;
+
+            function initStars() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                stars = [];
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    stars.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        radius: Math.random() * 2.5 + 1.2,
+                        baseAlpha: Math.random() * 0.7 + 0.3,
+                        speed: 0.005 + Math.random() * 0.02,
+                    });
+                }
+            }
+
+            function drawStars() {
+                if (!ctx) return;
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, w, h);
+
+                const now = Date.now() * 0.002;
+                for (let s of stars) {
+                    const twinkle = Math.sin(now * s.speed * 10 + s.x * 0.02) * 0.35 + 0.65;
+                    let alpha = s.baseAlpha * twinkle;
+                    alpha = Math.min(1, Math.max(0.2, alpha));
+                    
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 200, ${alpha})`;
+                    ctx.fill();
+                }
+                requestAnimationFrame(drawStars);
+            }
+
+            function resizeHandler() {
+                if (starsCanvas) {
+                    starsCanvas.width = window.innerWidth;
+                    starsCanvas.height = window.innerHeight;
+                }
+                initStars();
+            }
+            
+            window.addEventListener('resize', resizeHandler);
+            resizeHandler();
+            drawStars();
+
+            // ----- Функции управления панелью и видео -----
+            // Измените функцию showControlPanel
+            function showControlPanel() {
+                controlPanel.classList.add('visible');
+                updateLoadingBarVisibility(true); // Показываем полоску
+                resetHidePanelTimer();
+            }
+            
+            // Измените функцию hideControlPanel
+            function hideControlPanel() {
+                controlPanel.classList.remove('visible');
+                updateLoadingBarVisibility(false); // Скрываем полоску
+            }
+
+                                let isFirstOpen = true; // Добавьте эту переменную в начало скрипта (рядом с другими let)
+                                
+                                function resetHidePanelTimer() {
+                                    if (hidePanelTimer) clearTimeout(hidePanelTimer);
+                                    
+                                    // При первом открытии даём больше времени (6 секунд), потом по 3 секунды
+                                    const timeoutDuration = isFirstOpen ? 6000 : 3000;
+                                    
+                                    hidePanelTimer = setTimeout(() => {
+                                        controlPanel.classList.remove('visible');
+                                        isFirstOpen = false; // После первого скрытия сбрасываем флаг
+                                    }, timeoutDuration);
+                                }
+
+            function loadVideoByIndex(index) {
+                if (index >= 0 && index < videoFiles.length) {
+                    // Формируем правильный URL для GitHub Pages
+                    // Учитываем, что HTML лежит в корне, а видео — в папке viliv
+                    const baseUrl = window.location.origin + '/viliv/';
+                    const fileName = videoFiles[index];
+                    const videoUrl = baseUrl + fileName;
+                    
+                    console.log('Загрузка видео:', videoUrl);
+                    
+                    playerVideo.src = videoUrl;
+                    playerVideo.load();
+                    
+                    playerVideo.oncanplaythrough = function() {
+                        videoError.style.display = 'none';
+                    };
+                    
+                    playerVideo.onerror = function(e) {
+                        console.error('Ошибка загрузки видео:', videoUrl);
+                        videoError.style.display = 'block';
+                        setTimeout(() => {
+                            videoError.style.display = 'none';
+                        }, 3000);
+                    };
+                }
+            }
+
+            //// dil 
+                                       // ----- Обновлённая функция отслеживания загрузки -----
+                                const loadingProgress = document.getElementById('loadingProgress');
+                                const loadingContainer = document.querySelector('.loading-bar-container');
+                                let isFullyLoaded = false; // Добавьте эту переменную в начало скрипта
+                                
+                                function setupProgressTracking(videoElement) {
+                                    // При обновлении данных о загрузке
+                                    videoElement.addEventListener('progress', function() {
+                                        if (videoElement.buffered.length > 0 && videoElement.duration > 0) {
+                                            const bufferedEnd = videoElement.buffered.end(videoElement.buffered.length - 1);
+                                            const duration = videoElement.duration;
+                                            
+                                            if (duration > 0) {
+                                                const percent = (bufferedEnd / duration) * 100;
+                                                loadingProgress.style.width = percent + '%';
+                                                
+                                                // Если видео полностью загружено и ещё не отмечали
+                                                if (percent >= 99.9 && !isFullyLoaded) {
+                                                    isFullyLoaded = true;
+                                                    loadingProgress.classList.add('complete');
+                                                    
+                                                    // Полностью скрываем контейнер после анимации
+                                                    setTimeout(() => {
+                                                        if (!controlPanel.classList.contains('visible')) {
+                                                            loadingContainer.style.opacity = '0';
+                                                        }
+                                                    }, 1000);
+                                                }
+                                            }
+                                        }
+                                    });
+                                
+                                    // Когда видео полностью загружено (событие canplaythrough)
+                                    videoElement.addEventListener('canplaythrough', function() {
+                                        if (!isFullyLoaded) {
+                                            isFullyLoaded = true;
+                                            loadingProgress.style.width = '100%';
+                                            loadingProgress.classList.add('complete');
+                                            
+                                            setTimeout(() => {
+                                                if (!controlPanel.classList.contains('visible')) {
+                                                    loadingContainer.style.opacity = '0';
+                                                }
+                                            }, 1000);
+                                        }
+                                    });
+                                
+                                    // При смене источника сбрасываем всё
+                                    videoElement.addEventListener('loadstart', function() {
+                                        resetLoadingIndicator();
+                                    });
+                                }
+                                
+                                // Функция сброса индикатора
+                                function resetLoadingIndicator() {
+                                    isFullyLoaded = false;
+                                    loadingProgress.style.width = '0%';
+                                    loadingProgress.classList.remove('complete');
+                                    loadingContainer.style.opacity = '0';
+                                }
+                                
+                                // Функция показа/скрытия полоски вместе с панелью
+                                function updateLoadingBarVisibility(show) {
+                                    if (!isFullyLoaded) {
+                                        loadingContainer.style.opacity = show ? '1' : '0';
+                                    } else {
+                                        loadingContainer.style.opacity = '0';
+                                    }
+                                }
+                                                
+
+                // Вызовите эту функцию после создания видео элемента
+                setupProgressTracking(playerVideo);
+            
+            //// dil
+
+            function closeVideo() {
+                playerVideo.pause();
+                // Выходим из полноэкранного режима, если активен
+                exitFullScreen();
+                videoContainer.style.display = 'none';
+                hideControlPanel();
+                if (hidePanelTimer) {
+                    clearTimeout(hidePanelTimer);
+                    hidePanelTimer = null;
+                }
+                currentIndex = 0;
+                loadVideoByIndex(0);
+                isFirstOpen = true; // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+                resetLoadingIndicator(); // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+            }
+
+            // ----- Обработчики событий -----
+            startBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                videoContainer.style.display = 'flex';
+                currentIndex = 0;
+                loadVideoByIndex(0);
+                // Пытаемся войти в полноэкранный режим
+                enterFullScreen();
+                showControlPanel();
+                isFirstOpen = true; // <--- И СЮДА ТОЖЕ
+            });
+
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playerVideo.play()
+                    .then(() => {
+                        showControlPanel();
+                    })
+                    .catch(err => {
+                        console.warn('Автовоспроизведение не удалось:', err);
+                        // Пробуем воспроизвести после взаимодействия
+                        setTimeout(() => {
+                            playerVideo.play().catch(e => {});
+                        }, 100);
+                    });
+            });
+
+            pauseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playerVideo.pause();
+                showControlPanel();
+            });
+
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (videoFiles.length === 0) return;
+                currentIndex = (currentIndex + 1) % videoFiles.length;
+                loadVideoByIndex(currentIndex);
+                showControlPanel();
+                
+                // Пытаемся воспроизвести автоматически после смены
+                setTimeout(() => {
+                    playerVideo.play().catch(e => {});
+                }, 200);
+            });
+
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeVideo();
+            });
+
+            playerVideo.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showControlPanel();
+            });
+
+            playerVideo.addEventListener('ended', () => {
+                showControlPanel();
+            });
+
+            videoContainer.addEventListener('click', (e) => {
+                if (!controlPanel.contains(e.target)) {
+                    showControlPanel();
+                }
+            });
+
+            controlPanel.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetHidePanelTimer();
+            });
+
+            controlPanel.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                resetHidePanelTimer();
+            });
+
+            // Инициализация
+            hideControlPanel();
+            loadVideoByIndex(0);
+          })();
+        setupProgressTracking(playerVideo);
+    </script>
+</body>
+</html>
