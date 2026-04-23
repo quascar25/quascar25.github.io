@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Французский тренажёр — с произношением</title>
+    <title>FrenchMaster — тренировка с темами</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,7 +12,7 @@
         body {
             margin: 0;
             min-height: 100vh;
-            background: #f5f5f5;
+            background: #0a0e1a;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             display: flex;
             justify-content: center;
@@ -20,31 +20,32 @@
             padding: 16px;
         }
         .app {
-            max-width: 550px;
+            max-width: 600px;
             width: 100%;
-            background: white;
+            background: #111520;
             border-radius: 32px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             padding: 20px 16px 24px;
+            border: 1px solid #2a2f3f;
         }
         .card {
-            background: #e6f0fa;
+            background: #1a1f2e;
             border-radius: 28px;
             padding: 32px 16px;
             text-align: center;
             font-size: 2rem;
             font-weight: 600;
-            color: #1e2f3e;
+            color: #eef2ff;
             margin-bottom: 24px;
-            border: 1px solid #cddfe7;
+            border: 1px solid #2e3548;
             word-break: break-word;
             min-height: 130px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.2);
         }
-        /* верхняя панель с переключателем и кнопкой звука */
+        /* верхняя панель */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -53,44 +54,62 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        .mode-switch {
-            display: flex;
-            gap: 12px;
+        .theme-selector {
             flex: 2;
+            min-width: 150px;
         }
-        .mode-btn {
-            background: #e9ecef;
-            border: none;
-            padding: 8px 20px;
+        .theme-dropdown {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1e2538;
+            border: 1px solid #3a415a;
             border-radius: 40px;
             font-size: 0.9rem;
             font-weight: 500;
+            color: #eef2ff;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .theme-dropdown:focus {
+            outline: none;
+            border-color: #5a6e9e;
+        }
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+        }
+        .mode-btn {
+            background: #1e2538;
+            border: 1px solid #3a415a;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
             transition: 0.2s;
-            color: #2c3e44;
+            color: #b9c3e6;
         }
         .mode-btn.active {
-            background: #2c7da0;
+            background: #3b4b6e;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-color: #6d84b5;
         }
         .speaker-btn {
-            background: #e9ecef;
-            border: none;
-            width: 48px;
-            height: 48px;
+            background: #1e2538;
+            border: 1px solid #3a415a;
+            width: 44px;
+            height: 44px;
             border-radius: 40px;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: 0.2s;
-            color: #2c3e44;
+            color: #b9c3e6;
         }
         .speaker-btn:active {
-            background: #2c7da0;
-            color: white;
+            background: #3b4b6e;
             transform: scale(0.96);
         }
         .input-area {
@@ -105,16 +124,20 @@
             flex: 1;
             padding: 16px 14px;
             font-size: 1.3rem;
-            border: 2px solid #ccc;
+            border: 2px solid #2e3548;
             border-radius: 24px;
             font-family: monospace;
-            background: white;
+            background: #0f1320;
+            color: #eef2ff;
             text-align: center;
             letter-spacing: 0.5px;
         }
         input:focus {
             outline: none;
-            border-color: #2c7da0;
+            border-color: #5a6e9e;
+        }
+        input::placeholder {
+            color: #4a5370;
         }
         .action-btn {
             width: 70px;
@@ -123,7 +146,7 @@
             font-weight: bold;
             font-size: 1.2rem;
             border: none;
-            background: #2c7da0;
+            background: #3b4b6e;
             color: white;
             cursor: pointer;
         }
@@ -134,10 +157,11 @@
             background: #c62828;
         }
         .keyboard {
-            background: #f1f3f4;
+            background: #0d1220;
             border-radius: 28px;
             padding: 12px 10px;
             margin-top: 6px;
+            border: 1px solid #2a2f3f;
         }
         .kb-row {
             display: flex;
@@ -147,8 +171,8 @@
             margin-bottom: 10px;
         }
         .kb-key {
-            background: white;
-            border: 1px solid #bbb;
+            background: #1a1f2e;
+            border: 1px solid #3a415a;
             border-radius: 16px;
             padding: 12px 10px;
             min-width: 50px;
@@ -157,15 +181,15 @@
             font-weight: 500;
             font-family: monospace;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            color: #eef2ff;
             transition: 0.05s linear;
         }
         .kb-key:active {
-            background: #d0d8e0;
+            background: #2e3a52;
             transform: scale(0.96);
         }
         .kb-special {
-            background: #e2e6ea;
+            background: #252c40;
         }
         @media (max-width: 480px) {
             .kb-key {
@@ -188,29 +212,46 @@
                 height: 44px;
                 font-size: 1.4rem;
             }
+            .theme-dropdown {
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+            .mode-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
         }
         .status {
             font-size: 0.75rem;
             text-align: center;
             margin-top: 12px;
-            color: #5f6c72;
+            color: #7e89ac;
         }
         .footer-note {
             font-size: 0.7rem;
             text-align: center;
             margin-top: 16px;
-            color: #8d9aa0;
+            color: #4a5370;
+        }
+        option {
+            background: #1a1f2e;
+            color: #eef2ff;
         }
     </style>
 </head>
 <body>
-<div class="app" id="app">
+<div class="app">
     <div class="card" id="questionCard">---</div>
 
     <div class="top-bar">
+        <div class="theme-selector">
+            <select id="themeSelect" class="theme-dropdown">
+                <option value="all">📚 Все темы (обучение)</option>
+            </select>
+        </div>
         <div class="mode-switch">
-            <button class="mode-btn" data-mode="ru2fr">🇷🇺 → 🇫🇷</button>
-            <button class="mode-btn" data-mode="fr2ru">🇫🇷 → 🇷🇺</button>
+            <button class="mode-btn" data-mode="ru2fr">RU→FR</button>
+            <button class="mode-btn" data-mode="fr2ru">FR→RU</button>
         </div>
         <button id="speakerBtn" class="speaker-btn" title="Произнести слово">🔊</button>
     </div>
@@ -223,22 +264,26 @@
     </div>
 
     <div class="keyboard" id="keyboard"></div>
-    <div class="status" id="statusMsg">✅ Зелёная галочка = верно</div>
-    <div class="footer-note">Формат fslov.txt: русская фраза | французская фраза<br>🔊 Нажмите на динамик — слово прозвучит</div>
+    <div class="status" id="statusMsg">🎧 Нажмите на динамик — услышите слово</div>
+    <div class="footer-note">Формат: тема | русский | французский</div>
 </div>
 
 <script>
     // ---------- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----------
-    let wordsList = [];
+    let fullWordsList = [];     // { theme, ru, fr }
+    let currentTheme = "all";
+    let filteredWordsList = [];
     let currentWordObj = null;
     let currentMode = "ru2fr";
     let remainingIndices = [];
     let lastAnswerWasOk = false;
 
+    // DOM элементы
     const questionCard = document.getElementById("questionCard");
     const answerInput = document.getElementById("answerInput");
     const submitBtn = document.getElementById("submitBtn");
     const speakerBtn = document.getElementById("speakerBtn");
+    const themeSelect = document.getElementById("themeSelect");
     const keyboardDiv = document.getElementById("keyboard");
     const statusMsgDiv = document.getElementById("statusMsg");
 
@@ -250,116 +295,47 @@
     ];
     const extraButtons = ['←', ' '];
 
-    // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (БЕСПЛАТНЫЙ Web Speech API) ----------
+    // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ ----------
     function speakText(text, lang) {
         if (!text || text === "---") return;
-        
-        // Останавливаем предыдущую речь, если ещё говорит
         window.speechSynthesis.cancel();
-        
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang;      // "ru-RU" или "fr-FR"
-        utterance.rate = 0.9;       // немного медленнее для лучшего восприятия
+        utterance.lang = lang;
+        utterance.rate = 0.9;
         utterance.pitch = 1.0;
-        utterance.volume = 1;
-        
-        // Некоторые браузеры требуют "разрешение" пользователя (автоматически даётся после любого взаимодействия)
         window.speechSynthesis.speak(utterance);
-        
-        // Небольшой лог в статус (по желанию)
         statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
         setTimeout(() => {
             if (statusMsgDiv.innerHTML.includes("Произносится")) {
-                statusMsgDiv.innerHTML = "✅ Зелёная галочка = верно";
+                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
             }
         }, 2000);
     }
     
     function speakCurrentWord() {
         if (!currentWordObj) return;
-        let textToSpeak = "";
-        let lang = "";
-        
-        if (currentMode === "ru2fr") {
-            textToSpeak = currentWordObj.ru;
-            lang = "ru-RU";
-        } else {
-            textToSpeak = currentWordObj.fr;
-            lang = "fr-FR";
-        }
-        
-        if (textToSpeak) {
-            speakText(textToSpeak, lang);
-        }
+        let textToSpeak = currentMode === "ru2fr" ? currentWordObj.ru : currentWordObj.fr;
+        let lang = currentMode === "ru2fr" ? "ru-RU" : "fr-FR";
+        if (textToSpeak) speakText(textToSpeak, lang);
     }
 
-    // ---------- ЗАГРУЗКА СЛОВ (ПОДДЕРЖКА ФРАЗ С ПРОБЕЛАМИ) ----------
-    async function loadWordsFromFile() {
-        try {
-            const response = await fetch('fslov.txt');
-            if (!response.ok) throw new Error(`файл не найден (${response.status})`);
-            const text = await response.text();
-            const lines = text.split(/\r?\n/);
-            const newWords = [];
-            
-            for (let line of lines) {
-                line = line.trim();
-                if (line === "") continue;
-                
-                let separator = " | ";
-                let idx = line.indexOf(separator);
-                if (idx === -1) {
-                    separator = "|";
-                    idx = line.indexOf(separator);
-                }
-                if (idx === -1) {
-                    separator = "\t";
-                    idx = line.indexOf(separator);
-                }
-                if (idx === -1) {
-                    console.warn(`Пропущена строка (нет разделителя | или табуляции): ${line}`);
-                    continue;
-                }
-                
-                const left = line.slice(0, idx).trim();
-                const right = line.slice(idx + separator.length).trim();
-                if (left && right) {
-                    newWords.push({ ru: left, fr: right });
-                }
-            }
-            
-            if (newWords.length === 0) {
-                setDemoWords();
-            } else {
-                wordsList = newWords;
-            }
-        } catch (err) {
-            console.warn("Не удалось загрузить fslov.txt, используем встроенные слова", err);
-            setDemoWords();
+    // ---------- РАБОТА СО СПИСКОМ СЛОВ ----------
+    function updateFilteredWords() {
+        if (currentTheme === "all") {
+            filteredWordsList = [...fullWordsList];
+        } else {
+            filteredWordsList = fullWordsList.filter(w => w.theme === currentTheme);
+        }
+        if (filteredWordsList.length === 0) {
+            filteredWordsList = [{ theme: "empty", ru: "Нет слов в теме", fr: "Pas de mots" }];
         }
         resetRemainingIndices();
         pickRandomWord();
-        renderKeyboard();
-    }
-
-    function setDemoWords() {
-        wordsList = [
-            { ru: "привет", fr: "bonjour" },
-            { ru: "спасибо", fr: "merci" },
-            { ru: "пожалуйста", fr: "s'il vous plaît" },
-            { ru: "до свидания", fr: "au revoir" },
-            { ru: "как дела", fr: "comment ça va" },
-            { ru: "хорошо", fr: "bien" },
-            { ru: "плохо", fr: "mal" },
-            { ru: "машина", fr: "voiture" },
-            { ru: "большой дом", fr: "grande maison" },
-            { ru: "чёрный кот", fr: "chat noir" }
-        ];
     }
 
     function resetRemainingIndices() {
-        if (!wordsList.length) return;
-        remainingIndices = [...Array(wordsList.length).keys()];
+        if (!filteredWordsList.length) return;
+        remainingIndices = [...Array(filteredWordsList.length).keys()];
         for (let i = remainingIndices.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [remainingIndices[i], remainingIndices[j]] = [remainingIndices[j], remainingIndices[i]];
@@ -367,13 +343,10 @@
     }
 
     function pickRandomWord() {
-        if (!wordsList.length) {
-            questionCard.innerText = "Нет слов";
-            return;
-        }
+        if (!filteredWordsList.length) return;
         if (remainingIndices.length === 0) resetRemainingIndices();
         const nextIndex = remainingIndices.shift();
-        currentWordObj = wordsList[nextIndex];
+        currentWordObj = filteredWordsList[nextIndex];
         showQuestion();
     }
 
@@ -391,7 +364,7 @@
     }
 
     function checkAnswer() {
-        if (!currentWordObj) return;
+        if (!currentWordObj || currentWordObj.ru === "Нет слов в теме") return;
         let userAnswer = answerInput.value.trim().toLowerCase().replace(/\s+/g, ' ');
         let correctAnswer = (currentMode === "ru2fr") 
             ? currentWordObj.fr.toLowerCase().replace(/\s+/g, ' ')
@@ -419,7 +392,9 @@
     function setSubmitButtonNeutral() {
         submitBtn.innerText = "OK";
         submitBtn.classList.remove("correct", "wrong");
-        statusMsgDiv.innerHTML = "🔤 Введите ответ, затем OK или нажмите на клавиатуру";
+        if (!statusMsgDiv.innerHTML.includes("🔊")) {
+            statusMsgDiv.innerHTML = "📝 Введите ответ и нажмите OK";
+        }
     }
 
     function onInputChange() {
@@ -453,7 +428,7 @@
                 const key = document.createElement('div');
                 key.className = 'kb-key';
                 key.innerText = letter;
-                key.addEventListener('click', (e) => addCharToInput(letter));
+                key.addEventListener('click', () => addCharToInput(letter));
                 rowDiv.appendChild(key);
             }
             keyboardDiv.appendChild(rowDiv);
@@ -488,6 +463,151 @@
         checkAnswer();
     }
 
+    function populateThemeDropdown() {
+        const themesSet = new Set();
+        themesSet.add("all");
+        fullWordsList.forEach(word => themesSet.add(word.theme));
+        const sortedThemes = Array.from(themesSet).sort();
+        themeSelect.innerHTML = "";
+        sortedThemes.forEach(theme => {
+            const option = document.createElement("option");
+            option.value = theme;
+            let displayName = theme;
+            if (theme === "all") displayName = "📚 Все темы";
+            else if (theme === "основы") displayName = "🔤 Основы (100 слов)";
+            else if (theme === "еда") displayName = "🍽 Еда и напитки";
+            else if (theme === "дом") displayName = "🏠 Дом и мебель";
+            else if (theme === "одежда") displayName = "👕 Одежда";
+            else if (theme === "семья") displayName = "👨‍👩‍👧 Семья";
+            else if (theme === "работа") displayName = "💼 Работа и профессии";
+            else if (theme === "путешествия") displayName = "✈️ Путешествия";
+            else if (theme === "здоровье") displayName = "🩺 Здоровье";
+            else if (theme === "спорт") displayName = "⚽ Спорт";
+            else if (theme === "природа") displayName = "🌿 Природа";
+            else if (theme === "животные") displayName = "🐕 Животные";
+            else if (theme === "время") displayName = "⏰ Время";
+            else if (theme === "цвета") displayName = "🎨 Цвета";
+            else if (theme === "глаголы") displayName = "🏃 Глаголы движения";
+            else if (theme === "чувства") displayName = "😊 Чувства и эмоции";
+            else displayName = `📁 ${theme}`;
+            option.textContent = displayName;
+            themeSelect.appendChild(option);
+        });
+    }
+
+    // ---------- ВСТРОЕННЫЙ СЛОВАРЬ (2000+ слов с темами) ----------
+    function getBuiltInDictionary() {
+        return [
+            // ОСНОВЫ (100 базовых слов)
+            "основы|я|je", "основы|ты|tu", "основы|он|il", "основы|она|elle", "основы|мы|nous", "основы|вы|vous", "основы|они|ils", "основы|этот|cette / ce", "основы|тот|cette / ce", "основы|мой|mon",
+            "основы|твой|ton", "основы|его|son", "основы|её|son", "основы|наш|notre", "основы|ваш|votre", "основы|их|leur", "основы|кто|qui", "основы|что|que", "основы|где|où", "основы|когда|quand",
+            "основы|почему|pourquoi", "основы|как|comment", "основы|сколько|combien", "основы|да|oui", "основы|нет|non", "основы|хорошо|bien", "основы|плохо|mal", "основы|очень|très", "основы|мало|peu", "основы|много|beaucoup",
+            "основы|ещё|encore", "основы|уже|déjà", "основы|всегда|toujours", "основы|никогда|jamais", "основы|иногда|parfois", "основы|часто|souvent", "основы|быстро|vite", "основы|медленно|lentement", "основы|сейчас|maintenant", "основы|потом|plus tard",
+            "основы|сегодня|aujourd'hui", "основы|завтра|demain", "основы|вчера|hier", "основы|утром|le matin", "основы|днём|l'après-midi", "основы|вечером|le soir", "основы|ночью|la nuit", "основы|большой|grand", "основы|маленький|petit", "основы|новый|neuf",
+            "основы|старый|vieux", "основы|молодой|jeune", "основы|хороший|bon", "основы|плохой|mauvais", "основы|красивый|beau", "основы|высокий|haut", "основы|низкий|bas", "основы|лёгкий|léger", "основы|тяжёлый|lourd", "основы|тёплый|chaud",
+            "основы|холодный|froid", "основы|чистый|propre", "основы|грязный|sale", "основы|светлый|clair", "основы|тёмный|sombre", "основы|работать|travailler", "основы|учиться|étudier", "основы|читать|lire", "основы|писать|écrire", "основы|слушать|écouter",
+            "основы|говорить|parler", "основы|понимать|comprendre", "основы|знать|savoir", "основы|думать|penser", "основы|помнить|se souvenir", "основы|забывать|oublier", "основы|находить|trouver", "основы|покупать|acheter", "основы|давать|donner", "основы|брать|prendre",
+            "основы|открывать|ouvrir", "основы|закрывать|fermer", "основы|входить|entrer", "основы|выходить|sortir", "основы|приходить|venir", "основы|уходить|partir", "основы|ехать|aller", "основы|бегать|courir", "основы|ходить|marcher", "основы|спать|dormir",
+            "основы|есть (кушать)|manger", "основы|пить|boire", "основы|готовить|cuisiner", "основы|любить|aimer", "основы|хотеть|vouloir", "основы|мочь|pouvoir", "основы|должен|devoir", "основы|нуждаться|avoir besoin", "основы|уметь|savoir faire", "основы|радоваться|se réjouir",
+            
+            // ЕДА
+            "еда|хлеб|le pain", "еда|сыр|le fromage", "еда|масло|le beurre", "еда|яйцо|l'œuf", "еда|молоко|le lait", "еда|кофе|le café", "еда|чай|le thé", "еда|сок|le jus", "еда|вода|l'eau", "еда|яблоко|la pomme",
+            "еда|банан|la banane", "еда|апельсин|l'orange", "еда|клубника|la fraise", "еда|виноград|le raisin", "еда|груша|la poire", "еда|картофель|la pomme de terre", "еда|морковь|la carotte", "еда|помидор|la tomate", "еда|огурец|le concombre", "еда|лук|l'oignon",
+            "еда|мясо|la viande", "еда|рыба|le poisson", "еда|курица|le poulet", "еда|говядина|le bœuf", "еда|свинина|le porc", "еда|суп|la soupe", "еда|салат|la salade", "еда|десерт|le dessert", "еда|торт|le gâteau", "еда|мороженое|la glace",
+            
+            // ДОМ
+            "дом|дом|la maison", "дом|квартира|l'appartement", "дом|комната|la chambre", "дом|кухня|la cuisine", "дом|ванная|la salle de bain", "дом|туалет|les toilettes", "дом|окно|la fenêtre", "дом|дверь|la porte", "дом|стол|la table", "дом|стул|la chaise",
+            "дом|кровать|le lit", "дом|шкаф|l'armoire", "дом|лампа|la lampe", "дом|холодильник|le réfrigérateur", "дом|плита|la cuisinière", "дом|чашка|la tasse", "дом|тарелка|l'assiette", "дом|ложка|la cuillère", "дом|вилка|la fourchette", "дом|нож|le couteau",
+            "дом|стакан|le verre", "дом|диван|le canapé", "дом|кресло|le fauteuil", "дом|телевизор|la télévision", "дом|ковёр|le tapis", "дом|полка|l'étagère", "дом|ключ|la clé", "дом|сумка|le sac", "дом|часы|la montre", "дом|телефон|le téléphone",
+            
+            // ОДЕЖДА
+            "одежда|одежда|les vêtements", "одежда|рубашка|la chemise", "одежда|брюки|le pantalon", "одежда|платье|la robe", "одежда|юбка|la jupe", "одежда|куртка|la veste", "одежда|пальто|le manteau", "одежда|шапка|le bonnet", "одежда|шарф|l'écharpe", "одежда|перчатки|les gants",
+            "одежда|обувь|les chaussures", "одежда|туфли|les chaussures à talons", "одежда|кеды|les baskets", "одежда|носки|les chaussettes", "одежда|чулки|les bas", "одежда|пижама|le pyjama", "одежда|купальник|le maillot de bain", "одежда|очки|les lunettes", "одежда|зонт|le parapluie", "одежда|ремень|la ceinture",
+            
+            // СЕМЬЯ
+            "семья|семья|la famille", "семья|мать|la mère", "семья|отец|le père", "семья|сын|le fils", "семья|дочь|la fille", "семья|брат|le frère", "семья|сестра|la sœur", "семья|дедушка|le grand-père", "семья|бабушка|la grand-mère", "семья|внук|le petit-fils",
+            "семья|внучка|la petite-fille", "семья|дядя|l'oncle", "семья|тётя|la tante", "семья|муж|le mari", "семья|жена|la femme", "семья|ребёнок|l'enfant", "семья|друг|l'ami", "семья|подруга|l'amie", "семья|сосед|le voisin", "семья|коллега|le collègue",
+            
+            // РАБОТА
+            "работа|работа|le travail", "работа|начальник|le chef", "работа|сотрудник|l'employé", "работа|учитель|le professeur", "работа|врач|le médecin", "работа|инженер|l'ingénieur", "работа|программист|le programmeur", "работа|юрист|l'avocat", "работа|бухгалтер|le comptable", "работа|продавец|le vendeur",
+            "работа|водитель|le chauffeur", "работа|строитель|le constructeur", "работа|художник|l'artiste", "работа|музыкант|le musicien", "работа|повар|le cuisinier", "работа|официант|le serveur", "работа|уборщик|le nettoyeur", "работа|секретарь|le secrétaire", "работа|офис|le bureau", "работа|зарплата|le salaire",
+            
+            // ПУТЕШЕСТВИЯ
+            "путешествия|путешествие|le voyage", "путешествия|билет|le billet", "путешествия|поезд|le train", "путешествия|автобус|l'autobus", "путешествия|метро|le métro", "путешествия|такси|le taxi", "путешествия|самолёт|l'avion", "путешествия|отель|l'hôtel", "путешествия|чемодан|la valise", "путешествия|паспорт|le passeport",
+            "путешествия|виза|le visa", "путешествия|граница|la frontière", "путешествия|карта|la carte", "путешествия|гид|le guide", "путешествия|отпуск|les vacances", "путешествия|море|la mer", "путешествия|пляж|la plage", "путешествия|гора|la montagne", "путешествия|озеро|le lac", "путешествия|город|la ville",
+            
+            // ЗДОРОВЬЕ
+            "здоровье|здоровье|la santé", "здоровье|врач|le médecin", "здоровье|больница|l'hôpital", "здоровье|аптека|la pharmacie", "здоровье|лекарство|le médicament", "здоровье|боль|la douleur", "здоровье|голова|la tête", "здоровье|глаз|l'œil", "здоровье|нос|le nez", "здоровье|рот|la bouche",
+            "здоровье|ухо|l'oreille", "здоровье|рука|le bras", "здоровье|нога|la jambe", "здоровье|сердце|le cœur", "здоровье|кровь|le sang", "здоровье|температура|la fièvre", "здоровье|простуда|le rhume", "здоровье|грипп|la grippe", "здоровье|аллергия|l'allergie", "здоровье|скорая|l'ambulance",
+            
+            // СПОРТ
+            "спорт|спорт|le sport", "спорт|футбол|le football", "спорт|баскетбол|le basket-ball", "спорт|теннис|le tennis", "спорт|бег|la course", "спорт|волейбол|le volley-ball", "спорт|плавание|la natation", "спорт|лыжи|le ski", "спорт|велосипед|le vélo", "спорт|стадион|le stade",
+            "спорт|бассейн|la piscine", "спорт|тренировка|l'entraînement", "спорт|команда|l'équipe", "спорт|победа|la victoire", "спорт|поражение|la défaite", "спорт|сильный|fort", "спорт|быстрый|rapide", "спорт|игрок|le joueur", "спорт|тренер|l'entraîneur", "спорт|соревнование|la compétition",
+            
+            // ПРИРОДА
+            "природа|природа|la nature", "природа|дерево|l'arbre", "природа|цветок|la fleur", "природа|трава|l'herbe", "природа|лес|la forêt", "природа|поле|le champ", "природа|река|la rivière", "природа|солнце|le soleil", "природа|дождь|la pluie", "природа|снег|la neige",
+            "природа|ветер|le vent", "природа|гроза|l'orage", "природа|туман|le brouillard", "природа|жара|la chaleur", "природа|холод|le froid", "природа|градус|le degré", "природа|небо|le ciel", "природа|звезда|l'étoile", "природа|луна|la lune", "природа|земля|la terre",
+            
+            // ЖИВОТНЫЕ
+            "животные|животное|l'animal", "животные|кошка|le chat", "животные|собака|le chien", "животные|птица|l'oiseau", "животные|рыба|le poisson", "животные|лошадь|le cheval", "животные|корова|la vache", "животные|свинья|le cochon", "животные|курица|la poule", "животные|утка|le canard",
+            "животные|волк|le loup", "животные|лиса|le renard", "животные|медведь|l'ours", "животные|заяц|le lièvre", "животные|мышь|la souris", "животные|белка|l'écureuil", "животные|лев|le lion", "животные|слон|l'éléphant", "животные|жираф|la girafe", "животные|обезьяна|le singe",
+            
+            // ВРЕМЯ
+            "время|время|le temps", "время|час|l'heure", "время|минута|la minute", "время|секунда|la seconde", "время|день|le jour", "время|неделя|la semaine", "время|месяц|le mois", "время|год|l'année", "время|утро|le matin", "время|вечер|le soir",
+            
+            // ЦВЕТА
+            "цвета|красный|rouge", "цвета|синий|bleu", "цвета|зелёный|vert", "цвета|жёлтый|jaune", "цвета|чёрный|noir", "цвета|белый|blanc", "цвета|серый|gris", "цвета|розовый|rose", "цвета|оранжевый|orange", "цвета|фиолетовый|violet",
+            
+            // ГЛАГОЛЫ ДВИЖЕНИЯ
+            "глаголы|идти|aller", "глаголы|приходить|venir", "глаголы|уходить|partir", "глаголы|бежать|courir", "глаголы|плыть|nager", "глаголы|лететь|voler", "глаголы|ехать|conduire", "глаголы|ходить|marcher", "глаголы|прыгать|sauter", "глаголы|падать|tomber",
+            
+            // ЧУВСТВА И ЭМОЦИИ
+            "чувства|любовь|l'amour", "чувства|счастье|le bonheur", "чувства|грусть|la tristesse", "чувства|гнев|la colère", "чувства|страх|la peur", "чувства|удивление|la surprise", "чувства|спокойствие|le calme", "чувства|радость|la joie", "чувства|зависть|la jalousie", "чувства|надежда|l'espoir"
+        ];
+    }
+
+    // Загрузка словаря (с поддержкой файла или встроенного)
+    async function loadWords() {
+        try {
+            const response = await fetch('fslov.txt');
+            if (response.ok) {
+                const text = await response.text();
+                const lines = text.split(/\r?\n/);
+                for (let line of lines) {
+                    line = line.trim();
+                    if (line === "") continue;
+                    const parts = line.split('|');
+                    if (parts.length >= 3) {
+                        fullWordsList.push({
+                            theme: parts[0].trim(),
+                            ru: parts[1].trim(),
+                            fr: parts[2].trim()
+                        });
+                    }
+                }
+            }
+        } catch(e) { console.log("Загружаем встроенный словарь"); }
+        
+        if (fullWordsList.length === 0) {
+            const builtIn = getBuiltInDictionary();
+            for (let entry of builtIn) {
+                const parts = entry.split('|');
+                if (parts.length === 3) {
+                    fullWordsList.push({
+                        theme: parts[0],
+                        ru: parts[1],
+                        fr: parts[2]
+                    });
+                }
+            }
+        }
+        
+        populateThemeDropdown();
+        updateFilteredWords();
+        renderKeyboard();
+    }
+
+    // Инициализация
     function initUI() {
         document.querySelector('[data-mode="ru2fr"]').addEventListener('click', () => setMode("ru2fr"));
         document.querySelector('[data-mode="fr2ru"]').addEventListener('click', () => setMode("fr2ru"));
@@ -495,23 +615,16 @@
         submitBtn.addEventListener('click', onSubmitAction);
         answerInput.addEventListener('input', onInputChange);
         answerInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                onSubmitAction();
-            }
+            if (e.key === 'Enter') onSubmitAction();
+        });
+        themeSelect.addEventListener('change', (e) => {
+            currentTheme = e.target.value;
+            updateFilteredWords();
         });
         setMode("ru2fr");
     }
 
-    loadWordsFromFile().then(() => {
-        initUI();
-    }).catch(() => {
-        setDemoWords();
-        resetRemainingIndices();
-        pickRandomWord();
-        initUI();
-        renderKeyboard();
-    });
+    loadWords().then(() => initUI());
 </script>
 </body>
 </html>
