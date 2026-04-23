@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Французский тренажёр — фразы</title>
+    <title>Французский тренажёр — с произношением</title>
     <style>
         * {
             box-sizing: border-box;
@@ -42,12 +42,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+        /* верхняя панель с переключателем и кнопкой звука */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         .mode-switch {
             display: flex;
-            justify-content: center;
             gap: 12px;
-            margin-bottom: 20px;
+            flex: 2;
         }
         .mode-btn {
             background: #e9ecef;
@@ -64,6 +73,25 @@
             background: #2c7da0;
             color: white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .speaker-btn {
+            background: #e9ecef;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 40px;
+            font-size: 1.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            color: #2c3e44;
+        }
+        .speaker-btn:active {
+            background: #2c7da0;
+            color: white;
+            transform: scale(0.96);
         }
         .input-area {
             margin-bottom: 20px;
@@ -155,6 +183,11 @@
             input {
                 font-size: 1.1rem;
             }
+            .speaker-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.4rem;
+            }
         }
         .status {
             font-size: 0.75rem;
@@ -174,9 +207,12 @@
 <div class="app" id="app">
     <div class="card" id="questionCard">---</div>
 
-    <div class="mode-switch">
-        <button class="mode-btn" data-mode="ru2fr">🇷🇺 → 🇫🇷</button>
-        <button class="mode-btn" data-mode="fr2ru">🇫🇷 → 🇷🇺</button>
+    <div class="top-bar">
+        <div class="mode-switch">
+            <button class="mode-btn" data-mode="ru2fr">🇷🇺 → 🇫🇷</button>
+            <button class="mode-btn" data-mode="fr2ru">🇫🇷 → 🇷🇺</button>
+        </div>
+        <button id="speakerBtn" class="speaker-btn" title="Произнести слово">🔊</button>
     </div>
 
     <div class="input-area">
@@ -188,7 +224,7 @@
 
     <div class="keyboard" id="keyboard"></div>
     <div class="status" id="statusMsg">✅ Зелёная галочка = верно</div>
-    <div class="footer-note">Формат fslov.txt: русская фраза | французская фраза<br>Пример: до свидания | au revoir</div>
+    <div class="footer-note">Формат fslov.txt: русская фраза | французская фраза<br>🔊 Нажмите на динамик — слово прозвучит</div>
 </div>
 
 <script>
@@ -202,6 +238,7 @@
     const questionCard = document.getElementById("questionCard");
     const answerInput = document.getElementById("answerInput");
     const submitBtn = document.getElementById("submitBtn");
+    const speakerBtn = document.getElementById("speakerBtn");
     const keyboardDiv = document.getElementById("keyboard");
     const statusMsgDiv = document.getElementById("statusMsg");
 
@@ -212,6 +249,49 @@
         ['à','â','æ','ç','é','è','ê','ë','î','ï','ô','œ','ù','û','ü','ÿ','ñ','-',"'"]
     ];
     const extraButtons = ['←', ' '];
+
+    // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (БЕСПЛАТНЫЙ Web Speech API) ----------
+    function speakText(text, lang) {
+        if (!text || text === "---") return;
+        
+        // Останавливаем предыдущую речь, если ещё говорит
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;      // "ru-RU" или "fr-FR"
+        utterance.rate = 0.9;       // немного медленнее для лучшего восприятия
+        utterance.pitch = 1.0;
+        utterance.volume = 1;
+        
+        // Некоторые браузеры требуют "разрешение" пользователя (автоматически даётся после любого взаимодействия)
+        window.speechSynthesis.speak(utterance);
+        
+        // Небольшой лог в статус (по желанию)
+        statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
+        setTimeout(() => {
+            if (statusMsgDiv.innerHTML.includes("Произносится")) {
+                statusMsgDiv.innerHTML = "✅ Зелёная галочка = верно";
+            }
+        }, 2000);
+    }
+    
+    function speakCurrentWord() {
+        if (!currentWordObj) return;
+        let textToSpeak = "";
+        let lang = "";
+        
+        if (currentMode === "ru2fr") {
+            textToSpeak = currentWordObj.ru;
+            lang = "ru-RU";
+        } else {
+            textToSpeak = currentWordObj.fr;
+            lang = "fr-FR";
+        }
+        
+        if (textToSpeak) {
+            speakText(textToSpeak, lang);
+        }
+    }
 
     // ---------- ЗАГРУЗКА СЛОВ (ПОДДЕРЖКА ФРАЗ С ПРОБЕЛАМИ) ----------
     async function loadWordsFromFile() {
@@ -226,11 +306,10 @@
                 line = line.trim();
                 if (line === "") continue;
                 
-                // Ищем разделитель: " | " (пробел + вертикальная черта + пробел) — самый надёжный вариант для фраз
                 let separator = " | ";
                 let idx = line.indexOf(separator);
                 if (idx === -1) {
-                    separator = "|";  // без пробелов тоже поймёт
+                    separator = "|";
                     idx = line.indexOf(separator);
                 }
                 if (idx === -1) {
@@ -238,7 +317,6 @@
                     idx = line.indexOf(separator);
                 }
                 if (idx === -1) {
-                    // ВАЖНО: если нет нормального разделителя — пропускаем строку, не режем по первому пробелу!
                     console.warn(`Пропущена строка (нет разделителя | или табуляции): ${line}`);
                     continue;
                 }
@@ -247,8 +325,6 @@
                 const right = line.slice(idx + separator.length).trim();
                 if (left && right) {
                     newWords.push({ ru: left, fr: right });
-                } else {
-                    console.warn(`Пропущена строка с пустой частью: ${line}`);
                 }
             }
             
@@ -258,7 +334,7 @@
                 wordsList = newWords;
             }
         } catch (err) {
-            console.warn("Не удалось загрузить fslov.txt, используем встроенные 10 слов", err);
+            console.warn("Не удалось загрузить fslov.txt, используем встроенные слова", err);
             setDemoWords();
         }
         resetRemainingIndices();
@@ -343,7 +419,7 @@
     function setSubmitButtonNeutral() {
         submitBtn.innerText = "OK";
         submitBtn.classList.remove("correct", "wrong");
-        statusMsgDiv.innerHTML = "🔤 Введите ответ, затем OK";
+        statusMsgDiv.innerHTML = "🔤 Введите ответ, затем OK или нажмите на клавиатуру";
     }
 
     function onInputChange() {
@@ -415,6 +491,7 @@
     function initUI() {
         document.querySelector('[data-mode="ru2fr"]').addEventListener('click', () => setMode("ru2fr"));
         document.querySelector('[data-mode="fr2ru"]').addEventListener('click', () => setMode("fr2ru"));
+        speakerBtn.addEventListener('click', speakCurrentWord);
         submitBtn.addEventListener('click', onSubmitAction);
         answerInput.addEventListener('input', onInputChange);
         answerInput.addEventListener('keypress', (e) => {
