@@ -1,12 +1,12 @@
-привет bonjour
-спасибо merci
-пожалуйста s'il vous plaît
-до свидания au revoir
-хорошо bien
-плохо mal
-машина voiture
-дом maison
-кот chat
-собака chien
-яблоко pomme
-красный rouge
+привет | bonjour
+спасибо | merci
+пожалуйста | s'il vous plaît
+до свидания | au revoir
+хорошо | bien
+плохо | mal
+машина | voiture
+дом | maison
+кот | chat
+собака | chien
+яблоко | pomme
+красный | rouge
