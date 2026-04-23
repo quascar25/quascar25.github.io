@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Французский тренажёр</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none; /* чуть удобнее на телефоне, но текст можно выделить */
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f5f5;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .app {
+            max-width: 550px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 20px 16px 24px;
+            transition: all 0.2s;
+        }
+        /* верхний квадрат */
+        .card {
+            background: #e6f0fa;
+            border-radius: 28px;
+            padding: 32px 16px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1e2f3e;
+            margin-bottom: 24px;
+            border: 1px solid #cddfe7;
+            word-break: break-word;
+            min-height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* переключатель режима (рус/фр) */
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2c3e44;
+        }
+        .mode-btn.active {
+            background: #2c7da0;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        /* поле ввода */
+        .input-area {
+            margin-bottom: 20px;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        input {
+            flex: 1;
+            padding: 16px 14px;
+            font-size: 1.3rem;
+            border: 2px solid #ccc;
+            border-radius: 24px;
+            font-family: monospace;
+            background: white;
+            transition: 0.1s;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2c7da0;
+        }
+        .action-btn {
+            width: 70px;
+            padding: 14px 0;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            background: #2c7da0;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: center;
+        }
+        .action-btn.correct {
+            background: #2e7d32;
+        }
+        .action-btn.wrong {
+            background: #c62828;
+        }
+        /* клавиатура */
+        .keyboard {
+            background: #f1f3f4;
+            border-radius: 28px;
+            padding: 12px 10px;
+            margin-top: 6px;
+        }
+        .kb-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .kb-key {
+            background: white;
+            border: 1px solid #bbb;
+            border-radius: 16px;
+            padding: 12px 10px;
+            min-width: 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            font-family: monospace;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: 0.05s linear;
+        }
+        .kb-key:active {
+            background: #d0d8e0;
+            transform: scale(0.96);
+        }
+        .kb-special {
+            background: #e2e6ea;
+        }
+        /* для гибкости на маленьких экранах */
+        @media (max-width: 480px) {
+            .kb-key {
+                min-width: 42px;
+                padding: 10px 6px;
+                font-size: 1rem;
+            }
+            .kb-row {
+                gap: 6px;
+            }
+            .card {
+                font-size: 1.5rem;
+                padding: 24px 12px;
+            }
+            input {
+                font-size: 1.1rem;
+            }
+        }
+        .status {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 12px;
+            color: #5f6c72;
+        }
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 16px;
+            color: #8d9aa0;
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <div class="card" id="questionCard">---</div>
+
+    <div class="mode-switch">
+        <button class="mode-btn" data-mode="ru2fr">🇷🇺 → 🇫🇷</button>
+        <button class="mode-btn" data-mode="fr2ru">🇫🇷 → 🇷🇺</button>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" autofocus>
+            <button id="submitBtn" class="action-btn">OK</button>
+        </div>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+    <div class="status" id="statusMsg">✅ Зелёная галочка = верно, ❌ красный крест = ошибка</div>
+    <div class="footer-note">Слова из файла fslov.txt (формат: русское|французское)</div>
+</div>
+
+<script>
+    // ---------- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----------
+    let wordsList = [];           // массив объектов {ru, fr}
+    let currentWordObj = null;   // текущее слово (объект)
+    let currentMode = "ru2fr";   // "ru2fr" или "fr2ru"
+    let remainingIndices = [];    // индексы слов, которые ещё не выпадали в текущем цикле (случайный порядок)
+    let lastAnswerWasOk = false;  // просто для сброса кнопки при вводе
+
+    // Элементы DOM
+    const questionCard = document.getElementById("questionCard");
+    const answerInput = document.getElementById("answerInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const keyboardDiv = document.getElementById("keyboard");
+    const statusMsgDiv = document.getElementById("statusMsg");
+
+    // ---------- ФРАНЦУЗСКАЯ КЛАВИАТУРА (буквы + спецсимволы) ----------
+    const frenchLetters = [
+        ['a','b','c','d','e','f','g','h','i','j','k','l','m'],
+        ['n','o','p','q','r','s','t','u','v','w','x','y','z'],
+        ['à','â','æ','ç','é','è','ê','ë','î','ï','ô','œ','ù','û','ü','ÿ','ñ','-',"'"]
+    ];
+
+    // Спецкнопка Backspace и пробел
+    const extraButtons = ['←', ' '];  // ← удаление, пробел
+
+    // ---------- ЗАГРУЗКА СЛОВ ИЗ fsolv.txt ----------
+    async function loadWordsFromFile() {
+        try {
+            const response = await fetch('fslov.txt');
+            if (!response.ok) {
+                throw new Error(`файл не найден (${response.status})`);
+            }
+            const text = await response.text();
+            const lines = text.split(/\r?\n/);
+            const newWords = [];
+            for (let line of lines) {
+                line = line.trim();
+                if (line === "") continue;
+                // разделитель: пробел, табуляция, |, запятая? по заданию: русское и французкое разделены пробелом? 
+                // Но для надёжности: ищем первый пробел или табуляцию. Либо можно '|' на всякий случай.
+                let separator = ' ';
+                let idx = line.indexOf(separator);
+                if (idx === -1) {
+                    separator = '\t';
+                    idx = line.indexOf(separator);
+                }
+                if (idx === -1) {
+                    // пробуем через '|'
+                    separator = '|';
+                    idx = line.indexOf(separator);
+                }
+                if (idx === -1) continue; // неверная строка
+                const ru = line.slice(0, idx).trim();
+                const fr = line.slice(idx + 1).trim();
+                if (ru && fr) {
+                    newWords.push({ ru, fr });
+                }
+            }
+            if (newWords.length === 0) {
+                // Если файл пустой или не загрузился — добавим демо-слова (10 базовых)
+                setDemoWords();
+            } else {
+                wordsList = newWords;
+            }
+        } catch (err) {
+            console.warn("Не удалось загрузить fslov.txt, используем встроенные 10 слов", err);
+            setDemoWords();
+        }
+        // После загрузки слов — переинициализируем очередь случайных слов
+        resetRemainingIndices();
+        pickRandomWord();  // показать первое слово
+        renderKeyboard();
+    }
+
+    function setDemoWords() {
+        wordsList = [
+            { ru: "привет", fr: "bonjour" },
+            { ru: "спасибо", fr: "merci" },
+            { ru: "пожалуйста", fr: "s'il vous plaît" },
+            { ru: "до свидания", fr: "au revoir" },
+            { ru: "хорошо", fr: "bien" },
+            { ru: "плохо", fr: "mal" },
+            { ru: "машина", fr: "voiture" },
+            { ru: "дом", fr: "maison" },
+            { ru: "кот", fr: "chat" },
+            { ru: "собака", fr: "chien" }
+        ];
+    }
+
+    // Сброс очереди непоказанных слов (случайный порядок)
+    function resetRemainingIndices() {
+        if (!wordsList.length) return;
+        remainingIndices = [...Array(wordsList.length).keys()];
+        // перемешать (Fisher–Yates)
+        for (let i = remainingIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [remainingIndices[i], remainingIndices[j]] = [remainingIndices[j], remainingIndices[i]];
+        }
+    }
+
+    // Выбрать следующее случайное слово из оставшихся, иначе начать новый цикл
+    function pickRandomWord() {
+        if (!wordsList.length) {
+            questionCard.innerText = "Нет слов";
+            return;
+        }
+        if (remainingIndices.length === 0) {
+            // все слова уже были показаны, делаем новый случайный порядок
+            resetRemainingIndices();
+        }
+        // берем следующий индекс из начала очереди
+        const nextIndex = remainingIndices.shift();
+        currentWordObj = wordsList[nextIndex];
+        showQuestion();
+    }
+
+    // Показать вопрос в зависимости от текущего режима
+    function showQuestion() {
+        if (!currentWordObj) return;
+        if (currentMode === "ru2fr") {
+            questionCard.innerText = currentWordObj.ru;
+        } else {
+            questionCard.innerText = currentWordObj.fr;
+        }
+        // Сброс поля и кнопки
+        answerInput.value = "";
+        setSubmitButtonNeutral();
+        lastAnswerWasOk = false;
+        answerInput.focus();
+    }
+
+    // Проверка ответа
+    function checkAnswer() {
+        if (!currentWordObj) return;
+        let userAnswer = answerInput.value.trim().toLowerCase();
+        let correctAnswer = (currentMode === "ru2fr") ? currentWordObj.fr.toLowerCase() : currentWordObj.ru.toLowerCase();
+        // Нормализация для сравнения (убираем лишние пробелы)
+        userAnswer = userAnswer.replace(/\s+/g, ' ').trim();
+        correctAnswer = correctAnswer.replace(/\s+/g, ' ').trim();
+
+        const isCorrect = (userAnswer === correctAnswer);
+        if (isCorrect) {
+            // зеленая галочка: меняем вид кнопки
+            submitBtn.innerText = "✅";
+            submitBtn.classList.add("correct");
+            submitBtn.classList.remove("wrong");
+            statusMsgDiv.innerHTML = "✅ Верно! Следующее слово...";
+            // Через небольшую задержку переходим к следующему слову
+            setTimeout(() => {
+                pickRandomWord();
+                setSubmitButtonNeutral();
+            }, 600);
+        } else {
+            // красный крестик, НЕ переключаем слово, просто отмечаем ошибку
+            submitBtn.innerText = "❌";
+            submitBtn.classList.add("wrong");
+            submitBtn.classList.remove("correct");
+            statusMsgDiv.innerHTML = `❌ Неверно! Правильно: "${correctAnswer}"`;
+            // Кнопка не переходит в ок автоматически, пользователь должен изменить текст
+            // Но при следующем начале ввода вернётся "Ок"
+        }
+        lastAnswerWasOk = true;
+    }
+
+    function setSubmitButtonNeutral() {
+        submitBtn.innerText = "OK";
+        submitBtn.classList.remove("correct", "wrong");
+        statusMsgDiv.innerHTML = "🔤 Введите ответ, затем OK или нажмите на клавиатуру";
+    }
+
+    // обработчик ввода в поле (возврат OK при начале ввода)
+    function onInputChange() {
+        if (lastAnswerWasOk || submitBtn.innerText !== "OK") {
+            setSubmitButtonNeutral();
+            lastAnswerWasOk = false;
+        }
+    }
+
+    // Добавление символа в поле ввода
+    function addCharToInput(ch) {
+        if (ch === '←') {
+            // backspace
+            answerInput.value = answerInput.value.slice(0, -1);
+        } else if (ch === ' ') {
+            answerInput.value += ' ';
+        } else {
+            answerInput.value += ch;
+        }
+        // при нажатии любой клавиши сбрасываем кнопку на "ОК", если там крестик или галочка
+        if (submitBtn.innerText !== "OK") {
+            setSubmitButtonNeutral();
+            lastAnswerWasOk = false;
+        }
+        answerInput.focus();
+    }
+
+    // Отрисовка клавиатуры
+    function renderKeyboard() {
+        keyboardDiv.innerHTML = '';
+        // буквы строками
+        for (let row of frenchLetters) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'kb-row';
+            for (let letter of row) {
+                const key = document.createElement('div');
+                key.className = 'kb-key';
+                key.innerText = letter;
+                key.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addCharToInput(letter);
+                });
+                rowDiv.appendChild(key);
+            }
+            keyboardDiv.appendChild(rowDiv);
+        }
+        // дополнительный ряд: backspace и пробел
+        const extraRow = document.createElement('div');
+        extraRow.className = 'kb-row';
+        for (let btn of extraButtons) {
+            const key = document.createElement('div');
+            key.className = 'kb-key kb-special';
+            key.innerText = btn;
+            key.addEventListener('click', () => addCharToInput(btn));
+            extraRow.appendChild(key);
+        }
+        keyboardDiv.appendChild(extraRow);
+    }
+
+    // переключение режима
+    function setMode(mode) {
+        currentMode = mode;
+        // обновить активный класс на кнопках
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            if (btn.dataset.mode === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        // после смены режима нужно показать вопрос для текущего слова
+        if (currentWordObj) {
+            showQuestion();
+        } else {
+            pickRandomWord();
+        }
+        setSubmitButtonNeutral();
+        answerInput.value = "";
+        answerInput.focus();
+    }
+
+    // Обработчик кнопки OK
+    function onSubmitAction() {
+        if (submitBtn.innerText === "✅" || submitBtn.innerText === "❌") {
+            // если уже отображена галочка/крестик — ничего не делаем или обновим?
+            return;
+        }
+        checkAnswer();
+    }
+
+    // Инициализация UI и событий
+    function initUI() {
+        // режимные кнопки
+        const ru2frBtn = document.querySelector('[data-mode="ru2fr"]');
+        const fr2ruBtn = document.querySelector('[data-mode="fr2ru"]');
+        ru2frBtn.addEventListener('click', () => setMode("ru2fr"));
+        fr2ruBtn.addEventListener('click', () => setMode("fr2ru"));
+        submitBtn.addEventListener('click', onSubmitAction);
+        answerInput.addEventListener('input', onInputChange);
+        // также поддержка Enter на клавиатуре
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                onSubmitAction();
+            }
+        });
+        // начальная активация режима ru->fr
+        setMode("ru2fr");
+    }
+
+    // Старт загрузки
+    loadWordsFromFile().then(() => {
+        initUI();
+    }).catch(() => {
+        setDemoWords();
+        resetRemainingIndices();
+        pickRandomWord();
+        initUI();
+        renderKeyboard();
+    });
+</script>
+</body>
+</html>
