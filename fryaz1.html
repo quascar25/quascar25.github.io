@@ -457,20 +457,41 @@
         }
     }
 
-    function addCharToInput(ch) {
-        if (ch === '←') {
-            answerInput.value = answerInput.value.slice(0, -1);
-        } else if (ch === ' ') {
-            answerInput.value += ' ';
-        } else {
-            answerInput.value += ch;
+function addCharToInput(ch) {
+    const input = answerInput;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const oldValue = input.value;
+    
+    if (ch === '←') {
+        // Backspace: удаляем выделенное ИЛИ символ перед курсором
+        if (start !== end) {
+            input.value = oldValue.slice(0, start) + oldValue.slice(end);
+            input.selectionStart = input.selectionEnd = start;
+        } else if (start > 0) {
+            input.value = oldValue.slice(0, start - 1) + oldValue.slice(start);
+            input.selectionStart = input.selectionEnd = start - 1;
         }
-        if (submitBtn.innerText !== "OK") {
-            setSubmitButtonNeutral();
-            lastAnswerWasOk = false;
-        }
-        answerInput.focus();
+    } else if (ch === ' ') {
+        // Пробел
+        const newValue = oldValue.slice(0, start) + ' ' + oldValue.slice(end);
+        input.value = newValue;
+        input.selectionStart = input.selectionEnd = start + 1;
+    } else {
+        // Обычный символ
+        const newValue = oldValue.slice(0, start) + ch + oldValue.slice(end);
+        input.value = newValue;
+        input.selectionStart = input.selectionEnd = start + 1;
     }
+    
+    // Сбрасываем кнопку OK, если была ошибка/галочка
+    if (submitBtn.innerText !== "OK") {
+        setSubmitButtonNeutral();
+        lastAnswerWasOk = false;
+    }
+    
+    input.focus();
+}
 
     function renderKeyboard() {
         keyboardDiv.innerHTML = '';
