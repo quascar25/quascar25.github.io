@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1f2e'/%3E%3Ctext x='50' y='72' font-size='58' font-weight='bold' font-family='Arial, sans-serif' text-anchor='middle' fill='%23e6b422'%3EFR%3C/text%3E%3C/svg%3E" alt="FR">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FrenchMaster — тренировка с темами</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #0a0e1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .app {
+            max-width: 600px;
+            width: 100%;
+            background: #111520;
+            border-radius: 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            padding: 20px 16px 24px;
+            border: 1px solid #2a2f3f;
+        }
+        .card {
+            background: #1a1f2e;
+            border-radius: 28px;
+            padding: 32px 16px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #eef2ff;
+            margin-bottom: 24px;
+            border: 1px solid #2e3548;
+            word-break: break-word;
+            min-height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .theme-selector {
+            flex: 2;
+            min-width: 150px;
+        }
+        .theme-dropdown {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1e2538;
+            border: 1px solid #3a415a;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #eef2ff;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .theme-dropdown:focus {
+            outline: none;
+            border-color: #5a6e9e;
+        }
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+        }
+        .mode-btn {
+            background: #1e2538;
+            border: 1px solid #3a415a;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #b9c3e6;
+        }
+        .mode-btn.active {
+            background: #3b4b6e;
+            color: white;
+            border-color: #6d84b5;
+        }
+        .speaker-btn {
+            background: #1e2538;
+            border: 1px solid #3a415a;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            color: #b9c3e6;
+        }
+        .speaker-btn:active {
+            background: #3b4b6e;
+            transform: scale(0.96);
+        }
+        .input-area {
+            margin-bottom: 20px;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        input {
+            flex: 1;
+            padding: 16px 14px;
+            font-size: 1.3rem;
+            border: 2px solid #2e3548;
+            border-radius: 24px;
+            font-family: monospace;
+            background: #0f1320;
+            color: #eef2ff;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #5a6e9e;
+        }
+        input::placeholder {
+            color: #4a5370;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .nav-btn {
+            width: 55px;
+            padding: 14px 0;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            background: #2e3a52;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .nav-btn:active {
+            transform: scale(0.96);
+            background: #3b4b6e;
+        }
+        .action-btn {
+            width: 70px;
+            padding: 14px 0;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            background: #3b4b6e;
+            color: white;
+            cursor: pointer;
+        }
+        .action-btn.correct {
+            background: #2e7d32;
+        }
+        .action-btn.wrong {
+            background: #c62828;
+        }
+        .keyboard {
+            background: #0d1220;
+            border-radius: 28px;
+            padding: 12px 10px;
+            margin-top: 6px;
+            border: 1px solid #2a2f3f;
+        }
+        .kb-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .kb-key {
+            background: #1a1f2e;
+            border: 1px solid #3a415a;
+            border-radius: 16px;
+            padding: 12px 10px;
+            min-width: 50px;
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 500;
+            font-family: monospace;
+            cursor: pointer;
+            color: #eef2ff;
+            transition: 0.05s linear;
+        }
+        .kb-key:active {
+            background: #2e3a52;
+            transform: scale(0.96);
+        }
+        .kb-special {
+            background: #252c40;
+        }
+        @media (max-width: 480px) {
+            .kb-key {
+                min-width: 52px;
+                padding: 10px 6px;
+                font-size: 2.2rem;
+            }
+            .kb-row {
+                gap: 6px;
+            }
+            .card {
+                font-size: 1.5rem;
+                padding: 24px 12px;
+            }
+            input {
+                font-size: 1.1rem;
+            }
+            .speaker-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.4rem;
+            }
+            .theme-dropdown {
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+            .mode-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            .nav-btn {
+                width: 48px;
+                font-size: 1rem;
+            }
+            .action-btn {
+                width: 60px;
+                font-size: 1rem;
+            }
+        }
+        .status {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 12px;
+            color: #7e89ac;
+        }
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 16px;
+            color: #4a5370;
+        }
+        option {
+            background: #1a1f2e;
+            color: #eef2ff;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="card" id="questionCard">---</div>
+
+    <div class="top-bar">
+        <div class="theme-selector">
+            <select id="themeSelect" class="theme-dropdown">
+                <option value="all">📚 Все темы (обучение)</option>
+            </select>
+        </div>
+        <div class="mode-switch">
+            <button class="mode-btn" data-mode="ru2fr">RU→FR</button>
+            <button class="mode-btn" data-mode="fr2ru">FR→RU</button>
+        </div>
+        <button id="speakerBtn" class="speaker-btn" title="Произнести слово">🔊</button>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" autofocus>
+            <div class="action-buttons">
+                <button id="skipBtn" class="nav-btn" title="Следующее слово без проверки">›</button>
+                <button id="submitBtn" class="action-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+    <div class="status" id="statusMsg">🎧 Нажмите на динамик — услышите слово</div>
+    <div class="footer-note">Формат: тема | русский | французский | › — пропустить слово</div>
+</div>
+
+<script>
+    // ---------- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----------
+    let fullWordsList = [];
+    let currentTheme = "all";
+    let filteredWordsList = [];
+    let currentWordObj = null;
+    let currentMode = "ru2fr";
+    let remainingIndices = [];
+    let lastAnswerWasOk = false;
+    let speechEnabled = false;
+
+    // DOM элементы
+    const questionCard = document.getElementById("questionCard");
+    const answerInput = document.getElementById("answerInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const skipBtn = document.getElementById("skipBtn");
+    const speakerBtn = document.getElementById("speakerBtn");
+    const themeSelect = document.getElementById("themeSelect");
+    const keyboardDiv = document.getElementById("keyboard");
+    const statusMsgDiv = document.getElementById("statusMsg");
+
+    // ---------- ФРАНЦУЗСКАЯ КЛАВИАТУРА ----------
+    const frenchLetters = [
+        ['a','b','c','d','e','f','g','h','i','j','k','l','m'],
+        ['n','o','p','q','r','s','t','u','v','w','x','y','z'],
+        ['à','â','æ','ç','é','è','ê','ë','î','ï','ô','œ','ù','û','ü','ÿ','ñ','-',"'"]
+    ];
+    const extraButtons = ['←', ' '];
+
+    // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (ИСПРАВЛЕНО ДЛЯ СМАРТФОНОВ) ----------
+    function initSpeech() {
+        if (!speechEnabled) {
+            // Пробуем "разбудить" синтезатор речи на смартфоне
+            const utterance = new SpeechSynthesisUtterance(" ");
+            utterance.lang = "fr-FR";
+            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.cancel();
+            speechEnabled = true;
+        }
+    }
+
+    function speakText(text, lang) {
+        if (!text || text === "---") return;
+        
+        // Останавливаем предыдущую речь
+        window.speechSynthesis.cancel();
+        
+        // Для смартфонов: небольшая задержка и принудительная инициализация
+        initSpeech();
+        
+        setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.85;
+            utterance.pitch = 1.0;
+            utterance.volume = 1;
+            
+            // Выбираем правильный голос (если доступен)
+            const voices = window.speechSynthesis.getVoices();
+            if (lang === "fr-FR") {
+                const frenchVoice = voices.find(v => v.lang === "fr-FR" && (v.name.includes("Google") || v.name.includes("Microsoft")));
+                if (frenchVoice) utterance.voice = frenchVoice;
+            } else if (lang === "ru-RU") {
+                const russianVoice = voices.find(v => v.lang === "ru-RU");
+                if (russianVoice) utterance.voice = russianVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+            statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
+            setTimeout(() => {
+                if (statusMsgDiv.innerHTML.includes("Произносится")) {
+                    statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+                }
+            }, 2000);
+        }, 50);
+    }
+    
+    function speakCurrentWord() {
+        if (!currentWordObj) return;
+        let textToSpeak = currentMode === "ru2fr" ? currentWordObj.ru : currentWordObj.fr;
+        let lang = currentMode === "ru2fr" ? "ru-RU" : "fr-FR";
+        if (textToSpeak) speakText(textToSpeak, lang);
+    }
+
+    // Загружаем голоса один раз
+    if (typeof window !== 'undefined') {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
+
+    // ---------- РАБОТА СО СПИСКОМ СЛОВ ----------
+    function updateFilteredWords() {
+        if (currentTheme === "all") {
+            filteredWordsList = [...fullWordsList];
+        } else {
+            filteredWordsList = fullWordsList.filter(w => w.theme === currentTheme);
+        }
+        if (filteredWordsList.length === 0) {
+            filteredWordsList = [{ theme: "empty", ru: "Нет слов в теме", fr: "Pas de mots" }];
+        }
+        resetRemainingIndices();
+        pickRandomWord();
+    }
+
+    function resetRemainingIndices() {
+        if (!filteredWordsList.length) return;
+        remainingIndices = [...Array(filteredWordsList.length).keys()];
+        for (let i = remainingIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [remainingIndices[i], remainingIndices[j]] = [remainingIndices[j], remainingIndices[i]];
+        }
+    }
+
+    function pickRandomWord() {
+        if (!filteredWordsList.length) return;
+        if (remainingIndices.length === 0) resetRemainingIndices();
+        const nextIndex = remainingIndices.shift();
+        currentWordObj = filteredWordsList[nextIndex];
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if (!currentWordObj) return;
+        if (currentMode === "ru2fr") {
+            questionCard.innerText = currentWordObj.ru;
+        } else {
+            questionCard.innerText = currentWordObj.fr;
+        }
+        answerInput.value = "";
+        setSubmitButtonNeutral();
+        lastAnswerWasOk = false;
+        answerInput.focus();
+    }
+
+    function skipToNextWord() {
+        if (!filteredWordsList.length) return;
+        if (currentWordObj && currentWordObj.ru === "Нет слов в теме") return;
+        
+        // Берём следующее слово
+        if (remainingIndices.length === 0) resetRemainingIndices();
+        const nextIndex = remainingIndices.shift();
+        currentWordObj = filteredWordsList[nextIndex];
+        showQuestion();
+        statusMsgDiv.innerHTML = "⏩ Пропущено! Следующее слово...";
+        setTimeout(() => {
+            if (statusMsgDiv.innerHTML.includes("Пропущено")) {
+                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+            }
+        }, 1500);
+    }
+
+    function checkAnswer() {
+        if (!currentWordObj || currentWordObj.ru === "Нет слов в теме") return;
+        let userAnswer = answerInput.value.trim().toLowerCase().replace(/\s+/g, ' ');
+        let correctAnswer = (currentMode === "ru2fr") 
+            ? currentWordObj.fr.toLowerCase().replace(/\s+/g, ' ')
+            : currentWordObj.ru.toLowerCase().replace(/\s+/g, ' ');
+        
+        const isCorrect = (userAnswer === correctAnswer);
+        if (isCorrect) {
+            submitBtn.innerText = "✅";
+            submitBtn.classList.add("correct");
+            submitBtn.classList.remove("wrong");
+            statusMsgDiv.innerHTML = "✅ Верно! Следующее слово...";
+            setTimeout(() => {
+                pickRandomWord();
+                setSubmitButtonNeutral();
+            }, 600);
+        } else {
+            submitBtn.innerText = "❌";
+            submitBtn.classList.add("wrong");
+            submitBtn.classList.remove("correct");
+            statusMsgDiv.innerHTML = `❌ Неверно! Правильно: "${correctAnswer}"`;
+        }
+        lastAnswerWasOk = true;
+    }
+
+    function setSubmitButtonNeutral() {
+        submitBtn.innerText = "OK";
+        submitBtn.classList.remove("correct", "wrong");
+        if (!statusMsgDiv.innerHTML.includes("🔊") && !statusMsgDiv.innerHTML.includes("⏩")) {
+            statusMsgDiv.innerHTML = "📝 Введите ответ и нажмите OK";
+        }
+    }
+
+    function onInputChange() {
+        if (lastAnswerWasOk || submitBtn.innerText !== "OK") {
+            setSubmitButtonNeutral();
+            lastAnswerWasOk = false;
+        }
+    }
+
+    function addCharToInput(ch) {
+        if (ch === '←') {
+            answerInput.value = answerInput.value.slice(0, -1);
+        } else if (ch === ' ') {
+            answerInput.value += ' ';
+        } else {
+            answerInput.value += ch;
+        }
+        if (submitBtn.innerText !== "OK") {
+            setSubmitButtonNeutral();
+            lastAnswerWasOk = false;
+        }
+        answerInput.focus();
+    }
+
+    function renderKeyboard() {
+        keyboardDiv.innerHTML = '';
+        for (let row of frenchLetters) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'kb-row';
+            for (let letter of row) {
+                const key = document.createElement('div');
+                key.className = 'kb-key';
+                key.innerText = letter;
+                key.addEventListener('click', () => addCharToInput(letter));
+                rowDiv.appendChild(key);
+            }
+            keyboardDiv.appendChild(rowDiv);
+        }
+        const extraRow = document.createElement('div');
+        extraRow.className = 'kb-row';
+        for (let btn of extraButtons) {
+            const key = document.createElement('div');
+            key.className = 'kb-key kb-special';
+            key.innerText = btn;
+            key.addEventListener('click', () => addCharToInput(btn));
+            extraRow.appendChild(key);
+        }
+        keyboardDiv.appendChild(extraRow);
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            if (btn.dataset.mode === mode) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        if (currentWordObj) showQuestion();
+        else pickRandomWord();
+        setSubmitButtonNeutral();
+        answerInput.value = "";
+        answerInput.focus();
+    }
+
+    function onSubmitAction() {
+        if (submitBtn.innerText === "✅" || submitBtn.innerText === "❌") return;
+        checkAnswer();
+    }
+
+    function populateThemeDropdown() {
+        const themesSet = new Set();
+        themesSet.add("all");
+        fullWordsList.forEach(word => themesSet.add(word.theme));
+        const sortedThemes = Array.from(themesSet).sort();
+        themeSelect.innerHTML = "";
+        sortedThemes.forEach(theme => {
+            const option = document.createElement("option");
+            option.value = theme;
+            let displayName = theme;
+            if (theme === "all") displayName = "📚 Все темы";
+            else if (theme === "основы") displayName = "🔤 Основы";
+            else if (theme === "еда") displayName = "🍽 Еда и напитки";
+            else if (theme === "дом") displayName = "🏠 Дом и мебель";
+            else if (theme === "одежда") displayName = "👕 Одежда";
+            else if (theme === "семья") displayName = "👨‍👩‍👧 Семья";
+            else if (theme === "работа") displayName = "💼 Работа и профессии";
+            else if (theme === "путешествия") displayName = "✈️ Путешествия";
+            else if (theme === "здоровье") displayName = "🩺 Здоровье";
+            else if (theme === "спорт") displayName = "⚽ Спорт";
+            else if (theme === "природа") displayName = "🌿 Природа";
+            else if (theme === "животные") displayName = "🐕 Животные";
+            else if (theme === "время") displayName = "⏰ Время";
+            else if (theme === "цвета") displayName = "🎨 Цвета";
+            else if (theme === "глаголы") displayName = "🏃 Глаголы движения";
+            else if (theme === "чувства") displayName = "😊 Чувства и эмоции";
+            else displayName = `📁 ${theme}`;
+            option.textContent = displayName;
+            themeSelect.appendChild(option);
+        });
+    }
+
+    function getBuiltInDictionary() {
+        return [
+            "основы|я|je", "основы|ты|tu", "основы|он|il", "основы|она|elle", "основы|мы|nous", "основы|вы|vous", 
+            "еда|хлеб|le pain", "еда|сыр|le fromage", "еда|масло|le beurre", "дом|дом|la maison", "дом|окно|la fenêtre",
+            "одежда|рубашка|la chemise", "семья|мать|la mère", "работа|врач|le médecin", "путешествия|самолёт|l'avion",
+            "животные|кошка|le chat", "цвета|красный|rouge", "глаголы|идти|aller", "чувства|любовь|l'amour"
+        ];
+    }
+
+    async function loadWords() {
+        try {
+            const response = await fetch('fslov1.txt');
+            if (response.ok) {
+                const text = await response.text();
+                const lines = text.split(/\r?\n/);
+                for (let line of lines) {
+                    line = line.trim();
+                    if (line === "") continue;
+                    const parts = line.split('|');
+                    if (parts.length >= 3) {
+                        fullWordsList.push({
+                            theme: parts[0].trim(),
+                            ru: parts[1].trim(),
+                            fr: parts[2].trim()
+                        });
+                    }
+                }
+            }
+        } catch(e) { console.log("Загружаем встроенный словарь"); }
+        
+        if (fullWordsList.length === 0) {
+            const builtIn = getBuiltInDictionary();
+            for (let entry of builtIn) {
+                const parts = entry.split('|');
+                if (parts.length === 3) {
+                    fullWordsList.push({
+                        theme: parts[0],
+                        ru: parts[1],
+                        fr: parts[2]
+                    });
+                }
+            }
+        }
+        
+        populateThemeDropdown();
+        updateFilteredWords();
+        renderKeyboard();
+    }
+
+    function initUI() {
+        document.querySelector('[data-mode="ru2fr"]').addEventListener('click', () => setMode("ru2fr"));
+        document.querySelector('[data-mode="fr2ru"]').addEventListener('click', () => setMode("fr2ru"));
+        speakerBtn.addEventListener('click', speakCurrentWord);
+        submitBtn.addEventListener('click', onSubmitAction);
+        skipBtn.addEventListener('click', skipToNextWord);
+        answerInput.addEventListener('input', onInputChange);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') onSubmitAction();
+        });
+        themeSelect.addEventListener('change', (e) => {
+            currentTheme = e.target.value;
+            updateFilteredWords();
+        });
+        setMode("ru2fr");
+        
+        // Инициализируем голос при первом касании экрана
+        document.body.addEventListener('touchstart', function initSpeechOnce() {
+            initSpeech();
+            document.body.removeEventListener('touchstart', initSpeechOnce);
+        });
+    }
+
+    loadWords().then(() => initUI());
+</script>
+</body>
+</html>
