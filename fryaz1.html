@@ -272,6 +272,9 @@
             background: #1a2538 !important;
             box-shadow: 0 0 0 2px rgba(90, 110, 158, 0.3);
         }
+                .kb-key[data-clipboard] {
+            background: #2e3a52;
+        }
         
     </style>
 </head>
@@ -335,7 +338,7 @@
         ['â','æ','ç','é','è','ê','ë','î','ï'],
         ['ô','œ','ù','û','ü','ÿ','ñ','-',"'"]
     ];
-    const extraButtons = ['←', ' '];
+    const extraButtons = ['←', ' ', '📋', '📄'];
 
     // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ ----------
     function speakText(text, lang) {
@@ -541,7 +544,16 @@ function addCharToInput(ch) {
             const key = document.createElement('div');
             key.className = 'kb-key kb-special';
             key.innerText = btn;
-            key.addEventListener('click', () => addCharToInput(btn));
+            
+            // Разные действия для разных кнопок
+            if (btn === '📋') {
+                key.addEventListener('click', () => pasteFromClipboard());
+            } else if (btn === '📄') {
+                key.addEventListener('click', () => copyToClipboard());
+            } else {
+                key.addEventListener('click', () => addCharToInput(btn));
+            }
+            
             extraRow.appendChild(key);
         }
         keyboardDiv.appendChild(extraRow);
@@ -703,6 +715,69 @@ function addCharToInput(ch) {
         e.stopPropagation();
         // Разрешаем стандартное контекстное меню (копировать/вставить)
     });
+
+    // Вставить из буфера в позицию курсора
+async function pasteFromClipboard() {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (!text) return;
+        
+        const input = answerInput;
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const oldValue = input.value;
+        
+        const newValue = oldValue.slice(0, start) + text + oldValue.slice(end);
+        input.value = newValue;
+        input.selectionStart = input.selectionEnd = start + text.length;
+        
+        if (submitBtn.innerText !== "OK") {
+            setSubmitButtonNeutral();
+            lastAnswerWasOk = false;
+        }
+        input.focus();
+        statusMsgDiv.innerHTML = `📋 Вставлено: "${text.substring(0, 20)}..."`;
+        setTimeout(() => {
+            if (statusMsgDiv.innerHTML.includes("Вставлено")) {
+                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+            }
+        }, 1500);
+    } catch(e) {
+        statusMsgDiv.innerHTML = "❌ Не удалось вставить. Разрешите доступ к буферу.";
+        console.log("Clipboard error:", e);
+    }
+}
+
+// Скопировать выделенный текст
+async function copyToClipboard() {
+    const input = answerInput;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    
+    if (start === end) {
+        statusMsgDiv.innerHTML = "⚠️ Выделите текст для копирования";
+        setTimeout(() => {
+            if (statusMsgDiv.innerHTML.includes("выделите")) {
+                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+            }
+        }, 1000);
+        return;
+    }
+    
+    const selectedText = input.value.substring(start, end);
+    try {
+        await navigator.clipboard.writeText(selectedText);
+        statusMsgDiv.innerHTML = `📄 Скопировано: "${selectedText.substring(0, 20)}..."`;
+        setTimeout(() => {
+            if (statusMsgDiv.innerHTML.includes("Скопировано")) {
+                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+            }
+        }, 1500);
+    } catch(e) {
+        statusMsgDiv.innerHTML = "❌ Не удалось скопировать";
+        console.log("Copy error:", e);
+    }
+}
 
 
     
