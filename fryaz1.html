@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -141,6 +140,26 @@
         input::placeholder {
             color: #4a5370;
         }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .nav-btn {
+            width: 55px;
+            padding: 14px 0;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            background: #2e3a52;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .nav-btn:active {
+            transform: scale(0.96);
+            background: #3b4b6e;
+        }
         .action-btn {
             width: 70px;
             padding: 14px 0;
@@ -179,7 +198,7 @@
             padding: 12px 10px;
             min-width: 50px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 2.4rem;
             font-weight: 500;
             font-family: monospace;
             cursor: pointer;
@@ -195,9 +214,9 @@
         }
         @media (max-width: 480px) {
             .kb-key {
-                min-width: 42px;
+                min-width: 52px;
                 padding: 10px 6px;
-                font-size: 4rem;      /* было 1rem, увеличил в 4 раза */
+                font-size: 2.8rem;
             }
             .kb-row {
                 gap: 6px;
@@ -221,6 +240,14 @@
             .mode-btn {
                 padding: 6px 12px;
                 font-size: 0.75rem;
+            }
+            .nav-btn {
+                width: 48px;
+                font-size: 1rem;
+            }
+            .action-btn {
+                width: 60px;
+                font-size: 1rem;
             }
         }
         .status {
@@ -261,13 +288,16 @@
     <div class="input-area">
         <div class="input-wrapper">
             <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" autofocus>
-            <button id="submitBtn" class="action-btn">OK</button>
+            <div class="action-buttons">
+                <button id="skipBtn" class="nav-btn" title="Следующее слово без проверки">›</button>
+                <button id="submitBtn" class="action-btn">OK</button>
+            </div>
         </div>
     </div>
 
     <div class="keyboard" id="keyboard"></div>
     <div class="status" id="statusMsg">🎧 Нажмите на динамик — услышите слово</div>
-    <div class="footer-note">Формат: тема | русский | французский</div>
+    <div class="footer-note">Формат: тема | русский | французский | › — пропустить слово</div>
 </div>
 
 <script>
@@ -284,6 +314,7 @@
     const questionCard = document.getElementById("questionCard");
     const answerInput = document.getElementById("answerInput");
     const submitBtn = document.getElementById("submitBtn");
+    const skipBtn = document.getElementById("skipBtn");
     const speakerBtn = document.getElementById("speakerBtn");
     const themeSelect = document.getElementById("themeSelect");
     const keyboardDiv = document.getElementById("keyboard");
@@ -365,6 +396,24 @@
         answerInput.focus();
     }
 
+    function skipToNextWord() {
+        if (!filteredWordsList.length) return;
+        // Если слово-пустышка, просто игнорируем
+        if (currentWordObj && currentWordObj.ru === "Нет слов в теме") return;
+        
+        // Переходим к следующему слову без проверки
+        if (remainingIndices.length === 0) resetRemainingIndices();
+        const nextIndex = remainingIndices.shift();
+        currentWordObj = filteredWordsList[nextIndex];
+        showQuestion();
+        statusMsgDiv.innerHTML = "⏩ Пропущено! Следующее слово...";
+        setTimeout(() => {
+            if (statusMsgDiv.innerHTML.includes("Пропущено")) {
+                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+            }
+        }, 1500);
+    }
+
     function checkAnswer() {
         if (!currentWordObj || currentWordObj.ru === "Нет слов в теме") return;
         let userAnswer = answerInput.value.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -394,7 +443,7 @@
     function setSubmitButtonNeutral() {
         submitBtn.innerText = "OK";
         submitBtn.classList.remove("correct", "wrong");
-        if (!statusMsgDiv.innerHTML.includes("🔊")) {
+        if (!statusMsgDiv.innerHTML.includes("🔊") && !statusMsgDiv.innerHTML.includes("⏩")) {
             statusMsgDiv.innerHTML = "📝 Введите ответ и нажмите OK";
         }
     }
@@ -500,70 +549,20 @@
     // ---------- ВСТРОЕННЫЙ СЛОВАРЬ (2000+ слов с темами) ----------
     function getBuiltInDictionary() {
         return [
-            // ОСНОВЫ (100 базовых слов)
             "основы|я|je", "основы|ты|tu", "основы|он|il", "основы|она|elle", "основы|мы|nous", "основы|вы|vous", "основы|они|ils", "основы|этот|cette / ce", "основы|тот|cette / ce", "основы|мой|mon",
-       //     "основы|твой|ton", "основы|его|son", "основы|её|son", "основы|наш|notre", "основы|ваш|votre", "основы|их|leur", "основы|кто|qui", "основы|что|que", "основы|где|où", "основы|когда|quand",
-       //     "основы|почему|pourquoi", "основы|как|comment", "основы|сколько|combien", "основы|да|oui", "основы|нет|non", "основы|хорошо|bien", "основы|плохо|mal", "основы|очень|très", "основы|мало|peu", "основы|много|beaucoup",
-       //     "основы|ещё|encore", "основы|уже|déjà", "основы|всегда|toujours", "основы|никогда|jamais", "основы|иногда|parfois", "основы|часто|souvent", "основы|быстро|vite", "основы|медленно|lentement", "основы|сейчас|maintenant", "основы|потом|plus tard",
-       //     "основы|сегодня|aujourd'hui", "основы|завтра|demain", "основы|вчера|hier", "основы|утром|le matin", "основы|днём|l'après-midi", "основы|вечером|le soir", "основы|ночью|la nuit", "основы|большой|grand", "основы|маленький|petit", "основы|новый|neuf",
-       //     "основы|старый|vieux", "основы|молодой|jeune", "основы|хороший|bon", "основы|плохой|mauvais", "основы|красивый|beau", "основы|высокий|haut", "основы|низкий|bas", "основы|лёгкий|léger", "основы|тяжёлый|lourd", "основы|тёплый|chaud",
-       //     "основы|холодный|froid", "основы|чистый|propre", "основы|грязный|sale", "основы|светлый|clair", "основы|тёмный|sombre", "основы|работать|travailler", "основы|учиться|étudier", "основы|читать|lire", "основы|писать|écrire", "основы|слушать|écouter",
-       //     "основы|говорить|parler", "основы|понимать|comprendre", "основы|знать|savoir", "основы|думать|penser", "основы|помнить|se souvenir", "основы|забывать|oublier", "основы|находить|trouver", "основы|покупать|acheter", "основы|давать|donner", "основы|брать|prendre",
-       //     "основы|открывать|ouvrir", "основы|закрывать|fermer", "основы|входить|entrer", "основы|выходить|sortir", "основы|приходить|venir", "основы|уходить|partir", "основы|ехать|aller", "основы|бегать|courir", "основы|ходить|marcher", "основы|спать|dormir",
-       //     "основы|есть (кушать)|manger", "основы|пить|boire", "основы|готовить|cuisiner", "основы|любить|aimer", "основы|хотеть|vouloir", "основы|мочь|pouvoir", "основы|должен|devoir", "основы|нуждаться|avoir besoin", "основы|уметь|savoir faire", "основы|радоваться|se réjouir",
-            
-            // ЕДА
             "еда|хлеб|le pain", "еда|сыр|le fromage", "еда|масло|le beurre", "еда|яйцо|l'œuf", "еда|молоко|le lait", "еда|кофе|le café", "еда|чай|le thé", "еда|сок|le jus", "еда|вода|l'eau", "еда|яблоко|la pomme",
-       //     "еда|банан|la banane", "еда|апельсин|l'orange", "еда|клубника|la fraise", "еда|виноград|le raisin", "еда|груша|la poire", "еда|картофель|la pomme de terre", "еда|морковь|la carotte", "еда|помидор|la tomate", "еда|огурец|le concombre", "еда|лук|l'oignon",
-       //     "еда|мясо|la viande", "еда|рыба|le poisson", "еда|курица|le poulet", "еда|говядина|le bœuf", "еда|свинина|le porc", "еда|суп|la soupe", "еда|салат|la salade", "еда|десерт|le dessert", "еда|торт|le gâteau", "еда|мороженое|la glace",
-            
-            // ДОМ
             "дом|дом|la maison", "дом|квартира|l'appartement", "дом|комната|la chambre", "дом|кухня|la cuisine", "дом|ванная|la salle de bain", "дом|туалет|les toilettes", "дом|окно|la fenêtre", "дом|дверь|la porte", "дом|стол|la table", "дом|стул|la chaise",
-       //     "дом|кровать|le lit", "дом|шкаф|l'armoire", "дом|лампа|la lampe", "дом|холодильник|le réfrigérateur", "дом|плита|la cuisinière", "дом|чашка|la tasse", "дом|тарелка|l'assiette", "дом|ложка|la cuillère", "дом|вилка|la fourchette", "дом|нож|le couteau",
-       //     "дом|стакан|le verre", "дом|диван|le canapé", "дом|кресло|le fauteuil", "дом|телевизор|la télévision", "дом|ковёр|le tapis", "дом|полка|l'étagère", "дом|ключ|la clé", "дом|сумка|le sac", "дом|часы|la montre", "дом|телефон|le téléphone",
-            
-            // ОДЕЖДА
             "одежда|одежда|les vêtements", "одежда|рубашка|la chemise", "одежда|брюки|le pantalon", "одежда|платье|la robe", "одежда|юбка|la jupe", "одежда|куртка|la veste", "одежда|пальто|le manteau", "одежда|шапка|le bonnet", "одежда|шарф|l'écharpe", "одежда|перчатки|les gants",
-       //     "одежда|обувь|les chaussures", "одежда|туфли|les chaussures à talons", "одежда|кеды|les baskets", "одежда|носки|les chaussettes", "одежда|чулки|les bas", "одежда|пижама|le pyjama", "одежда|купальник|le maillot de bain", "одежда|очки|les lunettes", "одежда|зонт|le parapluie", "одежда|ремень|la ceinture",
-            
-            // СЕМЬЯ
             "семья|семья|la famille", "семья|мать|la mère", "семья|отец|le père", "семья|сын|le fils", "семья|дочь|la fille", "семья|брат|le frère", "семья|сестра|la sœur", "семья|дедушка|le grand-père", "семья|бабушка|la grand-mère", "семья|внук|le petit-fils",
-       //     "семья|внучка|la petite-fille", "семья|дядя|l'oncle", "семья|тётя|la tante", "семья|муж|le mari", "семья|жена|la femme", "семья|ребёнок|l'enfant", "семья|друг|l'ami", "семья|подруга|l'amie", "семья|сосед|le voisin", "семья|коллега|le collègue",
-            
-            // РАБОТА
             "работа|работа|le travail", "работа|начальник|le chef", "работа|сотрудник|l'employé", "работа|учитель|le professeur", "работа|врач|le médecin", "работа|инженер|l'ingénieur", "работа|программист|le programmeur", "работа|юрист|l'avocat", "работа|бухгалтер|le comptable", "работа|продавец|le vendeur",
-       //     "работа|водитель|le chauffeur", "работа|строитель|le constructeur", "работа|художник|l'artiste", "работа|музыкант|le musicien", "работа|повар|le cuisinier", "работа|официант|le serveur", "работа|уборщик|le nettoyeur", "работа|секретарь|le secrétaire", "работа|офис|le bureau", "работа|зарплата|le salaire",
-            
-            // ПУТЕШЕСТВИЯ
             "путешествия|путешествие|le voyage", "путешествия|билет|le billet", "путешествия|поезд|le train", "путешествия|автобус|l'autobus", "путешествия|метро|le métro", "путешествия|такси|le taxi", "путешествия|самолёт|l'avion", "путешествия|отель|l'hôtel", "путешествия|чемодан|la valise", "путешествия|паспорт|le passeport",
-       //     "путешествия|виза|le visa", "путешествия|граница|la frontière", "путешествия|карта|la carte", "путешествия|гид|le guide", "путешествия|отпуск|les vacances", "путешествия|море|la mer", "путешествия|пляж|la plage", "путешествия|гора|la montagne", "путешествия|озеро|le lac", "путешествия|город|la ville",
-            
-            // ЗДОРОВЬЕ
             "здоровье|здоровье|la santé", "здоровье|врач|le médecin", "здоровье|больница|l'hôpital", "здоровье|аптека|la pharmacie", "здоровье|лекарство|le médicament", "здоровье|боль|la douleur", "здоровье|голова|la tête", "здоровье|глаз|l'œil", "здоровье|нос|le nez", "здоровье|рот|la bouche",
-      //      "здоровье|ухо|l'oreille", "здоровье|рука|le bras", "здоровье|нога|la jambe", "здоровье|сердце|le cœur", "здоровье|кровь|le sang", "здоровье|температура|la fièvre", "здоровье|простуда|le rhume", "здоровье|грипп|la grippe", "здоровье|аллергия|l'allergie", "здоровье|скорая|l'ambulance",
-            
-            // СПОРТ
             "спорт|спорт|le sport", "спорт|футбол|le football", "спорт|баскетбол|le basket-ball", "спорт|теннис|le tennis", "спорт|бег|la course", "спорт|волейбол|le volley-ball", "спорт|плавание|la natation", "спорт|лыжи|le ski", "спорт|велосипед|le vélo", "спорт|стадион|le stade",
-       //     "спорт|бассейн|la piscine", "спорт|тренировка|l'entraînement", "спорт|команда|l'équipe", "спорт|победа|la victoire", "спорт|поражение|la défaite", "спорт|сильный|fort", "спорт|быстрый|rapide", "спорт|игрок|le joueur", "спорт|тренер|l'entraîneur", "спорт|соревнование|la compétition",
-            
-            // ПРИРОДА
             "природа|природа|la nature", "природа|дерево|l'arbre", "природа|цветок|la fleur", "природа|трава|l'herbe", "природа|лес|la forêt", "природа|поле|le champ", "природа|река|la rivière", "природа|солнце|le soleil", "природа|дождь|la pluie", "природа|снег|la neige",
-       //     "природа|ветер|le vent", "природа|гроза|l'orage", "природа|туман|le brouillard", "природа|жара|la chaleur", "природа|холод|le froid", "природа|градус|le degré", "природа|небо|le ciel", "природа|звезда|l'étoile", "природа|луна|la lune", "природа|земля|la terre",
-            
-            // ЖИВОТНЫЕ
             "животные|животное|l'animal", "животные|кошка|le chat", "животные|собака|le chien", "животные|птица|l'oiseau", "животные|рыба|le poisson", "животные|лошадь|le cheval", "животные|корова|la vache", "животные|свинья|le cochon", "животные|курица|la poule", "животные|утка|le canard",
-       //     "животные|волк|le loup", "животные|лиса|le renard", "животные|медведь|l'ours", "животные|заяц|le lièvre", "животные|мышь|la souris", "животные|белка|l'écureuil", "животные|лев|le lion", "животные|слон|l'éléphant", "животные|жираф|la girafe", "животные|обезьяна|le singe",
-            
-            // ВРЕМЯ
             "время|время|le temps", "время|час|l'heure", "время|минута|la minute", "время|секунда|la seconde", "время|день|le jour", "время|неделя|la semaine", "время|месяц|le mois", "время|год|l'année", "время|утро|le matin", "время|вечер|le soir",
-            
-            // ЦВЕТА
             "цвета|красный|rouge", "цвета|синий|bleu", "цвета|зелёный|vert", "цвета|жёлтый|jaune", "цвета|чёрный|noir", "цвета|белый|blanc", "цвета|серый|gris", "цвета|розовый|rose", "цвета|оранжевый|orange", "цвета|фиолетовый|violet",
-            
-            // ГЛАГОЛЫ ДВИЖЕНИЯ
             "глаголы|идти|aller", "глаголы|приходить|venir", "глаголы|уходить|partir", "глаголы|бежать|courir", "глаголы|плыть|nager", "глаголы|лететь|voler", "глаголы|ехать|conduire", "глаголы|ходить|marcher", "глаголы|прыгать|sauter", "глаголы|падать|tomber",
-            
-            // ЧУВСТВА И ЭМОЦИИ
             "чувства|любовь|l'amour", "чувства|счастье|le bonheur", "чувства|грусть|la tristesse", "чувства|гнев|la colère", "чувства|страх|la peur", "чувства|удивление|la surprise", "чувства|спокойствие|le calme", "чувства|радость|la joie", "чувства|зависть|la jalousie", "чувства|надежда|l'espoir"
         ];
     }
@@ -571,7 +570,7 @@
     // Загрузка словаря (с поддержкой файла или встроенного)
     async function loadWords() {
         try {
-            const response = await fetch('fslov1.txt');
+            const response = await fetch('fslov.txt');
             if (response.ok) {
                 const text = await response.text();
                 const lines = text.split(/\r?\n/);
@@ -615,6 +614,7 @@
         document.querySelector('[data-mode="fr2ru"]').addEventListener('click', () => setMode("fr2ru"));
         speakerBtn.addEventListener('click', speakCurrentWord);
         submitBtn.addEventListener('click', onSubmitAction);
+        skipBtn.addEventListener('click', skipToNextWord);
         answerInput.addEventListener('input', onInputChange);
         answerInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') onSubmitAction();
