@@ -390,6 +390,10 @@
         const nextIndex = remainingIndices.shift();
         currentWordObj = filteredWordsList[nextIndex];
         showQuestion();
+
+                // Убираем фокус
+        answerInput.blur();
+        answerInput.classList.remove("input-active");
     }
 
     function showQuestion() {
@@ -435,6 +439,9 @@
                 statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
             }
         }, 1500);
+            // Убираем фокус с поля
+        answerInput.blur();
+        answerInput.classList.remove("input-active");
     }
 
     function checkAnswer() {
@@ -550,7 +557,13 @@ function addCharToInput(ch) {
         else pickRandomWord();
         setSubmitButtonNeutral();
         answerInput.value = "";
-        answerInput.focus();
+        // УБИРАЕМ автоматический фокус
+        // answerInput.focus();  // <-- ЗАКОММЕНТИРОВАТЬ ИЛИ УДАЛИТЬ
+        
+        // Снимаем активный класс с поля
+        answerInput.classList.remove("input-active");
+        // Принудительно убираем фокус с поля
+        answerInput.blur();
     }
 
     function onSubmitAction() {
