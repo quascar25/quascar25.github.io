@@ -698,28 +698,11 @@ function addCharToInput(ch) {
 
     loadWords().then(() => initUI());
 
-    // блокировка клавы
-        // Блокируем вызов системной клавиатуры, но оставляем возможность выделять текст и копировать
-    answerInput.addEventListener('focus', function(e) {
-        e.preventDefault();
-        answerInput.blur();
-    });
+ 
     
-    // При клике разрешаем установку позиции курсора (без клавиатуры)
-    answerInput.addEventListener('click', function(e) {
-        e.stopPropagation();
-        // Курсор установится, но клавиатура не выскочит из-за preventDefault в focus
-    });
-    
-    // Восстанавливаем возможность копировать/вырезать через контекстное меню
-    answerInput.addEventListener('contextmenu', function(e) {
-        e.stopPropagation();
-        // Разрешаем стандартное контекстное меню (копировать/вставить)
-    });
-
     // Вставить из буфера в позицию курсора
-async function pasteFromClipboard() {
-    try {
+    async function pasteFromClipboard() {
+        try {
         const text = await navigator.clipboard.readText();
         if (!text) return;
         
