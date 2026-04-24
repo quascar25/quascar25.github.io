@@ -413,16 +413,18 @@
         answerInput.classList.remove("input-active");
     }
     
- //   // Добавь эти строки в initUI() или после объявления переменных
-    answerInput.addEventListener('click', () => {
-      //  answerInput.focus();
-        answerInput.classList.add("input-active");
-    });
- //   answerInput.addEventListener('blur', () => {
- //       answerInput.classList.remove("input-active");
- //   });
- //   // Снимаем начальный фокус
- //   answerInput.blur();
+// Добавь эти строки в initUI() или после объявления переменных
+answerInput.addEventListener('click', () => {
+    answerInput.focus();        // <-- ЭТО ВОЗВРАЩАЕТ КУРСОР
+    answerInput.classList.add("input-active");
+});
+
+answerInput.addEventListener('blur', () => {
+    answerInput.classList.remove("input-active");
+});
+
+// Снимаем начальный фокус при загрузке
+answerInput.blur();
 
     
 
