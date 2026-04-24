@@ -570,7 +570,7 @@
     // Загрузка словаря (с поддержкой файла или встроенного)
     async function loadWords() {
         try {
-            const response = await fetch('fslov.txt');
+            const response = await fetch('fslov1.txt');
             if (response.ok) {
                 const text = await response.text();
                 const lines = text.split(/\r?\n/);
