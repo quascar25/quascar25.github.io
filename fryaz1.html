@@ -266,6 +266,13 @@
             background: #1a1f2e;
             color: #eef2ff;
         }
+
+        .input-active {
+            border-color: #5a6e9e !important;
+            background: #1a2538 !important;
+            box-shadow: 0 0 0 2px rgba(90, 110, 158, 0.3);
+        }
+        
     </style>
 </head>
 <body>
@@ -287,7 +294,7 @@
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" autofocus>
+            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off">
             <div class="action-buttons">
                 <button id="skipBtn" class="nav-btn" title="Следующее слово без проверки">›</button>
                 <button id="submitBtn" class="action-btn">OK</button>
@@ -395,8 +402,22 @@
         answerInput.value = "";
         setSubmitButtonNeutral();
         lastAnswerWasOk = false;
-        answerInput.focus();
+        // НЕ фокусируемся
+        answerInput.classList.remove("input-active");
     }
+    
+    // Добавь эти строки в initUI() или после объявления переменных
+    answerInput.addEventListener('click', () => {
+        answerInput.focus();
+        answerInput.classList.add("input-active");
+    });
+    answerInput.addEventListener('blur', () => {
+        answerInput.classList.remove("input-active");
+    });
+    // Снимаем начальный фокус
+    answerInput.blur();
+
+    
 
     function skipToNextWord() {
         if (!filteredWordsList.length) return;
