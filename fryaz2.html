@@ -332,32 +332,27 @@
 
 
 // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (МАКСИМАЛЬНО ПРОСТО) ----------
+// ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (ПРОСТОЙ РАБОЧИЙ) ----------
 function speakText(text, lang) {
     if (!text || text === "---") return;
     
-    try {
-        // Останавливаем предыдущую речь
-        window.speechSynthesis.cancel();
-        
-        // Самый простой вариант - без поиска голосов
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang;
-        utterance.rate = 0.9;
-        
-        // Пробуем говорить
-        window.speechSynthesis.speak(utterance);
-        
-        statusMsgDiv.innerHTML = `🔊 Говорим: "${text.substring(0, 30)}..."`;
-        setTimeout(() => {
-            if (statusMsgDiv.innerHTML.includes("Говорим")) {
-                statusMsgDiv.innerHTML = "📚 Нажмите динамик ещё раз, если тихо";
-            }
-        }, 1500);
-        
-    } catch(e) {
-        console.log("Ошибка речи:", e);
-        statusMsgDiv.innerHTML = "⚠️ Ошибка речи. Попробуйте ещё раз.";
-    }
+    // Останавливаем всё, что говорит
+    window.speechSynthesis.cancel();
+    
+    // Создаём речь
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.9;
+    
+    // НЕ ищем голос — пусть система сама выберет по lang
+    window.speechSynthesis.speak(utterance);
+    
+    statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
+    setTimeout(() => {
+        if (statusMsgDiv.innerHTML.includes("Произносится")) {
+            statusMsgDiv.innerHTML = "📚 Нажмите динамик ещё раз, если тихо";
+        }
+    }, 2000);
 }
 
 function speakCurrentWord() {
@@ -378,25 +373,6 @@ function speakCurrentWord() {
         speakText(textToSpeak, lang);
     }
 }
-
-// Упрощённый "будильник" для Android
-let speechReady = false;
-function wakeUpSpeech() {
-    if (speechReady) return;
-    speechReady = true;
-    
-    // Произносим тихий пробел, чтобы "разбудить" голос
-    const wake = new SpeechSynthesisUtterance(" ");
-    wake.lang = "fr-FR";
-    wake.volume = 0;
-    window.speechSynthesis.speak(wake);
-    setTimeout(() => window.speechSynthesis.cancel(), 100);
-}
-
-// Будим голос при первом касании
-document.addEventListener('touchstart', function() {
-    wakeUpSpeech();
-}, { once: true });
 
 
     
