@@ -328,43 +328,76 @@
     ];
     const extraButtons = ['←', ' '];
 
-    // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (ИСПРАВЛЕНО ДЛЯ СМАРТФОНОВ) ----------
-    function initSpeech() {
-        if (!speechEnabled) {
-            // Пробуем "разбудить" синтезатор речи на смартфоне
-            const utterance = new SpeechSynthesisUtterance(" ");
-            utterance.lang = "fr-FR";
-            window.speechSynthesis.speak(utterance);
-            window.speechSynthesis.cancel();
-            speechEnabled = true;
-        }
-    }
+/ ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (РАБОТАЕТ НА ANDROID) ----------
+let voicesLoaded = false;
+let retryCount = 0;
 
- function speakText(text, lang) {
+function loadVoices(callback) {
+    if (voicesLoaded) {
+        if (callback) callback();
+        return;
+    }
+    
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+        voicesLoaded = true;
+        if (callback) callback();
+        return;
+    }
+    
+    // Если голоса ещё не загружены, ждём события
+    window.speechSynthesis.onvoiceschanged = () => {
+        voicesLoaded = true;
+        if (callback) callback();
+    };
+    
+    // Запасной вариант: если событие не сработало через 1 секунду
+    setTimeout(() => {
+        if (!voicesLoaded) {
+            voicesLoaded = true;
+            if (callback) callback();
+        }
+    }, 1000);
+}
+
+function speakText(text, lang) {
     if (!text || text === "---") return;
     
+    // Останавливаем предыдущую речь
     window.speechSynthesis.cancel();
     
-    // Маленькая задержка для Android
-    setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang;      // "fr-FR" или "ru-RU"
-        utterance.rate = 0.85;
-        utterance.pitch = 1.0;
-        utterance.volume = 1;
-        
-        // НЕ выбираем голос принудительно — пусть система сама подберёт по lang
-        window.speechSynthesis.speak(utterance);
-        
-        statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
+    // Ждём загрузки голосов, затем говорим
+    loadVoices(() => {
         setTimeout(() => {
-            if (statusMsgDiv.innerHTML.includes("Произносится")) {
-                statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.85;
+            utterance.pitch = 1.0;
+            utterance.volume = 1;
+            
+            // Пытаемся найти подходящий голос (опционально, но помогает)
+            const voices = window.speechSynthesis.getVoices();
+            if (lang === "fr-FR") {
+                // Ищем французский голос (любой)
+                const frenchVoice = voices.find(v => v.lang === "fr-FR" || v.lang.startsWith("fr"));
+                if (frenchVoice) utterance.voice = frenchVoice;
+            } else if (lang === "ru-RU") {
+                const russianVoice = voices.find(v => v.lang === "ru-RU");
+                if (russianVoice) utterance.voice = russianVoice;
             }
-        }, 2000);
-    }, 100);
+            
+            window.speechSynthesis.speak(utterance);
+            
+            statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
+            setTimeout(() => {
+                if (statusMsgDiv.innerHTML.includes("Произносится")) {
+                    statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
+                }
+            }, 2000);
+        }, 50);
+    });
 }
-    
+
 function speakCurrentWord() {
     if (!currentWordObj) return;
     let textToSpeak = currentMode === "ru2fr" ? currentWordObj.ru : currentWordObj.fr;
@@ -372,13 +405,21 @@ function speakCurrentWord() {
     if (textToSpeak) speakText(textToSpeak, lang);
 }
 
-// Эта функция для "пробуждения" голоса на Android (один раз при касании)
-function initSpeech() {
-    const utterance = new SpeechSynthesisUtterance(" ");
-    utterance.lang = "fr-FR";
-    window.speechSynthesis.speak(utterance);
-    setTimeout(() => window.speechSynthesis.cancel(), 100);
-}
+// Принудительная загрузка голосов при старте
+window.addEventListener('load', () => {
+    loadVoices(() => console.log("Голоса загружены"));
+});
+
+// Для смартфонов: при первом касании экрана "будим" синтезатор
+document.addEventListener('touchstart', function wakeSpeech() {
+    if (!voicesLoaded) {
+        const utterance = new SpeechSynthesisUtterance(" ");
+        utterance.lang = "fr-FR";
+        window.speechSynthesis.speak(utterance);
+        setTimeout(() => window.speechSynthesis.cancel(), 100);
+    }
+    document.removeEventListener('touchstart', wakeSpeech);
+}, { once: true });
 
     // ---------- РАБОТА СО СПИСКОМ СЛОВ ----------
     function updateFilteredWords() {
