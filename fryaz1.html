@@ -294,7 +294,7 @@
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" readonly>
+            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" >
             <div class="action-buttons">
                 <button id="skipBtn" class="nav-btn" title="Следующее слово без проверки">›</button>
                 <button id="submitBtn" class="action-btn">OK</button>
@@ -684,6 +684,28 @@ function addCharToInput(ch) {
     }
 
     loadWords().then(() => initUI());
+
+    // блокировка клавы
+        // Блокируем вызов системной клавиатуры, но оставляем возможность выделять текст и копировать
+    answerInput.addEventListener('focus', function(e) {
+        e.preventDefault();
+        answerInput.blur();
+    });
+    
+    // При клике разрешаем установку позиции курсора (без клавиатуры)
+    answerInput.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Курсор установится, но клавиатура не выскочит из-за preventDefault в focus
+    });
+    
+    // Восстанавливаем возможность копировать/вырезать через контекстное меню
+    answerInput.addEventListener('contextmenu', function(e) {
+        e.stopPropagation();
+        // Разрешаем стандартное контекстное меню (копировать/вставить)
+    });
+
+
+    
 </script>
 </body>
 </html>
