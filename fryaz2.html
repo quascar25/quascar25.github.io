@@ -328,99 +328,78 @@
     ];
     const extraButtons = ['←', ' '];
 
-// ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (РАБОТАЕТ НА ANDROID) ----------
-let voicesLoaded = false;
-let retryCount = 0;
 
-function loadVoices(callback) {
-    if (voicesLoaded) {
-        if (callback) callback();
-        return;
-    }
-    
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-        voicesLoaded = true;
-        if (callback) callback();
-        return;
-    }
-    
-    // Если голоса ещё не загружены, ждём события
-    window.speechSynthesis.onvoiceschanged = () => {
-        voicesLoaded = true;
-        if (callback) callback();
-    };
-    
-    // Запасной вариант: если событие не сработало через 1 секунду
-    setTimeout(() => {
-        if (!voicesLoaded) {
-            voicesLoaded = true;
-            if (callback) callback();
-        }
-    }, 1000);
-}
 
+
+// ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (МАКСИМАЛЬНО ПРОСТО) ----------
 function speakText(text, lang) {
     if (!text || text === "---") return;
     
-    // Останавливаем предыдущую речь
-    window.speechSynthesis.cancel();
-    
-    // Ждём загрузки голосов, затем говорим
-    loadVoices(() => {
+    try {
+        // Останавливаем предыдущую речь
+        window.speechSynthesis.cancel();
+        
+        // Самый простой вариант - без поиска голосов
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        utterance.rate = 0.9;
+        
+        // Пробуем говорить
+        window.speechSynthesis.speak(utterance);
+        
+        statusMsgDiv.innerHTML = `🔊 Говорим: "${text.substring(0, 30)}..."`;
         setTimeout(() => {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            utterance.rate = 0.85;
-            utterance.pitch = 1.0;
-            utterance.volume = 1;
-            
-            // Пытаемся найти подходящий голос (опционально, но помогает)
-            const voices = window.speechSynthesis.getVoices();
-            if (lang === "fr-FR") {
-                // Ищем французский голос (любой)
-                const frenchVoice = voices.find(v => v.lang === "fr-FR" || v.lang.startsWith("fr"));
-                if (frenchVoice) utterance.voice = frenchVoice;
-            } else if (lang === "ru-RU") {
-                const russianVoice = voices.find(v => v.lang === "ru-RU");
-                if (russianVoice) utterance.voice = russianVoice;
+            if (statusMsgDiv.innerHTML.includes("Говорим")) {
+                statusMsgDiv.innerHTML = "📚 Нажмите динамик ещё раз, если тихо";
             }
-            
-            window.speechSynthesis.speak(utterance);
-            
-            statusMsgDiv.innerHTML = `🔊 Произносится: "${text.substring(0, 30)}..."`;
-            setTimeout(() => {
-                if (statusMsgDiv.innerHTML.includes("Произносится")) {
-                    statusMsgDiv.innerHTML = "📚 Выберите тему и тренируйтесь";
-                }
-            }, 2000);
-        }, 50);
-    });
+        }, 1500);
+        
+    } catch(e) {
+        console.log("Ошибка речи:", e);
+        statusMsgDiv.innerHTML = "⚠️ Ошибка речи. Попробуйте ещё раз.";
+    }
 }
 
 function speakCurrentWord() {
     if (!currentWordObj) return;
-    let textToSpeak = currentMode === "ru2fr" ? currentWordObj.ru : currentWordObj.fr;
-    let lang = currentMode === "ru2fr" ? "ru-RU" : "fr-FR";
-    if (textToSpeak) speakText(textToSpeak, lang);
+    
+    let textToSpeak = "";
+    let lang = "";
+    
+    if (currentMode === "ru2fr") {
+        textToSpeak = currentWordObj.ru;
+        lang = "ru-RU";
+    } else {
+        textToSpeak = currentWordObj.fr;
+        lang = "fr-FR";
+    }
+    
+    if (textToSpeak) {
+        speakText(textToSpeak, lang);
+    }
 }
 
-// Принудительная загрузка голосов при старте
-window.addEventListener('load', () => {
-    loadVoices(() => console.log("Голоса загружены"));
-});
+// Упрощённый "будильник" для Android
+let speechReady = false;
+function wakeUpSpeech() {
+    if (speechReady) return;
+    speechReady = true;
+    
+    // Произносим тихий пробел, чтобы "разбудить" голос
+    const wake = new SpeechSynthesisUtterance(" ");
+    wake.lang = "fr-FR";
+    wake.volume = 0;
+    window.speechSynthesis.speak(wake);
+    setTimeout(() => window.speechSynthesis.cancel(), 100);
+}
 
-// Для смартфонов: при первом касании экрана "будим" синтезатор
-document.addEventListener('touchstart', function wakeSpeech() {
-    if (!voicesLoaded) {
-        const utterance = new SpeechSynthesisUtterance(" ");
-        utterance.lang = "fr-FR";
-        window.speechSynthesis.speak(utterance);
-        setTimeout(() => window.speechSynthesis.cancel(), 100);
-    }
-    document.removeEventListener('touchstart', wakeSpeech);
+// Будим голос при первом касании
+document.addEventListener('touchstart', function() {
+    wakeUpSpeech();
 }, { once: true });
 
+
+    
     
     // ---------- РАБОТА СО СПИСКОМ СЛОВ ----------
     function updateFilteredWords() {
