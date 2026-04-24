@@ -46,6 +46,7 @@
             justify-content: center;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.2);
         }
+        /* верхняя панель */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -197,7 +198,7 @@
             padding: 12px 10px;
             min-width: 50px;
             text-align: center;
-            font-size: 2.2rem;
+            font-size: 1.8rem;    /* <--- ЭТО ГЛАВНОЕ */
             font-weight: 500;
             font-family: monospace;
             cursor: pointer;
@@ -301,14 +302,13 @@
 
 <script>
     // ---------- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----------
-    let fullWordsList = [];
+    let fullWordsList = [];     // { theme, ru, fr }
     let currentTheme = "all";
     let filteredWordsList = [];
     let currentWordObj = null;
     let currentMode = "ru2fr";
     let remainingIndices = [];
     let lastAnswerWasOk = false;
-    let speechEnabled = false;
 
     // DOM элементы
     const questionCard = document.getElementById("questionCard");
@@ -328,6 +328,7 @@
     ];
     const extraButtons = ['←', ' '];
 
+    // ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ ----------
 / ---------- ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ (РАБОТАЕТ НА ANDROID) ----------
 let voicesLoaded = false;
 let retryCount = 0;
@@ -421,6 +422,7 @@ document.addEventListener('touchstart', function wakeSpeech() {
     document.removeEventListener('touchstart', wakeSpeech);
 }, { once: true });
 
+    
     // ---------- РАБОТА СО СПИСКОМ СЛОВ ----------
     function updateFilteredWords() {
         if (currentTheme === "all") {
@@ -467,9 +469,10 @@ document.addEventListener('touchstart', function wakeSpeech() {
 
     function skipToNextWord() {
         if (!filteredWordsList.length) return;
+        // Если слово-пустышка, просто игнорируем
         if (currentWordObj && currentWordObj.ru === "Нет слов в теме") return;
         
-        // Берём следующее слово
+        // Переходим к следующему слову без проверки
         if (remainingIndices.length === 0) resetRemainingIndices();
         const nextIndex = remainingIndices.shift();
         currentWordObj = filteredWordsList[nextIndex];
@@ -593,7 +596,7 @@ document.addEventListener('touchstart', function wakeSpeech() {
             option.value = theme;
             let displayName = theme;
             if (theme === "all") displayName = "📚 Все темы";
-            else if (theme === "основы") displayName = "🔤 Основы";
+            else if (theme === "основы") displayName = "🔤 Основы (100 слов)";
             else if (theme === "еда") displayName = "🍽 Еда и напитки";
             else if (theme === "дом") displayName = "🏠 Дом и мебель";
             else if (theme === "одежда") displayName = "👕 Одежда";
@@ -614,15 +617,28 @@ document.addEventListener('touchstart', function wakeSpeech() {
         });
     }
 
+    // ---------- ВСТРОЕННЫЙ СЛОВАРЬ (2000+ слов с темами) ----------
     function getBuiltInDictionary() {
         return [
-            "основы|я|je", "основы|ты|tu", "основы|он|il", "основы|она|elle", "основы|мы|nous", "основы|вы|vous", 
-            "еда|хлеб|le pain", "еда|сыр|le fromage", "еда|масло|le beurre", "дом|дом|la maison", "дом|окно|la fenêtre",
-            "одежда|рубашка|la chemise", "семья|мать|la mère", "работа|врач|le médecin", "путешествия|самолёт|l'avion",
-            "животные|кошка|le chat", "цвета|красный|rouge", "глаголы|идти|aller", "чувства|любовь|l'amour"
+            "основы|я|je", "основы|ты|tu", "основы|он|il", "основы|она|elle", "основы|мы|nous", "основы|вы|vous", "основы|они|ils", "основы|этот|cette / ce", "основы|тот|cette / ce", "основы|мой|mon",
+            "еда|хлеб|le pain", "еда|сыр|le fromage", "еда|масло|le beurre", "еда|яйцо|l'œuf", "еда|молоко|le lait", "еда|кофе|le café", "еда|чай|le thé", "еда|сок|le jus", "еда|вода|l'eau", "еда|яблоко|la pomme",
+            "дом|дом|la maison", "дом|квартира|l'appartement", "дом|комната|la chambre", "дом|кухня|la cuisine", "дом|ванная|la salle de bain", "дом|туалет|les toilettes", "дом|окно|la fenêtre", "дом|дверь|la porte", "дом|стол|la table", "дом|стул|la chaise",
+            "одежда|одежда|les vêtements", "одежда|рубашка|la chemise", "одежда|брюки|le pantalon", "одежда|платье|la robe", "одежда|юбка|la jupe", "одежда|куртка|la veste", "одежда|пальто|le manteau", "одежда|шапка|le bonnet", "одежда|шарф|l'écharpe", "одежда|перчатки|les gants",
+            "семья|семья|la famille", "семья|мать|la mère", "семья|отец|le père", "семья|сын|le fils", "семья|дочь|la fille", "семья|брат|le frère", "семья|сестра|la sœur", "семья|дедушка|le grand-père", "семья|бабушка|la grand-mère", "семья|внук|le petit-fils",
+            "работа|работа|le travail", "работа|начальник|le chef", "работа|сотрудник|l'employé", "работа|учитель|le professeur", "работа|врач|le médecin", "работа|инженер|l'ingénieur", "работа|программист|le programmeur", "работа|юрист|l'avocat", "работа|бухгалтер|le comptable", "работа|продавец|le vendeur",
+            "путешествия|путешествие|le voyage", "путешествия|билет|le billet", "путешествия|поезд|le train", "путешествия|автобус|l'autobus", "путешествия|метро|le métro", "путешествия|такси|le taxi", "путешествия|самолёт|l'avion", "путешествия|отель|l'hôtel", "путешествия|чемодан|la valise", "путешествия|паспорт|le passeport",
+            "здоровье|здоровье|la santé", "здоровье|врач|le médecin", "здоровье|больница|l'hôpital", "здоровье|аптека|la pharmacie", "здоровье|лекарство|le médicament", "здоровье|боль|la douleur", "здоровье|голова|la tête", "здоровье|глаз|l'œil", "здоровье|нос|le nez", "здоровье|рот|la bouche",
+            "спорт|спорт|le sport", "спорт|футбол|le football", "спорт|баскетбол|le basket-ball", "спорт|теннис|le tennis", "спорт|бег|la course", "спорт|волейбол|le volley-ball", "спорт|плавание|la natation", "спорт|лыжи|le ski", "спорт|велосипед|le vélo", "спорт|стадион|le stade",
+            "природа|природа|la nature", "природа|дерево|l'arbre", "природа|цветок|la fleur", "природа|трава|l'herbe", "природа|лес|la forêt", "природа|поле|le champ", "природа|река|la rivière", "природа|солнце|le soleil", "природа|дождь|la pluie", "природа|снег|la neige",
+            "животные|животное|l'animal", "животные|кошка|le chat", "животные|собака|le chien", "животные|птица|l'oiseau", "животные|рыба|le poisson", "животные|лошадь|le cheval", "животные|корова|la vache", "животные|свинья|le cochon", "животные|курица|la poule", "животные|утка|le canard",
+            "время|время|le temps", "время|час|l'heure", "время|минута|la minute", "время|секунда|la seconde", "время|день|le jour", "время|неделя|la semaine", "время|месяц|le mois", "время|год|l'année", "время|утро|le matin", "время|вечер|le soir",
+            "цвета|красный|rouge", "цвета|синий|bleu", "цвета|зелёный|vert", "цвета|жёлтый|jaune", "цвета|чёрный|noir", "цвета|белый|blanc", "цвета|серый|gris", "цвета|розовый|rose", "цвета|оранжевый|orange", "цвета|фиолетовый|violet",
+            "глаголы|идти|aller", "глаголы|приходить|venir", "глаголы|уходить|partir", "глаголы|бежать|courir", "глаголы|плыть|nager", "глаголы|лететь|voler", "глаголы|ехать|conduire", "глаголы|ходить|marcher", "глаголы|прыгать|sauter", "глаголы|падать|tomber",
+            "чувства|любовь|l'amour", "чувства|счастье|le bonheur", "чувства|грусть|la tristesse", "чувства|гнев|la colère", "чувства|страх|la peur", "чувства|удивление|la surprise", "чувства|спокойствие|le calme", "чувства|радость|la joie", "чувства|зависть|la jalousie", "чувства|надежда|l'espoir"
         ];
     }
 
+    // Загрузка словаря (с поддержкой файла или встроенного)
     async function loadWords() {
         try {
             const response = await fetch('fslov1.txt');
@@ -663,6 +679,7 @@ document.addEventListener('touchstart', function wakeSpeech() {
         renderKeyboard();
     }
 
+    // Инициализация
     function initUI() {
         document.querySelector('[data-mode="ru2fr"]').addEventListener('click', () => setMode("ru2fr"));
         document.querySelector('[data-mode="fr2ru"]').addEventListener('click', () => setMode("fr2ru"));
@@ -678,12 +695,6 @@ document.addEventListener('touchstart', function wakeSpeech() {
             updateFilteredWords();
         });
         setMode("ru2fr");
-        
-        // Инициализируем голос при первом касании экрана
-        document.body.addEventListener('touchstart', function initSpeechOnce() {
-            initSpeech();
-            document.body.removeEventListener('touchstart', initSpeechOnce);
-        });
     }
 
     loadWords().then(() => initUI());
