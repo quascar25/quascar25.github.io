@@ -297,7 +297,7 @@
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off" >
+            <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off"  inputmode="none" >
             <div class="action-buttons">
                 <button id="skipBtn" class="nav-btn" title="Следующее слово без проверки">›</button>
                 <button id="submitBtn" class="action-btn">OK</button>
@@ -413,16 +413,16 @@
         answerInput.classList.remove("input-active");
     }
     
-    // Добавь эти строки в initUI() или после объявления переменных
+ //   // Добавь эти строки в initUI() или после объявления переменных
     answerInput.addEventListener('click', () => {
-        answerInput.focus();
+      //  answerInput.focus();
         answerInput.classList.add("input-active");
     });
-    answerInput.addEventListener('blur', () => {
-        answerInput.classList.remove("input-active");
-    });
-    // Снимаем начальный фокус
-    answerInput.blur();
+ //   answerInput.addEventListener('blur', () => {
+ //       answerInput.classList.remove("input-active");
+ //   });
+ //   // Снимаем начальный фокус
+ //   answerInput.blur();
 
     
 
