@@ -289,8 +289,7 @@
             </select>
         </div>
         <div class="mode-switch">
-            <button class="mode-btn" data-mode="ru2fr">RU→FR</button>
-            <button class="mode-btn" data-mode="fr2ru">FR→RU</button>
+            <button id="modeToggleBtn" class="mode-btn">RU → FR</button>
         </div>
         <button id="speakerBtn" class="speaker-btn" title="Произнести слово">🔊</button>
     </div>
@@ -560,25 +559,6 @@ function addCharToInput(ch) {
         keyboardDiv.appendChild(extraRow);
     }
 
-    function setMode(mode) {
-        currentMode = mode;
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            if (btn.dataset.mode === mode) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        if (currentWordObj) showQuestion();
-        else pickRandomWord();
-        setSubmitButtonNeutral();
-        answerInput.value = "";
-        // УБИРАЕМ автоматический фокус
-        // answerInput.focus();  // <-- ЗАКОММЕНТИРОВАТЬ ИЛИ УДАЛИТЬ
-        
-        // Снимаем активный класс с поля
-        answerInput.classList.remove("input-active");
-        // Принудительно убираем фокус с поля
-        answerInput.blur();
-    }
-
     function onSubmitAction() {
         if (submitBtn.innerText === "✅" || submitBtn.innerText === "❌") return;
         checkAnswer();
@@ -680,8 +660,6 @@ function addCharToInput(ch) {
 
     // Инициализация
     function initUI() {
-        document.querySelector('[data-mode="ru2fr"]').addEventListener('click', () => setMode("ru2fr"));
-        document.querySelector('[data-mode="fr2ru"]').addEventListener('click', () => setMode("fr2ru"));
         speakerBtn.addEventListener('click', speakCurrentWord);
         submitBtn.addEventListener('click', onSubmitAction);
         skipBtn.addEventListener('click', skipToNextWord);
@@ -693,12 +671,35 @@ function addCharToInput(ch) {
             currentTheme = e.target.value;
             updateFilteredWords();
         });
-        setMode("ru2fr");
     }
 
     loadWords().then(() => initUI());
 
- 
+
+    ///////
+    const modeToggleBtn = document.getElementById("modeToggleBtn");
+    
+    function toggleMode() {
+        if (currentMode === "ru2fr") {
+            currentMode = "fr2ru";
+            modeToggleBtn.textContent = "FR → RU";
+        } else {
+            currentMode = "ru2fr";
+            modeToggleBtn.textContent = "RU → FR";
+        }
+        
+        // Обновляем вопрос для текущего слова
+        if (currentWordObj) showQuestion();
+        else pickRandomWord();
+        
+        setSubmitButtonNeutral();
+        answerInput.value = "";
+        answerInput.classList.remove("input-active");
+        answerInput.blur();
+    }
+    
+    modeToggleBtn.addEventListener('click', toggleMode);
+    ////////
     
     // Вставить из буфера в позицию курсора
     async function pasteFromClipboard() {
