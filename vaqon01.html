@@ -969,6 +969,9 @@
             currentFrameIndex = seriesFrames.length - 1;
             renderTimeline();
             showToast('✅ Кадр ' + seriesFrames.length + ' сохранён');
+                stopPlayback();
+                const playBtn = document.querySelector('.timeline-header button.accent');
+                if (playBtn) playBtn.textContent = '▶ Воспроизвести';
         }
 
         function addCurrentToSeries() {
@@ -1103,13 +1106,26 @@
             showToast('🔊 Озвучка...');
         }
 
-        // --- PLAY SERIES ---
+             // --- PLAY SERIES (с остановкой) ---
+        let playbackTimer = null;
+        let playbackActive = false;
+        
         function playSeries() {
+            const playBtn = document.querySelector('.timeline-header button.accent');
+            
+            // Если уже играет — останавливаем
+            if (playbackActive) {
+                stopPlayback();
+                if (playBtn) playBtn.textContent = '▶ Воспроизвести';
+                return;
+            }
+            
             if (seriesFrames.length === 0) {
                 showToast('Нет кадров для воспроизведения');
                 return;
             }
-            // Save current
+            
+            // Сохраняем текущий кадр перед стартом
             if (currentFrameIndex >= 0 && seriesFrames[currentFrameIndex]) {
                 seriesFrames[currentFrameIndex].imageData = currentCanvasState;
                 seriesFrames[currentFrameIndex].markers = JSON.parse(JSON.stringify(markers));
@@ -1118,20 +1134,29 @@
                     lang: annotationLang.value
                 };
             }
-
+            
+            playbackActive = true;
+            if (playBtn) playBtn.textContent = '⏹ Остановить';
+            
             const delay = parseInt(autoAdvanceInput.value) * 1000 || 3000;
             const loop = loopCheckbox.checked;
             let idx = 0;
-
             const synth = window.speechSynthesis;
-
+            
             function showNext() {
+                if (!playbackActive) return;
+                
                 if (idx >= seriesFrames.length) {
-                    if (loop) { idx = 0; } else {
+                    if (loop) { 
+                        idx = 0; 
+                    } else {
+                        stopPlayback();
+                        if (playBtn) playBtn.textContent = '▶ Воспроизвести';
                         showToast('⏹ Конец серии');
                         return;
                     }
                 }
+                
                 const frame = seriesFrames[idx];
                 const img = new Image();
                 img.onload = function() {
@@ -1145,47 +1170,80 @@
                     canvas.style.display = 'block';
                     placeholder.style.display = 'none';
                     canvasWrapper.style.display = 'block';
-
-                    // Voice
+                    
+                    // Обновляем маркеры в панели
+                    markers = JSON.parse(JSON.stringify(frame.markers || []));
+                    markerCounter = markers.length > 0 ? Math.max(...markers.map(m => m.id)) + 1 : 1;
+                    updateMarkerList();
+                    
+                    // Обновляем аннотацию
+                    annotationText.value = frame.annotation?.text || '';
+                    annotationLang.value = frame.annotation?.lang || 'ru-RU';
+                    
+                    // Озвучка
                     if (frame.annotation?.text) {
                         synth.cancel();
                         const utterance = new SpeechSynthesisUtterance(frame.annotation.text);
                         utterance.lang = frame.annotation.lang || 'ru-RU';
                         utterance.rate = 0.9;
                         const voices = synth.getVoices();
-                        const voice = voices.find(v => v.lang.startsWith((frame.annotation.lang || 'ru')
-                            .split('-')[0]));
+                        const voice = voices.find(v => v.lang.startsWith((frame.annotation.lang || 'ru').split('-')[0]));
                         if (voice) utterance.voice = voice;
                         synth.speak(utterance);
                     }
-
-                    // Highlight timeline
+                    
+                    // Подсветка в таймлайне
                     document.querySelectorAll('.timeline-frame').forEach((el, i) => {
                         el.classList.toggle('active', i === idx);
                     });
                 };
                 img.src = frame.imageData;
                 idx++;
-                if (idx < seriesFrames.length || loop) {
-                    setTimeout(showNext, delay);
+                
+                if (playbackActive && (idx < seriesFrames.length || loop)) {
+                    playbackTimer = setTimeout(showNext, delay);
+                } else if (!loop && idx >= seriesFrames.length) {
+                    stopPlayback();
+                    if (playBtn) playBtn.textContent = '▶ Воспроизвести';
+                    showToast('⏹ Конец серии');
                 }
             }
-
+            
             showNext();
-            showToast('▶ Воспроизведение серии (' + seriesFrames.length + ' кадров)');
+            showToast('▶ Воспроизведение (' + seriesFrames.length + ' кадров)');
+        }
+        
+        function stopPlayback() {
+            playbackActive = false;
+            if (playbackTimer) {
+                clearTimeout(playbackTimer);
+                playbackTimer = null;
+            }
+            window.speechSynthesis.cancel();
+            // Возвращаем выделение текущего кадра в таймлайне
+            document.querySelectorAll('.timeline-frame').forEach((el, i) => {
+                el.classList.toggle('active', i === currentFrameIndex);
+            });
         }
 
         // --- EXPORT / IMPORT ---
         function exportSeries() {
             if (currentFrameIndex >= 0 && seriesFrames[currentFrameIndex]) {
+
+                stopPlayback();
+                const playBtn = document.querySelector('.timeline-header button.accent');
+                if (playBtn) playBtn.textContent = '▶ Воспроизвести';
+                
                 seriesFrames[currentFrameIndex].imageData = currentCanvasState;
                 seriesFrames[currentFrameIndex].markers = JSON.parse(JSON.stringify(markers));
                 seriesFrames[currentFrameIndex].annotation = {
                     text: annotationText.value,
                     lang: annotationLang.value
                 };
+                
             }
 
+            
             const seriesData = {
                 type: 'series',
                 version: '1.0',
@@ -1241,6 +1299,12 @@
 
         function clearAll() {
             if (!confirm('Очистить все кадры и текущее изображение?')) return;
+
+            stopPlayback();
+            const playBtn = document.querySelector('.timeline-header button.accent');
+            if (playBtn) playBtn.textContent = '▶ Воспроизвести';
+
+            
             seriesFrames = [];
             currentFrameIndex = -1;
             markers = [];
@@ -1291,6 +1355,17 @@
             'color:#c8c8d4;font-size:14px;');
         console.log('Откройте изображение, чтобы начать работу.');
         console.log('Инструменты: ✂ Кадрирование | ✏ Рисование | T Текст | ① Метки | 🔊 Озвучка');
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && playbackActive) {
+                stopPlayback();
+                const playBtn = document.querySelector('.timeline-header button.accent');
+                if (playBtn) playBtn.textContent = '▶ Воспроизвести';
+                showToast('⏹ Остановлено');
+            }
+        });
+
+        
     </script>
 </body>
 </html>
