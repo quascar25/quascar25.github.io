@@ -5,210 +5,505 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🍔 Учет калорий</title>
     <style>
-        /* ----- Стили ----- */
+        /* ----- Базовые переменные (светлая тема по умолчанию) ----- */
+        :root {
+            --bg-body: #f4f6fa;
+            --bg-card: #ffffff;
+            --bg-input: #f8fafc;
+            --bg-stat: #f8fafc;
+            --bg-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-focus: #3b82f6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --btn-primary: #3b82f6;
+            --btn-primary-hover: #2563eb;
+            --btn-danger: #ef4444;
+            --btn-danger-hover: #dc2626;
+            --btn-outline-border: #3b82f6;
+            --btn-outline-text: #3b82f6;
+            --income-color: #22c55e;
+            --expense-color: #ef4444;
+            --badge-food-bg: #dbeafe;
+            --badge-food-text: #1d4ed8;
+            --badge-sport-bg: #fce7f3;
+            --badge-sport-text: #be185d;
+            --chart-bg: #f8fafc;
+            --table-border: #f1f5f9;
+            --empty-color: #94a3b8;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ----- Космическая тема ----- */
+        [data-theme="space"] {
+            --bg-body: #0b0e1a;
+            --bg-card: rgba(18, 25, 45, 0.75);
+            --bg-input: rgba(255, 255, 255, 0.04);
+            --bg-stat: rgba(255, 255, 255, 0.03);
+            --bg-hover: rgba(255, 255, 255, 0.06);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(56, 189, 248, 0.2);
+            --border-focus: rgba(56, 189, 248, 0.6);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(56, 189, 248, 0.05);
+            --btn-primary: transparent;
+            --btn-primary-hover: rgba(56, 189, 248, 0.15);
+            --btn-danger: transparent;
+            --btn-danger-hover: rgba(248, 113, 113, 0.15);
+            --btn-outline-border: rgba(56, 189, 248, 0.5);
+            --btn-outline-text: #38bdf8;
+            --income-color: #4ade80;
+            --expense-color: #f87171;
+            --badge-food-bg: rgba(56, 189, 248, 0.15);
+            --badge-food-text: #7dd3fc;
+            --badge-sport-bg: rgba(248, 113, 113, 0.15);
+            --badge-sport-text: #fca5a5;
+            --chart-bg: rgba(255, 255, 255, 0.03);
+            --table-border: rgba(255, 255, 255, 0.05);
+            --empty-color: #4b5563;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ----- Общие стили ----- */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: #f4f6fa;
-            color: #1e293b;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            transition: background var(--transition), color var(--transition);
+            min-height: 100vh;
         }
-        h1 {
+
+        /* ----- Шапка с переключателем ----- */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            transition: border-color var(--transition);
+        }
+
+        .header h1 {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 28px;
-            margin-bottom: 24px;
-            border-bottom: 3px solid #e2e8f0;
-            padding-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
+
+        .theme-toggle {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 4px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .theme-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 26px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: transparent;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .theme-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .theme-btn.active {
+            background: var(--btn-primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        [data-theme="space"] .theme-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1), inset 0 0 20px rgba(56, 189, 248, 0.05);
+        }
+
+        .theme-btn .icon {
+            margin-right: 6px;
+        }
+
+        /* ----- Карточки ----- */
         .card {
-            background: #ffffff;
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
+
+        [data-theme="space"] .card {
+            border-color: rgba(56, 189, 248, 0.08);
+        }
+
+        /* ----- Форма ----- */
         .row {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
             align-items: flex-end;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            flex: 1 1 160px;
+            flex: 1 1 150px;
         }
+
         .form-group label {
             font-weight: 600;
-            font-size: 14px;
-            color: #475569;
+            font-size: 13px;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+            transition: color var(--transition);
         }
+
         .form-group input,
         .form-group select {
-            padding: 10px 12px;
-            border: 1.5px solid #e2e8f0;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             font-size: 15px;
-            background: #f8fafc;
-            transition: 0.2s;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: all var(--transition);
+            outline: none;
+            font-weight: 500;
         }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
         .form-group input:focus,
         .form-group select:focus {
-            border-color: #3b82f6;
-            outline: none;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08);
+            background: var(--bg-card);
         }
+
+        [data-theme="space"] .form-group input:focus,
+        [data-theme="space"] .form-group select:focus {
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.06), 0 0 30px rgba(56, 189, 248, 0.02);
+        }
+
+        .form-group select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* ----- Кнопки ----- */
         .btn {
             padding: 10px 28px;
-            border: none;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 15px;
-            background: #3b82f6;
-            color: #fff;
             cursor: pointer;
-            transition: 0.15s;
+            transition: all var(--transition);
             white-space: nowrap;
+            background: var(--btn-primary);
+            color: #fff;
+            letter-spacing: 0.2px;
         }
+
         .btn:hover {
-            background: #2563eb;
-            transform: scale(1.02);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        [data-theme="space"] .btn {
+            background: transparent;
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        [data-theme="space"] .btn:hover {
+            background: rgba(56, 189, 248, 0.08);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.04);
+        }
+
+        .btn-primary {
+            background: var(--btn-primary);
+            color: #fff;
+            border-color: var(--btn-primary);
+        }
+
+        [data-theme="space"] .btn-primary {
+            background: rgba(56, 189, 248, 0.12);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.25);
+        }
+
+        [data-theme="space"] .btn-primary:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
         .btn-danger {
-            background: #ef4444;
+            background: var(--btn-danger);
+            color: #fff;
+            border-color: var(--btn-danger);
         }
-        .btn-danger:hover {
-            background: #dc2626;
+
+        [data-theme="space"] .btn-danger {
+            background: transparent;
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.25);
         }
+
+        [data-theme="space"] .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.08);
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
         .btn-outline {
             background: transparent;
-            color: #3b82f6;
-            border: 2px solid #3b82f6;
+            color: var(--btn-outline-text);
+            border-color: var(--btn-outline-border);
         }
+
         .btn-outline:hover {
-            background: #3b82f6;
+            background: var(--btn-primary);
             color: #fff;
+            border-color: var(--btn-primary);
         }
+
+        [data-theme="space"] .btn-outline:hover {
+            background: rgba(56, 189, 248, 0.08);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        /* ----- Статистика ----- */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
-            margin: 8px 0 4px;
+            margin: 4px 0;
         }
+
         .stat-item {
-            background: #f8fafc;
+            background: var(--bg-stat);
             border-radius: 16px;
-            padding: 16px;
+            padding: 18px 16px;
             text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+            backdrop-filter: blur(4px);
         }
+
+        [data-theme="space"] .stat-item {
+            border-color: rgba(56, 189, 248, 0.06);
+        }
+
         .stat-item .number {
             font-size: 32px;
             font-weight: 700;
+            letter-spacing: -0.5px;
+            transition: color var(--transition);
         }
+
         .stat-item .label {
-            font-size: 14px;
-            color: #64748b;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            transition: color var(--transition);
         }
+
         .stat-item.income .number {
-            color: #22c55e;
+            color: var(--income-color);
         }
         .stat-item.expense .number {
-            color: #ef4444;
+            color: var(--expense-color);
         }
         .stat-item.balance .number {
-            color: #3b82f6;
+            color: var(--btn-primary);
         }
+
+        /* ----- Фильтр ----- */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 14px;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
+
         .filter-bar label {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: color var(--transition);
         }
+
         .filter-bar input[type="date"] {
             padding: 8px 12px;
             border-radius: 10px;
-            border: 1.5px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: all var(--transition);
+            outline: none;
         }
+
+        .filter-bar input[type="date"]:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.06);
+        }
+
+        .filter-bar .spacer {
+            flex: 1;
+        }
+
+        /* ----- Таблица ----- */
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 15px;
         }
+
         th {
             text-align: left;
             padding: 12px 8px;
-            border-bottom: 2px solid #e2e8f0;
-            color: #475569;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
             font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            transition: border-color var(--transition), color var(--transition);
         }
+
         td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 11px 8px;
+            border-bottom: 1px solid var(--table-border);
+            transition: border-color var(--transition);
         }
+
+        tr:hover td {
+            background: var(--bg-hover);
+        }
+
         .badge {
             display: inline-block;
             padding: 4px 14px;
             border-radius: 30px;
             font-size: 13px;
             font-weight: 600;
+            transition: all var(--transition);
         }
+
         .badge-food {
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: var(--badge-food-bg);
+            color: var(--badge-food-text);
         }
+
         .badge-sport {
-            background: #fce7f3;
-            color: #be185d;
+            background: var(--badge-sport-bg);
+            color: var(--badge-sport-text);
         }
+
         .delete-btn {
             background: none;
             border: none;
-            color: #94a3b8;
+            color: var(--text-muted);
             cursor: pointer;
             font-size: 18px;
-            transition: 0.15s;
+            transition: all var(--transition);
+            padding: 4px 8px;
+            border-radius: 8px;
         }
+
         .delete-btn:hover {
-            color: #ef4444;
-            transform: scale(1.2);
+            color: var(--expense-color);
+            background: rgba(239, 68, 68, 0.08);
+            transform: scale(1.1);
         }
+
+        .empty {
+            text-align: center;
+            color: var(--empty-color);
+            padding: 30px 0;
+            font-style: italic;
+            transition: color var(--transition);
+        }
+
+        /* ----- Графики ----- */
         .chart-container {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 24px;
-            margin-top: 8px;
+            margin-top: 4px;
         }
+
         .chart-box {
-            background: #f8fafc;
+            background: var(--chart-bg);
             border-radius: 16px;
-            padding: 12px 12px 4px;
+            padding: 16px 12px 8px;
             min-height: 200px;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
         }
+
+        [data-theme="space"] .chart-box {
+            border-color: rgba(56, 189, 248, 0.06);
+        }
+
         .chart-box h3 {
-            font-size: 15px;
-            color: #475569;
+            font-size: 14px;
+            color: var(--text-secondary);
             margin-bottom: 8px;
             text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: color var(--transition);
         }
+
+        /* Бар-чарт */
         .bar-chart {
             display: flex;
             align-items: flex-end;
@@ -217,67 +512,100 @@
             gap: 6px;
             padding-top: 8px;
         }
+
         .bar-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             flex: 1;
+            gap: 2px;
         }
+
         .bar {
             width: 100%;
-            max-width: 40px;
-            border-radius: 6px 6px 0 0;
+            max-width: 36px;
+            border-radius: 4px 4px 0 0;
             min-height: 4px;
-            transition: 0.2s;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
         }
+
         .bar-income {
-            background: #22c55e;
+            background: var(--income-color);
+            opacity: 0.85;
         }
+
         .bar-expense {
-            background: #ef4444;
+            background: var(--expense-color);
+            opacity: 0.85;
         }
+
+        [data-theme="space"] .bar-income {
+            background: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.08);
+        }
+
+        [data-theme="space"] .bar-expense {
+            background: #f87171;
+            box-shadow: 0 0 20px rgba(248, 113, 113, 0.08);
+        }
+
         .bar-label {
             font-size: 11px;
-            color: #64748b;
+            color: var(--text-muted);
             margin-top: 4px;
+            font-weight: 500;
+            transition: color var(--transition);
         }
+
+        /* Круговая диаграмма */
         .pie-container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 170px;
+            gap: 16px;
         }
+
         .pie {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             background: conic-gradient(#22c55e 0%, #22c55e 0%, #ef4444 0%, #ef4444 100%);
+            transition: background 0.5s ease;
+            flex-shrink: 0;
+            border: 2px solid var(--border-color);
         }
+
+        [data-theme="space"] .pie {
+            border-color: rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.03);
+        }
+
         .pie-legend {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            margin-left: 20px;
+            gap: 6px;
             font-size: 14px;
+            color: var(--text-secondary);
         }
+
         .pie-legend span {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 500;
         }
+
         .dot {
             display: inline-block;
             width: 14px;
             height: 14px;
             border-radius: 4px;
+            flex-shrink: 0;
         }
-        .empty {
-            text-align: center;
-            color: #94a3b8;
-            padding: 30px 0;
-            font-style: italic;
-        }
+
+        /* ----- Адаптив ----- */
         @media (max-width: 700px) {
             .chart-container {
                 grid-template-columns: 1fr;
@@ -288,19 +616,109 @@
             .form-group {
                 flex: 1 1 100%;
             }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .theme-toggle {
+                align-self: flex-start;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar .spacer {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .theme-btn {
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+            body {
+                padding: 12px;
+            }
+            .card {
+                padding: 16px;
+            }
+        }
+
+        /* ----- Скролл для таблицы ----- */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 0 -4px;
+            padding: 0 4px;
+        }
+
+        /* ----- Анимация появления ----- */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* ----- Кастомный скролл для космоса ----- */
+        [data-theme="space"] ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        [data-theme="space"] ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        [data-theme="space"] ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.15);
+            border-radius: 10px;
+        }
+
+        [data-theme="space"] ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.25);
         }
     </style>
 </head>
 <body>
 
-    <h1>🍔 Учет калорий</h1>
+    <!-- ----- Шапка с переключателем темы ----- -->
+    <div class="header">
+        <h1>🍔 Учет калорий</h1>
+        <div class="theme-toggle">
+            <button class="theme-btn active" data-theme-value="light" id="themeLight">
+                <span class="icon">☀️</span> Светлая
+            </button>
+            <button class="theme-btn" data-theme-value="space" id="themeSpace">
+                <span class="icon">🌌</span> Космос
+            </button>
+        </div>
+    </div>
 
     <!-- ----- Форма ввода ----- -->
     <div class="card">
         <div class="row">
             <div class="form-group">
                 <label>📂 Тип</label>
-                <select id="typeSelect"><option value="income">🍽️ Еда (приход)</option><option value="expense">🏃 Спорт (расход)</option></select>
+                <select id="typeSelect">
+                    <option value="income">🍽️ Еда (приход)</option>
+                    <option value="expense">🏃 Спорт (расход)</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>📝 Название</label>
@@ -314,31 +732,48 @@
                 <label>📅 Дата</label>
                 <input type="date" id="dateInput" />
             </div>
-            <button class="btn" id="addBtn">➕ Добавить</button>
+            <button class="btn btn-primary" id="addBtn">➕ Добавить</button>
         </div>
     </div>
 
     <!-- ----- Статистика ----- -->
     <div class="card">
         <div class="stats-grid" id="statsGrid">
-            <div class="stat-item income"><div class="number" id="totalIncome">0</div><div class="label">🍽️ Приход (еда)</div></div>
-            <div class="stat-item expense"><div class="number" id="totalExpense">0</div><div class="label">🏃 Расход (спорт)</div></div>
-            <div class="stat-item balance"><div class="number" id="balance">0</div><div class="label">⚖️ Баланс</div></div>
+            <div class="stat-item income">
+                <div class="number" id="totalIncome">0</div>
+                <div class="label">🍽️ Приход (еда)</div>
+            </div>
+            <div class="stat-item expense">
+                <div class="number" id="totalExpense">0</div>
+                <div class="label">🏃 Расход (спорт)</div>
+            </div>
+            <div class="stat-item balance">
+                <div class="number" id="balance">0</div>
+                <div class="label">⚖️ Баланс</div>
+            </div>
         </div>
     </div>
 
     <!-- ----- Фильтр и таблица ----- -->
     <div class="card">
         <div class="filter-bar">
-            <label>📅 Период: <input type="date" id="filterFrom" /></label>
-            <label>— <input type="date" id="filterTo" /></label>
+            <label>📅 С: <input type="date" id="filterFrom" /></label>
+            <label>По: <input type="date" id="filterTo" /></label>
             <button class="btn btn-outline" id="resetFilterBtn">🔄 Сбросить</button>
-            <span style="flex:1"></span>
+            <span class="spacer"></span>
             <button class="btn btn-danger" id="clearAllBtn">🗑️ Очистить всё</button>
         </div>
-        <div style="overflow-x:auto;">
+        <div class="table-wrap">
             <table>
-                <thead><tr><th>Тип</th><th>Название</th><th>Калории</th><th>Дата</th><th style="width:40px;"></th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Тип</th>
+                        <th>Название</th>
+                        <th>Калории</th>
+                        <th>Дата</th>
+                        <th style="width:40px;"></th>
+                    </tr>
+                </thead>
                 <tbody id="entriesBody"></tbody>
             </table>
         </div>
@@ -357,8 +792,8 @@
                 <div class="pie-container">
                     <div class="pie" id="pieChart"></div>
                     <div class="pie-legend">
-                        <span><span class="dot" style="background:#22c55e;"></span> Еда</span>
-                        <span><span class="dot" style="background:#ef4444;"></span> Спорт</span>
+                        <span><span class="dot" style="background:var(--income-color);"></span> Еда</span>
+                        <span><span class="dot" style="background:var(--expense-color);"></span> Спорт</span>
                     </div>
                 </div>
             </div>
@@ -369,6 +804,7 @@
         (function() {
             // ----- Константы -----
             const STORAGE_KEY = 'calorie_data';
+            const THEME_KEY = 'calorie_theme';
 
             // ----- Элементы DOM -----
             const typeSelect = document.getElementById('typeSelect');
@@ -387,13 +823,37 @@
             const clearAllBtn = document.getElementById('clearAllBtn');
             const barChart = document.getElementById('barChart');
             const pieChart = document.getElementById('pieChart');
+            const themeLight = document.getElementById('themeLight');
+            const themeSpace = document.getElementById('themeSpace');
 
             // ----- Состояние -----
             let entries = [];
             let filterFromVal = '';
             let filterToVal = '';
+            let currentTheme = 'light';
 
-            // ----- Загрузка / сохранение -----
+            // ----- Тема -----
+            function setTheme(theme) {
+                currentTheme = theme;
+                document.documentElement.setAttribute('data-theme', theme === 'space' ? 'space' : '');
+                localStorage.setItem(THEME_KEY, theme);
+                themeLight.classList.toggle('active', theme === 'light');
+                themeSpace.classList.toggle('active', theme === 'space');
+            }
+
+            function loadTheme() {
+                const saved = localStorage.getItem(THEME_KEY);
+                if (saved === 'space') {
+                    setTheme('space');
+                } else {
+                    setTheme('light');
+                }
+            }
+
+            themeLight.addEventListener('click', () => setTheme('light'));
+            themeSpace.addEventListener('click', () => setTheme('space'));
+
+            // ----- Загрузка / сохранение данных -----
             function loadData() {
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw) {
@@ -419,7 +879,6 @@
                     ];
                     saveData();
                 }
-                // Установить дату по умолчанию
                 if (!dateInput.value) {
                     const now = new Date();
                     dateInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -431,10 +890,8 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
             }
 
-            // ----- Генерация ID -----
             function genId() { return Date.now() + Math.random() * 1000; }
 
-            // ----- Фильтрация -----
             function getFiltered() {
                 return entries.filter(e => {
                     if (filterFromVal && e.date < filterFromVal) return false;
@@ -460,10 +917,9 @@
                 });
                 totalIncomeEl.textContent = income;
                 totalExpenseEl.textContent = expense;
-                balanceEl.textContent = income - expense;
-                // цвет баланса
                 const bal = income - expense;
-                balanceEl.style.color = bal >= 0 ? '#22c55e' : '#ef4444';
+                balanceEl.textContent = bal;
+                balanceEl.style.color = bal >= 0 ? 'var(--income-color)' : 'var(--expense-color)';
             }
 
             function renderTable(filtered) {
@@ -474,7 +930,6 @@
                 }
                 emptyMessage.style.display = 'none';
                 let html = '';
-                // сортировка по дате (новые сверху)
                 const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
                 for (const e of sorted) {
                     const badge = e.type === 'income' ?
@@ -489,7 +944,6 @@
                     </tr>`;
                 }
                 entriesBody.innerHTML = html;
-                // Обработчики удаления
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const id = Number(this.dataset.id);
@@ -506,9 +960,8 @@
                 return div.innerHTML;
             }
 
-            // ----- Графики -----
             function renderCharts(filtered) {
-                // Бар-чарт по дням
+                // Бар-чарт
                 const dayMap = {};
                 filtered.forEach(e => {
                     if (!dayMap[e.date]) dayMap[e.date] = { income: 0, expense: 0 };
@@ -536,7 +989,7 @@
                 }
                 barChart.innerHTML = barHtml;
 
-                // Pie chart
+                // Pie
                 let totalInc = 0,
                     totalExp = 0;
                 filtered.forEach(e => {
@@ -545,14 +998,14 @@
                 });
                 const total = totalInc + totalExp;
                 if (total === 0) {
-                    pieChart.style.background = '#e2e8f0';
+                    pieChart.style.background = 'var(--border-color)';
                 } else {
                     const incDeg = (totalInc / total) * 360;
-                    pieChart.style.background = `conic-gradient(#22c55e 0% ${incDeg}%, #ef4444 ${incDeg}% 100%)`;
+                    pieChart.style.background = `conic-gradient(var(--income-color) 0% ${incDeg}%, var(--expense-color) ${incDeg}% 100%)`;
                 }
             }
 
-            // ----- Добавление записи -----
+            // ----- Добавление -----
             function addEntry() {
                 const type = typeSelect.value;
                 const name = nameInput.value.trim();
@@ -571,7 +1024,6 @@
                     date: date
                 });
                 saveData();
-                // Очистить поля (кроме даты)
                 nameInput.value = '';
                 caloriesInput.value = '';
                 typeSelect.value = 'income';
@@ -579,7 +1031,6 @@
                 nameInput.focus();
             }
 
-            // ----- Очистка всего -----
             function clearAll() {
                 if (entries.length === 0) return;
                 if (confirm('Удалить все записи?')) {
@@ -589,7 +1040,6 @@
                 }
             }
 
-            // ----- Сброс фильтра -----
             function resetFilter() {
                 filterFrom.value = '';
                 filterTo.value = '';
@@ -599,6 +1049,7 @@
             }
 
             // ----- Инициализация -----
+            loadTheme();
             loadData();
 
             // ----- События -----
@@ -620,13 +1071,19 @@
             resetFilterBtn.addEventListener('click', resetFilter);
             clearAllBtn.addEventListener('click', clearAll);
 
-            // Автообновление при ручном изменении localStorage (для других вкладок)
             window.addEventListener('storage', function(e) {
                 if (e.key === STORAGE_KEY) {
                     loadData();
                     renderAll();
                 }
             });
+
+            // Обновление графиков при смене темы (цвета меняются через CSS-переменные)
+            // Дополнительно перерисовываем pie, т.к. background не отслеживает CSS-переменные автоматически
+            const observer = new MutationObserver(() => {
+                renderCharts(getFiltered());
+            });
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
         })();
     </script>
