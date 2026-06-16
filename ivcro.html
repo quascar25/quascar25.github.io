@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚀 KS Space — три проекта</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='48' font-weight='bold' font-family='Arial' text-anchor='middle' fill='white'%3EKS%3C/text%3E%3C/svg%3E" type="image/svg+xml" />
+    <style>
+        /* ----- Космическая тема (единая) ----- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            background: #0b0e1a;
+            color: #e2e8f0;
+            padding: 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* ----- Шапка с вкладками ----- */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header h1 .icon {
+            font-size: 32px;
+            -webkit-text-fill-color: initial;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            background: rgba(18, 25, 45, 0.6);
+            padding: 4px;
+            border-radius: 30px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            backdrop-filter: blur(12px);
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 26px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .tab-btn:hover {
+            color: #e2e8f0;
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .tab-btn.active {
+            background: rgba(56, 189, 248, 0.12);
+            color: #7dd3fc;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.05), inset 0 1px 0 rgba(56, 189, 248, 0.1);
+        }
+
+        .tab-btn .badge {
+            display: inline-block;
+            font-size: 11px;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 0 8px;
+            border-radius: 10px;
+            color: #38bdf8;
+            margin-left: 4px;
+        }
+
+        /* ----- Контейнер вкладок ----- */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ----- Общие карточки (космос) ----- */
+        .card {
+            background: rgba(18, 25, 45, 0.7);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.06);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(56, 189, 248, 0.03);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #e2e8f0;
+        }
+
+        .card-title .sub {
+            font-size: 14px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        /* ----- Формы ----- */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1 1 140px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            border: 1px solid rgba(56, 189, 248, 0.12);
+            border-radius: 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            outline: none;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .form-group input::placeholder {
+            color: #4b5563;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.04);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .form-group select option {
+            background: #0b0e1a;
+            color: #e2e8f0;
+        }
+
+        /* ----- Кнопки (прозрачные, рамка 1px) ----- */
+        .btn {
+            padding: 10px 28px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            background: transparent;
+            color: #38bdf8;
+            letter-spacing: 0.2px;
+        }
+
+        .btn:hover {
+            background: rgba(56, 189, 248, 0.06);
+            border-color: rgba(56, 189, 248, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: rgba(56, 189, 248, 0.08);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+
+        .btn-danger {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.06);
+            border-color: rgba(248, 113, 113, 0.35);
+        }
+
+        .btn-outline {
+            color: #94a3b8;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .btn-outline:hover {
+            color: #e2e8f0;
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* ----- Статистика (калории) ----- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 4px 0;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 18px 16px;
+            text-align: center;
+            border: 1px solid rgba(56, 189, 248, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item .number {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-item .label {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .stat-item.income .number {
+            color: #4ade80;
+        }
+        .stat-item.expense .number {
+            color: #f87171;
+        }
+        .stat-item.balance .number {
+            color: #38bdf8;
+        }
+
+        /* ----- Фильтр ----- */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .filter-bar label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-bar input[type="date"] {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(56, 189, 248, 0.12);
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .filter-bar input[type="date"]:focus {
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.04);
+        }
+
+        .filter-bar .spacer {
+            flex: 1;
+        }
+
+        /* ----- Таблицы ----- */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 0 -4px;
+            padding: 0 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.08);
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 11px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .badge-food {
+            background: rgba(56, 189, 248, 0.12);
+            color: #7dd3fc;
+        }
+
+        .badge-sport {
+            background: rgba(248, 113, 113, 0.12);
+            color: #fca5a5;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #4b5563;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .delete-btn:hover {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.06);
+            transform: scale(1.1);
+        }
+
+        .empty {
+            text-align: center;
+            color: #4b5563;
+            padding: 30px 0;
+            font-style: italic;
+        }
+
+        /* ----- Графики (калории) ----- */
+        .chart-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-top: 4px;
+        }
+
+        .chart-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 16px 12px 8px;
+            min-height: 200px;
+            border: 1px solid rgba(56, 189, 248, 0.04);
+        }
+
+        .chart-box h3 {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 170px;
+            gap: 6px;
+            padding-top: 8px;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            gap: 2px;
+        }
+
+        .bar {
+            width: 100%;
+            max-width: 36px;
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bar-income {
+            background: #4ade80;
+            opacity: 0.8;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.06);
+        }
+
+        .bar-expense {
+            background: #f87171;
+            opacity: 0.8;
+            box-shadow: 0 0 20px rgba(248, 113, 113, 0.06);
+        }
+
+        .bar-label {
+            font-size: 11px;
+            color: #4b5563;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .pie-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 170px;
+            gap: 16px;
+        }
+
+        .pie {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 2px solid rgba(56, 189, 248, 0.06);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.02);
+            transition: background 0.5s ease;
+            flex-shrink: 0;
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .pie-legend span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        /* ----- Рейтинг: критерии ----- */
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 12px 0 8px;
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.06);
+        }
+
+        .criteria-item label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #94a3b8;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .criteria-item input[type="range"] {
+            flex: 1;
+            min-width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .criteria-item input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            border: 2px solid #0b0e1a;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .criteria-item .weight-value {
+            font-weight: 700;
+            font-size: 15px;
+            color: #e2e8f0;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        /* ----- Рейтинг: места ----- */
+        .rank-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(56, 189, 248, 0.1);
+        }
+
+        .rank-1 {
+            background: #fbbf24;
+            color: #0b0e1a;
+            border-color: #fbbf24;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.1);
+        }
+
+        .rank-2 {
+            background: #9ca3af;
+            color: #0b0e1a;
+            border-color: #9ca3af;
+        }
+
+        .rank-3 {
+            background: #d97706;
+            color: #fff;
+            border-color: #d97706;
+        }
+
+        .supplier-name {
+            font-weight: 600;
+        }
+
+        .score-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+            min-width: 60px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #38bdf8, #4ade80);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .score-text {
+            font-weight: 700;
+            font-size: 15px;
+            min-width: 48px;
+            text-align: right;
+            color: #e2e8f0;
+        }
+
+        /* ----- Анкетирование (третья вкладка) ----- */
+        .question-block {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.04);
+        }
+
+        .question-block .q-text {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .question-block .q-options {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .question-block .q-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .question-block .q-options input[type="radio"] {
+            accent-color: #38bdf8;
+            transform: scale(1.1);
+        }
+
+        .survey-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .survey-stat {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(56, 189, 248, 0.04);
+            text-align: center;
+        }
+
+        .survey-stat .sval {
+            font-size: 28px;
+            font-weight: 700;
+            color: #7dd3fc;
+        }
+
+        .survey-stat .slabel {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* ----- Адаптив ----- */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .tabs {
+                align-self: flex-start;
+                flex-wrap: wrap;
+            }
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .row {
+                flex-direction: column;
+            }
+            .form-group {
+                flex: 1 1 100%;
+            }
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                padding: 16px;
+            }
+            body {
+                padding: 12px;
+            }
+            .criteria-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .survey-results {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ----- Скролл ----- */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ШАПКА С ВКЛАДКАМИ ===== -->
+    <div class="header">
+        <h1>
+            <span class="icon">🚀</span> KS Space
+            <span style="font-size:16px;font-weight:400;background:none;-webkit-text-fill-color:initial;color:#64748b;">
+                три проекта
+            </span>
+        </h1>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="tab1">🍔 Калории <span class="badge">IC</span></button>
+            <button class="tab-btn" data-tab="tab2">⭐ Рейтинг <span class="badge">IR</span></button>
+            <button class="tab-btn" data-tab="tab3">📊 Опрос <span class="badge">IQ</span></button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===== ВКЛАДКА 1: УЧЕТ КАЛОРИЙ ===== -->
+    <!-- ============================================================ -->
+    <div class="tab-content active" id="tab1">
+
+        <div class="card">
+            <div class="card-title">➕ Добавить запись</div>
+            <div class="row">
+                <div class="form-group">
+                    <label>📂 Тип</label>
+                    <select id="calType">
+                        <option value="income">🍽️ Еда (приход)</option>
+                        <option value="expense">🏃 Спорт (расход)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📝 Название</label>
+                    <input type="text" id="calName" placeholder="Напр. Омлет, Бег" />
+                </div>
+                <div class="form-group">
+                    <label>🔥 Калории</label>
+                    <input type="number" id="calCalories" placeholder="0" min="0" step="1" />
+                </div>
+                <div class="form-group">
+                    <label>📅 Дата</label>
+                    <input type="date" id="calDate" />
+                </div>
+                <button class="btn btn-primary" id="calAddBtn">➕ Добавить</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="stats-grid" id="calStats">
+                <div class="stat-item income"><div class="number" id="calTotalIncome">0</div><div class="label">🍽️ Приход (еда)</div></div>
+                <div class="stat-item expense"><div class="number" id="calTotalExpense">0</div><div class="label">🏃 Расход (спорт)</div></div>
+                <div class="stat-item balance"><div class="number" id="calBalance">0</div><div class="label">⚖️ Баланс</div></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filter-bar">
+                <label>📅 С: <input type="date" id="calFilterFrom" /></label>
+                <label>По: <input type="date" id="calFilterTo" /></label>
+                <button class="btn btn-outline btn-sm" id="calResetFilter">🔄 Сбросить</button>
+                <span class="spacer"></span>
+                <button class="btn btn-danger btn-sm" id="calClearAll">🗑️ Очистить всё</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Тип</th><th>Название</th><th>Калории</th><th>Дата</th><th style="width:40px;"></th></tr></thead>
+                    <tbody id="calBody"></tbody>
+                </table>
+            </div>
+            <div id="calEmpty" class="empty">Нет записей. Добавьте первую!</div>
+        </div>
+
+        <div class="card">
+            <div class="chart-container">
+                <div class="chart-box">
+                    <h3>📊 Калории по дням</h3>
+                    <div class="bar-chart" id="calBarChart"></div>
+                </div>
+                <div class="chart-box">
+                    <h3>🧩 Соотношение</h3>
+                    <div class="pie-container">
+                        <div class="pie" id="calPieChart"></div>
+                        <div class="pie-legend">
+                            <span><span class="dot" style="background:#4ade80;"></span> Еда</span>
+                            <span><span class="dot" style="background:#f87171;"></span> Спорт</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===== ВКЛАДКА 2: РЕЙТИНГ ПОСТАВЩИКОВ ===== -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab2">
+
+        <div class="card">
+            <div class="card-title">➕ Добавить поставщика</div>
+            <div class="row">
+                <div class="form-group" style="flex:2;">
+                    <label>🏢 Название</label>
+                    <input type="text" id="ratName" placeholder="Напр. ООО ТехноСнаб" />
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>📊 Оценки (0–10)</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;" id="ratScoreInputs"></div>
+                </div>
+                <button class="btn btn-primary" id="ratAddBtn">➕ Добавить</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">⚖️ Веса критериев</div>
+            <div class="criteria-grid" id="ratCriteriaGrid"></div>
+            <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-outline btn-sm" id="ratResetWeights">🔄 Сбросить веса</button>
+                <span style="color:#94a3b8;font-size:13px;align-self:center;">
+                    Сумма: <strong id="ratTotalWeight">100</strong>%
+                </span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                🏆 Рейтинг поставщиков
+                <span style="font-size:14px;font-weight:400;color:#94a3b8;margin-left:auto;">
+                    Всего: <span id="ratCount">0</span>
+                </span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th>Поставщик</th>
+                            <th id="ratHeaders"></th>
+                            <th style="width:120px;">Итог</th>
+                            <th style="width:50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratBody"></tbody>
+                </table>
+            </div>
+            <div id="ratEmpty" class="empty">Нет поставщиков. Добавьте первого!</div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===== ВКЛАДКА 3: АНКЕТИРОВАНИЕ (ОПРОС) ===== -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab3">
+
+        <div class="card">
+            <div class="card-title">📋 Опрос: Оценка удовлетворенности работой</div>
+            <p style="color:#94a3b8;margin-bottom:16px;font-size:14px;">
+                Ответьте на вопросы. Результаты обновляются автоматически.
+            </p>
+
+            <div id="surveyQuestions"></div>
+
+            <button class="btn btn-outline btn-sm" id="surveyReset" style="margin-top:8px;">
+                🔄 Сбросить все ответы
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 Сводные результаты</div>
+            <div class="survey-results" id="surveyResults"></div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===== СКРИПТ ===== -->
+    <!-- ============================================================ -->
+    <script>
+        (function() {
+
+            // ================================================================
+            // 1. ВКЛАДКИ (переключение)
+            // ================================================================
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = {
+                tab1: document.getElementById('tab1'),
+                tab2: document.getElementById('tab2'),
+                tab3: document.getElementById('tab3'),
+            };
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabId = this.dataset.tab;
+                    Object.keys(tabContents).forEach(key => {
+                        tabContents[key].classList.toggle('active', key === tabId);
+                    });
+                    // Обновить графики калорий при переключении
+                    if (tabId === 'tab1') renderCalCharts();
+                    if (tabId === 'tab2') renderRatTable();
+                });
+            });
+
+            // ================================================================
+            // 2. УЧЕТ КАЛОРИЙ
+            // ================================================================
+            const CAL_KEY = 'calorie_data_ks';
+            let calEntries = [];
+            let calFilterFrom = '';
+            let calFilterTo = '';
+
+            function calLoad() {
+                const raw = localStorage.getItem(CAL_KEY);
+                if (raw) { try { calEntries = JSON.parse(raw); } catch (e) { calEntries = []; } } else {
+                    const today = new Date();
+                    const y = today.getFullYear(),
+                        m = String(today.getMonth() + 1).padStart(2, '0'),
+                        d = String(today.getDate()).padStart(2, '0');
+                    const ts = `${y}-${m}-${d}`;
+                    const yest = new Date(today);
+                    yest.setDate(today.getDate() - 1);
+                    const y2 = yest.getFullYear(),
+                        m2 = String(yest.getMonth() + 1).padStart(2, '0'),
+                        d2 = String(yest.getDate()).padStart(2, '0');
+                    const ys = `${y2}-${m2}-${d2}`;
+                    calEntries = [
+                        { id: Date.now() + 1, type: 'income', name: 'Омлет', calories: 350, date: ys },
+                        { id: Date.now() + 2, type: 'income', name: 'Гречка с курицей', calories: 520, date: ts },
+                        { id: Date.now() + 3, type: 'expense', name: 'Бег 5 км', calories: 300, date: ts },
+                        { id: Date.now() + 4, type: 'expense', name: 'Силовая', calories: 250, date: ys },
+                    ];
+                    calSave();
+                }
+                const now = new Date();
+                document.getElementById('calDate').value =
+                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+                calRenderAll();
+            }
+
+            function calSave() { localStorage.setItem(CAL_KEY, JSON.stringify(calEntries)); }
+
+            function calGenId() { return Date.now() + Math.random() * 1000; }
+
+            function calGetFiltered() {
+                return calEntries.filter(e => {
+                    if (calFilterFrom && e.date < calFilterFrom) return false;
+                    if (calFilterTo && e.date > calFilterTo) return false;
+                    return true;
+                });
+            }
+
+            function calRenderAll() {
+                const filtered = calGetFiltered();
+                calRenderStats(filtered);
+                calRenderTable(filtered);
+                calRenderCharts(filtered);
+            }
+
+            function calRenderStats(filtered) {
+                let inc = 0,
+                    exp = 0;
+                filtered.forEach(e => { if (e.type === 'income') inc += e.calories;
+                    else exp += e.calories; });
+                document.getElementById('calTotalIncome').textContent = inc;
+                document.getElementById('calTotalExpense').textContent = exp;
+                const bal = inc - exp;
+                const el = document.getElementById('calBalance');
+                el.textContent = bal;
+                el.style.color = bal >= 0 ? '#4ade80' : '#f87171';
+            }
+
+            function calRenderTable(filtered) {
+                const body = document.getElementById('calBody');
+                const empty = document.getElementById('calEmpty');
+                if (filtered.length === 0) { body.innerHTML = '';
+                    empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                let html = '';
+                const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+                for (const e of sorted) {
+                    const badge = e.type === 'income' ?
+                        '<span class="badge badge-food">🍽️ Еда</span>' :
+                        '<span class="badge badge-sport">🏃 Спорт</span>';
+                    html += `<tr>
+                        <td>${badge}</td>
+                        <td>${escHtml(e.name)}</td>
+                        <td>${e.calories}</td>
+                        <td>${e.date}</td>
+                        <td><button class="delete-btn cal-del" data-id="${e.id}">✕</button></td>
+                    </tr>`;
+                }
+                body.innerHTML = html;
+                document.querySelectorAll('.cal-del').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = Number(this.dataset.id);
+                        calEntries = calEntries.filter(e => e.id !== id);
+                        calSave();
+                        calRenderAll();
+                    });
+                });
+            }
+
+            function calRenderCharts(filtered) {
+                // Бар
+                const dayMap = {};
+                filtered.forEach(e => {
+                    if (!dayMap[e.date]) dayMap[e.date] = { income: 0, expense: 0 };
+                    if (e.type === 'income') dayMap[e.date].income += e.calories;
+                    else dayMap[e.date].expense += e.calories;
+                });
+                const days = Object.keys(dayMap).sort();
+                const maxVal = Math.max(1, ...days.map(d => Math.max(dayMap[d].income, dayMap[d].expense)));
+                let barHtml = '';
+                if (days.length === 0) { barHtml = '<div class="empty" style="padding:10px;">Нет данных</div>'; } else {
+                    for (const d of days) {
+                        const inc = dayMap[d].income,
+                            exp = dayMap[d].expense;
+                        const incH = maxVal > 0 ? (inc / maxVal) * 140 : 0;
+                        const expH = maxVal > 0 ? (exp / maxVal) * 140 : 0;
+                        barHtml += `<div class="bar-wrapper">
+                            <div class="bar bar-income" style="height:${incH}px;"></div>
+                            <div class="bar bar-expense" style="height:${expH}px;"></div>
+                            <div class="bar-label">${d.slice(5)}</div>
+                        </div>`;
+                    }
+                }
+                document.getElementById('calBarChart').innerHTML = barHtml;
+
+                // Pie
+                let totalInc = 0,
+                    totalExp = 0;
+                filtered.forEach(e => { if (e.type === 'income') totalInc += e.calories;
+                    else totalExp += e.calories; });
+                const total = totalInc + totalExp;
+                const pie = document.getElementById('calPieChart');
+                if (total === 0) { pie.style.background = 'rgba(255,255,255,0.04)'; } else {
+                    const deg = (totalInc / total) * 360;
+                    pie.style.background = `conic-gradient(#4ade80 0% ${deg}%, #f87171 ${deg}% 100%)`;
+                }
+            }
+
+            function calRenderChartsWrapper() {
+                calRenderCharts(calGetFiltered());
+            }
+
+            function calAdd() {
+                const type = document.getElementById('calType').value;
+                const name = document.getElementById('calName').value.trim();
+                const calories = parseInt(document.getElementById('calCalories').value);
+                const date = document.getElementById('calDate').value;
+                if (!name) { alert('Введите название!'); return; }
+                if (isNaN(calories) || calories <= 0) { alert('Введите калории > 0!'); return; }
+                if (!date) { alert('Выберите дату!'); return; }
+                calEntries.push({ id: calGenId(), type, name, calories, date });
+                calSave();
+                document.getElementById('calName').value = '';
+                document.getElementById('calCalories').value = '';
+                document.getElementById('calType').value = 'income';
+                calRenderAll();
+                document.getElementById('calName').focus();
+            }
+
+            // События калорий
+            document.getElementById('calAddBtn').addEventListener('click', calAdd);
+            document.getElementById('calResetFilter').addEventListener('click', function() {
+                document.getElementById('calFilterFrom').value = '';
+                document.getElementById('calFilterTo').value = '';
+                calFilterFrom = '';
+                calFilterTo = '';
+                calRenderAll();
+            });
+            document.getElementById('calClearAll').addEventListener('click', function() {
+                if (calEntries.length === 0) return;
+                if (confirm('Удалить все записи?')) { calEntries = [];
+                    calSave();
+                    calRenderAll(); }
+            });
+            document.getElementById('calFilterFrom').addEventListener('change', function() { calFilterFrom = this.value;
+                calRenderAll(); });
+            document.getElementById('calFilterTo').addEventListener('change', function() { calFilterTo = this.value;
+                calRenderAll(); });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.target.closest('#tab1 .card:first-of-type')) calAdd();
+            });
+
+            // ================================================================
+            // 3. РЕЙТИНГ
+            // ================================================================
+            const RAT_KEY = 'rating_suppliers_ks';
+            const CRIT_KEY = 'rating_criteria_ks';
+            const DEF_CRIT = [
+                { id: 'quality', name: 'Качество', weight: 30 },
+                { id: 'price', name: 'Цена', weight: 25 },
+                { id: 'delivery', name: 'Сроки поставки', weight: 20 },
+                { id: 'service', name: 'Сервис', weight: 15 },
+                { id: 'reliability', name: 'Надежность', weight: 10 },
+            ];
+            let ratSuppliers = [];
+            let ratCriteria = [];
+
+            function ratLoad() {
+                const rawCrit = localStorage.getItem(CRIT_KEY);
+                if (rawCrit) { try { ratCriteria = JSON.parse(rawCrit); } catch (e) { ratCriteria = [...DEF_CRIT]; } } else
+                    { ratCriteria = [...DEF_CRIT];
+                    ratSaveCrit(); }
+                const rawSup = localStorage.getItem(RAT_KEY);
+                if (rawSup) { try { ratSuppliers = JSON.parse(rawSup); } catch (e) { ratSuppliers = []; } } else {
+                    ratSuppliers = [
+                        { id: Date.now() + 1, name: 'ООО ТехноСнаб', scores: { quality: 9, price: 7, delivery: 8,
+                                service: 9, reliability: 8 } },
+                        { id: Date.now() + 2, name: 'АО ПромРесурс', scores: { quality: 8, price: 9, delivery: 7,
+                                service: 6, reliability: 7 } },
+                        { id: Date.now() + 3, name: 'ИП СтройМаркет', scores: { quality: 7, price: 8, delivery: 9,
+                                service: 8, reliability: 9 } },
+                    ];
+                    ratSaveSup();
+                }
+                ratRenderAll();
+            }
+
+            function ratSaveSup() { localStorage.setItem(RAT_KEY, JSON.stringify(ratSuppliers)); }
+
+            function ratSaveCrit() { localStorage.setItem(CRIT_KEY, JSON.stringify(ratCriteria)); }
+
+            function ratGenId() { return Date.now() + Math.random() * 1000; }
+
+            function ratCalcScore(scores) {
+                let total = 0,
+                    wSum = 0;
+                for (const c of ratCriteria) {
+                    const val = scores[c.id] || 0;
+                    total += val * c.weight;
+                    wSum += c.weight;
+                }
+                return wSum > 0 ? Math.round((total / wSum) * 10) / 10 : 0;
+            }
+
+            function ratGetRanked() {
+                return ratSuppliers.map(s => ({ ...s, score: ratCalcScore(s.scores) }))
+                    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+            }
+
+            function ratRenderAll() {
+                ratRenderCriteria();
+                ratRenderScoreInputs();
+                ratRenderHeaders();
+                ratRenderTable();
+                ratUpdateTotalWeight();
+            }
+
+            function ratRenderCriteria() {
+                let html = '';
+                for (const c of ratCriteria) {
+                    html += `<div class="criteria-item">
+                        <label>${c.name}</label>
+                        <input type="range" min="0" max="100" value="${c.weight}" data-id="${c.id}" class="rat-slider" />
+                        <span class="weight-value" data-id="${c.id}">${c.weight}%</span>
+                    </div>`;
+                }
+                document.getElementById('ratCriteriaGrid').innerHTML = html;
+                document.querySelectorAll('.rat-slider').forEach(sl => {
+                    sl.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const val = parseInt(this.value);
+                        const item = ratCriteria.find(c => c.id === id);
+                        if (item) { item.weight = val;
+                            document.querySelector(`.weight-value[data-id="${id}"]`).textContent = val + '%';
+                            ratSaveCrit();
+                            ratUpdateTotalWeight();
+                            ratRenderAll(); }
+                    });
+                });
+            }
+
+            function ratRenderScoreInputs() {
+                let html = '';
+                for (const c of ratCriteria) {
+                    html += `<div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.03);padding:4px 10px;border-radius:8px;border:1px solid rgba(56,189,248,0.06);">
+                        <span style="font-size:12px;color:#94a3b8;">${c.name}</span>
+                        <input type="number" min="0" max="10" step="0.5" value="5" 
+                               style="width:50px;padding:4px 4px;border:none;background:transparent;text-align:center;font-weight:600;color:#e2e8f0;outline:none;"
+                               class="rat-score-input" data-id="${c.id}" />
+                    </div>`;
+                }
+                document.getElementById('ratScoreInputs').innerHTML = html;
+            }
+
+            function ratRenderHeaders() {
+                let html = '';
+                for (const c of ratCriteria) {
+                    html +=
+                        `<th style="font-size:11px;text-align:center;">${c.name}<br><span style="font-weight:400;font-size:10px;color:#4b5563;">${c.weight}%</span></th>`;
+                }
+                document.getElementById('ratHeaders').innerHTML = html;
+            }
+
+            function ratRenderTable() {
+                const ranked = ratGetRanked();
+                document.getElementById('ratCount').textContent = ranked.length;
+                const body = document.getElementById('ratBody');
+                const empty = document.getElementById('ratEmpty');
+                if (ranked.length === 0) { body.innerHTML = '';
+                    empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                let html = '';
+                for (let i = 0; i < ranked.length; i++) {
+                    const s = ranked[i];
+                    const rank = i + 1;
+                    let rc = 'rank-number';
+                    if (rank === 1) rc += ' rank-1';
+                    else if (rank === 2) rc += ' rank-2';
+                    else if (rank === 3) rc += ' rank-3';
+                    let scoresHtml = '';
+                    for (const c of ratCriteria) {
+                        const val = s.scores[c.id] || 0;
+                        scoresHtml += `<td style="text-align:center;font-weight:500;">${val.toFixed(1)}</td>`;
+                    }
+                    const barW = Math.min(100, (s.score / 10) * 100);
+                    html += `<tr>
+                        <td><span class="${rc}">${rank}</span></td>
+                        <td class="supplier-name">${escHtml(s.name)}</td>
+                        ${scoresHtml}
+                        <td>
+                            <div class="score-bar-wrap">
+                                <div class="score-bar-bg"><div class="score-bar-fill" style="width:${barW}%;"></div></div>
+                                <span class="score-text">${s.score.toFixed(1)}</span>
+                            </div>
+                        </td>
+                        <td><button class="delete-btn rat-del" data-id="${s.id}">✕</button></td>
+                    </tr>`;
+                }
+                body.innerHTML = html;
+                document.querySelectorAll('.rat-del').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = Number(this.dataset.id);
+                        ratSuppliers = ratSuppliers.filter(s => s.id !== id);
+                        ratSaveSup();
+                        ratRenderAll();
+                    });
+                });
+            }
+
+            function ratUpdateTotalWeight() {
+                const sum = ratCriteria.reduce((a, c) => a + c.weight, 0);
+                const el = document.getElementById('ratTotalWeight');
+                el.textContent = sum;
+                el.style.color = sum === 100 ? '#4ade80' : '#f87171';
+            }
+
+            function ratAdd() {
+                const name = document.getElementById('ratName').value.trim();
+                if (!name) { alert('Введите название!'); return; }
+                const scores = {};
+                document.querySelectorAll('.rat-score-input').forEach(inp => {
+                    const val = parseFloat(inp.value);
+                    scores[inp.dataset.id] = (isNaN(val) || val < 0) ? 0 : Math.min(10, val);
+                });
+                for (const c of ratCriteria) { if (scores[c.id] === undefined) scores[c.id] = 0; }
+                ratSuppliers.push({ id: ratGenId(), name, scores });
+                ratSaveSup();
+                document.getElementById('ratName').value = '';
+                document.querySelectorAll('.rat-score-input').forEach(inp => inp.value = '5');
+                ratRenderAll();
+                document.getElementById('ratName').focus();
+            }
+
+            function ratResetWeights() {
+                const eq = Math.floor(100 / ratCriteria.length);
+                let rem = 100 - eq * ratCriteria.length;
+                for (let i = 0; i < ratCriteria.length; i++) {
+                    ratCriteria[i].weight = eq + (i < rem ? 1 : 0);
+                }
+                ratSaveCrit();
+                ratRenderAll();
+            }
+
+            document.getElementById('ratAddBtn').addEventListener('click', ratAdd);
+            document.getElementById('ratResetWeights').addEventListener('click', ratResetWeights);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.target.closest('#tab2 .card:first-of-type')) ratAdd();
+            });
+
+            // ================================================================
+            // 4. АНКЕТИРОВАНИЕ (ОПРОС)
+            // ================================================================
+            const SURVEY_KEY = 'survey_data_ks';
+            const SURVEY_QUESTIONS = [
+                { id: 'q1', text: 'Как вы оцениваете условия труда?', options: ['Отлично', 'Хорошо', 'Удовлетворительно',
+                        'Плохо'
+                    ] },
+                { id: 'q2', text: 'Удовлетворены ли вы уровнем зарплаты?', options: ['Полностью', 'Частично', 'Не удовлетворен',
+                        'Категорически нет'
+                    ] },
+                { id: 'q3', text: 'Как вы оцениваете коллектив?', options: ['Дружный', 'Нормальный', 'Напряженный',
+                        'Токсичный'
+                    ] },
+                { id: 'q4', text: 'Готовы ли вы рекомендовать компанию друзьям?', options: ['Да', 'Скорее да', 'Скорее нет',
+                        'Нет'
+                    ] },
+            ];
+
+            let surveyAnswers = {};
+
+            function surveyLoad() {
+                const raw = localStorage.getItem(SURVEY_KEY);
+                if (raw) { try { surveyAnswers = JSON.parse(raw); } catch (e) { surveyAnswers = {}; } } else
+                    { surveyAnswers = {}; }
+                surveyRender();
+            }
+
+            function surveySave() { localStorage.setItem(SURVEY_KEY, JSON.stringify(surveyAnswers)); }
+
+            function surveyRender() {
+                // Вопросы
+                let html = '';
+                for (const q of SURVEY_QUESTIONS) {
+                    const selected = surveyAnswers[q.id] || '';
+                    html += `<div class="question-block">
+                        <div class="q-text">${q.text}</div>
+                        <div class="q-options">`;
+                    for (const opt of q.options) {
+                        const checked = selected === opt ? 'checked' : '';
+                        html += `<label>
+                            <input type="radio" name="${q.id}" value="${escHtml(opt)}" ${checked} class="survey-radio" />
+                            ${escHtml(opt)}
+                        </label>`;
+                    }
+                    html += `</div></div>`;
+                }
+                document.getElementById('surveyQuestions').innerHTML = html;
+
+                // События для радио
+                document.querySelectorAll('.survey-radio').forEach(el => {
+                    el.addEventListener('change', function() {
+                        const name = this.name;
+                        const val = this.value;
+                        surveyAnswers[name] = val;
+                        surveySave();
+                        surveyRenderResults();
+                    });
+                });
+
+                surveyRenderResults();
+            }
+
+            function surveyRenderResults() {
+                const container = document.getElementById('surveyResults');
+                let html = '';
+                let total = 0;
+                const counts = {};
+                // Подсчет ответов
+                for (const q of SURVEY_QUESTIONS) {
+                    const ans = surveyAnswers[q.id];
+                    if (ans) {
+                        total++;
+                        if (!counts[ans]) counts[ans] = 0;
+                        counts[ans]++;
+                    }
+                }
+
+                if (total === 0) {
+                    html =
+                        '<div class="survey-stat"><div class="sval">—</div><div class="slabel">Нет ответов</div></div>';
+                } else {
+                    // Самый частый ответ
+                    let maxCount = 0,
+                        maxAns = '';
+                    for (const [key, val] of Object.entries(counts)) {
+                        if (val > maxCount) { maxCount = val;
+                            maxAns = key; }
+                    }
+                    html += `<div class="survey-stat">
+                        <div class="sval">${escHtml(maxAns)}</div>
+                        <div class="slabel">Самый частый ответ (${maxCount}/${total})</div>
+                    </div>`;
+                    html += `<div class="survey-stat">
+                        <div class="sval">${total}</div>
+                        <div class="slabel">Всего ответов</div>
+                    </div>`;
+                    html += `<div class="survey-stat">
+                        <div class="sval">${SURVEY_QUESTIONS.length}</div>
+                        <div class="slabel">Вопросов в опросе</div>
+                    </div>`;
+                    // Процент заполнения
+                    const pct = Math.round((total / SURVEY_QUESTIONS.length) * 100);
+                    html += `<div class="survey-stat">
+                        <div class="sval">${pct}%</div>
+                        <div class="slabel">Заполнено</div>
+                    </div>`;
+                }
+                container.innerHTML = html;
+            }
+
+            document.getElementById('surveyReset').addEventListener('click', function() {
+                if (confirm('Сбросить все ответы?')) {
+                    surveyAnswers = {};
+                    surveySave();
+                    surveyRender();
+                }
+            });
+
+            // ================================================================
+            // 5. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+            // ================================================================
+            function escHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ================================================================
+            // 6. ИНИЦИАЛИЗАЦИЯ
+            // ================================================================
+            calLoad();
+            ratLoad();
+            surveyLoad();
+
+            // Обновление графиков калорий при изменении темы не нужно (тема одна)
+            // Перерисовка калорий при переключении вкладки уже есть
+
+            // Обработка storage из других вкладок
+            window.addEventListener('storage', function(e) {
+                if (e.key === CAL_KEY) { calLoad(); }
+                if (e.key === RAT_KEY || e.key === CRIT_KEY) { ratLoad(); }
+                if (e.key === SURVEY_KEY) { surveyLoad(); }
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
