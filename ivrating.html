@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⭐ Рейтинг поставщиков</title>
+    <style>
+        /* ----- Базовые переменные (светлая тема) ----- */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-card: #ffffff;
+            --bg-input: #f8fafc;
+            --bg-hover: #f1f5f9;
+            --bg-table-alt: #fafbfc;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-focus: #3b82f6;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            --btn-primary: #3b82f6;
+            --btn-primary-hover: #2563eb;
+            --btn-danger: #ef4444;
+            --btn-danger-hover: #dc2626;
+            --btn-outline-border: #3b82f6;
+            --btn-outline-text: #3b82f6;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --rank-gold: #f59e0b;
+            --rank-silver: #94a3b8;
+            --rank-bronze: #cd7f32;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ----- Космическая тема ----- */
+        [data-theme="space"] {
+            --bg-body: #0b0e1a;
+            --bg-card: rgba(18, 25, 45, 0.75);
+            --bg-input: rgba(255, 255, 255, 0.04);
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --bg-table-alt: rgba(255, 255, 255, 0.02);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #4b5563;
+            --border-color: rgba(56, 189, 248, 0.15);
+            --border-focus: rgba(56, 189, 248, 0.5);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(56, 189, 248, 0.05);
+            --btn-primary: transparent;
+            --btn-primary-hover: rgba(56, 189, 248, 0.12);
+            --btn-danger: transparent;
+            --btn-danger-hover: rgba(248, 113, 113, 0.12);
+            --btn-outline-border: rgba(56, 189, 248, 0.4);
+            --btn-outline-text: #38bdf8;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --rank-gold: #fbbf24;
+            --rank-silver: #9ca3af;
+            --rank-bronze: #d97706;
+        }
+
+        /* ----- Общие стили ----- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            padding: 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+            transition: background var(--transition), color var(--transition);
+            min-height: 100vh;
+        }
+
+        /* ----- Шапка ----- */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+            transition: border-color var(--transition);
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1 small {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-left: 6px;
+        }
+
+        .theme-toggle {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 4px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .theme-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 26px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .theme-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .theme-btn.active {
+            background: var(--btn-primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        [data-theme="space"] .theme-btn.active {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.05);
+        }
+
+        .theme-btn .icon {
+            margin-right: 6px;
+        }
+
+        /* ----- Карточки ----- */
+        .card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        [data-theme="space"] .card {
+            border-color: rgba(56, 189, 248, 0.06);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        /* ----- Форма ----- */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1 1 140px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+            transition: color var(--transition);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: all var(--transition);
+            outline: none;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.06);
+            background: var(--bg-card);
+        }
+
+        [data-theme="space"] .form-group input:focus,
+        [data-theme="space"] .form-group select:focus {
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.04);
+        }
+
+        .form-group select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ----- Кнопки ----- */
+        .btn {
+            padding: 10px 28px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--transition);
+            white-space: nowrap;
+            background: var(--btn-primary);
+            color: #fff;
+            letter-spacing: 0.2px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        [data-theme="space"] .btn {
+            background: transparent;
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.25);
+        }
+
+        [data-theme="space"] .btn:hover {
+            background: rgba(56, 189, 248, 0.06);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-primary {
+            background: var(--btn-primary);
+            color: #fff;
+            border-color: var(--btn-primary);
+        }
+
+        [data-theme="space"] .btn-primary {
+            background: rgba(56, 189, 248, 0.1);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        [data-theme="space"] .btn-primary:hover {
+            background: rgba(56, 189, 248, 0.18);
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+
+        .btn-danger {
+            background: var(--btn-danger);
+            color: #fff;
+            border-color: var(--btn-danger);
+        }
+
+        [data-theme="space"] .btn-danger {
+            background: transparent;
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.2);
+        }
+
+        [data-theme="space"] .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.06);
+            border-color: rgba(248, 113, 113, 0.35);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--btn-outline-text);
+            border-color: var(--btn-outline-border);
+        }
+
+        .btn-outline:hover {
+            background: var(--btn-primary);
+            color: #fff;
+            border-color: var(--btn-primary);
+        }
+
+        [data-theme="space"] .btn-outline:hover {
+            background: rgba(56, 189, 248, 0.08);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* ----- Критерии (веса) ----- */
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 12px 0 8px;
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+        }
+
+        .criteria-item label {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .criteria-item input[type="range"] {
+            flex: 1;
+            min-width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: background var(--transition);
+        }
+
+        .criteria-item input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--btn-primary);
+            cursor: pointer;
+            transition: all var(--transition);
+            border: 2px solid var(--bg-card);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="space"] .criteria-item input[type="range"]::-webkit-slider-thumb {
+            background: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .criteria-item .weight-value {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-primary);
+            min-width: 36px;
+            text-align: center;
+        }
+
+        /* ----- Рейтинг (таблица) ----- */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 0 -4px;
+            padding: 0 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: border-color var(--transition), color var(--transition);
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            transition: border-color var(--transition);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: var(--bg-hover);
+        }
+
+        tr:nth-child(even) td {
+            background: var(--bg-table-alt);
+        }
+
+        tr:nth-child(even):hover td {
+            background: var(--bg-hover);
+        }
+
+        .rank-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            transition: all var(--transition);
+        }
+
+        .rank-1 {
+            background: var(--rank-gold);
+            color: #fff;
+            border-color: var(--rank-gold);
+        }
+
+        .rank-2 {
+            background: var(--rank-silver);
+            color: #fff;
+            border-color: var(--rank-silver);
+        }
+
+        .rank-3 {
+            background: var(--rank-bronze);
+            color: #fff;
+            border-color: var(--rank-bronze);
+        }
+
+        .supplier-name {
+            font-weight: 600;
+        }
+
+        .score-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            min-width: 60px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--btn-primary), var(--success));
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        [data-theme="space"] .score-bar-fill {
+            background: linear-gradient(90deg, #38bdf8, #4ade80);
+        }
+
+        .score-text {
+            font-weight: 700;
+            font-size: 15px;
+            min-width: 48px;
+            text-align: right;
+            color: var(--text-primary);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all var(--transition);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.06);
+            transform: scale(1.1);
+        }
+
+        .empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 0;
+            font-style: italic;
+            transition: color var(--transition);
+        }
+
+        .badge-criterion {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* ----- Адаптив ----- */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .theme-toggle {
+                align-self: flex-start;
+            }
+            .row {
+                flex-direction: column;
+            }
+            .form-group {
+                flex: 1 1 100%;
+            }
+            .criteria-grid {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                padding: 16px;
+            }
+            body {
+                padding: 12px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .header h1 small {
+                font-size: 14px;
+                display: block;
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-btn {
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+            .score-bar-wrap {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* ----- Анимация ----- */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* ----- Скролл для космоса ----- */
+        [data-theme="space"] ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        [data-theme="space"] ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        [data-theme="space"] ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.12);
+            border-radius: 10px;
+        }
+
+        [data-theme="space"] ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ----- Шапка ----- -->
+    <div class="header">
+        <h1>
+            ⭐ Рейтинг поставщиков
+            <small>оценка по критериям</small>
+        </h1>
+        <div class="theme-toggle">
+            <button class="theme-btn active" data-theme-value="light" id="themeLight">
+                <span class="icon">☀️</span> Светлая
+            </button>
+            <button class="theme-btn" data-theme-value="space" id="themeSpace">
+                <span class="icon">🌌</span> Космос
+            </button>
+        </div>
+    </div>
+
+    <!-- ----- Добавление поставщика ----- -->
+    <div class="card">
+        <div class="card-title">➕ Добавить поставщика</div>
+        <div class="row">
+            <div class="form-group" style="flex:2;">
+                <label>🏢 Название</label>
+                <input type="text" id="supplierName" placeholder="Напр. ООО ТехноСнаб" />
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>📊 Оценки (0–10)</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;" id="scoreInputs">
+                    <!-- Заполняется JS -->
+                </div>
+            </div>
+            <button class="btn btn-primary" id="addBtn">➕ Добавить</button>
+        </div>
+    </div>
+
+    <!-- ----- Настройка критериев (веса) ----- -->
+    <div class="card">
+        <div class="card-title">⚖️ Веса критериев</div>
+        <div class="criteria-grid" id="criteriaGrid">
+            <!-- Заполняется JS -->
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" id="resetWeightsBtn">🔄 Сбросить веса</button>
+            <span style="color:var(--text-secondary);font-size:13px;align-self:center;">
+                Сумма весов: <strong id="totalWeight">100</strong>%
+            </span>
+        </div>
+    </div>
+
+    <!-- ----- Рейтинг (таблица) ----- -->
+    <div class="card">
+        <div class="card-title">
+            🏆 Рейтинг поставщиков
+            <span style="font-size:14px;font-weight:400;color:var(--text-secondary);margin-left:auto;">
+                Всего: <span id="supplierCount">0</span>
+            </span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:50px;">#</th>
+                        <th>Поставщик</th>
+                        <th id="criteriaHeaders"></th>
+                        <th style="width:120px;">Итог</th>
+                        <th style="width:50px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="suppliersBody"></tbody>
+            </table>
+        </div>
+        <div id="emptyMessage" class="empty">Нет поставщиков. Добавьте первого!</div>
+    </div>
+
+    <script>
+        (function() {
+            // ----- Константы -----
+            const STORAGE_KEY = 'rating_suppliers';
+            const CRITERIA_KEY = 'rating_criteria';
+            const THEME_KEY = 'rating_theme';
+
+            // ----- Критерии по умолчанию -----
+            const DEFAULT_CRITERIA = [
+                { id: 'quality', name: 'Качество', weight: 30 },
+                { id: 'price', name: 'Цена', weight: 25 },
+                { id: 'delivery', name: 'Сроки поставки', weight: 20 },
+                { id: 'service', name: 'Сервис', weight: 15 },
+                { id: 'reliability', name: 'Надежность', weight: 10 },
+            ];
+
+            // ----- Элементы DOM -----
+            const supplierName = document.getElementById('supplierName');
+            const scoreInputs = document.getElementById('scoreInputs');
+            const addBtn = document.getElementById('addBtn');
+            const suppliersBody = document.getElementById('suppliersBody');
+            const emptyMessage = document.getElementById('emptyMessage');
+            const criteriaGrid = document.getElementById('criteriaGrid');
+            const criteriaHeaders = document.getElementById('criteriaHeaders');
+            const totalWeight = document.getElementById('totalWeight');
+            const supplierCount = document.getElementById('supplierCount');
+            const resetWeightsBtn = document.getElementById('resetWeightsBtn');
+            const themeLight = document.getElementById('themeLight');
+            const themeSpace = document.getElementById('themeSpace');
+
+            // ----- Состояние -----
+            let suppliers = [];
+            let criteria = [];
+            let currentTheme = 'light';
+
+            // ----- Тема -----
+            function setTheme(theme) {
+                currentTheme = theme;
+                document.documentElement.setAttribute('data-theme', theme === 'space' ? 'space' : '');
+                localStorage.setItem(THEME_KEY, theme);
+                themeLight.classList.toggle('active', theme === 'light');
+                themeSpace.classList.toggle('active', theme === 'space');
+            }
+
+            function loadTheme() {
+                const saved = localStorage.getItem(THEME_KEY);
+                setTheme(saved === 'space' ? 'space' : 'light');
+            }
+
+            themeLight.addEventListener('click', () => setTheme('light'));
+            themeSpace.addEventListener('click', () => setTheme('space'));
+
+            // ----- Загрузка / сохранение -----
+            function loadData() {
+                // Критерии
+                const savedCriteria = localStorage.getItem(CRITERIA_KEY);
+                if (savedCriteria) {
+                    try { criteria = JSON.parse(savedCriteria); } catch (e) { criteria = [...DEFAULT_CRITERIA]; }
+                } else {
+                    criteria = [...DEFAULT_CRITERIA];
+                    saveCriteria();
+                }
+
+                // Поставщики
+                const savedSuppliers = localStorage.getItem(STORAGE_KEY);
+                if (savedSuppliers) {
+                    try { suppliers = JSON.parse(savedSuppliers); } catch (e) { suppliers = []; }
+                } else {
+                    // Демо-данные
+                    suppliers = [
+                        { id: Date.now() + 1, name: 'ООО ТехноСнаб', scores: { quality: 9, price: 7, delivery: 8,
+                                service: 9, reliability: 8 } },
+                        { id: Date.now() + 2, name: 'АО ПромРесурс', scores: { quality: 8, price: 9, delivery: 7,
+                                service: 6, reliability: 7 } },
+                        { id: Date.now() + 3, name: 'ИП СтройМаркет', scores: { quality: 7, price: 8, delivery: 9,
+                                service: 8, reliability: 9 } },
+                    ];
+                    saveSuppliers();
+                }
+                renderAll();
+            }
+
+            function saveSuppliers() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(suppliers));
+            }
+
+            function saveCriteria() {
+                localStorage.setItem(CRITERIA_KEY, JSON.stringify(criteria));
+            }
+
+            function genId() { return Date.now() + Math.random() * 1000; }
+
+            // ----- Расчет рейтинга -----
+            function calculateScore(scores) {
+                let total = 0;
+                let weightSum = 0;
+                for (const c of criteria) {
+                    const val = scores[c.id] || 0;
+                    total += val * c.weight;
+                    weightSum += c.weight;
+                }
+                return weightSum > 0 ? Math.round((total / weightSum) * 10) / 10 : 0;
+            }
+
+            function getSuppliersWithScore() {
+                return suppliers.map(s => ({
+                    ...s,
+                    score: calculateScore(s.scores)
+                })).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+            }
+
+            // ----- Рендер -----
+            function renderAll() {
+                renderCriteria();
+                renderScoreInputs();
+                renderTable();
+                renderHeaders();
+                updateTotalWeight();
+            }
+
+            function renderCriteria() {
+                let html = '';
+                for (const c of criteria) {
+                    html += `
+                        <div class="criteria-item">
+                            <label>${c.name}</label>
+                            <input type="range" min="0" max="100" value="${c.weight}" 
+                                   data-id="${c.id}" class="weight-slider" />
+                            <span class="weight-value" data-id="${c.id}">${c.weight}%</span>
+                        </div>
+                    `;
+                }
+                criteriaGrid.innerHTML = html;
+
+                // События для слайдеров
+                document.querySelectorAll('.weight-slider').forEach(slider => {
+                    slider.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const val = parseInt(this.value);
+                        const item = criteria.find(c => c.id === id);
+                        if (item) {
+                            item.weight = val;
+                            document.querySelector(`.weight-value[data-id="${id}"]`).textContent = val + '%';
+                            saveCriteria();
+                            updateTotalWeight();
+                            renderTable();
+                            renderHeaders();
+                        }
+                    });
+                });
+            }
+
+            function renderScoreInputs() {
+                let html = '';
+                for (const c of criteria) {
+                    html += `
+                        <div style="display:flex;align-items:center;gap:4px;background:var(--bg-input);padding:4px 10px;border-radius:8px;border:1px solid var(--border-color);">
+                            <span style="font-size:12px;color:var(--text-secondary);">${c.name}</span>
+                            <input type="number" min="0" max="10" step="0.5" value="5" 
+                                   style="width:50px;padding:4px 4px;border:none;background:transparent;text-align:center;font-weight:600;color:var(--text-primary);outline:none;"
+                                   class="score-input" data-id="${c.id}" />
+                        </div>
+                    `;
+                }
+                scoreInputs.innerHTML = html;
+            }
+
+            function renderHeaders() {
+                let html = '';
+                for (const c of criteria) {
+                    html += `<th style="font-size:11px;text-align:center;">${c.name}<br><span style="font-weight:400;font-size:10px;color:var(--text-muted);">${c.weight}%</span></th>`;
+                }
+                criteriaHeaders.innerHTML = html;
+            }
+
+            function renderTable() {
+                const ranked = getSuppliersWithScore();
+                supplierCount.textContent = ranked.length;
+
+                if (ranked.length === 0) {
+                    suppliersBody.innerHTML = '';
+                    emptyMessage.style.display = 'block';
+                    return;
+                }
+                emptyMessage.style.display = 'none';
+
+                let html = '';
+                for (let i = 0; i < ranked.length; i++) {
+                    const s = ranked[i];
+                    const rank = i + 1;
+                    let rankClass = 'rank-number';
+                    if (rank === 1) rankClass += ' rank-1';
+                    else if (rank === 2) rankClass += ' rank-2';
+                    else if (rank === 3) rankClass += ' rank-3';
+
+                    // Оценки по критериям
+                    let scoresHtml = '';
+                    for (const c of criteria) {
+                        const val = s.scores[c.id] || 0;
+                        scoresHtml += `<td style="text-align:center;font-weight:500;">${val.toFixed(1)}</td>`;
+                    }
+
+                    const barWidth = Math.min(100, (s.score / 10) * 100);
+
+                    html += `
+                        <tr>
+                            <td><span class="${rankClass}">${rank}</span></td>
+                            <td class="supplier-name">${escapeHtml(s.name)}</td>
+                            ${scoresHtml}
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <div class="score-bar-bg">
+                                        <div class="score-bar-fill" style="width:${barWidth}%;"></div>
+                                    </div>
+                                    <span class="score-text">${s.score.toFixed(1)}</span>
+                                </div>
+                            </td>
+                            <td><button class="delete-btn" data-id="${s.id}">✕</button></td>
+                        </tr>
+                    `;
+                }
+                suppliersBody.innerHTML = html;
+
+                // Обработчики удаления
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = Number(this.dataset.id);
+                        suppliers = suppliers.filter(s => s.id !== id);
+                        saveSuppliers();
+                        renderAll();
+                    });
+                });
+            }
+
+            function updateTotalWeight() {
+                const sum = criteria.reduce((acc, c) => acc + c.weight, 0);
+                totalWeight.textContent = sum;
+                // Подсветка если сумма != 100
+                totalWeight.style.color = sum === 100 ? 'var(--success)' : 'var(--danger)';
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ----- Добавление поставщика -----
+            function addSupplier() {
+                const name = supplierName.value.trim();
+                if (!name) { alert('Введите название поставщика!'); return; }
+
+                const scores = {};
+                document.querySelectorAll('.score-input').forEach(input => {
+                    const val = parseFloat(input.value);
+                    scores[input.dataset.id] = (isNaN(val) || val < 0) ? 0 : Math.min(10, val);
+                });
+
+                // Проверка: все ли критерии оценены
+                for (const c of criteria) {
+                    if (scores[c.id] === undefined) scores[c.id] = 0;
+                }
+
+                suppliers.push({
+                    id: genId(),
+                    name: name,
+                    scores: scores
+                });
+                saveSuppliers();
+                supplierName.value = '';
+                // Сбросить оценки на 5
+                document.querySelectorAll('.score-input').forEach(inp => inp.value = '5');
+                renderAll();
+                supplierName.focus();
+            }
+
+            // ----- Сброс весов -----
+            function resetWeights() {
+                const equalWeight = Math.floor(100 / criteria.length);
+                let remainder = 100 - equalWeight * criteria.length;
+                for (let i = 0; i < criteria.length; i++) {
+                    criteria[i].weight = equalWeight + (i < remainder ? 1 : 0);
+                }
+                saveCriteria();
+                renderAll();
+            }
+
+            // ----- Инициализация -----
+            loadTheme();
+            loadData();
+
+            // ----- События -----
+            addBtn.addEventListener('click', addSupplier);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.target.closest('.card:first-of-type')) {
+                    addSupplier();
+                }
+            });
+
+            resetWeightsBtn.addEventListener('click', resetWeights);
+
+            // Обновление при изменении данных в других вкладках
+            window.addEventListener('storage', function(e) {
+                if (e.key === STORAGE_KEY || e.key === CRITERIA_KEY) {
+                    loadData();
+                }
+            });
+
+            // Перерисовка при смене темы (для баров)
+            const themeObserver = new MutationObserver(() => {
+                renderTable();
+            });
+            themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+        })();
+    </script>
+
+</body>
+</html>
