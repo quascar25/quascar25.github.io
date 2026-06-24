@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⭐ Конвертер видео/аудио</title>
     <style>
-        /* === КОСМИЧЕСКИЙ ДИЗАЙН === */
+        /* === ВЕСЬ КОСМИЧЕСКИЙ ДИЗАЙН (ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ) === */
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +24,6 @@
             overflow: hidden;
         }
         
-        /* === ЗВЕЗДНЫЙ ФОН === */
         body::before {
             content: '';
             position: fixed;
@@ -488,7 +487,7 @@
         <div class="error-message" id="errorMessage"></div>
     </div>
 
-    <!-- Подключаем FFmpeg.wasm (локально!) -->
+    <!-- Подключаем FFmpeg.wasm -->
     <script type="importmap">
         {
             "imports": {
@@ -529,9 +528,10 @@
                 
                 ffmpeg = new FFmpeg();
                 
-                // === ИСПОЛЬЗУЕМ ЛОКАЛЬНЫЙ ИСТОЧНИК ===
-                // Файлы должны лежать в папке ffmpeg-core рядом с file.html
-                const baseURL = 'https://cdnjs.cloudflare.com/ajax/libs/ffmpeg-core/0.11.0';
+                // === ВСТАВЬТЕ СВОИ ССЫЛКИ С ЯНДЕКС.ДИСКА ===
+                // ВАЖНО: Ссылки должны быть ПРЯМЫМИ (заканчиваться на .js и .wasm)
+                const baseURL = 'https://downloader.disk.yandex.ru/NU3DhzC-dojDCQ';
+                //const baseURL = 'https://disk.yandex.ru/d/NU3DhzC-dojDCQ?dl=1';
                 
                 await ffmpeg.load({
                     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
@@ -543,7 +543,7 @@
             } catch (error) {
                 console.error('Ошибка загрузки FFmpeg:', error);
                 statusMessage.textContent = '❌ ОШИБКА ЗАГРУЗКИ';
-                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте папку ffmpeg-core';
+                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте ссылки на Яндекс.Диске';
                 return false;
             }
         }
@@ -703,7 +703,7 @@
             URL.revokeObjectURL(url);
         });
 
-        console.log('🚀 КОСМОКОНВЕРТЕР АКТИВИРОВАН (ЛОКАЛЬНЫЙ РЕЖИМ)');
+        console.log('🚀 КОСМОКОНВЕРТЕР АКТИВИРОВАН');
     </script>
 </body>
 </html>
