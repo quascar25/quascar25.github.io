@@ -55,7 +55,7 @@
             100% { opacity: 0.7; }
         }
         
-        /* === ОСНОВНОЙ КОНТЕЙНЕР (как иллюминатор) === */
+        /* === ОСНОВНОЙ КОНТЕЙНЕР === */
         .container {
             background: linear-gradient(145deg, #1a2940 0%, #0f1a2e 100%);
             border: 2px solid #2a4a6a;
@@ -71,7 +71,6 @@
             backdrop-filter: blur(5px);
         }
         
-        /* Декоративный уголок (как в космических кораблях) */
         .container::before {
             content: '◆';
             position: absolute;
@@ -92,7 +91,6 @@
             text-shadow: 0 0 10px rgba(74, 138, 186, 0.5);
         }
         
-        /* === ЗАГОЛОВКИ === */
         h1 {
             font-size: 22px;
             color: #8ab8e8;
@@ -120,7 +118,6 @@
             padding-bottom: 15px;
         }
         
-        /* === ЗОНА ЗАГРУЗКИ ФАЙЛА (как посадочная площадка) === */
         .file-upload {
             border: 2px dashed #2a4a6a;
             border-radius: 16px;
@@ -172,7 +169,6 @@
             font-family: 'Courier New', monospace;
         }
         
-        /* === ВЫБОР ФОРМАТА === */
         .format-section {
             margin: 25px 0;
         }
@@ -219,7 +215,6 @@
             position: relative;
         }
         
-        /* Эффект "резиновой кнопки" */
         .format-option label::before {
             content: '';
             position: absolute;
@@ -256,7 +251,6 @@
             opacity: 1;
         }
         
-        /* === КНОПКА "ОК" (РЕЗИНОВАЯ КЛАВИША) === */
         .convert-btn {
             width: 100%;
             padding: 18px;
@@ -279,7 +273,6 @@
             text-shadow: 0 0 20px rgba(74, 138, 186, 0.2);
         }
         
-        /* Эффект нажатия (резиновая кнопка) */
         .convert-btn:active:not(:disabled) {
             transform: translateY(4px);
             box-shadow: 
@@ -303,7 +296,6 @@
             box-shadow: 0 2px 0 #0a1520;
         }
         
-        /* Светодиодный индикатор */
         .convert-btn::after {
             content: '●';
             position: absolute;
@@ -327,7 +319,6 @@
             50% { opacity: 0.3; }
         }
         
-        /* === ПРОГРЕСС === */
         .progress-section {
             margin-top: 20px;
             display: none;
@@ -373,7 +364,6 @@
             letter-spacing: 1px;
         }
         
-        /* === КНОПКА СКАЧИВАНИЯ === */
         .download-section {
             margin-top: 20px;
             display: none;
@@ -420,7 +410,6 @@
                 0 0 40px rgba(0, 255, 136, 0.15);
         }
         
-        /* === ОШИБКИ === */
         .error-message {
             color: #ff4466;
             text-align: center;
@@ -430,7 +419,6 @@
             text-shadow: 0 0 20px rgba(255, 68, 102, 0.2);
         }
         
-        /* === АДАПТИВ === */
         @media (max-width: 480px) {
             .container {
                 padding: 20px;
@@ -501,12 +489,12 @@
         <div class="error-message" id="errorMessage"></div>
     </div>
 
-    <!-- Подключаем FFmpeg.wasm -->
+    <!-- Подключаем FFmpeg.wasm с РАБОТАЮЩЕГО CDN -->
     <script type="importmap">
         {
             "imports": {
-                "@ffmpeg/ffmpeg": "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js",
-                "@ffmpeg/util": "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js"
+                "@ffmpeg/ffmpeg": "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js",
+                "@ffmpeg/util": "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js"
             }
         }
     </script>
@@ -542,7 +530,9 @@
                 
                 ffmpeg = new FFmpeg();
                 
-                const baseURL = 'https://cdnjs.cloudflare.com/ajax/libs/ffmpeg/0.12.10';
+                // ИСПОЛЬЗУЕМ РАБОТАЮЩИЙ CDN С FFMPEG.CORE
+                // Загружаем с официального репозитория через jsdelivr
+                const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
                 
                 await ffmpeg.load({
                     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
