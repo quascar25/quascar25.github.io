@@ -532,7 +532,9 @@
                 // ВАЖНО: Ссылки должны быть ПРЯМЫМИ (заканчиваться на .js и .wasm)
                // const baseURL = 'https://downloader.disk.yandex.ru/NU3DhzC-dojDCQ';
                 //const baseURL = 'https://disk.yandex.ru/d/NU3DhzC-dojDCQ?dl=1';
-                const baseURL = 'https://corsproxy.io/?https://downloader.disk.yandex.ru/NU3DhzC-dojDCQ';
+                //const baseURL = 'https://corsproxy.io/?https://downloader.disk.yandex.ru/NU3DhzC-dojDCQ';
+
+                const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
                 
                 await ffmpeg.load({
                     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
