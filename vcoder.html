@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⭐ Конвертер видео/аудио ⭐</title>
+    <title>⭐⭐ Конвертер видео/аудио ⭐⭐</title>
     <style>
-        /* === ВЕСЬ КОСМИЧЕСКИЙ ДИЗАЙН (ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ) === */
+        /* === КОСМИЧЕСКИЙ ДИЗАЙН === */
         * {
             margin: 0;
             padding: 0;
@@ -499,7 +499,7 @@
 
     <script type="module">
         import { FFmpeg } from '@ffmpeg/ffmpeg';
-        import { fetchFile, toBlobURL } from '@ffmpeg/util';
+        import { fetchFile } from '@ffmpeg/util';
 
         // DOM элементы
         const fileInput = document.getElementById('fileInput');
@@ -528,18 +528,12 @@
                 
                 ffmpeg = new FFmpeg();
                 
-                // === ВСТАВЬТЕ СВОИ ССЫЛКИ С ЯНДЕКС.ДИСКА ===
-                // ВАЖНО: Ссылки должны быть ПРЯМЫМИ (заканчиваться на .js и .wasm)
-               //const baseURL = 'https://downloader.disk.yandex.ru/NU3DhzC-dojDCQ';
-                //const baseURL = 'https://disk.yandex.ru/d/NU3DhzC-dojDCQ?dl=1';
-                //const baseURL = 'https://corsproxy.io/?https://downloader.disk.yandex.ru/NU3DhzC-dojDCQ';
-
-                // const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+                // === ПРЯМАЯ ЗАГРУЗКА БЕЗ toBlobURL ===
                 const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
                 
                 await ffmpeg.load({
-                    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-                    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+                    coreURL: `${baseURL}/ffmpeg-core.js`,
+                    wasmURL: `${baseURL}/ffmpeg-core.wasm`,
                 });
                 
                 statusMessage.textContent = '✅ FFMPEG ЗАГРУЖЕН';
@@ -547,7 +541,7 @@
             } catch (error) {
                 console.error('Ошибка загрузки FFmpeg:', error);
                 statusMessage.textContent = '❌ ОШИБКА ЗАГРУЗКИ';
-                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте ссылки на Яндекс.Диске';
+                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте соединение.';
                 return false;
             }
         }
