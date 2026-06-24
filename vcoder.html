@@ -24,7 +24,7 @@
             overflow: hidden;
         }
         
-        /* === ЗВЕЗДНЫЙ ФОН (анимированный) === */
+        /* === ЗВЕЗДНЫЙ ФОН === */
         body::before {
             content: '';
             position: fixed;
@@ -55,7 +55,6 @@
             100% { opacity: 0.7; }
         }
         
-        /* === ОСНОВНОЙ КОНТЕЙНЕР === */
         .container {
             background: linear-gradient(145deg, #1a2940 0%, #0f1a2e 100%);
             border: 2px solid #2a4a6a;
@@ -489,7 +488,7 @@
         <div class="error-message" id="errorMessage"></div>
     </div>
 
-    <!-- Подключаем FFmpeg.wasm с РАБОТАЮЩЕГО CDN -->
+    <!-- Подключаем FFmpeg.wasm (локально!) -->
     <script type="importmap">
         {
             "imports": {
@@ -530,15 +529,9 @@
                 
                 ffmpeg = new FFmpeg();
                 
-                // ИСПОЛЬЗУЕМ РАБОТАЮЩИЙ CDN С FFMPEG.CORE
-                // Загружаем с официального репозитория через jsdelivr
-               // const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
-
-                                // Вариант 1: Использовать другой CDN
-                const baseURL = 'https://unpkg.zhimg.com/@ffmpeg/core@0.12.6/dist/esm';
-                
-                // Вариант 2: Использовать более старую версию
-               // const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/esm';
+                // === ИСПОЛЬЗУЕМ ЛОКАЛЬНЫЙ ИСТОЧНИК ===
+                // Файлы должны лежать в папке ffmpeg-core рядом с file.html
+                const baseURL = 'https://cdnjs.cloudflare.com/ajax/libs/ffmpeg-core/0.11.0';
                 
                 await ffmpeg.load({
                     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
@@ -550,7 +543,7 @@
             } catch (error) {
                 console.error('Ошибка загрузки FFmpeg:', error);
                 statusMessage.textContent = '❌ ОШИБКА ЗАГРУЗКИ';
-                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте соединение.';
+                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте папку ffmpeg-core';
                 return false;
             }
         }
@@ -710,7 +703,7 @@
             URL.revokeObjectURL(url);
         });
 
-        console.log('🚀 КОСМОКОНВЕРТЕР АКТИВИРОВАН');
+        console.log('🚀 КОСМОКОНВЕРТЕР АКТИВИРОВАН (ЛОКАЛЬНЫЙ РЕЖИМ)');
     </script>
 </body>
 </html>
