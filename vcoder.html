@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конвертер видео/аудио</title>
+    <title>⭐ Конвертер видео/аудио</title>
     <style>
+        /* === КОСМИЧЕСКИЙ ДИЗАЙН === */
         * {
             margin: 0;
             padding: 0;
@@ -12,57 +13,137 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #020617 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
         
+        /* === ЗВЕЗДНЫЙ ФОН (анимированный) === */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 300px 200px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 400px 100px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 500px 300px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 600px 50px, #fff, rgba(0,0,0,0));
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: twinkle 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+        
+        /* === ОСНОВНОЙ КОНТЕЙНЕР (как иллюминатор) === */
         .container {
-            background: white;
-            border-radius: 20px;
+            background: linear-gradient(145deg, #1a2940 0%, #0f1a2e 100%);
+            border: 2px solid #2a4a6a;
+            border-radius: 24px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 520px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 0 30px rgba(0, 100, 255, 0.15),
+                inset 0 0 60px rgba(0, 50, 150, 0.1),
+                0 20px 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+            backdrop-filter: blur(5px);
         }
         
+        /* Декоративный уголок (как в космических кораблях) */
+        .container::before {
+            content: '◆';
+            position: absolute;
+            top: -8px;
+            left: 20px;
+            color: #4a8aba;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(74, 138, 186, 0.5);
+        }
+        
+        .container::after {
+            content: '◆';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            color: #4a8aba;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(74, 138, 186, 0.5);
+        }
+        
+        /* === ЗАГОЛОВКИ === */
         h1 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 22px;
+            color: #8ab8e8;
+            margin-bottom: 8px;
             text-align: center;
+            text-shadow: 0 0 20px rgba(74, 138, 186, 0.3);
+            letter-spacing: 4px;
+            font-weight: 400;
+            text-transform: uppercase;
+        }
+        
+        h1 span {
+            color: #ffd700;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
         }
         
         .subtitle {
             text-align: center;
-            color: #666;
+            color: #5a7a9a;
             margin-bottom: 30px;
-            font-size: 14px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            font-weight: 300;
+            border-bottom: 1px solid rgba(74, 138, 186, 0.15);
+            padding-bottom: 15px;
         }
         
+        /* === ЗОНА ЗАГРУЗКИ ФАЙЛА (как посадочная площадка) === */
         .file-upload {
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 40px 20px;
+            border: 2px dashed #2a4a6a;
+            border-radius: 16px;
+            padding: 35px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             margin-bottom: 25px;
             position: relative;
+            background: rgba(20, 40, 70, 0.3);
         }
         
         .file-upload:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            border-color: #4a8aba;
+            background: rgba(30, 60, 100, 0.4);
+            box-shadow: 0 0 30px rgba(74, 138, 186, 0.1);
+            transform: scale(1.01);
         }
         
         .file-upload.dragover {
-            border-color: #667eea;
-            background: #f0f3ff;
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
             transform: scale(1.02);
         }
         
@@ -71,32 +152,39 @@
         }
         
         .file-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
+            font-size: 40px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 10px rgba(74, 138, 186, 0.3));
         }
         
         .file-name {
-            color: #333;
-            font-weight: 500;
+            color: #8ab8e8;
+            font-weight: 400;
             word-break: break-all;
+            font-size: 14px;
+            letter-spacing: 1px;
         }
         
         .file-size {
-            color: #999;
-            font-size: 13px;
+            color: #4a6a8a;
+            font-size: 12px;
             margin-top: 5px;
+            font-family: 'Courier New', monospace;
         }
         
+        /* === ВЫБОР ФОРМАТА === */
         .format-section {
             margin: 25px 0;
         }
         
         .format-label {
             display: block;
-            color: #555;
-            font-weight: 500;
-            margin-bottom: 10px;
-            font-size: 14px;
+            color: #6a9aba;
+            font-weight: 300;
+            margin-bottom: 12px;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         
         .format-options {
@@ -115,54 +203,131 @@
         
         .format-option label {
             display: block;
-            padding: 12px 8px;
+            padding: 12px 6px;
             text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border: 2px solid #1a3a5a;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 14px;
-            color: #555;
+            font-weight: 400;
+            font-size: 13px;
+            color: #6a8aaa;
+            background: rgba(10, 20, 40, 0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
         }
         
-        .format-option input[type="radio"]:checked + label {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        /* Эффект "резиновой кнопки" */
+        .format-option label::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 14px;
+            padding: 2px;
+            background: linear-gradient(135deg, #2a5a7a, #0a1a3a);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         
         .format-option label:hover {
-            border-color: #667eea;
+            border-color: #3a6a8a;
+            color: #8ab8e8;
             transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 50, 100, 0.2);
         }
         
+        .format-option input[type="radio"]:checked + label {
+            border-color: #ffd700;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.08);
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.1),
+                inset 0 0 20px rgba(255, 215, 0, 0.05);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        .format-option input[type="radio"]:checked + label::before {
+            opacity: 1;
+        }
+        
+        /* === КНОПКА "ОК" (РЕЗИНОВАЯ КЛАВИША) === */
         .convert-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
+            padding: 18px;
+            background: linear-gradient(180deg, #1a3a5a 0%, #0a1a30 100%);
+            color: #8ab8e8;
+            border: 2px solid #2a5a7a;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 400;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            position: relative;
+            box-shadow: 
+                0 6px 0 #0a1520,
+                0 8px 20px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 20px rgba(74, 138, 186, 0.2);
+        }
+        
+        /* Эффект нажатия (резиновая кнопка) */
+        .convert-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 
+                0 2px 0 #0a1520,
+                0 8px 20px rgba(0, 0, 0, 0.5);
         }
         
         .convert-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(180deg, #2a4a6a 0%, #0a1a30 100%);
+            border-color: #4a8aba;
+            box-shadow: 
+                0 6px 0 #0a1520,
+                0 0 40px rgba(74, 138, 186, 0.2);
+            color: #aac8e8;
         }
         
         .convert-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.3;
             cursor: not-allowed;
-            transform: none;
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0a1520;
         }
         
+        /* Светодиодный индикатор */
+        .convert-btn::after {
+            content: '●';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff88;
+            font-size: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .convert-btn:disabled::after {
+            color: #ff4444;
+            animation: none;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* === ПРОГРЕСС === */
         .progress-section {
             margin-top: 20px;
             display: none;
@@ -174,36 +339,41 @@
         
         .progress-bar-bg {
             width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
+            height: 6px;
+            background: #0a1a2a;
+            border-radius: 3px;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 12px;
+            border: 1px solid #1a3a5a;
         }
         
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #2a6a9a, #4a8aba, #6aaada);
             width: 0%;
             transition: width 0.3s ease;
-            border-radius: 4px;
+            border-radius: 3px;
+            box-shadow: 0 0 20px rgba(74, 138, 186, 0.3);
         }
         
         .progress-text {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            color: #5a7a9a;
             margin-top: 8px;
+            font-family: 'Courier New', monospace;
         }
         
         .status-message {
             text-align: center;
-            color: #666;
-            font-size: 14px;
+            color: #6a8aaa;
+            font-size: 13px;
             margin-top: 10px;
+            letter-spacing: 1px;
         }
         
+        /* === КНОПКА СКАЧИВАНИЯ === */
         .download-section {
             margin-top: 20px;
             display: none;
@@ -215,31 +385,52 @@
         }
         
         .download-btn {
-            padding: 12px 30px;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 14px 35px;
+            background: linear-gradient(180deg, #1a4a3a 0%, #0a2a20 100%);
+            color: #00ff88;
+            border: 2px solid #00aa66;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 400;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-block;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 
+                0 6px 0 #0a1a15,
+                0 8px 20px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+        
+        .download-btn:active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 2px 0 #0a1a15,
+                0 8px 20px rgba(0, 0, 0, 0.5);
         }
         
         .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(180deg, #2a5a4a 0%, #0a2a20 100%);
+            border-color: #00ff88;
+            box-shadow: 
+                0 6px 0 #0a1a15,
+                0 0 40px rgba(0, 255, 136, 0.15);
         }
         
+        /* === ОШИБКИ === */
         .error-message {
-            color: #ef4444;
+            color: #ff4466;
             text-align: center;
-            margin-top: 10px;
-            font-size: 14px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px rgba(255, 68, 102, 0.2);
         }
         
+        /* === АДАПТИВ === */
         @media (max-width: 480px) {
             .container {
                 padding: 20px;
@@ -248,25 +439,28 @@
             .format-options {
                 grid-template-columns: 1fr 1fr;
             }
+            
+            h1 {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎬 Конвертер видео/аудио</h1>
-        <p class="subtitle">Обработка файлов прямо в браузере</p>
+        <h1>🚀 <span>КОСМО</span>КОНВЕРТЕР</h1>
+        <div class="subtitle">▸ СИСТЕМА ОБРАБОТКИ МЕДИАФАЙЛОВ ◂</div>
         
-        <!-- Выбор файла -->
         <div class="file-upload" id="fileDropZone">
-            <div class="file-icon">📁</div>
-            <div class="file-name" id="fileName">Выберите файл</div>
-            <div class="file-size" id="fileSize">или перетащите его сюда</div>
+            <div class="file-icon">🛸</div>
+            <div class="file-name" id="fileName">ЗАГРУЗИТЕ ФАЙЛ</div>
+            <div class="file-size" id="fileSize">или переместите в зону захвата</div>
             <input type="file" id="fileInput" accept=".mp4,.avi,.mkv,.mov,.wmv,.flv,.webm,.mp3,.wav,.aac,.flac,.ogg">
         </div>
         
-        <!-- Выбор формата -->
         <div class="format-section">
-            <label class="format-label">Выберите выходной формат:</label>
+            <label class="format-label">⬡ ВЫБОР ФОРМАТА</label>
             <div class="format-options">
                 <div class="format-option">
                     <input type="radio" name="format" id="formatMp4" value="mp4" checked>
@@ -287,30 +481,27 @@
             </div>
         </div>
         
-        <!-- Кнопка конвертации -->
-        <button class="convert-btn" id="convertBtn" disabled>ОК</button>
+        <button class="convert-btn" id="convertBtn" disabled>ЗАПУСК</button>
         
-        <!-- Прогресс -->
         <div class="progress-section" id="progressSection">
             <div class="progress-bar-bg">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
             <div class="progress-text">
                 <span id="progressPercent">0%</span>
-                <span id="progressTime">Обработка...</span>
+                <span id="progressTime">ОБРАБОТКА...</span>
             </div>
-            <div class="status-message" id="statusMessage">Загрузка FFmpeg...</div>
+            <div class="status-message" id="statusMessage">ЗАГРУЗКА FFMPEG...</div>
         </div>
         
-        <!-- Скачивание -->
         <div class="download-section" id="downloadSection">
-            <button class="download-btn" id="downloadBtn">📥 Скачать файл</button>
+            <button class="download-btn" id="downloadBtn">⬇ СКАЧАТЬ</button>
         </div>
         
         <div class="error-message" id="errorMessage"></div>
     </div>
 
-    <!-- Подключаем FFmpeg.wasm с другого CDN -->
+    <!-- Подключаем FFmpeg.wasm -->
     <script type="importmap">
         {
             "imports": {
@@ -344,15 +535,13 @@
         let outputFileName = '';
         let ffmpeg = null;
 
-        // Инициализация FFmpeg с использованием Cloudflare CDN
         async function initFFmpeg() {
             try {
-                statusMessage.textContent = '⏳ Загрузка FFmpeg (около 30MB)...';
+                statusMessage.textContent = '⏳ ЗАГРУЗКА FFMPEG (30MB)...';
                 progressSection.classList.add('active');
                 
                 ffmpeg = new FFmpeg();
                 
-                // Используем Cloudflare CDN вместо unpkg
                 const baseURL = 'https://cdnjs.cloudflare.com/ajax/libs/ffmpeg/0.12.10';
                 
                 await ffmpeg.load({
@@ -360,29 +549,27 @@
                     wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
                 });
                 
-                statusMessage.textContent = '✅ FFmpeg загружен!';
+                statusMessage.textContent = '✅ FFMPEG ЗАГРУЖЕН';
                 return true;
             } catch (error) {
                 console.error('Ошибка загрузки FFmpeg:', error);
-                statusMessage.textContent = '❌ Ошибка загрузки FFmpeg';
-                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте интернет-соединение.';
+                statusMessage.textContent = '❌ ОШИБКА ЗАГРУЗКИ';
+                errorMessage.textContent = 'Не удалось загрузить FFmpeg. Проверьте соединение.';
                 return false;
             }
         }
 
-        // Обработка выбора файла
         function handleFile(file) {
             if (!file) return;
             
             selectedFile = file;
-            fileName.textContent = file.name;
+            fileName.textContent = file.name.toUpperCase();
             fileSize.textContent = formatFileSize(file.size);
             convertBtn.disabled = false;
             errorMessage.textContent = '';
             downloadSection.classList.remove('active');
             convertedData = null;
             
-            // Определяем формат по умолчанию
             const ext = file.name.split('.').pop().toLowerCase();
             const formatMap = {
                 'mp4': 'mp4',
@@ -396,7 +583,6 @@
             }
         }
 
-        // Drag and drop
         fileDropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             fileDropZone.classList.add('dragover');
@@ -426,7 +612,6 @@
             }
         });
 
-        // Форматирование размера
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -434,13 +619,11 @@
             return (bytes / 1073741824).toFixed(1) + ' GB';
         }
 
-        // Получение выбранного формата
         function getSelectedFormat() {
             const radio = document.querySelector('input[name="format"]:checked');
             return radio ? radio.value : 'mp4';
         }
 
-        // Конвертация
         convertBtn.addEventListener('click', async () => {
             if (!selectedFile) return;
             
@@ -451,7 +634,6 @@
             convertedData = null;
             
             try {
-                // Инициализируем FFmpeg если нужно
                 if (!ffmpeg) {
                     const loaded = await initFFmpeg();
                     if (!loaded) {
@@ -463,38 +645,28 @@
                 progressSection.classList.add('active');
                 progressBar.style.width = '0%';
                 progressPercent.textContent = '0%';
-                statusMessage.textContent = '⏳ Чтение файла...';
+                statusMessage.textContent = '⏳ ЧТЕНИЕ ФАЙЛА...';
                 
-                // Читаем файл
                 const fileData = await fetchFile(selectedFile);
                 const inputName = 'input.' + selectedFile.name.split('.').pop();
                 const outputName = `output.${format}`;
                 
                 ffmpeg.writeFile(inputName, fileData);
                 
-                statusMessage.textContent = '⏳ Конвертация...';
+                statusMessage.textContent = '⏳ КОНВЕРТАЦИЯ...';
                 
-                // Формируем команду FFmpeg
                 let args = ['-i', inputName];
                 
-                // Если выходной формат аудио (mp3, wav)
                 if (format === 'mp3' || format === 'wav') {
-                    // Извлекаем аудио
                     args.push('-vn');
                     args.push('-acodec', format === 'mp3' ? 'libmp3lame' : 'pcm_s16le');
-                    
-                    // Для MP3 устанавливаем качество (по умолчанию)
                     if (format === 'mp3') {
-                        args.push('-q:a', '2'); // Высокое качество (~190 kbps)
+                        args.push('-q:a', '2');
                     }
                 } else {
-                    // Для видео (mp4, avi) - сохраняем качество исходника
-                    args.push('-c:v', 'copy'); // Копируем видео без перекодирования
-                    args.push('-c:a', 'copy'); // Копируем аудио без перекодирования
-                    
-                    // Для AVI нужен другой контейнер
+                    args.push('-c:v', 'copy');
+                    args.push('-c:a', 'copy');
                     if (format === 'avi') {
-                        // Если исходник не AVI, перекодируем в совместимый формат
                         args = ['-i', inputName];
                         args.push('-c:v', 'libx264');
                         args.push('-c:a', 'aac');
@@ -503,37 +675,31 @@
                 }
                 
                 args.push(outputName);
-                
-                // Выполняем конвертацию
                 await ffmpeg.exec(args);
                 
-                statusMessage.textContent = '⏳ Чтение результата...';
+                statusMessage.textContent = '⏳ ЧТЕНИЕ РЕЗУЛЬТАТА...';
                 
-                // Читаем результат
                 const data = await ffmpeg.readFile(outputName);
                 convertedData = data;
                 outputFileName = selectedFile.name.replace(/\.[^.]+$/, '') + '.' + format;
                 
-                // Показываем кнопку скачивания
                 downloadSection.classList.add('active');
-                statusMessage.textContent = '✅ Готово!';
+                statusMessage.textContent = '✅ ГОТОВО!';
                 progressBar.style.width = '100%';
                 progressPercent.textContent = '100%';
                 
-                // Очищаем временные файлы
                 ffmpeg.deleteFile(inputName);
                 ffmpeg.deleteFile(outputName);
                 
             } catch (error) {
                 console.error('Ошибка конвертации:', error);
-                errorMessage.textContent = '❌ Ошибка: ' + (error.message || 'Неизвестная ошибка');
-                statusMessage.textContent = '❌ Ошибка конвертации';
+                errorMessage.textContent = '❌ ОШИБКА: ' + (error.message || 'Неизвестная ошибка');
+                statusMessage.textContent = '❌ ОШИБКА КОНВЕРТАЦИИ';
             } finally {
                 convertBtn.disabled = false;
             }
         });
 
-        // Скачивание
         downloadBtn.addEventListener('click', () => {
             if (!convertedData) return;
             
@@ -548,8 +714,7 @@
             URL.revokeObjectURL(url);
         });
 
-        // Инициализация при загрузке
-        console.log('Приложение готово! Выберите файл для конвертации.');
+        console.log('🚀 КОСМОКОНВЕРТЕР АКТИВИРОВАН');
     </script>
 </body>
 </html>
