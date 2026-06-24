@@ -532,7 +532,13 @@
                 
                 // ИСПОЛЬЗУЕМ РАБОТАЮЩИЙ CDN С FFMPEG.CORE
                 // Загружаем с официального репозитория через jsdelivr
-                const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+               // const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+
+                                // Вариант 1: Использовать другой CDN
+                const baseURL = 'https://unpkg.zhimg.com/@ffmpeg/core@0.12.6/dist/esm';
+                
+                // Вариант 2: Использовать более старую версию
+               // const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/esm';
                 
                 await ffmpeg.load({
                     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
