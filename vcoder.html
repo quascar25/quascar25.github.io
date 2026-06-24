@@ -310,12 +310,12 @@
         <div class="error-message" id="errorMessage"></div>
     </div>
 
-    <!-- Подключаем FFmpeg.wasm -->
+    <!-- Подключаем FFmpeg.wasm с другого CDN -->
     <script type="importmap">
         {
             "imports": {
-                "@ffmpeg/ffmpeg": "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js",
-                "@ffmpeg/util": "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js"
+                "@ffmpeg/ffmpeg": "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js",
+                "@ffmpeg/util": "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js"
             }
         }
     </script>
@@ -344,7 +344,7 @@
         let outputFileName = '';
         let ffmpeg = null;
 
-        // Инициализация FFmpeg
+        // Инициализация FFmpeg с использованием Cloudflare CDN
         async function initFFmpeg() {
             try {
                 statusMessage.textContent = '⏳ Загрузка FFmpeg (около 30MB)...';
@@ -352,8 +352,9 @@
                 
                 ffmpeg = new FFmpeg();
                 
-                // Загружаем FFmpeg из CDN
-                const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+                // Используем Cloudflare CDN вместо unpkg
+                const baseURL = 'https://cdnjs.cloudflare.com/ajax/libs/ffmpeg/0.12.10';
+                
                 await ffmpeg.load({
                     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
                     wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
