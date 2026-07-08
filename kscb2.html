@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ключевая ставка ЦБ РФ_2</title>
+    <title>Ключевая ставка ЦБ РФ_3</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         html, body {
             width: 100%;
             height: 100%;
@@ -22,7 +21,6 @@
             overflow: hidden;
             touch-action: none;
         }
-
         .container {
             display: flex;
             justify-content: center;
@@ -31,7 +29,6 @@
             height: 100%;
             padding: 20px;
         }
-
         .frame {
             border: 1.5px solid rgba(255, 255, 255, 0.8);
             border-radius: 8px;
@@ -44,7 +41,6 @@
             background-color: transparent;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.03);
         }
-
         .rate {
             color: #ffffff;
             font-size: clamp(48px, 15vw, 120px);
@@ -53,27 +49,22 @@
             text-align: center;
             line-height: 1.2;
             user-select: none;
-            -webkit-user-select: none;
         }
-
         .percent {
             font-size: 0.6em;
             font-weight: 300;
             margin-left: 2px;
         }
-
         .loading {
             color: rgba(255, 255, 255, 0.3);
             font-size: 18px;
             font-weight: 300;
             animation: pulse 1.5s ease-in-out infinite;
         }
-
         @keyframes pulse {
             0%, 100% { opacity: 0.3; }
             50% { opacity: 0.8; }
         }
-
         .update-info {
             position: fixed;
             bottom: 20px;
@@ -86,12 +77,10 @@
             letter-spacing: 0.5px;
             pointer-events: none;
         }
-
         .error-text {
             color: rgba(255, 255, 255, 0.3);
             font-size: 0.4em;
         }
-
         @media (max-width: 400px) {
             .frame {
                 padding: 25px 35px;
@@ -99,10 +88,6 @@
                 min-height: 90px;
                 border-width: 1px;
             }
-        }
-
-        .frame {
-            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
@@ -114,7 +99,6 @@
             </div>
         </div>
     </div>
-
     <div class="update-info" id="updateInfo">загрузка...</div>
 
     <script>
@@ -125,48 +109,22 @@
             const updateInfo = document.getElementById('updateInfo');
             let isFetching = false;
 
-            // ----- ГЛАВНЫЙ ИСТОЧНИК: ОФИЦИАЛЬНЫЙ SOAP API ЦБ РФ -----
-            // Документация: http://www.cbr.ru/dailyinfowebserv/dailyinfo.asmx?op=KeyRateXML
-            // Не требует токенов, возвращает XML с динамикой ключевой ставки
+            // ----- НОВЫЙ ИСТОЧНИК: СТРАНИЦА ИСТОРИИ СТАВОК НА САЙТЕ ЦБ РФ -----
+            // Страница: http://www.cbr.ru/hd_base/KeyRate/
+            // Содержит таблицу со всеми ставками, включая актуальную.
+            // Запрашиваем через прокси для обхода CORS.
 
             async function fetchKeyRate() {
                 if (isFetching) return;
                 isFetching = true;
 
                 try {
-                    // SOAP-запрос к официальному сервису ЦБ РФ
-                    // Запрашиваем ставки за последние 90 дней, чтобы получить актуальную
-                    const now = new Date();
-                    const threeMonthsAgo = new Date(now);
-                    threeMonthsAgo.setDate(now.getDate() - 90);
-
-                    const fromDate = threeMonthsAgo.toISOString().split('T')[0];
-                    const toDate = now.toISOString().split('T')[0];
-
-                    const soapBody = `<?xml version="1.0" encoding="utf-8"?>
-                        <soap:Envelope 
-                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-                            xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-                            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                            <soap:Body>
-                                <KeyRateXML xmlns="http://web.cbr.ru/">
-                                    <fromDate>${fromDate}</fromDate>
-                                    <ToDate>${toDate}</ToDate>
-                                </KeyRateXML>
-                            </soap:Body>
-                        </soap:Envelope>`;
-
                     // Используем прокси для обхода CORS
                     const response = await fetch(
                         'https://api.allorigins.win/raw?url=' +
-                        encodeURIComponent('http://www.cbr.ru/dailyinfowebserv/dailyinfo.asmx'),
+                        encodeURIComponent('https://www.cbr.ru/hd_base/KeyRate/'),
                         {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'text/xml; charset=utf-8',
-                                'SOAPAction': 'http://web.cbr.ru/KeyRateXML'
-                            },
-                            body: soapBody
+                            method: 'GET'
                         }
                     );
 
@@ -174,63 +132,47 @@
                         throw new Error(`HTTP ${response.status}`);
                     }
 
-                    const xmlText = await response.text();
+                    const html = await response.text();
 
-                    // Парсим XML ответ
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-
-                    // Ищем все элементы KeyRate
-                    const keyRateElements = xmlDoc.getElementsByTagName('KeyRate');
-
-                    if (keyRateElements.length === 0) {
-                        throw new Error('Ставки не найдены в ответе');
-                    }
-
-                    // Берём последнюю (самую актуальную) ставку
-                    const lastElement = keyRateElements[keyRateElements.length - 1];
-                    
-                    // Парсим значение ставки (ищем внутри элемента)
-                    const rateText = lastElement.textContent || '';
-                    const rateMatch = rateText.match(/(\d+[,.]?\d*)/);
-                    
+                    // Парсим HTML: ищем строку "Ключевая ставка" и число с %
+                    // Пример: "Ключевая ставка, установленная Банком России с 22 июня 2026 г. ... 14,25 %"
                     let rate = null;
                     let date = null;
 
+                    // Ищем процентную ставку
+                    const rateMatch = html.match(/Ключевая ставка[^0-9]*([0-9,]+)\s*%/i);
                     if (rateMatch && rateMatch[1]) {
                         rate = parseFloat(rateMatch[1].replace(',', '.'));
                     }
 
-                    // Парсим дату начала действия ставки (атрибут или текст)
-                    // Ищем дату в формате DD.MM.YYYY или YYYY-MM-DD
-                    const dateMatch = rateText.match(/(\d{2}\.\d{2}\.\d{4})|(\d{4}-\d{2}-\d{2})/);
-                    if (dateMatch) {
-                        date = dateMatch[0];
+                    // Ищем дату введения ставки
+                    const dateMatch = html.match(/с\s+(\d{2}\s+\w+\s+\d{4})\s+г\.?/i);
+                    if (dateMatch && dateMatch[1]) {
+                        date = dateMatch[1];
                     }
 
                     if (rate !== null && !isNaN(rate) && rate > 0) {
                         displayRate(rate, date);
                     } else {
-                        // Если парсинг не удался, пробуем резервный вариант
-                        await fetchFallbackAPI();
+                        // Если парсинг не удался, пробуем запасной источник
+                        await fetchSecondarySource();
                     }
 
                 } catch (error) {
-                    console.warn('SOAP API не сработал:', error);
-                    await fetchFallbackAPI();
+                    console.warn('Основной источник не сработал:', error);
+                    await fetchSecondarySource();
                 } finally {
                     isFetching = false;
                 }
             }
 
-            // ----- РЕЗЕРВНЫЙ ИСТОЧНИК: XML-фид ЦБ РФ (DailyInfo) -----
-            async function fetchFallbackAPI() {
+            // ----- ЗАПАСНОЙ ИСТОЧНИК: ТА ЖЕ СТРАНИЦА, НО ЧЕРЕЗ ДРУГОЙ ПРОКСИ -----
+            async function fetchSecondarySource() {
                 try {
-                    // Используем другой публичный эндпоинт ЦБ РФ
-                    // Он возвращает XML с курсами и ставками
+                    // Используем другой прокси-сервис
                     const response = await fetch(
-                        'https://api.allorigins.win/raw?url=' +
-                        encodeURIComponent('http://www.cbr.ru/scripts/XML_daily.asp'),
+                        'https://corsproxy.io/?' +
+                        encodeURIComponent('https://www.cbr.ru/hd_base/KeyRate/'),
                         {
                             method: 'GET'
                         }
@@ -240,64 +182,28 @@
                         throw new Error(`HTTP ${response.status}`);
                     }
 
-                    const xmlText = await response.text();
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                    const html = await response.text();
 
-                    // В этом XML нет прямой ключевой ставки, но есть дата
-                    // Показываем дату и сообщение
-                    const dateAttr = xmlDoc.documentElement.getAttribute('Date');
-                    if (dateAttr) {
-                        updateInfo.textContent = `данные ЦБ РФ от ${dateAttr}`;
+                    // Тот же парсинг
+                    let rate = null;
+                    let date = null;
+
+                    const rateMatch = html.match(/Ключевая ставка[^0-9]*([0-9,]+)\s*%/i);
+                    if (rateMatch && rateMatch[1]) {
+                        rate = parseFloat(rateMatch[1].replace(',', '.'));
                     }
 
-                    // Пробуем третий источник
-                    await fetchThirdSource();
-
-                } catch (error) {
-                    console.warn('Резервный API не сработал:', error);
-                    await fetchThirdSource();
-                }
-            }
-
-            // ----- ТРЕТИЙ ИСТОЧНИК: XML с ключевой ставкой (альтернативный) -----
-            async function fetchThirdSource() {
-                try {
-                    // Прямой запрос к XML-фиду с ключевой ставкой
-                    const response = await fetch(
-                        'https://api.allorigins.win/raw?url=' +
-                        encodeURIComponent('http://www.cbr.ru/dailyinfowebserv/dailyinfo.asmx/KeyRateXML?fromDate=2026-01-01&ToDate=2026-12-31'),
-                        {
-                            method: 'GET'
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
+                    const dateMatch = html.match(/с\s+(\d{2}\s+\w+\s+\d{4})\s+г\.?/i);
+                    if (dateMatch && dateMatch[1]) {
+                        date = dateMatch[1];
                     }
 
-                    const xmlText = await response.text();
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-
-                    // Ищем ставку
-                    const keyRateElements = xmlDoc.getElementsByTagName('KeyRate');
-                    if (keyRateElements.length > 0) {
-                        const lastElement = keyRateElements[keyRateElements.length - 1];
-                        const rateText = lastElement.textContent || '';
-                        const rateMatch = rateText.match(/(\d+[,.]?\d*)/);
-                        
-                        if (rateMatch && rateMatch[1]) {
-                            const rate = parseFloat(rateMatch[1].replace(',', '.'));
-                            if (rate > 0) {
-                                displayRate(rate, '2026');
-                                return;
-                            }
-                        }
+                    if (rate !== null && !isNaN(rate) && rate > 0) {
+                        displayRate(rate, date);
+                    } else {
+                        // Если ничего не нашли
+                        throw new Error('Данные не найдены');
                     }
-
-                    // Если ничего не нашли
-                    throw new Error('Данные не найдены');
 
                 } catch (error) {
                     console.error('Все источники недоступны:', error);
@@ -306,7 +212,7 @@
                 }
             }
 
-            // ----- ОТОБРАЖЕНИЕ -----
+            // ----- ОТОБРАЖЕНИЕ ДАННЫХ -----
             function displayRate(rate, date) {
                 if (rate !== null && !isNaN(rate) && rate > 0) {
                     const formatted = parseFloat(rate.toFixed(2));
@@ -316,7 +222,7 @@
                 }
 
                 if (date) {
-                    updateInfo.textContent = `актуально на ${date}`;
+                    updateInfo.textContent = `актуально с ${date}`;
                 } else {
                     const now = new Date();
                     updateInfo.textContent = `актуально на ${now.toLocaleDateString('ru-RU')}`;
@@ -355,11 +261,6 @@
 
                 // Клик для ручного обновления
                 document.addEventListener('click', refreshRate);
-
-                // Блокировка скролла
-                document.addEventListener('touchmove', (e) => {
-                    if (e.target === document.body) e.preventDefault();
-                }, { passive: false });
 
                 console.log('📊 Ключевая ставка РФ — приложение загружено');
                 console.log('🔄 Кликните по экрану для обновления');
