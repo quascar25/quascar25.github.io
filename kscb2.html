@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ключевая ставка ЦБ РФ</title>
+    <title>Ключевая ставка ЦБ РФ_66</title>
     <style>
         * {
             margin: 0;
@@ -47,7 +47,6 @@
             transition: opacity 0.5s ease, transform 0.3s ease;
         }
 
-        /* Анимация при обновлении */
         .frame.updating {
             opacity: 0.5;
             transform: scale(0.97);
@@ -83,29 +82,36 @@
             50% { opacity: 0.8; }
         }
 
-        /* Информационная строка внизу — все тексты белые */
+        /* ----- ИНФОРМАЦИОННАЯ СТРОКА СВЕТЛО-СЕРАЯ И УВЕЛИЧЕННАЯ ----- */
         .info-line {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             left: 0;
             right: 0;
             text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
+            color: rgba(200, 200, 200, 0.7);
+            font-size: 18px;
             font-weight: 300;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             pointer-events: none;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 2.0;
         }
 
         .info-line .date {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(200, 200, 200, 0.5);
+            font-size: 0.9em;
+        }
+
+        .info-line .next-meeting {
+            color: rgba(200, 200, 200, 0.35);
+            font-size: 0.75em;
+            margin-top: 4px;
         }
 
         .info-line .forecast {
-            color: rgba(255, 255, 255, 0.25);
-            font-size: 11px;
+            color: rgba(200, 200, 200, 0.3);
+            font-size: 0.85em;
             margin-top: 2px;
         }
 
@@ -117,7 +123,7 @@
             color: rgba(255, 100, 100, 0.5) !important;
         }
         .forecast.steady {
-            color: rgba(255, 255, 255, 0.25) !important;
+            color: rgba(200, 200, 200, 0.3) !important;
         }
 
         .error-text {
@@ -133,8 +139,9 @@
                 border-width: 1px;
             }
             .info-line {
-                font-size: 11px;
-                bottom: 20px;
+                font-size: 15px;
+                bottom: 30px;
+                line-height: 1.8;
             }
         }
 
@@ -154,6 +161,7 @@
 
     <div class="info-line" id="infoLine">
         <div class="date" id="dateDisplay">загрузка...</div>
+        <div class="next-meeting" id="nextMeetingDisplay"></div>
         <div class="forecast" id="forecastDisplay"></div>
     </div>
 
@@ -163,6 +171,7 @@
 
             const rateDisplay = document.getElementById('rateDisplay');
             const dateDisplay = document.getElementById('dateDisplay');
+            const nextMeetingDisplay = document.getElementById('nextMeetingDisplay');
             const forecastDisplay = document.getElementById('forecastDisplay');
             const frame = document.getElementById('frame');
             let isFetching = false;
@@ -171,12 +180,13 @@
             // ----- АДРЕС ВАШЕГО WORKER (ЗАМЕНИТЕ!) -----
             const WORKER_URL = 'https://silent-cherry-6c61.quascar20.workers.dev/';
 
+            // ----- ДАТА СЛЕДУЮЩЕГО ЗАСЕДАНИЯ (ИЗВЕСТНАЯ ИНФОРМАЦИЯ) -----
+            // По данным Trading Economics и макропрогнозу ЦБ, следующее заседание — 24 июля 2026
+            const NEXT_MEETING = new Date(2026, 6, 24); // 24 июля 2026
+
             // ----- ФУНКЦИЯ ПРОГНОЗА -----
-            // Используем данные Trading Economics: ожидание ставки 14% на заседании 24 июля [citation:13]
-            // Если текущая ставка (14.25%) выше прогноза (14%) → прогнозируем снижение на 0.25
-            // Можно также использовать прогнозы из макропрогноза ЦБ: диапазон 14.0–14.5% на 2026 год [citation:14]
             function generateForecast(currentRate) {
-                // Прогноз на следующее заседание (24 июля 2026) — снижение до 14% [citation:13]
+                // Прогноз Trading Economics: ожидание ставки 14% на заседании 24 июля 
                 const forecastRate = 14.0;
                 const diff = currentRate - forecastRate;
 
@@ -202,12 +212,22 @@
                 };
             }
 
+            // ----- ФОРМАТИРОВАНИЕ ДАТЫ -----
+            function formatDate(dateObj) {
+                if (!dateObj || isNaN(dateObj.getTime())) return null;
+                const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                                'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                const day = dateObj.getDate();
+                const month = months[dateObj.getMonth()];
+                const year = dateObj.getFullYear();
+                return `${day} ${month} ${year}`;
+            }
+
             // ----- ПОЛУЧЕНИЕ ДАННЫХ С ВАШЕГО WORKER -----
             async function fetchKeyRate() {
                 if (isFetching) return;
                 isFetching = true;
 
-                // Анимация начала обновления
                 frame.classList.add('updating');
 
                 try {
@@ -236,10 +256,10 @@
                     console.error('Ошибка получения данных:', error);
                     rateDisplay.innerHTML = '<span class="error-text">нет данных</span>';
                     dateDisplay.textContent = 'проверьте соединение';
+                    nextMeetingDisplay.textContent = '';
                     forecastDisplay.textContent = '';
                 } finally {
                     isFetching = false;
-                    // Анимация завершения
                     setTimeout(() => {
                         frame.classList.remove('updating');
                     }, 300);
@@ -252,17 +272,11 @@
                 const formatted = parseFloat(rate.toFixed(2));
                 rateDisplay.innerHTML = `${formatted}<span class="percent">%</span>`;
 
-                // Показываем дату (белым текстом)
+                // 1. Дата текущей ставки
                 if (date) {
-                    // Форматируем дату из строки "2026-06-22" в "с 22 июня 2026"
                     const dateObj = new Date(date);
                     if (!isNaN(dateObj.getTime())) {
-                        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-                                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-                        const day = dateObj.getDate();
-                        const month = months[dateObj.getMonth()];
-                        const year = dateObj.getFullYear();
-                        dateDisplay.textContent = `с ${day} ${month} ${year}`;
+                        dateDisplay.textContent = `с ${formatDate(dateObj)}`;
                     } else {
                         dateDisplay.textContent = `с ${date}`;
                     }
@@ -271,7 +285,13 @@
                     dateDisplay.textContent = `актуально на ${now.toLocaleDateString('ru-RU')}`;
                 }
 
-                // ---- ГЕНЕРАЦИЯ ПРОГНОЗА ----
+                // 2. Дата следующего заседания (всегда показываем)
+                const nextDateFormatted = formatDate(NEXT_MEETING);
+                if (nextDateFormatted) {
+                    nextMeetingDisplay.textContent = `следующее заседание ЦБ: ${nextDateFormatted}`;
+                }
+
+                // 3. Прогноз
                 const forecast = generateForecast(rate);
                 forecastDisplay.textContent = forecast.text;
                 forecastDisplay.className = 'forecast ' + forecast.direction;
@@ -281,6 +301,7 @@
             function showLoading() {
                 rateDisplay.innerHTML = '<span class="loading">···</span>';
                 dateDisplay.textContent = 'загрузка...';
+                nextMeetingDisplay.textContent = '';
                 forecastDisplay.textContent = '';
                 forecastDisplay.className = 'forecast';
             }
@@ -289,6 +310,7 @@
                 if (!navigator.onLine) {
                     rateDisplay.innerHTML = '<span class="error-text">нет соединения</span>';
                     dateDisplay.textContent = 'проверьте интернет';
+                    nextMeetingDisplay.textContent = '';
                     forecastDisplay.textContent = '';
                     return;
                 }
