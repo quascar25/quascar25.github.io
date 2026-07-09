@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ключевая ставка ЦБ РФ_66</title>
+    <title>Ключевая ставка ЦБ РФ</title>
     <style>
         * {
             margin: 0;
@@ -23,38 +23,64 @@
             touch-action: none;
         }
 
+        /* ----- ФОН С КАРТИНКОЙ ----- */
+        body {
+            background-image: url('seyf.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Полупрозрачный слой поверх картинки для читаемости */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .container {
+            position: relative;
+            z-index: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             width: 100%;
             height: 100%;
-            padding: 20px;
-            flex-direction: column;
+            padding: 30px;
+            gap: 30px;
         }
 
-        .frame {
-            border: 1.5px solid rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            padding: 40px 60px;
+        /* ----- ВЕРХНИЙ ЧЕРНЫЙ ПРЯМОУГОЛЬНИК (СТАВКА) ----- */
+        .frame-top {
+            background-color: rgba(0, 0, 0, 0.75);
+            border-radius: 12px;
+            padding: 20px 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-width: 200px;
-            min-height: 120px;
-            background-color: transparent;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.03);
+            min-width: 160px;
+            min-height: 80px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             transition: opacity 0.5s ease, transform 0.3s ease;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
-        .frame.updating {
+        .frame-top.updating {
             opacity: 0.5;
             transform: scale(0.97);
         }
 
         .rate {
             color: #ffffff;
-            font-size: clamp(48px, 15vw, 120px);
+            font-size: clamp(36px, 10vw, 80px);
             font-weight: 300;
             letter-spacing: 2px;
             text-align: center;
@@ -72,7 +98,7 @@
 
         .loading {
             color: rgba(255, 255, 255, 0.3);
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 300;
             animation: pulse 1.5s ease-in-out infinite;
         }
@@ -82,15 +108,26 @@
             50% { opacity: 0.8; }
         }
 
-        /* ----- ИНФОРМАЦИОННАЯ СТРОКА СВЕТЛО-СЕРАЯ И УВЕЛИЧЕННАЯ ----- */
+        /* ----- НИЖНИЙ ЧЕРНЫЙ ПРЯМОУГОЛЬНИК (ИНФОРМАЦИЯ) ----- */
+        .frame-bottom {
+            background-color: rgba(0, 0, 0, 0.75);
+            border-radius: 12px;
+            padding: 18px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-width: 200px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
         .info-line {
-            position: fixed;
-            bottom: 40px;
-            left: 0;
-            right: 0;
             text-align: center;
-            color: rgba(200, 200, 200, 0.7);
-            font-size: 18px;
+            color: rgba(220, 220, 220, 0.85);
+            font-size: 22px;
             font-weight: 300;
             letter-spacing: 0.5px;
             pointer-events: none;
@@ -99,31 +136,31 @@
         }
 
         .info-line .date {
-            color: rgba(200, 200, 200, 0.5);
+            color: rgba(220, 220, 220, 0.65);
             font-size: 0.9em;
         }
 
         .info-line .next-meeting {
-            color: rgba(200, 200, 200, 0.35);
+            color: rgba(220, 220, 220, 0.5);
             font-size: 0.75em;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .info-line .forecast {
-            color: rgba(200, 200, 200, 0.3);
+            color: rgba(220, 220, 220, 0.4);
             font-size: 0.85em;
             margin-top: 2px;
         }
 
         /* Прогноз — зелёный для снижения, красный для повышения, серый для без изменений */
         .forecast.down {
-            color: rgba(100, 255, 100, 0.5) !important;
+            color: rgba(100, 255, 100, 0.6) !important;
         }
         .forecast.up {
-            color: rgba(255, 100, 100, 0.5) !important;
+            color: rgba(255, 100, 100, 0.6) !important;
         }
         .forecast.steady {
-            color: rgba(200, 200, 200, 0.3) !important;
+            color: rgba(220, 220, 220, 0.4) !important;
         }
 
         .error-text {
@@ -131,38 +168,88 @@
             font-size: 0.4em;
         }
 
-        @media (max-width: 400px) {
-            .frame {
-                padding: 25px 35px;
-                min-width: 150px;
-                min-height: 90px;
-                border-width: 1px;
+        /* ----- АДАПТАЦИЯ ПОД МАЛЕНЬКИЕ ЭКРАНЫ ----- */
+        @media (max-width: 480px) {
+            .frame-top {
+                padding: 14px 28px;
+                min-width: 120px;
+                min-height: 60px;
+                border-radius: 10px;
             }
+
+            .rate {
+                font-size: clamp(30px, 8vw, 60px);
+            }
+
+            .frame-bottom {
+                padding: 14px 20px;
+                min-width: 160px;
+                border-radius: 10px;
+            }
+
             .info-line {
-                font-size: 15px;
-                bottom: 30px;
+                font-size: 17px;
                 line-height: 1.8;
+            }
+
+            .container {
+                gap: 20px;
+                padding: 20px;
             }
         }
 
-        .frame {
+        @media (max-width: 360px) {
+            .frame-top {
+                padding: 10px 20px;
+                min-width: 100px;
+                min-height: 50px;
+            }
+
+            .rate {
+                font-size: clamp(24px, 7vw, 44px);
+            }
+
+            .frame-bottom {
+                padding: 10px 16px;
+                min-width: 140px;
+            }
+
+            .info-line {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .container {
+                gap: 15px;
+                padding: 15px;
+            }
+        }
+
+        .frame-top, .frame-bottom {
             -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
 <body>
+    <!-- Полупрозрачный слой поверх картинки -->
+    <div class="overlay"></div>
+
     <div class="container">
-        <div class="frame" id="frame">
+        <!-- Верхний прямоугольник: ставка -->
+        <div class="frame-top" id="frameTop">
             <div class="rate" id="rateDisplay">
                 <span class="loading">···</span>
             </div>
         </div>
-    </div>
 
-    <div class="info-line" id="infoLine">
-        <div class="date" id="dateDisplay">загрузка...</div>
-        <div class="next-meeting" id="nextMeetingDisplay"></div>
-        <div class="forecast" id="forecastDisplay"></div>
+        <!-- Нижний прямоугольник: информация -->
+        <div class="frame-bottom" id="frameBottom">
+            <div class="info-line">
+                <div class="date" id="dateDisplay">загрузка...</div>
+                <div class="next-meeting" id="nextMeetingDisplay"></div>
+                <div class="forecast" id="forecastDisplay"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -173,20 +260,18 @@
             const dateDisplay = document.getElementById('dateDisplay');
             const nextMeetingDisplay = document.getElementById('nextMeetingDisplay');
             const forecastDisplay = document.getElementById('forecastDisplay');
-            const frame = document.getElementById('frame');
+            const frameTop = document.getElementById('frameTop');
             let isFetching = false;
             let refreshTimer = null;
 
             // ----- АДРЕС ВАШЕГО WORKER (ЗАМЕНИТЕ!) -----
-            const WORKER_URL = 'https://silent-cherry-6c61.quascar20.workers.dev/';
+            const WORKER_URL = 'https://cbr-rate-proxy.ваш-аккаунт.workers.dev/';
 
-            // ----- ДАТА СЛЕДУЮЩЕГО ЗАСЕДАНИЯ (ИЗВЕСТНАЯ ИНФОРМАЦИЯ) -----
-            // По данным Trading Economics и макропрогнозу ЦБ, следующее заседание — 24 июля 2026
+            // ----- ДАТА СЛЕДУЮЩЕГО ЗАСЕДАНИЯ -----
             const NEXT_MEETING = new Date(2026, 6, 24); // 24 июля 2026
 
             // ----- ФУНКЦИЯ ПРОГНОЗА -----
             function generateForecast(currentRate) {
-                // Прогноз Trading Economics: ожидание ставки 14% на заседании 24 июля 
                 const forecastRate = 14.0;
                 const diff = currentRate - forecastRate;
 
@@ -228,7 +313,7 @@
                 if (isFetching) return;
                 isFetching = true;
 
-                frame.classList.add('updating');
+                frameTop.classList.add('updating');
 
                 try {
                     const response = await fetch(WORKER_URL, {
@@ -261,18 +346,18 @@
                 } finally {
                     isFetching = false;
                     setTimeout(() => {
-                        frame.classList.remove('updating');
+                        frameTop.classList.remove('updating');
                     }, 300);
                 }
             }
 
             // ----- ОТОБРАЖЕНИЕ ДАННЫХ -----
             function displayRate(rate, date) {
-                // Форматируем число
+                // Ставка
                 const formatted = parseFloat(rate.toFixed(2));
                 rateDisplay.innerHTML = `${formatted}<span class="percent">%</span>`;
 
-                // 1. Дата текущей ставки
+                // Дата текущей ставки
                 if (date) {
                     const dateObj = new Date(date);
                     if (!isNaN(dateObj.getTime())) {
@@ -285,13 +370,13 @@
                     dateDisplay.textContent = `актуально на ${now.toLocaleDateString('ru-RU')}`;
                 }
 
-                // 2. Дата следующего заседания (всегда показываем)
+                // Следующее заседание
                 const nextDateFormatted = formatDate(NEXT_MEETING);
                 if (nextDateFormatted) {
                     nextMeetingDisplay.textContent = `следующее заседание ЦБ: ${nextDateFormatted}`;
                 }
 
-                // 3. Прогноз
+                // Прогноз
                 const forecast = generateForecast(rate);
                 forecastDisplay.textContent = forecast.text;
                 forecastDisplay.className = 'forecast ' + forecast.direction;
