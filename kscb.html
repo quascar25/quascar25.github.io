@@ -23,7 +23,6 @@
             touch-action: none;
         }
 
-        /* ----- ФОН С КАРТИНКОЙ ----- */
         body {
             background-image: url('seyf.jpg');
             background-size: cover;
@@ -31,7 +30,6 @@
             background-repeat: no-repeat;
         }
 
-        /* Полупрозрачный слой поверх картинки для читаемости */
         .overlay {
             position: fixed;
             top: 0;
@@ -56,7 +54,6 @@
             gap: 30px;
         }
 
-        /* ----- ВЕРХНИЙ ЧЕРНЫЙ ПРЯМОУГОЛЬНИК (СТАВКА) ----- */
         .frame-top {
             background-color: rgba(0, 0, 0, 0.75);
             border-radius: 12px;
@@ -108,7 +105,6 @@
             50% { opacity: 0.8; }
         }
 
-        /* ----- НИЖНИЙ ЧЕРНЫЙ ПРЯМОУГОЛЬНИК (ИНФОРМАЦИЯ) ----- */
         .frame-bottom {
             background-color: rgba(0, 0, 0, 0.75);
             border-radius: 12px;
@@ -152,7 +148,6 @@
             margin-top: 2px;
         }
 
-        /* Прогноз — зелёный для снижения, красный для повышения, серый для без изменений */
         .forecast.down {
             color: rgba(100, 255, 100, 0.6) !important;
         }
@@ -168,7 +163,21 @@
             font-size: 0.4em;
         }
 
-        /* ----- АДАПТАЦИЯ ПОД МАЛЕНЬКИЕ ЭКРАНЫ ----- */
+        /* Индикатор загрузки */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 480px) {
             .frame-top {
                 padding: 14px 28px;
@@ -176,22 +185,18 @@
                 min-height: 60px;
                 border-radius: 10px;
             }
-
             .rate {
                 font-size: clamp(30px, 8vw, 60px);
             }
-
             .frame-bottom {
                 padding: 14px 20px;
                 min-width: 160px;
                 border-radius: 10px;
             }
-
             .info-line {
                 font-size: 17px;
                 line-height: 1.8;
             }
-
             .container {
                 gap: 20px;
                 padding: 20px;
@@ -204,21 +209,17 @@
                 min-width: 100px;
                 min-height: 50px;
             }
-
             .rate {
                 font-size: clamp(24px, 7vw, 44px);
             }
-
             .frame-bottom {
                 padding: 10px 16px;
                 min-width: 140px;
             }
-
             .info-line {
                 font-size: 14px;
                 line-height: 1.6;
             }
-
             .container {
                 gap: 15px;
                 padding: 15px;
@@ -231,18 +232,15 @@
     </style>
 </head>
 <body>
-    <!-- Полупрозрачный слой поверх картинки -->
     <div class="overlay"></div>
 
     <div class="container">
-        <!-- Верхний прямоугольник: ставка -->
         <div class="frame-top" id="frameTop">
             <div class="rate" id="rateDisplay">
                 <span class="loading">···</span>
             </div>
         </div>
 
-        <!-- Нижний прямоугольник: информация -->
         <div class="frame-bottom" id="frameBottom">
             <div class="info-line">
                 <div class="date" id="dateDisplay">загрузка...</div>
@@ -263,12 +261,14 @@
             const frameTop = document.getElementById('frameTop');
             let isFetching = false;
             let refreshTimer = null;
+            let retryCount = 0;
+            const MAX_RETRIES = 3;
 
             // ----- АДРЕС ВАШЕГО WORKER (ЗАМЕНИТЕ!) -----
             const WORKER_URL = 'https://silent-cherry-6c61.quascar20.workers.dev/';
 
             // ----- ДАТА СЛЕДУЮЩЕГО ЗАСЕДАНИЯ -----
-            const NEXT_MEETING = new Date(2026, 6, 24); // 24 июля 2026
+            const NEXT_MEETING = new Date(2026, 6, 24);
 
             // ----- ФУНКЦИЯ ПРОГНОЗА -----
             function generateForecast(currentRate) {
@@ -308,41 +308,66 @@
                 return `${day} ${month} ${year}`;
             }
 
-            // ----- ПОЛУЧЕНИЕ ДАННЫХ С ВАШЕГО WORKER -----
+            // ----- ПОЛУЧЕНИЕ ДАННЫХ С ВАШЕГО WORKER (С ПОВТОРНЫМИ ПОПЫТКАМИ) -----
             async function fetchKeyRate() {
                 if (isFetching) return;
                 isFetching = true;
+                retryCount = 0;
 
                 frameTop.classList.add('updating');
 
+                // Показываем индикатор загрузки, если данных ещё нет
+                if (rateDisplay.innerHTML.includes('···') || rateDisplay.innerHTML.includes('loading')) {
+                    // Уже показываем загрузку
+                } else {
+                    // Показываем спиннер на время обновления
+                    rateDisplay.innerHTML = '<span class="loading">⟳</span>';
+                }
+
                 try {
-                    const response = await fetch(WORKER_URL, {
+                    const result = await fetchWithTimeout(WORKER_URL, {
                         method: 'GET',
-                        headers: { 'Accept': 'application/json' }
+                        headers: { 
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
+                        },
+                        timeout: 8000 // 8 секунд таймаут
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
+                    if (!result) {
+                        throw new Error('Таймаут или ошибка сети');
                     }
 
-                    const data = await response.json();
+                    const data = result;
 
                     if (data && data.rate !== undefined && data.rate !== null) {
                         const rate = parseFloat(data.rate);
                         if (!isNaN(rate) && rate > 0) {
                             displayRate(rate, data.date);
+                            retryCount = 0;
                             return;
                         }
                     }
 
-                    throw new Error('Ставка не найдена в ответе');
+                    throw new Error('Ставка не найдена');
 
                 } catch (error) {
                     console.error('Ошибка получения данных:', error);
-                    rateDisplay.innerHTML = '<span class="error-text">нет данных</span>';
-                    dateDisplay.textContent = 'проверьте соединение';
-                    nextMeetingDisplay.textContent = '';
-                    forecastDisplay.textContent = '';
+                    
+                    // Пробуем повторно
+                    if (retryCount < MAX_RETRIES) {
+                        retryCount++;
+                        console.log(`Повторная попытка ${retryCount}/${MAX_RETRIES}...`);
+                        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                        isFetching = false;
+                        await fetchKeyRate();
+                        return;
+                    }
+
+                    // Если все попытки провалились
+                    showError('нет соединения');
                 } finally {
                     isFetching = false;
                     setTimeout(() => {
@@ -351,13 +376,30 @@
                 }
             }
 
+            // ----- ФУНКЦИЯ ЗАПРОСА С ТАЙМАУТОМ -----
+            function fetchWithTimeout(url, options, timeout = 8000) {
+                return Promise.race([
+                    fetch(url, options).then(r => r.json()),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Таймаут запроса')), timeout)
+                    )
+                ]);
+            }
+
+            // ----- ПОКАЗ ОШИБКИ -----
+            function showError(message) {
+                rateDisplay.innerHTML = `<span class="error-text">${message}</span>`;
+                dateDisplay.textContent = 'проверьте интернет';
+                nextMeetingDisplay.textContent = '';
+                forecastDisplay.textContent = '';
+                forecastDisplay.className = 'forecast';
+            }
+
             // ----- ОТОБРАЖЕНИЕ ДАННЫХ -----
             function displayRate(rate, date) {
-                // Ставка
                 const formatted = parseFloat(rate.toFixed(2));
                 rateDisplay.innerHTML = `${formatted}<span class="percent">%</span>`;
 
-                // Дата текущей ставки
                 if (date) {
                     const dateObj = new Date(date);
                     if (!isNaN(dateObj.getTime())) {
@@ -370,19 +412,17 @@
                     dateDisplay.textContent = `актуально на ${now.toLocaleDateString('ru-RU')}`;
                 }
 
-                // Следующее заседание
                 const nextDateFormatted = formatDate(NEXT_MEETING);
                 if (nextDateFormatted) {
                     nextMeetingDisplay.textContent = `следующее заседание ЦБ: ${nextDateFormatted}`;
                 }
 
-                // Прогноз
                 const forecast = generateForecast(rate);
                 forecastDisplay.textContent = forecast.text;
                 forecastDisplay.className = 'forecast ' + forecast.direction;
             }
 
-            // ----- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ -----
+            // ----- ПОКАЗ ЗАГРУЗКИ -----
             function showLoading() {
                 rateDisplay.innerHTML = '<span class="loading">···</span>';
                 dateDisplay.textContent = 'загрузка...';
@@ -391,12 +431,10 @@
                 forecastDisplay.className = 'forecast';
             }
 
+            // ----- ОБНОВЛЕНИЕ -----
             function refreshRate() {
                 if (!navigator.onLine) {
-                    rateDisplay.innerHTML = '<span class="error-text">нет соединения</span>';
-                    dateDisplay.textContent = 'проверьте интернет';
-                    nextMeetingDisplay.textContent = '';
-                    forecastDisplay.textContent = '';
+                    showError('нет интернета');
                     return;
                 }
                 showLoading();
@@ -405,19 +443,42 @@
 
             // ----- ИНИЦИАЛИЗАЦИЯ -----
             function init() {
+                // Принудительно очищаем кеш при загрузке
+                if ('caches' in window) {
+                    caches.keys().then(keys => {
+                        keys.forEach(key => {
+                            caches.delete(key);
+                        });
+                    });
+                }
+
                 refreshRate();
 
+                // Обновление каждые 30 минут
                 refreshTimer = setInterval(refreshRate, 30 * 60 * 1000);
 
+                // Обновление при возврате на вкладку
                 document.addEventListener('visibilitychange', () => {
-                    if (!document.hidden) refreshRate();
+                    if (!document.hidden) {
+                        // Небольшая задержка, чтобы не нагружать
+                        setTimeout(refreshRate, 300);
+                    }
                 });
 
-                window.addEventListener('online', refreshRate);
+                // Обновление при восстановлении интернета
+                window.addEventListener('online', () => {
+                    setTimeout(refreshRate, 500);
+                });
 
+                // Клик для ручного обновления (с защитой от частых нажатий)
+                let lastClickTime = 0;
                 document.addEventListener('click', (e) => {
                     if (e.target.closest('a, button')) return;
-                    refreshRate();
+                    const now = Date.now();
+                    if (now - lastClickTime > 3000) { // Не чаще 1 раза в 3 секунды
+                        lastClickTime = now;
+                        refreshRate();
+                    }
                 });
 
                 document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -426,8 +487,8 @@
                 }, { passive: false });
 
                 console.log('📊 Ключевая ставка РФ — приложение загружено');
-                console.log('🔄 Кликните по экрану для обновления');
                 console.log(`🔗 Worker URL: ${WORKER_URL}`);
+                console.log('🔄 Кликните по экрану для обновления');
             }
 
             if (document.readyState === 'loading') {
