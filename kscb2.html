@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ключевая ставка ЦБ РФ_55</title>
+    <title>Ключевая ставка ЦБ РФ</title>
     <style>
         * {
             margin: 0;
@@ -30,6 +30,7 @@
             width: 100%;
             height: 100%;
             padding: 20px;
+            flex-direction: column;
         }
 
         .frame {
@@ -43,6 +44,13 @@
             min-height: 120px;
             background-color: transparent;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.03);
+            transition: opacity 0.5s ease, transform 0.3s ease;
+        }
+
+        /* Анимация при обновлении */
+        .frame.updating {
+            opacity: 0.5;
+            transform: scale(0.97);
         }
 
         .rate {
@@ -54,6 +62,7 @@
             line-height: 1.2;
             user-select: none;
             -webkit-user-select: none;
+            transition: all 0.5s ease;
         }
 
         .percent {
@@ -74,18 +83,41 @@
             50% { opacity: 0.8; }
         }
 
-        .update-info {
+        /* Информационная строка внизу — все тексты белые */
+        .info-line {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             left: 0;
             right: 0;
             text-align: center;
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
             font-weight: 300;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             pointer-events: none;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .info-line .date {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .info-line .forecast {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        /* Прогноз — зелёный для снижения, красный для повышения, серый для без изменений */
+        .forecast.down {
+            color: rgba(100, 255, 100, 0.5) !important;
+        }
+        .forecast.up {
+            color: rgba(255, 100, 100, 0.5) !important;
+        }
+        .forecast.steady {
+            color: rgba(255, 255, 255, 0.25) !important;
         }
 
         .error-text {
@@ -100,6 +132,10 @@
                 min-height: 90px;
                 border-width: 1px;
             }
+            .info-line {
+                font-size: 11px;
+                bottom: 20px;
+            }
         }
 
         .frame {
@@ -109,45 +145,75 @@
 </head>
 <body>
     <div class="container">
-        <div class="frame">
+        <div class="frame" id="frame">
             <div class="rate" id="rateDisplay">
                 <span class="loading">···</span>
             </div>
         </div>
     </div>
 
-    <div class="update-info" id="updateInfo">загрузка...</div>
+    <div class="info-line" id="infoLine">
+        <div class="date" id="dateDisplay">загрузка...</div>
+        <div class="forecast" id="forecastDisplay"></div>
+    </div>
 
     <script>
         (function() {
             'use strict';
 
             const rateDisplay = document.getElementById('rateDisplay');
-            const updateInfo = document.getElementById('updateInfo');
+            const dateDisplay = document.getElementById('dateDisplay');
+            const forecastDisplay = document.getElementById('forecastDisplay');
+            const frame = document.getElementById('frame');
             let isFetching = false;
             let refreshTimer = null;
 
-            // ----- ВАШ WORKER НА CLOUDFLARE -----
-            // ЗАМЕНИТЕ ЭТОТ URL НА АДРЕС ВАШЕГО WORKER'А!
-            const WORKER_URL = 'https://silent-cherry-6c61.quascar20.workers.dev/';
+            // ----- АДРЕС ВАШЕГО WORKER (ЗАМЕНИТЕ!) -----
+            const WORKER_URL = 'https://cbr-rate-proxy.ваш-аккаунт.workers.dev/';
 
-            // ----- ПОЛУЧЕНИЕ ДАННЫХ С ВАШЕГО WORKER'А -----
+            // ----- ФУНКЦИЯ ПРОГНОЗА -----
+            // Используем данные Trading Economics: ожидание ставки 14% на заседании 24 июля [citation:13]
+            // Если текущая ставка (14.25%) выше прогноза (14%) → прогнозируем снижение на 0.25
+            // Можно также использовать прогнозы из макропрогноза ЦБ: диапазон 14.0–14.5% на 2026 год [citation:14]
+            function generateForecast(currentRate) {
+                // Прогноз на следующее заседание (24 июля 2026) — снижение до 14% [citation:13]
+                const forecastRate = 14.0;
+                const diff = currentRate - forecastRate;
+
+                let direction = 'steady';
+                let emoji = '→';
+                let changeText = 'без изменений';
+
+                if (diff > 0.1) {
+                    direction = 'down';
+                    emoji = '↓';
+                    changeText = `снижение до ${forecastRate.toFixed(2)}%`;
+                } else if (diff < -0.1) {
+                    direction = 'up';
+                    emoji = '↑';
+                    changeText = `повышение до ${forecastRate.toFixed(2)}%`;
+                }
+
+                return {
+                    direction: direction,
+                    emoji: emoji,
+                    text: `прогноз: ${changeText} ${emoji}`,
+                    forecastRate: forecastRate
+                };
+            }
+
+            // ----- ПОЛУЧЕНИЕ ДАННЫХ С ВАШЕГО WORKER -----
             async function fetchKeyRate() {
                 if (isFetching) return;
                 isFetching = true;
 
-                const isFirstLoad = rateDisplay.innerHTML.includes('···');
-                if (!isFirstLoad) {
-                    rateDisplay.style.opacity = '0.5';
-                }
+                // Анимация начала обновления
+                frame.classList.add('updating');
 
                 try {
-                    // Запрос к вашему Cloudflare Worker
                     const response = await fetch(WORKER_URL, {
                         method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
+                        headers: { 'Accept': 'application/json' }
                     });
 
                     if (!response.ok) {
@@ -156,84 +222,97 @@
 
                     const data = await response.json();
 
-                    // Проверяем, есть ли ставка в ответе
                     if (data && data.rate !== undefined && data.rate !== null) {
                         const rate = parseFloat(data.rate);
                         if (!isNaN(rate) && rate > 0) {
-                            displayRate(rate);
+                            displayRate(rate, data.date);
                             return;
                         }
                     }
 
-                    // Если ставка не найдена
                     throw new Error('Ставка не найдена в ответе');
 
                 } catch (error) {
                     console.error('Ошибка получения данных:', error);
                     rateDisplay.innerHTML = '<span class="error-text">нет данных</span>';
-                    updateInfo.textContent = 'проверьте соединение';
+                    dateDisplay.textContent = 'проверьте соединение';
+                    forecastDisplay.textContent = '';
                 } finally {
                     isFetching = false;
-                    rateDisplay.style.opacity = '1';
+                    // Анимация завершения
+                    setTimeout(() => {
+                        frame.classList.remove('updating');
+                    }, 300);
                 }
             }
 
             // ----- ОТОБРАЖЕНИЕ ДАННЫХ -----
-            function displayRate(rate) {
-                if (rate !== null && !isNaN(rate) && rate > 0) {
-                    const formatted = parseFloat(rate.toFixed(2));
-                    rateDisplay.innerHTML = `${formatted}<span class="percent">%</span>`;
-                    const now = new Date();
-                    updateInfo.textContent = `актуально на ${now.toLocaleDateString('ru-RU')}`;
+            function displayRate(rate, date) {
+                // Форматируем число
+                const formatted = parseFloat(rate.toFixed(2));
+                rateDisplay.innerHTML = `${formatted}<span class="percent">%</span>`;
+
+                // Показываем дату (белым текстом)
+                if (date) {
+                    // Форматируем дату из строки "2026-06-22" в "с 22 июня 2026"
+                    const dateObj = new Date(date);
+                    if (!isNaN(dateObj.getTime())) {
+                        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                        const day = dateObj.getDate();
+                        const month = months[dateObj.getMonth()];
+                        const year = dateObj.getFullYear();
+                        dateDisplay.textContent = `с ${day} ${month} ${year}`;
+                    } else {
+                        dateDisplay.textContent = `с ${date}`;
+                    }
                 } else {
-                    rateDisplay.innerHTML = '<span class="error-text">ошибка</span>';
-                    updateInfo.textContent = 'некорректные данные';
+                    const now = new Date();
+                    dateDisplay.textContent = `актуально на ${now.toLocaleDateString('ru-RU')}`;
                 }
+
+                // ---- ГЕНЕРАЦИЯ ПРОГНОЗА ----
+                const forecast = generateForecast(rate);
+                forecastDisplay.textContent = forecast.text;
+                forecastDisplay.className = 'forecast ' + forecast.direction;
             }
 
             // ----- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ -----
             function showLoading() {
                 rateDisplay.innerHTML = '<span class="loading">···</span>';
-                updateInfo.textContent = 'загрузка...';
+                dateDisplay.textContent = 'загрузка...';
+                forecastDisplay.textContent = '';
+                forecastDisplay.className = 'forecast';
             }
 
             function refreshRate() {
                 if (!navigator.onLine) {
                     rateDisplay.innerHTML = '<span class="error-text">нет соединения</span>';
-                    updateInfo.textContent = 'проверьте интернет';
+                    dateDisplay.textContent = 'проверьте интернет';
+                    forecastDisplay.textContent = '';
                     return;
                 }
                 showLoading();
                 fetchKeyRate();
             }
 
-            // ----- ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ -----
+            // ----- ИНИЦИАЛИЗАЦИЯ -----
             function init() {
-                // Первая загрузка
                 refreshRate();
 
-                // Автообновление каждые 30 минут
                 refreshTimer = setInterval(refreshRate, 30 * 60 * 1000);
 
-                // Обновление при возврате на вкладку
                 document.addEventListener('visibilitychange', () => {
-                    if (!document.hidden) {
-                        refreshRate();
-                    }
+                    if (!document.hidden) refreshRate();
                 });
 
-                // Обновление при восстановлении интернета
-                window.addEventListener('online', () => {
-                    refreshRate();
-                });
+                window.addEventListener('online', refreshRate);
 
-                // Ручное обновление по клику
                 document.addEventListener('click', (e) => {
                     if (e.target.closest('a, button')) return;
                     refreshRate();
                 });
 
-                // Блокировка скролла
                 document.addEventListener('gesturestart', (e) => e.preventDefault());
                 document.addEventListener('touchmove', (e) => {
                     if (e.target === document.body) e.preventDefault();
@@ -244,7 +323,6 @@
                 console.log(`🔗 Worker URL: ${WORKER_URL}`);
             }
 
-            // Запуск
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
