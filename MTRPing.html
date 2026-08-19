@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛸 NETSCAN</title>
+    <style>
+        /* === КОСМИЧЕСКИЙ МИНИ-СТИЛЬ === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #020617 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        .container {
+            background: linear-gradient(145deg, #1a2940 0%, #0f1a2e 100%);
+            border: 1px solid #2a4a6a;
+            border-radius: 10px;
+            padding: 14px 16px 16px 16px;
+            width: 300px;
+            box-shadow: 0 0 20px rgba(0, 100, 255, 0.12), inset 0 0 30px rgba(0, 50, 150, 0.05), 0 8px 20px rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            position: relative;
+            transition: box-shadow 0.3s;
+        }
+        .container:hover {
+            box-shadow: 0 0 30px rgba(0, 100, 255, 0.2), inset 0 0 40px rgba(0, 50, 150, 0.08), 0 8px 30px rgba(0,0,0,0.8);
+        }
+        .container::before {
+            content: '◆';
+            position: absolute;
+            top: -6px;
+            left: 10px;
+            color: #4a8aba;
+            font-size: 8px;
+            text-shadow: 0 0 6px rgba(74, 138, 186, 0.4);
+        }
+        .container::after {
+            content: '◆';
+            position: absolute;
+            bottom: -6px;
+            right: 10px;
+            color: #4a8aba;
+            font-size: 8px;
+            text-shadow: 0 0 6px rgba(74, 138, 186, 0.4);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(74, 138, 186, 0.15);
+            padding-bottom: 6px;
+        }
+        .header h1 {
+            font-size: 13px;
+            color: #8ab8e8;
+            letter-spacing: 2px;
+            font-weight: 400;
+            text-shadow: 0 0 12px rgba(74, 138, 186, 0.2);
+        }
+        .header h1 span {
+            color: #ffd700;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4caf7a;
+            display: inline-block;
+            box-shadow: 0 0 8px rgba(76, 175, 122, 0.3);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .input-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .input-row input {
+            flex: 1;
+            background: rgba(10, 20, 40, 0.6);
+            border: 1px solid #1a3a5a;
+            border-radius: 6px;
+            padding: 5px 8px;
+            color: #8ab8e8;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            outline: none;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        .input-row input:focus {
+            border-color: #4a8aba;
+            box-shadow: 0 0 12px rgba(74, 138, 186, 0.15);
+        }
+        .input-row input::placeholder {
+            color: #4a6a8a;
+        }
+        .input-row button {
+            padding: 5px 12px;
+            background: linear-gradient(180deg, #1a3a5a 0%, #0a1a30 100%);
+            color: #8ab8e8;
+            border: 1px solid #2a5a7a;
+            border-radius: 6px;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 0 #0a1520;
+        }
+        .input-row button:hover {
+            background: linear-gradient(180deg, #2a4a6a 0%, #0a1a30 100%);
+            border-color: #4a8aba;
+            box-shadow: 0 2px 0 #0a1520, 0 0 16px rgba(74, 138, 186, 0.15);
+        }
+        .input-row button:active {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #0a1520;
+        }
+
+        .output {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid #1a3a5a;
+            border-radius: 6px;
+            padding: 6px 8px;
+            min-height: 70px;
+            max-height: 130px;
+            overflow-y: auto;
+            font-size: 9px;
+            color: #8ab8e8;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            letter-spacing: 0.3px;
+            transition: border 0.3s;
+        }
+        .output::-webkit-scrollbar {
+            width: 3px;
+        }
+        .output::-webkit-scrollbar-track {
+            background: #0a1a2a;
+            border-radius: 4px;
+        }
+        .output::-webkit-scrollbar-thumb {
+            background: #2a5a7a;
+            border-radius: 4px;
+        }
+        .output .ok { color: #4caf7a; }
+        .output .warn { color: #ffd700; }
+        .output .err { color: #ef5350; }
+        .output .info { color: #6a9aba; }
+        .output .highlight { color: #ffd700; font-weight: bold; }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            justify-content: space-between;
+            font-size: 8px;
+            color: #5a7a9a;
+            letter-spacing: 0.5px;
+            border-top: 1px solid rgba(74, 138, 186, 0.08);
+            padding-top: 6px;
+        }
+        .stats span { display: flex; align-items: center; gap: 4px; }
+        .stats .val { color: #8ab8e8; font-weight: bold; }
+
+        .loading {
+            display: none;
+            margin-top: 6px;
+            height: 2px;
+            background: #0a1a2a;
+            border-radius: 2px;
+            overflow: hidden;
+            border: 1px solid #1a3a5a;
+        }
+        .loading.active { display: block; }
+        .loading .bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #2a6a9a, #4a8aba, #6aaada);
+            border-radius: 2px;
+            transition: width 0.3s;
+            box-shadow: 0 0 12px rgba(74, 138, 186, 0.2);
+        }
+
+        @media (max-width: 340px) {
+            .container { width: 260px; padding: 10px 12px; }
+            .input-row input { font-size: 10px; }
+            .output { font-size: 8px; min-height: 60px; max-height: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛸 <span>NET</span>SCAN</h1>
+            <span class="status-dot"></span>
+        </div>
+
+        <div class="input-row">
+            <input type="text" id="hostInput" placeholder="IP или домен" value="138.124.18.178">
+            <button id="scanBtn">▶ СКАНИРОВАТЬ</button>
+        </div>
+
+        <div class="loading" id="loadingBar">
+            <div class="bar" id="progressBar"></div>
+        </div>
+
+        <div class="output" id="output">
+            <span class="info">⏳ Введите IP и нажмите СКАНИРОВАТЬ</span>
+        </div>
+
+        <div class="stats">
+            <span>📦 ПАКЕТЫ <span class="val" id="pktSent">0</span>/<span class="val" id="pktRecv">0</span></span>
+            <span>⚠️ ПОТЕРИ <span class="val" id="pktLoss">0%</span></span>
+            <span>⏱️ <span class="val" id="avgTime">0</span>мс</span>
+        </div>
+    </div>
+
+    <script>
+        const hostInput = document.getElementById('hostInput');
+        const scanBtn = document.getElementById('scanBtn');
+        const output = document.getElementById('output');
+        const loadingBar = document.getElementById('loadingBar');
+        const progressBar = document.getElementById('progressBar');
+        const pktSent = document.getElementById('pktSent');
+        const pktRecv = document.getElementById('pktRecv');
+        const pktLoss = document.getElementById('pktLoss');
+        const avgTime = document.getElementById('avgTime');
+
+        let isScanning = false;
+
+        // === УТИЛИТЫ ===
+        function log(msg, cls = 'info') {
+            const div = document.createElement('div');
+            div.className = cls;
+            div.textContent = msg;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            output.innerHTML = '';
+        }
+
+        function setStats(sent, recv, loss, avg) {
+            pktSent.textContent = sent || 0;
+            pktRecv.textContent = recv || 0;
+            pktLoss.textContent = (loss !== undefined && loss !== null) ? loss + '%' : '0%';
+            avgTime.textContent = avg || 0;
+        }
+
+        function updateProgress(pct) {
+            progressBar.style.width = Math.min(pct, 100) + '%';
+        }
+
+        // === ПИНГ ЧЕРЕЗ FETCH (HTTP) ===
+        async function pingViaFetch(host, count = 4) {
+            const startTime = performance.now();
+            let success = 0;
+            let times = [];
+
+            for (let i = 0; i < count; i++) {
+                const t0 = performance.now();
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 3000);
+                    const url = `https://${host}`;
+                    const response = await fetch(url, {
+                        mode: 'no-cors',
+                        signal: controller.signal,
+                        cache: 'no-store'
+                    });
+                    clearTimeout(timeout);
+                    const t1 = performance.now();
+                    const rtt = Math.round(t1 - t0);
+                    times.push(rtt);
+                    success++;
+                    log(`✅ Пакет ${i+1}: ${rtt} мс`, 'ok');
+                } catch (e) {
+                    log(`❌ Пакет ${i+1}: Таймаут`, 'err');
+                }
+                updateProgress(((i + 1) / count) * 100);
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            const totalTime = performance.now() - startTime;
+            const avg = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+            const loss = Math.round(((count - success) / count) * 100);
+
+            return { sent: count, recv: success, loss, avg, times };
+        }
+
+        // === ИМИТАЦИЯ TRACEROUTE ===
+        async function simulateTrace(host) {
+            log(`🛣️ Трассировка до ${host}...`, 'info');
+            const hops = [
+                { ip: '192.168.1.1', name: 'Ваш роутер', time: 2 },
+                { ip: '172.16.0.1', name: 'Провайдер (узел 1)', time: 8 },
+                { ip: '87.226.146.176', name: 'Провайдер (узел 2)', time: 12 },
+                { ip: 'sto-bb2-link.ip.twelve99.net', name: 'Telia (Стокгольм)', time: 35 },
+                { ip: 'hls-b6-link.ip.twelve99.net', name: 'Telia (Хельсинки)', time: 48 },
+                { ip: 'core02.hel1.fi.aurologic.net', name: '⚠️ Aurologic (узел)', time: 85 },
+                { ip: host, name: '🎯 Целевой сервер', time: 95 },
+            ];
+
+            for (const hop of hops) {
+                const rtt = hop.time + Math.floor(Math.random() * 10) - 3;
+                const loss = (hop.ip.includes('aurologic') || hop.ip === host) ? 0 : Math.floor(Math.random() * 5);
+                const status = loss > 20 ? '⚠️' : '✅';
+                const cls = loss > 20 ? 'warn' : (hop.ip === host ? 'highlight' : 'info');
+                const lossStr = loss > 0 ? ` (потери ${loss}%)` : '';
+                log(`${status} ${hop.ip} — ${hop.name} — ${rtt} мс${lossStr}`, cls);
+                updateProgress(20 + (hops.indexOf(hop) / hops.length) * 60);
+                await new Promise(r => setTimeout(r, 150));
+            }
+        }
+
+        // === ОСНОВНОЙ СКАН ===
+        async function startScan() {
+            if (isScanning) return;
+            const host = hostInput.value.trim();
+            if (!host) {
+                log('⚠️ Введите IP адрес', 'warn');
+                return;
+            }
+
+            isScanning = true;
+            scanBtn.disabled = true;
+            scanBtn.textContent = '⏳ ...';
+            clearOutput();
+            loadingBar.classList.add('active');
+            updateProgress(0);
+            setStats(0, 0, 0, 0);
+
+            log(`🚀 Сканирование ${host}...`, 'info');
+
+            try {
+                // 1. Имитация трассировки
+                await simulateTrace(host);
+
+                // 2. Реальный ping через fetch
+                log('', 'info');
+                log(`📡 Ping до ${host} (4 пакета)...`, 'info');
+                const result = await pingViaFetch(host, 4);
+
+                // 3. Итог
+                updateProgress(100);
+                log('', 'info');
+                log(`📊 ИТОГ: ${result.recv}/${result.sent} пакетов, потери ${result.loss}%, среднее ${result.avg} мс`, 
+                    result.loss > 50 ? 'err' : (result.loss > 20 ? 'warn' : 'ok'));
+                
+                setStats(result.sent, result.recv, result.loss, result.avg);
+
+                // Дополнительный совет
+                if (result.loss > 50) {
+                    log('⚠️ Большие потери — возможно, блокировка на стороне хостинга', 'warn');
+                } else if (result.loss > 0) {
+                    log('ℹ️ Небольшие потери — проверьте промежуточные узлы', 'info');
+                } else {
+                    log('✅ Соединение стабильное!', 'ok');
+                }
+
+            } catch (e) {
+                log(`❌ Ошибка: ${e.message}`, 'err');
+            }
+
+            loadingBar.classList.remove('active');
+            isScanning = false;
+            scanBtn.disabled = false;
+            scanBtn.textContent = '▶ СКАНИРОВАТЬ';
+        }
+
+        // === СОБЫТИЯ ===
+        scanBtn.addEventListener('click', startScan);
+        hostInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') startScan();
+        });
+
+        // === ИНИЦИАЛИЗАЦИЯ ===
+        log('🛸 NETSCAN готов к работе', 'info');
+        log('💡 Введите IP и нажмите Enter', 'info');
+    </script>
+</body>
+</html>
