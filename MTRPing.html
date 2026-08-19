@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛸 NETSCAN</title>
     <style>
-        /* === КОСМИЧЕСКИЙ МИНИ-СТИЛЬ === */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Courier New', monospace;
             background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #020617 100%);
@@ -22,13 +25,13 @@
             border-radius: 10px;
             padding: 14px 16px 16px 16px;
             width: 300px;
-            box-shadow: 0 0 20px rgba(0, 100, 255, 0.12), inset 0 0 30px rgba(0, 50, 150, 0.05), 0 8px 20px rgba(0,0,0,0.7);
+            box-shadow: 0 0 20px rgba(0, 100, 255, 0.12), inset 0 0 30px rgba(0, 50, 150, 0.05), 0 8px 20px rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
             position: relative;
             transition: box-shadow 0.3s;
         }
         .container:hover {
-            box-shadow: 0 0 30px rgba(0, 100, 255, 0.2), inset 0 0 40px rgba(0, 50, 150, 0.08), 0 8px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0, 100, 255, 0.2), inset 0 0 40px rgba(0, 50, 150, 0.08), 0 8px 30px rgba(0, 0, 0, 0.8);
         }
         .container::before {
             content: '◆';
@@ -78,8 +81,15 @@
             animation: pulse-dot 2s infinite;
         }
         @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
         }
 
         .input-row {
@@ -106,6 +116,12 @@
         .input-row input::placeholder {
             color: #4a6a8a;
         }
+        .input-row input.valid {
+            border-color: #2a6a4a;
+        }
+        .input-row input.invalid {
+            border-color: #6a3a3a;
+        }
         .input-row button {
             padding: 5px 12px;
             background: linear-gradient(180deg, #1a3a5a 0%, #0a1a30 100%);
@@ -118,13 +134,20 @@
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 2px 0 #0a1520;
+            white-space: nowrap;
         }
-        .input-row button:hover {
+        .input-row button:hover:not(:disabled) {
             background: linear-gradient(180deg, #2a4a6a 0%, #0a1a30 100%);
             border-color: #4a8aba;
             box-shadow: 0 2px 0 #0a1520, 0 0 16px rgba(74, 138, 186, 0.15);
         }
-        .input-row button:active {
+        .input-row button:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #0a1520;
+        }
+        .input-row button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
             transform: translateY(2px);
             box-shadow: 0 0px 0 #0a1520;
         }
@@ -155,11 +178,22 @@
             background: #2a5a7a;
             border-radius: 4px;
         }
-        .output .ok { color: #4caf7a; }
-        .output .warn { color: #ffd700; }
-        .output .err { color: #ef5350; }
-        .output .info { color: #6a9aba; }
-        .output .highlight { color: #ffd700; font-weight: bold; }
+        .output .ok {
+            color: #4caf7a;
+        }
+        .output .warn {
+            color: #ffd700;
+        }
+        .output .err {
+            color: #ef5350;
+        }
+        .output .info {
+            color: #6a9aba;
+        }
+        .output .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
 
         .stats {
             display: flex;
@@ -172,8 +206,15 @@
             border-top: 1px solid rgba(74, 138, 186, 0.08);
             padding-top: 6px;
         }
-        .stats span { display: flex; align-items: center; gap: 4px; }
-        .stats .val { color: #8ab8e8; font-weight: bold; }
+        .stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stats .val {
+            color: #8ab8e8;
+            font-weight: bold;
+        }
 
         .loading {
             display: none;
@@ -184,7 +225,9 @@
             overflow: hidden;
             border: 1px solid #1a3a5a;
         }
-        .loading.active { display: block; }
+        .loading.active {
+            display: block;
+        }
         .loading .bar {
             height: 100%;
             width: 0%;
@@ -195,9 +238,18 @@
         }
 
         @media (max-width: 340px) {
-            .container { width: 260px; padding: 10px 12px; }
-            .input-row input { font-size: 10px; }
-            .output { font-size: 8px; min-height: 60px; max-height: 100px; }
+            .container {
+                width: 260px;
+                padding: 10px 12px;
+            }
+            .input-row input {
+                font-size: 10px;
+            }
+            .output {
+                font-size: 8px;
+                min-height: 60px;
+                max-height: 100px;
+            }
         }
     </style>
 </head>
@@ -209,8 +261,8 @@
         </div>
 
         <div class="input-row">
-            <input type="text" id="hostInput" placeholder="IP или домен" value="138.124.18.178">
-            <button id="scanBtn">▶ СКАНИРОВАТЬ</button>
+            <input type="text" id="hostInput" placeholder="0.0.0.0" value="0.0.0.0">
+            <button id="scanBtn" disabled>▶ СКАНИРОВАТЬ</button>
         </div>
 
         <div class="loading" id="loadingBar">
@@ -241,6 +293,46 @@
 
         let isScanning = false;
 
+        // === ПРОВЕРКА IP ===
+        function isValidIp(ip) {
+            if (!ip) return false;
+            const parts = ip.trim().split('.');
+            if (parts.length !== 4) return false;
+            for (let p of parts) {
+                if (p === '') return false;
+                const num = Number(p);
+                if (isNaN(num) || num < 0 || num > 255) return false;
+                // запрещаем строки вида "00", "01" и т.п. — только числа без лишних нулей
+                if (p.length > 1 && p[0] === '0') return false;
+            }
+            return true;
+        }
+
+        function isIpChanged(ip) {
+            // проверяем, отличается ли IP от 0.0.0.0
+            return ip && ip.trim() !== '0.0.0.0';
+        }
+
+        function validateInput() {
+            const ip = hostInput.value.trim();
+            const changed = isIpChanged(ip);
+            const valid = isValidIp(ip);
+            if (!changed) {
+                hostInput.className = '';
+                scanBtn.disabled = true;
+                return false;
+            }
+            if (valid) {
+                hostInput.className = 'valid';
+                scanBtn.disabled = false;
+                return true;
+            } else {
+                hostInput.className = 'invalid';
+                scanBtn.disabled = true;
+                return false;
+            }
+        }
+
         // === УТИЛИТЫ ===
         function log(msg, cls = 'info') {
             const div = document.createElement('div');
@@ -267,7 +359,6 @@
 
         // === ПИНГ ЧЕРЕЗ FETCH (HTTP) ===
         async function pingViaFetch(host, count = 4) {
-            const startTime = performance.now();
             let success = 0;
             let times = [];
 
@@ -295,7 +386,6 @@
                 await new Promise(r => setTimeout(r, 200));
             }
 
-            const totalTime = performance.now() - startTime;
             const avg = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
             const loss = Math.round(((count - success) / count) * 100);
 
@@ -331,8 +421,8 @@
         async function startScan() {
             if (isScanning) return;
             const host = hostInput.value.trim();
-            if (!host) {
-                log('⚠️ Введите IP адрес', 'warn');
+            if (!isValidIp(host)) {
+                log('⚠️ Некорректный IP адрес', 'warn');
                 return;
             }
 
@@ -358,12 +448,11 @@
                 // 3. Итог
                 updateProgress(100);
                 log('', 'info');
-                log(`📊 ИТОГ: ${result.recv}/${result.sent} пакетов, потери ${result.loss}%, среднее ${result.avg} мс`, 
+                log(`📊 ИТОГ: ${result.recv}/${result.sent} пакетов, потери ${result.loss}%, среднее ${result.avg} мс`,
                     result.loss > 50 ? 'err' : (result.loss > 20 ? 'warn' : 'ok'));
-                
+
                 setStats(result.sent, result.recv, result.loss, result.avg);
 
-                // Дополнительный совет
                 if (result.loss > 50) {
                     log('⚠️ Большие потери — возможно, блокировка на стороне хостинга', 'warn');
                 } else if (result.loss > 0) {
@@ -380,17 +469,23 @@
             isScanning = false;
             scanBtn.disabled = false;
             scanBtn.textContent = '▶ СКАНИРОВАТЬ';
+            validateInput();
         }
 
         // === СОБЫТИЯ ===
+        hostInput.addEventListener('input', validateInput);
         scanBtn.addEventListener('click', startScan);
         hostInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') startScan();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!scanBtn.disabled) startScan();
+            }
         });
 
         // === ИНИЦИАЛИЗАЦИЯ ===
+        validateInput();
         log('🛸 NETSCAN готов к работе', 'info');
-        log('💡 Введите IP и нажмите Enter', 'info');
+        log('💡 Введите IP (кроме 0.0.0.0) и нажмите Enter', 'info');
     </script>
 </body>
 </html>
