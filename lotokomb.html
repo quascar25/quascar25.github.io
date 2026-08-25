@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LotoAnalystt Pro</title>
+    <title>LotoAnalyst Pro</title>
     <style>
         * {
             margin: 0;
@@ -77,7 +77,7 @@
 
         textarea {
             width: 100%;
-            height: 170px;
+            height: 150px;
             background: #070a17;
             border: 1px solid #1f2b4a;
             border-radius: 6px;
@@ -137,6 +137,7 @@
             margin-top: 20px;
             display: flex;
             justify-content: center;
+            gap: 12px;
         }
 
         .btn {
@@ -163,14 +164,68 @@
             transform: scale(0.97);
         }
 
-        .footer-note {
+        .btn-clear {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+            padding: 12px 24px;
+            font-size: 13px;
+        }
+        .btn-clear:hover {
+            background: #2a2a4a;
+            border-color: #4a4a6a;
+        }
+
+        /* ----- ЛОГ ----- */
+        .log-area {
             margin-top: 18px;
+            background: #070a17;
+            border: 1px solid #1a2440;
+            border-radius: 8px;
+            padding: 10px 14px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: #4b608a;
+            line-height: 1.7;
+        }
+        .log-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .log-area::-webkit-scrollbar-track {
+            background: #0b0e1a;
+        }
+        .log-area::-webkit-scrollbar-thumb {
+            background: #1e2a4a;
+            border-radius: 4px;
+        }
+        .log-entry {
+            border-bottom: 1px solid #11162b;
+            padding: 2px 0;
+        }
+        .log-entry.ok {
+            color: #6a9a7a;
+        }
+        .log-entry.err {
+            color: #aa5a5a;
+        }
+        .log-entry.info {
+            color: #6a8aaa;
+        }
+        .log-entry.success {
+            color: #8acc8a;
+        }
+        .log-time {
+            color: #2a3a5a;
+            margin-right: 10px;
+        }
+
+        .footer-note {
+            margin-top: 12px;
             text-align: center;
             font-size: 10px;
             color: #1f2d4a;
             letter-spacing: 0.5px;
-            border-top: 1px solid #131d35;
-            padding-top: 14px;
         }
 
         @media (max-width: 700px) {
@@ -182,7 +237,11 @@
                 padding: 16px;
             }
             textarea {
-                height: 130px;
+                height: 110px;
+            }
+            .btn {
+                padding: 10px 24px;
+                font-size: 13px;
             }
         }
     </style>
@@ -200,7 +259,7 @@
             </div>
             <textarea id="arch45" placeholder="Вставьте комбинации 6/45&#10;Формат: 19,10,27,20,12,32,2"></textarea>
             <div class="result-area" id="result45">
-                <span class="result-empty">ожиданиее</span>
+                <span class="result-empty">ожидание</span>
             </div>
         </div>
 
@@ -217,7 +276,15 @@
     </div>
 
     <div class="btn-area">
-        <button class="btn" id="calcBtn">▶ Получить_3 комбинации</button>
+        <button class="btn" id="calcBtn">▶ Получить 3 комбинации</button>
+        <button class="btn btn-clear" id="clearBtn">✕ Очистить лог</button>
+    </div>
+
+    <!-- ОКНО ЛОГА -->
+    <div class="log-area" id="logArea">
+        <div class="log-entry info">
+            <span class="log-time">[--:--:--]</span> Ожидание действия...
+        </div>
     </div>
 
     <div class="footer-note">максимум 4 совпадения · минимальное среднее</div>
@@ -227,32 +294,74 @@
     (function() {
         'use strict';
 
-        // ---------- ПАРСЕР ----------
+        // ----- ЛОГГЕР -----
+        const logArea = document.getElementById('logArea');
+
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+            // Ограничиваем количество записей в логе (200)
+            while (logArea.children.length > 200) {
+                logArea.removeChild(logArea.firstChild);
+            }
+        }
+
+        function clearLog() {
+            logArea.innerHTML = '';
+            log('Лог очищен', 'info');
+        }
+
+        // ----- ПАРСЕР -----
         function parseCombos(text, is6of45) {
+            log('Парсинг комбинаций...', 'info');
             const lines = text.split(/\n/).filter(line => line.trim() !== '');
+            log(`Найдено строк: ${lines.length}`, 'info');
+            
             const combos = [];
             const needed = is6of45 ? 6 : 5;
             const maxNum = is6of45 ? 45 : 36;
+            let skipped = 0;
 
             for (let line of lines) {
                 const nums = line.match(/\d+/g);
-                if (!nums) continue;
+                if (!nums) {
+                    skipped++;
+                    continue;
+                }
                 const parsed = nums.map(Number).filter(n => n > 0);
-                if (parsed.length < needed) continue;
+                if (parsed.length < needed) {
+                    skipped++;
+                    continue;
+                }
 
                 const combo = parsed.slice(0, needed);
                 const unique = new Set(combo);
                 if (unique.size === needed && combo.every(n => n >= 1 && n <= maxNum)) {
                     combos.push(combo);
+                } else {
+                    skipped++;
                 }
             }
+
+            log(`Распаршено комбинаций: ${combos.length} (пропущено: ${skipped})`, combos.length > 0 ? 'ok' : 'err');
             return combos;
         }
 
-        // ---------- ПОИСК 3 КОМБИНАЦИЙ ----------
+        // ----- ПОИСК 3 КОМБИНАЦИЙ -----
         function findBestCombos(archive, totalNumbers, comboSize, maxCombosToReturn) {
-            if (!archive || archive.length === 0) return [];
+            if (!archive || archive.length === 0) {
+                log('Архив пуст, поиск невозможен', 'err');
+                return [];
+            }
 
+            log(`Поиск комбинаций (${comboSize}/${totalNumbers})...`, 'info');
+            log(`Размер архива: ${archive.length} комбинаций`, 'info');
+
+            // 1. Частота чисел
             const freq = new Array(totalNumbers + 1).fill(0);
             for (const combo of archive) {
                 for (const num of combo) {
@@ -260,13 +369,15 @@
                 }
             }
 
-            // холодные числа
+            // 2. Холодные числа
             const sorted = Array.from({ length: totalNumbers }, (_, i) => i + 1);
             sorted.sort((a, b) => (freq[a] || 0) - (freq[b] || 0));
             const cold = sorted.slice(0, Math.min(30, totalNumbers));
+            log(`Отобрано холодных чисел: ${cold.length}`, 'info');
 
             const candidates = [];
-            const maxAttempts = 5000;
+            const maxAttempts = 8000;
+            let foundGood = 0;
 
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
                 // Формируем пул
@@ -336,7 +447,10 @@
                     maxMatch: maxMatch,
                     avg: avg
                 });
+                foundGood++;
             }
+
+            log(`Найдено подходящих кандидатов: ${foundGood}`, foundGood > 0 ? 'ok' : 'err');
 
             // Сортировка
             candidates.sort((a, b) => {
@@ -356,83 +470,128 @@
                 if (unique.length >= maxCombosToReturn) break;
             }
 
+            log(`Отобрано лучших комбинаций: ${unique.length}`, unique.length > 0 ? 'success' : 'err');
             return unique.map(c => c.combo);
         }
 
-        // ---------- ОСНОВНОЙ РАСЧЁТ ----------
+        // ----- ОСНОВНОЙ РАСЧЁТ -----
         function calculate() {
+            log('=== ЗАПУСК РАСЧЁТА ===', 'info');
+            
             try {
                 const text45 = document.getElementById('arch45').value;
                 const text36 = document.getElementById('arch36').value;
 
-                const arch45 = parseCombos(text45, true);
-                const arch36 = parseCombos(text36, false);
+                log(`Длина текста 6/45: ${text45.length} симв.`, 'info');
+                log(`Длина текста 5/36: ${text36.length} симв.`, 'info');
 
                 const result45 = document.getElementById('result45');
                 const result36 = document.getElementById('result36');
 
-                // 6/45
-                if (arch45.length > 0) {
-                    const combos45 = findBestCombos(arch45, 45, 6, 3);
-                    if (combos45 && combos45.length > 0) {
-                        let html = '';
-                        for (const c of combos45) {
-                            html += `<span class="result-item">${c.join(', ')}</span>`;
+                // ----- 6/45 -----
+                if (text45.trim().length > 0) {
+                    log('Обработка 6/45...', 'info');
+                    const arch45 = parseCombos(text45, true);
+                    if (arch45.length > 0) {
+                        const combos45 = findBestCombos(arch45, 45, 6, 3);
+                        if (combos45 && combos45.length > 0) {
+                            let html = '';
+                            for (const c of combos45) {
+                                html += `<span class="result-item">${c.join(', ')}</span>`;
+                            }
+                            result45.innerHTML = html;
+                            result45.classList.add('has-result');
+                            log(`✅ 6/45: найдено ${combos45.length} комбинаций`, 'success');
+                            for (const c of combos45) {
+                                log(`   → ${c.join(', ')}`, 'success');
+                            }
+                        } else {
+                            result45.innerHTML = '<span class="result-empty">не найдено</span>';
+                            result45.classList.remove('has-result');
+                            log('❌ 6/45: подходящие комбинации не найдены', 'err');
                         }
-                        result45.innerHTML = html;
-                        result45.classList.add('has-result');
                     } else {
-                        result45.innerHTML = '<span class="result-empty">не найдено</span>';
+                        result45.innerHTML = '<span class="result-empty">нет валидных данных</span>';
                         result45.classList.remove('has-result');
+                        log('❌ 6/45: не удалось распарсить комбинации', 'err');
                     }
                 } else {
                     result45.innerHTML = '<span class="result-empty">ожидание</span>';
                     result45.classList.remove('has-result');
+                    log('⏸ 6/45: поле пустое, пропускаем', 'info');
                 }
 
-                // 5/36
-                if (arch36.length > 0) {
-                    const combos36 = findBestCombos(arch36, 36, 5, 3);
-                    if (combos36 && combos36.length > 0) {
-                        let html = '';
-                        for (const c of combos36) {
-                            html += `<span class="result-item">${c.join(', ')}</span>`;
+                // ----- 5/36 -----
+                if (text36.trim().length > 0) {
+                    log('Обработка 5/36...', 'info');
+                    const arch36 = parseCombos(text36, false);
+                    if (arch36.length > 0) {
+                        const combos36 = findBestCombos(arch36, 36, 5, 3);
+                        if (combos36 && combos36.length > 0) {
+                            let html = '';
+                            for (const c of combos36) {
+                                html += `<span class="result-item">${c.join(', ')}</span>`;
+                            }
+                            result36.innerHTML = html;
+                            result36.classList.add('has-result');
+                            log(`✅ 5/36: найдено ${combos36.length} комбинаций`, 'success');
+                            for (const c of combos36) {
+                                log(`   → ${c.join(', ')}`, 'success');
+                            }
+                        } else {
+                            result36.innerHTML = '<span class="result-empty">не найдено</span>';
+                            result36.classList.remove('has-result');
+                            log('❌ 5/36: подходящие комбинации не найдены', 'err');
                         }
-                        result36.innerHTML = html;
-                        result36.classList.add('has-result');
                     } else {
-                        result36.innerHTML = '<span class="result-empty">не найдено</span>';
+                        result36.innerHTML = '<span class="result-empty">нет валидных данных</span>';
                         result36.classList.remove('has-result');
+                        log('❌ 5/36: не удалось распарсить комбинации', 'err');
                     }
                 } else {
                     result36.innerHTML = '<span class="result-empty">ожидание</span>';
                     result36.classList.remove('has-result');
+                    log('⏸ 5/36: поле пустое, пропускаем', 'info');
                 }
+
+                log('=== РАСЧЁТ ЗАВЕРШЁН ===', 'success');
             } catch (e) {
+                log(`❌ ОШИБКА: ${e.message}`, 'err');
+                log(`   Стек: ${e.stack}`, 'err');
                 console.error('Ошибка:', e);
-                alert('Произошла ошибка. Проверьте консоль (F12) для подробностей.');
+                alert('Произошла ошибка. Подробности в логе и консоли (F12).');
             }
         }
 
-        // ---------- ПРИВЯЗКА ----------
+        // ----- ПРИВЯЗКА СОБЫТИЙ -----
         document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('calcBtn');
+            const clearBtn = document.getElementById('clearBtn');
+
             if (btn) {
                 btn.addEventListener('click', calculate);
+                log('Кнопка "Получить" активирована', 'ok');
             } else {
+                log('❌ Кнопка "Получить" не найдена!', 'err');
                 console.error('Кнопка не найдена!');
             }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', clearLog);
+            }
+
+            log('Программа загружена, ожидание ввода данных', 'info');
         });
 
         // Ctrl+Enter
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                log('=== Ctrl+Enter ===', 'info');
                 calculate();
             }
         });
 
     })();
 </script>
-
 </body>
 </html>
