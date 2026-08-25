@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotoAnalyst Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0e1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            background: #11162b;
+            border: 1px solid #1e2a4a;
+            border-radius: 16px;
+            padding: 24px 28px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(30, 60, 120, 0.08);
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #7a8bb5;
+            text-align: center;
+            border-bottom: 1px solid #1e2a4a;
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+        }
+        h1 span {
+            color: #b8ccff;
+            font-weight: 500;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .block {
+            background: #0e1429;
+            border: 1px solid #1c2748;
+            border-radius: 10px;
+            padding: 14px 16px 16px;
+            position: relative;
+        }
+
+        .block-label {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #4b608a;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .block-label small {
+            color: #2f4068;
+            font-size: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 170px;
+            background: #070a17;
+            border: 1px solid #1f2b4a;
+            border-radius: 6px;
+            color: #b8ccff;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 10px 12px;
+            resize: vertical;
+            outline: none;
+            transition: border 0.2s;
+            line-height: 1.6;
+        }
+        textarea:focus {
+            border-color: #3f5f9a;
+        }
+        textarea::placeholder {
+            color: #263456;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+        }
+
+        .result-area {
+            margin-top: 10px;
+            min-height: 38px;
+            background: #070a17;
+            border: 1px solid #1a2440;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #7a8bb5;
+            font-size: 13px;
+            font-family: 'Consolas', monospace;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            transition: border 0.3s;
+        }
+        .result-area.has-result {
+            border-color: #3a6a9a;
+        }
+        .result-item {
+            color: #b8ccff;
+            background: #111b33;
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid #253a66;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .result-empty {
+            color: #263456;
+            font-size: 12px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .btn-area {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #1a2648;
+            border: 1px solid #2f4a7a;
+            border-radius: 40px;
+            padding: 12px 48px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #b8ccff;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 0 20px rgba(30, 70, 150, 0.1);
+        }
+        .btn:hover {
+            background: #263b6a;
+            border-color: #4a7abb;
+            box-shadow: 0 0 35px rgba(40, 80, 180, 0.25);
+            transform: scale(1.01);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 10px;
+            color: #1f2d4a;
+            letter-spacing: 0.5px;
+            border-top: 1px solid #131d35;
+            padding-top: 14px;
+        }
+
+        /* адаптив */
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .container {
+                padding: 16px;
+            }
+            textarea {
+                height: 130px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Loto<span>Analyst</span></h1>
+
+    <div class="grid">
+        <!-- Блок 6/45 -->
+        <div class="block">
+            <div class="block-label">
+                <span>6 из 45</span>
+                <small>архив</small>
+            </div>
+            <textarea id="arch45" placeholder="Вставьте комбинации 6/45&#10;Формат: 19,10,27,20,12,32,2"></textarea>
+            <div class="result-area" id="result45">
+                <span class="result-empty">ожидание</span>
+            </div>
+        </div>
+
+        <!-- Блок 5/36 -->
+        <div class="block">
+            <div class="block-label">
+                <span>5 из 36</span>
+                <small>архив</small>
+            </div>
+            <textarea id="arch36" placeholder="Вставьте комбинации 5/36&#10;Формат: 11,4,8,24,27,3"></textarea>
+            <div class="result-area" id="result36">
+                <span class="result-empty">ожидание</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-area">
+        <button class="btn" id="calcBtn">▶ Получить 3 комбинации</button>
+    </div>
+
+    <div class="footer-note">максимум 4 совпадения · минимальное среднее</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- парсер ----------
+        function parseCombos(text, is6of45) {
+            const lines = text.split(/\n/).filter(line => line.trim() !== '');
+            const combos = [];
+            for (let line of lines) {
+                // ищем числа через запятую / точку с запятой / пробел
+                const nums = line.match(/\d+/g);
+                if (!nums) continue;
+                const parsed = nums.map(Number).filter(n => n > 0);
+                // если в строке есть 7 чисел (6 основн. + бонус) — берём первые 6 (или 5)
+                const count = is6of45 ? 6 : 5;
+                if (parsed.length >= count) {
+                    const combo = parsed.slice(0, count);
+                    // проверка на дубли и диапазон
+                    const unique = new Set(combo);
+                    if (unique.size === count && combo.every(n => n >= 1 && n <= (is6of45 ? 45 : 36))) {
+                        combos.push(combo);
+                    }
+                }
+            }
+            return combos;
+        }
+
+        // ---------- поиск 3 комбинаций ----------
+        function findBestCombos(archive, totalNumbers, comboSize, maxCombosToReturn = 3) {
+            if (archive.length === 0) return [];
+
+            // 1. Частота чисел
+            const freq = new Array(totalNumbers + 1).fill(0);
+            for (const combo of archive) {
+                for (const num of combo) {
+                    freq[num]++;
+                }
+            }
+
+            // 2. Собираем "холодные" числа (реже встречающиеся)
+            const sorted = Array.from({ length: totalNumbers }, (_, i) => i + 1);
+            sorted.sort((a, b) => freq[a] - freq[b]);
+            const cold = sorted.slice(0, Math.min(30, totalNumbers));
+
+            // 3. Генерируем кандидатов (жадный перебор с холодными числами)
+            const candidates = [];
+            const maxAttempts = 8000;
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                // берём 60% холодных, 40% случайных
+                const pool = [];
+                const useCold = Math.min(cold.length, Math.floor(comboSize * 0.6 + 1));
+                for (let i = 0; i < useCold; i++) {
+                    pool.push(cold[i % cold.length]);
+                }
+                // добавляем случайные
+                while (pool.length < comboSize * 2) {
+                    const r = Math.floor(Math.random() * totalNumbers) + 1;
+                    if (!pool.includes(r)) pool.push(r);
+                }
+
+                // выбираем comboSize уникальных
+                const candidate = [];
+                const used = new Set();
+                // сначала холодные
+                for (const n of pool) {
+                    if (!used.has(n) && candidate.length < comboSize) {
+                        candidate.push(n);
+                        used.add(n);
+                    }
+                }
+                // если не хватает — добиваем случайными
+                let tries = 0;
+                while (candidate.length < comboSize && tries < 500) {
+                    const r = Math.floor(Math.random() * totalNumbers) + 1;
+                    if (!used.has(r)) {
+                        candidate.push(r);
+                        used.add(r);
+                    }
+                    tries++;
+                }
+                if (candidate.length !== comboSize) continue;
+                candidate.sort((a, b) => a - b);
+
+                // проверяем, есть ли в архиве (полное совпадение)
+                let isInArchive = false;
+                for (const arch of archive) {
+                    const sortedArch = [...arch].sort((a,b) => a-b);
+                    if (sortedArch.length === candidate.length && sortedArch.every((v,i) => v === candidate[i])) {
+                        isInArchive = true;
+                        break;
+                    }
+                }
+                if (isInArchive) continue;
+
+                // считаем максимальное и среднее совпадений
+                let maxMatch = 0;
+                let sumMatch = 0;
+                for (const arch of archive) {
+                    const archSet = new Set(arch);
+                    let match = 0;
+                    for (const n of candidate) {
+                        if (archSet.has(n)) match++;
+                    }
+                    if (match > maxMatch) maxMatch = match;
+                    sumMatch += match;
+                }
+                const avg = sumMatch / archive.length;
+
+                // отсеиваем те, где максимум > 4 (или > comboSize-1)
+                if (maxMatch >= comboSize) continue; // если 5 или 6 совпадений — отбрасываем
+
+                candidates.push({
+                    combo: candidate,
+                    maxMatch: maxMatch,
+                    avg: avg
+                });
+            }
+
+            // сортируем: сначала по макс. совпадению (чем меньше, тем лучше), затем по среднему
+            candidates.sort((a, b) => {
+                if (a.maxMatch !== b.maxMatch) return a.maxMatch - b.maxMatch;
+                return a.avg - b.avg;
+            });
+
+            // берём уникальные комбинации (без повторов)
+            const unique = [];
+            const seen = new Set();
+            for (const c of candidates) {
+                const key = c.combo.join(',');
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(c);
+                }
+                if (unique.length >= maxCombosToReturn) break;
+            }
+
+            return unique.map(c => c.combo);
+        }
+
+        // ---------- основной расчёт ----------
+        function calculate() {
+            const text45 = document.getElementById('arch45').value;
+            const text36 = document.getElementById('arch36').value;
+
+            const arch45 = parseCombos(text45, true);
+            const arch36 = parseCombos(text36, false);
+
+            // 6/45
+            const result45 = document.getElementById('result45');
+            if (arch45.length > 0) {
+                const combos45 = findBestCombos(arch45, 45, 6, 3);
+                if (combos45.length > 0) {
+                    let html = '';
+                    for (const c of combos45) {
+                        html += `<span class="result-item">${c.join(', ')}</span>`;
+                    }
+                    result45.innerHTML = html;
+                    result45.classList.add('has-result');
+                } else {
+                    result45.innerHTML = '<span class="result-empty">не найдено</span>';
+                    result45.classList.remove('has-result');
+                }
+            } else {
+                result45.innerHTML = '<span class="result-empty">ожидание</span>';
+                result45.classList.remove('has-result');
+            }
+
+            // 5/36
+            const result36 = document.getElementById('result36');
+            if (arch36.length > 0) {
+                const combos36 = findBestCombos(arch36, 36, 5, 3);
+                if (combos36.length > 0) {
+                    let html = '';
+                    for (const c of combos36) {
+                        html += `<span class="result-item">${c.join(', ')}</span>`;
+                    }
+                    result36.innerHTML = html;
+                    result36.classList.add('has-result');
+                } else {
+                    result36.innerHTML = '<span class="result-empty">не найдено</span>';
+                    result36.classList.remove('has-result');
+                }
+            } else {
+                result36.innerHTML = '<span class="result-empty">ожидание</span>';
+                result36.classList.remove('has-result');
+            }
+        }
+
+        // ---------- привязка кнопки ----------
+        document.getElementById('calcBtn').addEventListener('click', calculate);
+
+        // можно также по Ctrl+Enter (для удобства)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                calculate();
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>
