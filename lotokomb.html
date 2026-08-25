@@ -173,7 +173,6 @@
             padding-top: 14px;
         }
 
-        /* адаптив */
         @media (max-width: 700px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -194,7 +193,6 @@
     <h1>Loto<span>Analyst</span></h1>
 
     <div class="grid">
-        <!-- Блок 6/45 -->
         <div class="block">
             <div class="block-label">
                 <span>6 из 45</span>
@@ -206,7 +204,6 @@
             </div>
         </div>
 
-        <!-- Блок 5/36 -->
         <div class="block">
             <div class="block-label">
                 <span>5 из 36</span>
@@ -228,76 +225,73 @@
 
 <script>
     (function() {
-        // ---------- парсер ----------
+        'use strict';
+
+        // ---------- ПАРСЕР ----------
         function parseCombos(text, is6of45) {
             const lines = text.split(/\n/).filter(line => line.trim() !== '');
             const combos = [];
+            const needed = is6of45 ? 6 : 5;
+            const maxNum = is6of45 ? 45 : 36;
+
             for (let line of lines) {
-                // ищем числа через запятую / точку с запятой / пробел
                 const nums = line.match(/\d+/g);
                 if (!nums) continue;
                 const parsed = nums.map(Number).filter(n => n > 0);
-                // если в строке есть 7 чисел (6 основн. + бонус) — берём первые 6 (или 5)
-                const count = is6of45 ? 6 : 5;
-                if (parsed.length >= count) {
-                    const combo = parsed.slice(0, count);
-                    // проверка на дубли и диапазон
-                    const unique = new Set(combo);
-                    if (unique.size === count && combo.every(n => n >= 1 && n <= (is6of45 ? 45 : 36))) {
-                        combos.push(combo);
-                    }
+                if (parsed.length < needed) continue;
+
+                const combo = parsed.slice(0, needed);
+                const unique = new Set(combo);
+                if (unique.size === needed && combo.every(n => n >= 1 && n <= maxNum)) {
+                    combos.push(combo);
                 }
             }
             return combos;
         }
 
-        // ---------- поиск 3 комбинаций ----------
-        function findBestCombos(archive, totalNumbers, comboSize, maxCombosToReturn = 3) {
-            if (archive.length === 0) return [];
+        // ---------- ПОИСК 3 КОМБИНАЦИЙ ----------
+        function findBestCombos(archive, totalNumbers, comboSize, maxCombosToReturn) {
+            if (!archive || archive.length === 0) return [];
 
-            // 1. Частота чисел
             const freq = new Array(totalNumbers + 1).fill(0);
             for (const combo of archive) {
                 for (const num of combo) {
-                    freq[num]++;
+                    freq[num] = (freq[num] || 0) + 1;
                 }
             }
 
-            // 2. Собираем "холодные" числа (реже встречающиеся)
+            // холодные числа
             const sorted = Array.from({ length: totalNumbers }, (_, i) => i + 1);
-            sorted.sort((a, b) => freq[a] - freq[b]);
+            sorted.sort((a, b) => (freq[a] || 0) - (freq[b] || 0));
             const cold = sorted.slice(0, Math.min(30, totalNumbers));
 
-            // 3. Генерируем кандидатов (жадный перебор с холодными числами)
             const candidates = [];
-            const maxAttempts = 8000;
+            const maxAttempts = 5000;
 
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                // берём 60% холодных, 40% случайных
+                // Формируем пул
                 const pool = [];
-                const useCold = Math.min(cold.length, Math.floor(comboSize * 0.6 + 1));
+                const useCold = Math.min(cold.length, Math.floor(comboSize * 0.6) + 1);
                 for (let i = 0; i < useCold; i++) {
                     pool.push(cold[i % cold.length]);
                 }
-                // добавляем случайные
                 while (pool.length < comboSize * 2) {
                     const r = Math.floor(Math.random() * totalNumbers) + 1;
                     if (!pool.includes(r)) pool.push(r);
                 }
 
-                // выбираем comboSize уникальных
+                // Выбираем комбинацию
                 const candidate = [];
                 const used = new Set();
-                // сначала холодные
                 for (const n of pool) {
                     if (!used.has(n) && candidate.length < comboSize) {
                         candidate.push(n);
                         used.add(n);
                     }
                 }
-                // если не хватает — добиваем случайными
+
                 let tries = 0;
-                while (candidate.length < comboSize && tries < 500) {
+                while (candidate.length < comboSize && tries < 300) {
                     const r = Math.floor(Math.random() * totalNumbers) + 1;
                     if (!used.has(r)) {
                         candidate.push(r);
@@ -308,18 +302,19 @@
                 if (candidate.length !== comboSize) continue;
                 candidate.sort((a, b) => a - b);
 
-                // проверяем, есть ли в архиве (полное совпадение)
+                // Проверка на полное совпадение
                 let isInArchive = false;
                 for (const arch of archive) {
-                    const sortedArch = [...arch].sort((a,b) => a-b);
-                    if (sortedArch.length === candidate.length && sortedArch.every((v,i) => v === candidate[i])) {
+                    const sortedArch = [...arch].sort((a, b) => a - b);
+                    if (sortedArch.length === candidate.length && 
+                        sortedArch.every((v, i) => v === candidate[i])) {
                         isInArchive = true;
                         break;
                     }
                 }
                 if (isInArchive) continue;
 
-                // считаем максимальное и среднее совпадений
+                // Подсчёт совпадений
                 let maxMatch = 0;
                 let sumMatch = 0;
                 for (const arch of archive) {
@@ -333,8 +328,8 @@
                 }
                 const avg = sumMatch / archive.length;
 
-                // отсеиваем те, где максимум > 4 (или > comboSize-1)
-                if (maxMatch >= comboSize) continue; // если 5 или 6 совпадений — отбрасываем
+                // Отсев: если maxMatch >= comboSize (т.е. 5 или 6) — пропускаем
+                if (maxMatch >= comboSize) continue;
 
                 candidates.push({
                     combo: candidate,
@@ -343,13 +338,13 @@
                 });
             }
 
-            // сортируем: сначала по макс. совпадению (чем меньше, тем лучше), затем по среднему
+            // Сортировка
             candidates.sort((a, b) => {
                 if (a.maxMatch !== b.maxMatch) return a.maxMatch - b.maxMatch;
                 return a.avg - b.avg;
             });
 
-            // берём уникальные комбинации (без повторов)
+            // Уникальные
             const unique = [];
             const seen = new Set();
             for (const c of candidates) {
@@ -364,64 +359,78 @@
             return unique.map(c => c.combo);
         }
 
-        // ---------- основной расчёт ----------
+        // ---------- ОСНОВНОЙ РАСЧЁТ ----------
         function calculate() {
-            const text45 = document.getElementById('arch45').value;
-            const text36 = document.getElementById('arch36').value;
+            try {
+                const text45 = document.getElementById('arch45').value;
+                const text36 = document.getElementById('arch36').value;
 
-            const arch45 = parseCombos(text45, true);
-            const arch36 = parseCombos(text36, false);
+                const arch45 = parseCombos(text45, true);
+                const arch36 = parseCombos(text36, false);
 
-            // 6/45
-            const result45 = document.getElementById('result45');
-            if (arch45.length > 0) {
-                const combos45 = findBestCombos(arch45, 45, 6, 3);
-                if (combos45.length > 0) {
-                    let html = '';
-                    for (const c of combos45) {
-                        html += `<span class="result-item">${c.join(', ')}</span>`;
+                const result45 = document.getElementById('result45');
+                const result36 = document.getElementById('result36');
+
+                // 6/45
+                if (arch45.length > 0) {
+                    const combos45 = findBestCombos(arch45, 45, 6, 3);
+                    if (combos45 && combos45.length > 0) {
+                        let html = '';
+                        for (const c of combos45) {
+                            html += `<span class="result-item">${c.join(', ')}</span>`;
+                        }
+                        result45.innerHTML = html;
+                        result45.classList.add('has-result');
+                    } else {
+                        result45.innerHTML = '<span class="result-empty">не найдено</span>';
+                        result45.classList.remove('has-result');
                     }
-                    result45.innerHTML = html;
-                    result45.classList.add('has-result');
                 } else {
-                    result45.innerHTML = '<span class="result-empty">не найдено</span>';
+                    result45.innerHTML = '<span class="result-empty">ожидание</span>';
                     result45.classList.remove('has-result');
                 }
-            } else {
-                result45.innerHTML = '<span class="result-empty">ожидание</span>';
-                result45.classList.remove('has-result');
-            }
 
-            // 5/36
-            const result36 = document.getElementById('result36');
-            if (arch36.length > 0) {
-                const combos36 = findBestCombos(arch36, 36, 5, 3);
-                if (combos36.length > 0) {
-                    let html = '';
-                    for (const c of combos36) {
-                        html += `<span class="result-item">${c.join(', ')}</span>`;
+                // 5/36
+                if (arch36.length > 0) {
+                    const combos36 = findBestCombos(arch36, 36, 5, 3);
+                    if (combos36 && combos36.length > 0) {
+                        let html = '';
+                        for (const c of combos36) {
+                            html += `<span class="result-item">${c.join(', ')}</span>`;
+                        }
+                        result36.innerHTML = html;
+                        result36.classList.add('has-result');
+                    } else {
+                        result36.innerHTML = '<span class="result-empty">не найдено</span>';
+                        result36.classList.remove('has-result');
                     }
-                    result36.innerHTML = html;
-                    result36.classList.add('has-result');
                 } else {
-                    result36.innerHTML = '<span class="result-empty">не найдено</span>';
+                    result36.innerHTML = '<span class="result-empty">ожидание</span>';
                     result36.classList.remove('has-result');
                 }
-            } else {
-                result36.innerHTML = '<span class="result-empty">ожидание</span>';
-                result36.classList.remove('has-result');
+            } catch (e) {
+                console.error('Ошибка:', e);
+                alert('Произошла ошибка. Проверьте консоль (F12) для подробностей.');
             }
         }
 
-        // ---------- привязка кнопки ----------
-        document.getElementById('calcBtn').addEventListener('click', calculate);
+        // ---------- ПРИВЯЗКА ----------
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('calcBtn');
+            if (btn) {
+                btn.addEventListener('click', calculate);
+            } else {
+                console.error('Кнопка не найдена!');
+            }
+        });
 
-        // можно также по Ctrl+Enter (для удобства)
-        document.addEventListener('keydown', (e) => {
+        // Ctrl+Enter
+        document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 calculate();
             }
         });
+
     })();
 </script>
 
