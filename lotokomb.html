@@ -175,7 +175,6 @@
             border-color: #4a4a6a;
         }
 
-        /* ----- ЛОГ ----- */
         .log-area {
             margin-top: 18px;
             background: #070a17;
@@ -280,7 +279,6 @@
         <button class="btn btn-clear" id="clearBtn">✕ Очистить лог</button>
     </div>
 
-    <!-- ОКНО ЛОГА -->
     <div class="log-area" id="logArea">
         <div class="log-entry info">
             <span class="log-time">[--:--:--]</span> Ожидание действия...
@@ -294,7 +292,6 @@
     (function() {
         'use strict';
 
-        // ----- ЛОГГЕР -----
         const logArea = document.getElementById('logArea');
 
         function log(message, type = 'info') {
@@ -304,7 +301,6 @@
             entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
             logArea.appendChild(entry);
             logArea.scrollTop = logArea.scrollHeight;
-            // Ограничиваем количество записей в логе (200)
             while (logArea.children.length > 200) {
                 logArea.removeChild(logArea.firstChild);
             }
@@ -315,7 +311,7 @@
             log('Лог очищен', 'info');
         }
 
-        // ----- ПАРСЕР -----
+        // ===== ИСПРАВЛЕННЫЙ ПАРСЕР =====
         function parseCombos(text, is6of45) {
             log('Парсинг комбинаций...', 'info');
             const lines = text.split(/\n/).filter(line => line.trim() !== '');
@@ -327,11 +323,23 @@
             let skipped = 0;
 
             for (let line of lines) {
-                const nums = line.match(/\d+/g);
+                // Ищем числа В КАВЫЧКАХ (формат "19,10,27,20,12,32,2")
+                const match = line.match(/"([\d,\s]+)"/);
+                let nums;
+                
+                if (match) {
+                    // Если есть кавычки — берём числа оттуда
+                    nums = match[1].match(/\d+/g);
+                } else {
+                    // Если кавычек нет — берём все числа из строки
+                    nums = line.match(/\d+/g);
+                }
+                
                 if (!nums) {
                     skipped++;
                     continue;
                 }
+                
                 const parsed = nums.map(Number).filter(n => n > 0);
                 if (parsed.length < needed) {
                     skipped++;
@@ -351,7 +359,6 @@
             return combos;
         }
 
-        // ----- ПОИСК 3 КОМБИНАЦИЙ -----
         function findBestCombos(archive, totalNumbers, comboSize, maxCombosToReturn) {
             if (!archive || archive.length === 0) {
                 log('Архив пуст, поиск невозможен', 'err');
@@ -361,7 +368,6 @@
             log(`Поиск комбинаций (${comboSize}/${totalNumbers})...`, 'info');
             log(`Размер архива: ${archive.length} комбинаций`, 'info');
 
-            // 1. Частота чисел
             const freq = new Array(totalNumbers + 1).fill(0);
             for (const combo of archive) {
                 for (const num of combo) {
@@ -369,7 +375,6 @@
                 }
             }
 
-            // 2. Холодные числа
             const sorted = Array.from({ length: totalNumbers }, (_, i) => i + 1);
             sorted.sort((a, b) => (freq[a] || 0) - (freq[b] || 0));
             const cold = sorted.slice(0, Math.min(30, totalNumbers));
@@ -380,7 +385,6 @@
             let foundGood = 0;
 
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                // Формируем пул
                 const pool = [];
                 const useCold = Math.min(cold.length, Math.floor(comboSize * 0.6) + 1);
                 for (let i = 0; i < useCold; i++) {
@@ -391,7 +395,6 @@
                     if (!pool.includes(r)) pool.push(r);
                 }
 
-                // Выбираем комбинацию
                 const candidate = [];
                 const used = new Set();
                 for (const n of pool) {
@@ -413,7 +416,6 @@
                 if (candidate.length !== comboSize) continue;
                 candidate.sort((a, b) => a - b);
 
-                // Проверка на полное совпадение
                 let isInArchive = false;
                 for (const arch of archive) {
                     const sortedArch = [...arch].sort((a, b) => a - b);
@@ -425,7 +427,6 @@
                 }
                 if (isInArchive) continue;
 
-                // Подсчёт совпадений
                 let maxMatch = 0;
                 let sumMatch = 0;
                 for (const arch of archive) {
@@ -439,7 +440,6 @@
                 }
                 const avg = sumMatch / archive.length;
 
-                // Отсев: если maxMatch >= comboSize (т.е. 5 или 6) — пропускаем
                 if (maxMatch >= comboSize) continue;
 
                 candidates.push({
@@ -452,13 +452,11 @@
 
             log(`Найдено подходящих кандидатов: ${foundGood}`, foundGood > 0 ? 'ok' : 'err');
 
-            // Сортировка
             candidates.sort((a, b) => {
                 if (a.maxMatch !== b.maxMatch) return a.maxMatch - b.maxMatch;
                 return a.avg - b.avg;
             });
 
-            // Уникальные
             const unique = [];
             const seen = new Set();
             for (const c of candidates) {
@@ -474,7 +472,6 @@
             return unique.map(c => c.combo);
         }
 
-        // ----- ОСНОВНОЙ РАСЧЁТ -----
         function calculate() {
             log('=== ЗАПУСК РАСЧЁТА ===', 'info');
             
@@ -488,7 +485,6 @@
                 const result45 = document.getElementById('result45');
                 const result36 = document.getElementById('result36');
 
-                // ----- 6/45 -----
                 if (text45.trim().length > 0) {
                     log('Обработка 6/45...', 'info');
                     const arch45 = parseCombos(text45, true);
@@ -521,7 +517,6 @@
                     log('⏸ 6/45: поле пустое, пропускаем', 'info');
                 }
 
-                // ----- 5/36 -----
                 if (text36.trim().length > 0) {
                     log('Обработка 5/36...', 'info');
                     const arch36 = parseCombos(text36, false);
@@ -563,7 +558,6 @@
             }
         }
 
-        // ----- ПРИВЯЗКА СОБЫТИЙ -----
         document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('calcBtn');
             const clearBtn = document.getElementById('clearBtn');
@@ -583,7 +577,6 @@
             log('Программа загружена, ожидание ввода данных', 'info');
         });
 
-        // Ctrl+Enter
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 log('=== Ctrl+Enter ===', 'info');
