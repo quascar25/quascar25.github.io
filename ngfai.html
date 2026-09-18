@@ -68,57 +68,59 @@
     overflow: visible;
   }
 
-  .continent {
-    fill: none;
-    stroke: #5a5a5a;
-    stroke-width: 1.1;
-    cursor: pointer;
-    transition: stroke 0.35s ease, fill 0.35s ease;
-    vector-effect: non-scaling-stroke;
-  }
+ .continent {
+  fill: rgba(255, 255, 255, 0.01);   /* невидимый, но ловит курсор по всей площади */
+  stroke: #5a5a5a;
+  stroke-width: 1.1;
+  cursor: pointer;
+  transition: stroke 0.35s ease, fill 0.35s ease;
+  vector-effect: non-scaling-stroke;
+}
 
-  .continent:hover {
-    stroke: #9ec5d8;
-  }
+.continent:hover {
+  stroke: #9ec5d8;
+  fill: rgba(158, 197, 216, 0.06);
+}
 
-  .continent.active {
-    stroke: #9ec5d8;
-    fill: rgba(158, 197, 216, 0.10);
-  }
+.continent.active {
+  stroke: #9ec5d8;
+  fill: rgba(158, 197, 216, 0.10);   /* полупрозрачный голубой для активного */
+}
 
-  .continent-label {
-    fill: #7a7a7a;
-    font-size: 11px;
-    letter-spacing: 1.6px;
-    pointer-events: none;
-    transition: fill 0.35s ease;
-  }
+.continent-label {
+  fill: #7a7a7a;
+  font-size: 33px;                    /* было 11 — увеличил в 3 раза */
+  letter-spacing: 1.6px;
+  pointer-events: none;
+  transition: fill 0.35s ease;
+}
 
-  .continent-label.active {
-    fill: #9ec5d8;
-  }
+.continent-label.active {
+  fill: #9ec5d8;
+}
 
   /* === JOIN BUTTON === */
-  #join-btn {
-    background: transparent;
-    border: 1px solid #6a6a6a;
-    color: #c8c8c8;
-    padding: 14px 48px;
-    font-family: inherit;
-    font-size: 14px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.35s ease;
-    margin-top: 8px;
-  }
+ #join-btn {
+  display: block;
+  margin: 8px auto 0 auto;   /* auto по бокам = центр по горизонтали */
+  background: transparent;
+  border: 1px solid #6a6a6a;
+  color: #c8c8c8;
+  padding: 14px 48px;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
 
-  #join-btn:hover {
-    border-color: #9ec5d8;
-    color: #9ec5d8;
-    letter-spacing: 4px;
-  }
-
+#join-btn:hover {
+  border-color: #9ec5d8;
+  color: #9ec5d8;
+  letter-spacing: 4px;
+}
+ 
   #join-btn:disabled {
     opacity: 0.3;
     cursor: default;
