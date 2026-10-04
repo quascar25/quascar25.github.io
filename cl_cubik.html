@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>╨Ъ╤Г╨▒╨╕╨║</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .scene { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; perspective: 700px; }
+  .cube { position: relative; width: 160px; height: 160px; transform-style: preserve-3d; cursor: pointer; }
+  .face { position: absolute; width: 160px; height: 160px; opacity: .92; border: 2px solid rgba(255,255,255,.35); box-sizing: border-box; }
+  .front  { background: #ff2d2d; transform: translateZ(80px); }
+  .back   { background: #2dff6a; transform: rotateY(180deg) translateZ(80px); }
+  .right  { background: #2d7bff; transform: rotateY(90deg) translateZ(80px); }
+  .left   { background: #ffe92d; transform: rotateY(-90deg) translateZ(80px); }
+  .top    { background: #ff2dd4; transform: rotateX(90deg) translateZ(80px); }
+  .bottom { background: #2df0ff; transform: rotateX(-90deg) translateZ(80px); }
+  canvas { position: fixed; inset: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="cube" id="cube">
+    <div class="face front"></div><div class="face back"></div>
+    <div class="face right"></div><div class="face left"></div>
+    <div class="face top"></div><div class="face bottom"></div>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+  var tg = window.Telegram && window.Telegram.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  var cube = document.getElementById('cube');
+  var cv = document.getElementById('fx'), ctx = cv.getContext('2d');
+  function resize() { cv.width = innerWidth; cv.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+
+  // ╨У╤А╨░╨╜╨╕: ╨╜╨╛╤А╨╝╨░╨╗╤М (x, y, z) ╨╕ ╤Ж╨▓╨╡╤В. ╨Ю╤Б╤М y ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨░ ╨▓╨╜╨╕╨╖, ╨║╨░╨║ ╨▓ CSS.
+  var faces = [
+    { n: [0, 0, 1],  c: '#ff2d2d' }, { n: [0, 0, -1], c: '#2dff6a' },
+    { n: [1, 0, 0],  c: '#2d7bff' }, { n: [-1, 0, 0], c: '#ffe92d' },
+    { n: [0, -1, 0], c: '#ff2dd4' }, { n: [0, 1, 0],  c: '#2df0ff' }
+  ];
+
+  var ax = -25, ay = 0; // ╤Г╨│╨╗╤Л ╨▓ ╨│╤А╨░╨┤╤Г╤Б╨░╤Е
+  var last = performance.now();
+
+  function frame(t) {
+    var dt = (t - last) / 1000; last = t;
+    ay += 18 * dt;   // ╨╝╨╡╨┤╨╗╨╡╨╜╨╜╨╛╨╡ ╨▓╤А╨░╤Й╨╡╨╜╨╕╨╡
+    ax += 7 * dt;
+    cube.style.transform = 'rotateX(' + ax + 'deg) rotateY(' + ay + 'deg)';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ╨ж╨▓╨╡╤В ╨│╤А╨░╨╜╨╕, ╨┐╨╛╨▓╤С╤А╨╜╤Г╤В╨╛╨╣ ╨║ ╨╖╤А╨╕╤В╨╡╨╗╤О (╨╝╨░╨║╤Б╨╕╨╝╨░╨╗╤М╨╜╨░╤П z ╨┐╨╛╤Б╨╗╨╡ ╨┐╨╛╨▓╨╛╤А╨╛╤В╨░)
+  function frontColor() {
+    var a = ax * Math.PI / 180, b = ay * Math.PI / 180, best = -2, color = '#fff';
+    faces.forEach(function (f) {
+      var x = f.n[0], y = f.n[1], z = f.n[2];
+      var z1 = -x * Math.sin(b) + z * Math.cos(b);   // rotateY
+      var z2 = y * Math.sin(a) + z1 * Math.cos(a);   // rotateX
+      if (z2 > best) { best = z2; color = f.c; }
+    });
+    return color;
+  }
+
+  var bolt = null;
+
+  function makeBolt() {
+    var cx = innerWidth / 2, endY = innerHeight / 2 - 120, startY = Math.max(10, endY - 260);
+    function path(x0, y0, x1, y1, n, spread) {
+      var p = [[x0, y0]];
+      for (var i = 1; i < n; i++) {
+        var k = i / n;
+        p.push([x0 + (x1 - x0) * k + (Math.random() - .5) * spread, y0 + (y1 - y0) * k]);
+      }
+      p.push([x1, y1]);
+      return p;
+    }
+    var main = path(cx + (Math.random() - .5) * 40, startY, cx, endY, 9, 70);
+    var m = main[4];
+    var branch = path(m[0], m[1], m[0] + (Math.random() < .5 ? -1 : 1) * 70, m[1] + 80, 4, 40);
+    return [main, branch];
+  }
+
+  function draw(now) {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    if (bolt) {
+      var age = now - bolt.t0;
+      if (age > 500) { bolt = null; }
+      else {
+        // ╨║╨╛╤А╨╛╤В╨║╨╕╨╡ ╨▓╤Б╨┐╤Л╤И╨║╨╕: ╨╝╨╡╤А╤Ж╨░╨╜╨╕╨╡, ╨╖╨░╤В╨╡╨╝ ╨╖╨░╤В╤Г╤Е╨░╨╜╨╕╨╡
+        var alpha = (age < 250 ? (Math.floor(age / 50) % 2 ? .6 : 1) : 1 - (age - 250) / 250);
+        ctx.globalAlpha = alpha; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.shadowColor = bolt.color; ctx.shadowBlur = 25;
+        bolt.paths.forEach(function (p, i) {
+          ctx.beginPath();
+          p.forEach(function (pt, j) { j ? ctx.lineTo(pt[0], pt[1]) : ctx.moveTo(pt[0], pt[1]); });
+          ctx.strokeStyle = bolt.color; ctx.lineWidth = i ? 3 : 6; ctx.stroke();
+          ctx.shadowBlur = 0; ctx.strokeStyle = '#fff'; ctx.lineWidth = i ? 1 : 2; ctx.stroke();
+          ctx.shadowBlur = 25;
+        });
+        ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  cube.addEventListener('pointerdown', function () {
+    bolt = { color: frontColor(), paths: makeBolt(), t0: performance.now() };
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+  });
+</script>
+</body>
+</html>
