@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест ДВС — Термодинамические циклы</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    color: #1a1a1a;
+  }
+  .container {
+    max-width: 750px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 30px;
+  }
+  h1 {
+    font-size: 22px;
+    margin: 0 0 6px;
+    color: #1a3a5c;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  .progress {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #e4e7ec;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #2d6cdf;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .question {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 18px;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    padding: 12px 16px;
+    border: 2px solid #d5dae2;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 15px;
+    line-height: 1.4;
+    background: #fafbfc;
+  }
+  .option:hover {
+    border-color: #2d6cdf;
+    background: #f0f5ff;
+  }
+  .option.correct {
+    border-color: #1e9e5a;
+    background: #e8f8f0;
+  }
+  .option.wrong {
+    border-color: #d63a3a;
+    background: #fdeaea;
+  }
+  .option.disabled {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .explanation {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation.ok {
+    background: #e8f8f0;
+    border-left: 4px solid #1e9e5a;
+  }
+  .explanation.bad {
+    background: #fdeaea;
+    border-left: 4px solid #d63a3a;
+  }
+  .explanation strong { display: block; margin-bottom: 4px; }
+  .controls {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .score {
+    font-size: 14px;
+    color: #555;
+  }
+  .score b { color: #1a3a5c; }
+  button {
+    background: #2d6cdf;
+    color: #fff;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button:hover { background: #1f55b8; }
+  button:disabled {
+    background: #b8c4d6;
+    cursor: not-allowed;
+  }
+  .final {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .final h2 { color: #1a3a5c; margin: 0 0 10px; }
+  .final .big { font-size: 42px; font-weight: 700; color: #2d6cdf; }
+  .final .msg { color: #555; margin: 10px 0 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Теория рабочих процессов поршневых двигателей</h1>
+  <div class="subtitle">Вопрос 1. Термодинамические циклы с различными способами подвода и отвода теплоты</div>
+
+  <div class="progress" id="progress">Вопрос 1 из 10</div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div id="quizArea">
+    <div class="question" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <div class="explanation" id="explanation"></div>
+    <div class="controls">
+      <div class="score">Правильно: <b id="scoreVal">0</b> / <span id="scoreTotal">0</span></div>
+      <button id="nextBtn" disabled>Далее →</button>
+    </div>
+  </div>
+
+  <div id="finalArea" style="display:none;">
+    <div class="final">
+      <h2>Тест завершён</h2>
+      <div class="big" id="finalScore">0 / 10</div>
+      <div class="msg" id="finalMsg"></div>
+      <button onclick="location.reload()">Пройти заново</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Какой идеальный термодинамический цикл лежит в основе работы бензинового двигателя с искровым зажиганием?",
+    options: [
+      "Цикл Дизеля",
+      "Цикл Отто",
+      "Цикл Карно",
+      "Цикл Тринклера"
+    ],
+    correct: 1,
+    explanation: "Бензиновый двигатель с искровым зажиганием работает по циклу Отто — с подводом теплоты при постоянном объёме (v = const). Цикл Дизеля — подвод при постоянном давлении, Тринклера — смешанный."
+  },
+  {
+    q: "В цикле Дизеля подвод теплоты происходит:",
+    options: [
+      "При постоянном объёме",
+      "При постоянном давлении",
+      "Частично при V=const, частично при P=const",
+      "При постоянной температуре"
+    ],
+    correct: 1,
+    explanation: "В идеальном цикле Дизеля теплота подводится при постоянном давлении (p = const). Именно поэтому его называют циклом с изобарным подводом теплоты."
+  },
+  {
+    q: "Что такое степень сжатия ε?",
+    options: [
+      "Отношение полного объёма цилиндра к объёму камеры сгорания",
+      "Отношение объёма камеры сгорания к полному объёму",
+      "Отношение хода поршня к диаметру цилиндра",
+      "Разность между полным объёмом и объёмом камеры сгорания"
+    ],
+    correct: 0,
+    explanation: "Степень сжатия ε = Va / Vc, где Va — полный объём цилиндра, Vc — объём камеры сгорания. Это ключевой параметр, влияющий на КПД цикла."
+  },
+  {
+    q: "Как влияет увеличение степени сжатия на термический КПД цикла Отто?",
+    options: [
+      "КПД не изменяется",
+      "КПД уменьшается",
+      "КПД увеличивается",
+      "КПД сначала растёт, потом падает"
+    ],
+    correct: 2,
+    explanation: "Для цикла Отто η = 1 − 1/ε^(k−1). Чем больше ε, тем выше КПД. Однако в реальных двигателях рост ограничен детонацией."
+  },
+  {
+    q: "Цикл Карно в реальных поршневых ДВС не используется, потому что:",
+    options: [
+      "Он имеет самый низкий КПД",
+      "Его невозможно реализовать технически из-за необходимости изотермических процессов",
+      "Он требует слишком высокого давления",
+      "Он работает только на газообразном топливе"
+    ],
+    correct: 1,
+    explanation: "Цикл Карно имеет максимальный теоретический КПД, но его практическая реализация невозможна: изотермическое сжатие и расширение при высоких скоростях поршня технически неосуществимы."
+  },
+  {
+    q: "Какой цикл наиболее близок к реальному рабочему процессу современных дизельных двигателей?",
+    options: [
+      "Цикл Отто",
+      "Цикл Дизеля",
+      "Цикл Тринклера (смешанный)",
+      "Цикл Карно"
+    ],
+    correct: 2,
+    explanation: "В реальном дизеле теплота подводится сначала при почти постоянном объёме (фаза быстрого сгорания), затем при почти постоянном давлении. Это соответствует смешанному циклу Тринклера."
+  },
+  {
+    q: "Что такое среднее индикаторное давление (MEP)?",
+    options: [
+      "Максимальное давление в цилиндре за цикл",
+      "Условное постоянное давление, совершающее за один ход поршня ту же работу, что и реальное переменное давление за цикл",
+      "Давление в конце сжатия",
+      "Среднее давление газов на выпуске"
+    ],
+    correct: 1,
+    explanation: "Среднее индикаторное давление — это условная величина: постоянное давление, которое за один рабочий ход совершило бы работу, равную индикаторной работе за весь цикл. Характеризует нагрузку и совершенство цикла."
+  },
+  {
+    q: "В цикле Тринклера теплота отводится:",
+    options: [
+      "При постоянном объёме",
+      "При постоянном давлении",
+      "При постоянной температуре",
+      "При постоянной энтропии"
+    ],
+    correct: 0,
+    explanation: "Во всех трёх циклах (Отто, Дизеля, Тринклера) отвод теплоты в идеальном цикле происходит при постоянном объёме (v = const), то есть по изохоре."
+  },
+  {
+    q: "Какая формула соответствует термическому КПД цикла Отто?",
+    options: [
+      "η = 1 − 1/ε^(k−1)",
+      "η = 1 − ρ^k / ε^(k−1)",
+      "η = 1 − 1/(ε^(k−1)) · (ρ^k − 1)/(k(ρ − 1))",
+      "η = 1 − T2/T1"
+    ],
+    correct: 0,
+    explanation: "Для цикла Отто η = 1 − 1/ε^(k−1), где ε — степень сжатия, k — показатель адиабаты. Остальные формулы — для цикла Дизеля и Тринклера."
+  },
+  {
+    q: "Почему в реальных двигателях степень сжатия бензинового двигателя ограничена (обычно 9–12)?",
+    options: [
+      "Из-за ограничений прочности коленвала",
+      "Из-за детонации — преждевременного самовоспламенения топлива",
+      "Из-за низкого октанового числа моторного масла",
+      "Из-за невозможности обеспечить высокую точность изготовления"
+    ],
+    correct: 1,
+    explanation: "При высокой степени сжатия температура и давление в конце сжатия растут, что вызывает детонацию — взрывное самовоспламенение топлива. Это ограничивает ε для бензиновых двигателей."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+const qEl = document.getElementById('questionText');
+const optEl = document.getElementById('options');
+const expEl = document.getElementById('explanation');
+const nextBtn = document.getElementById('nextBtn');
+const progressEl = document.getElementById('progress');
+const progressFill = document.getElementById('progressFill');
+const scoreVal = document.getElementById('scoreVal');
+const scoreTotal = document.getElementById('scoreTotal');
+
+function render() {
+  answered = false;
+  const q = questions[current];
+  qEl.textContent = q.q;
+  optEl.innerHTML = '';
+  expEl.className = 'explanation';
+  expEl.innerHTML = '';
+  nextBtn.disabled = true;
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt;
+    div.onclick = () => selectAnswer(i, div);
+    optEl.appendChild(div);
+  });
+
+  progressEl.textContent = `Вопрос ${current + 1} из ${questions.length}`;
+  progressFill.style.width = ((current) / questions.length * 100) + '%';
+  scoreTotal.textContent = questions.length;
+  scoreVal.textContent = score;
+}
+
+function selectAnswer(idx, el) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[current];
+  const allOptions = optEl.querySelectorAll('.option');
+  allOptions.forEach(o => o.classList.add('disabled'));
+
+  if (idx === q.correct) {
+    el.classList.add('correct');
+    score++;
+    scoreVal.textContent = score;
+    expEl.className = 'explanation show ok';
+    expEl.innerHTML = '<strong>✅ Верно!</strong>' + q.explanation;
+  } else {
+    el.classList.add('wrong');
+    allOptions[q.correct].classList.add('correct');
+    expEl.className = 'explanation show bad';
+    expEl.innerHTML = '<strong>❌ Неверно.</strong>' + q.explanation;
+  }
+
+  nextBtn.disabled = false;
+}
+
+nextBtn.onclick = () => {
+  current++;
+  if (current < questions.length) {
+    render();
+  } else {
+    showFinal();
+  }
+};
+
+function showFinal() {
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('finalArea').style.display = 'block';
+  progressFill.style.width = '100%';
+  progressEl.textContent = 'Завершено';
+
+  document.getElementById('finalScore').textContent = score + ' / ' + questions.length;
+  const pct = score / questions.length * 100;
+  let msg = '';
+  if (pct >= 90) msg = 'Отличный результат! Материал усвоен.';
+  else if (pct >= 70) msg = 'Хороший результат, но есть пробелы. Повторите слабые темы.';
+  else if (pct >= 50) msg = 'Удовлетворительно. Нужно вернуться к учебнику Луканина.';
+  else msg = 'Слабый результат. Рекомендуется повторить теорию циклов с нуля.';
+  document.getElementById('finalMsg').textContent = msg;
+}
+
+render();
+</script>
+</body>
+</html>
