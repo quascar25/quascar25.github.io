@@ -84,7 +84,7 @@
             height: 100%;
             background-color: black;
             z-index: 10;
-            display: none;          /* изначально скрыт */
+            display: none;
             align-items: center;
             justify-content: center;
         }
@@ -94,7 +94,7 @@
             max-height: 100%;
             width: auto;
             height: auto;
-            object-fit: contain;    /* сохраняет пропорции, вписывая в экран */
+            object-fit: contain;
             background: black;
             display: block;
             margin: 0 auto;
@@ -105,7 +105,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 180, 255, 0.2);         /* полупрозрачный голубой */
+            background: rgba(0, 180, 255, 0.2);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(0, 255, 255, 0.5);
@@ -176,9 +176,9 @@
             z-index: 2;
             background: transparent;
             border: 2px solid rgba(255, 255, 255, 0.9);
-            border-radius: 20px; /* Делает кнопку более вытянутой, как у YouTube */
+            border-radius: 20px;
             width: 180px;
-            height: 120px; /* Приплюснутая форма */
+            height: 120px;
             max-width: 65vw;
             max-height: 40vw;
             display: flex;
@@ -190,26 +190,23 @@
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
         
-        /* Белая стрелка как на YouTube */
         .youtube-play-icon {
             width: 0;
             height: 0;
             border-left: 40px solid white;
             border-top: 24px solid transparent;
             border-bottom: 24px solid transparent;
-            margin-left: 8px; /* Небольшой сдвиг для центрирования треугольника */
+            margin-left: 8px;
             filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
             transition: transform 0.2s, filter 0.2s;
         }
         
-        /* Альтернативный вариант стрелки (если треугольник кажется слишком большим) */
         .youtube-btn.smaller-arrow .youtube-play-icon {
             border-left: 32px solid white;
             border-top: 20px solid transparent;
             border-bottom: 20px solid transparent;
         }
         
-        /* Эффект при нажатии */
         .youtube-btn:active {
             transform: scale(0.96);
             border-color: white;
@@ -221,7 +218,6 @@
             filter: drop-shadow(0 0 12px white);
         }
         
-        /* Для очень маленьких экранов */
         @media (max-width: 480px) {
             .youtube-btn {
                 width: 140px;
@@ -234,103 +230,127 @@
             }
         }
 
-        
-        /* ////dil */
-        /* Контейнер полоски загрузки */
-        .loading-bar-container {
+        /* ===== SEEK BAR (интерактивный прогрессбар) ===== */
+        .seek-bar {
             position: absolute;
-            bottom: 118px;  /* Поднял на 4 пикселя (было 86) 82*/
+            bottom: 120px;                /* над панелью управления */
             left: 50%;
             transform: translateX(-50%);
-            width: 260px;  /* Фиксированная ширина, как у панели */
-            height: 3px;
-            background-color: rgba(128, 128, 128, 0.5);
-            border-radius: 2px;
+            width: 260px;                 /* как у панели */
+            height: 20px;                 /* увеличенная зона клика */
             z-index: 25;
-            overflow: hidden;
-            backdrop-filter: blur(2px);
-            opacity: 0;  /* По умолчанию скрыта */
+            opacity: 0;
             transition: opacity 0.2s ease;
-            pointer-events: none; /* Чтобы не мешала нажимать на кнопки */
+            pointer-events: none;         /* пока скрыт — не мешает */
+            display: flex;
+            align-items: center;
+            cursor: pointer;
         }
 
+        /* Показываем вместе с панелью */
+        .control-panel.visible ~ .seek-bar,
+        .seek-bar.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-                 /* Показываем полоску вместе с панелью */
-            .control-panel.visible ~ .loading-bar-container,
-            .loading-bar-container.visible {
-                opacity: 1;
-            }
-            
-            /* Бегущая белая полоска */
-            .loading-bar-progress {
-                width: 0%;
-                height: 100%;
-                background-color: white;
-                border-radius: 2px;
-                transition: width 0.3s ease;
-                box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
-            }
-            
-            /* При полной загрузке - зелёная и потом исчезает */
-            .loading-bar-progress.complete {
-                background-color: #4caf50;
-                animation: fadeOut 0.5s forwards;
-                animation-delay: 0.3s;
-            }
-            
-            @keyframes fadeOut {
-                to {
-                    opacity: 0;
-                }
-            }
-            
-            /* Для мобильных экранов */
-            @media (max-width: 480px) {
-                .loading-bar-container {
-                    width: 220px;  /* Чуть уже на маленьких экранах */
-                    bottom: 78px;
-                }
-            }
+        /* Трек (фон) */
+        .seek-bar-track {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background-color: rgba(128, 128, 128, 0.5);
+            border-radius: 3px;
+            overflow: visible;
+            backdrop-filter: blur(2px);
+        }
 
-        <div class="fullscreen-hint" id="fullscreenHint">
-         👆 Свайпните сверху для выхода
-        </div>
-        
-        /* На маленьких экранах поднимем повыше */
-        @media (max-width: 600px) {
-            .loading-bar-container {
+        /* Буферизация (серым) */
+        .seek-bar-buffered {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background-color: rgba(200, 200, 200, 0.5);
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        /* Прогресс воспроизведения */
+        .seek-bar-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background-color: white;
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+        }
+
+        /* Ползунок */
+        .seek-bar-thumb {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            box-shadow: 0 0 10px cyan, 0 0 4px white;
+            pointer-events: none;
+            transition: transform 0.15s ease;
+        }
+
+        .seek-bar:hover .seek-bar-thumb,
+        .seek-bar.dragging .seek-bar-thumb {
+            transform: translate(-50%, -50%) scale(1.25);
+        }
+
+        .seek-bar.dragging .seek-bar-progress {
+            box-shadow: 0 0 16px cyan, 0 0 8px white;
+        }
+
+        /* На маленьких экранах */
+        @media (max-width: 480px) {
+            .seek-bar {
+                width: 220px;
                 bottom: 90px;
             }
         }
-        /* ////dil */
-
-
-
-            .fullscreen-hint {
-                position: absolute;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                color: rgba(255, 255, 255, 0.8);
-                background: rgba(0,0,0,0.5);
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-size: 14px;
-                z-index: 26;
-                backdrop-filter: blur(4px);
-                border: 1px solid rgba(255,255,255,0.3);
-                animation: fadeOut 3s forwards;
-                animation-delay: 2s;
+        @media (max-width: 600px) {
+            .seek-bar {
+                bottom: 90px;
             }
-            
-            @keyframes fadeOut {
-                to {
-                    opacity: 0;
-                    visibility: hidden;
-                }
-            }
+        }
 
-    
+        /* Полноэкранная подсказка */
+        .fullscreen-hint {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 26;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeOut 3s forwards;
+            animation-delay: 2s;
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
     </style>
 </head>
 <body>
@@ -344,30 +364,30 @@
         </div>
 
         <div class="video-container" id="videoContainer">
-            
-            
-            <div class="loading-bar-container">
-                <div class="loading-bar-progress" id="loadingProgress"></div>
-            </div>
-            
-            <div class="error-message" id="videoError">
-                Ошибка загрузки видео<br>
-                Проверьте наличие файлов в папке viliv/
-            </div>
-            
 
-            
             <div class="error-message" id="videoError">
                 Ошибка загрузки видео<br>
                 Проверьте наличие файлов в папке viliv/
             </div>
+
             <video id="playerVideo" playsinline webkit-playsinline preload="auto"></video>
+
             <div class="control-panel" id="controlPanel">
                 <button class="icon-btn play" id="playBtn" aria-label="Воспроизвести">▶</button>
                 <button class="icon-btn pause" id="pauseBtn" aria-label="Пауза">⏸️</button>
                 <button class="icon-btn next" id="nextBtn" aria-label="Следующий">⏭️</button>
                 <button class="icon-btn close" id="closeBtn" aria-label="Закрыть видео">✕</button>
             </div>
+
+            <!-- ===== SEEK BAR ===== -->
+            <div class="seek-bar" id="seekBar">
+                <div class="seek-bar-track" id="seekTrack">
+                    <div class="seek-bar-buffered" id="seekBuffered"></div>
+                    <div class="seek-bar-progress" id="seekProgress"></div>
+                    <div class="seek-bar-thumb" id="seekThumb"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -384,20 +404,30 @@
             const closeBtn = document.getElementById('closeBtn');
             const videoError = document.getElementById('videoError');
 
+            // Seek-bar элементы
+            const seekBar = document.getElementById('seekBar');
+            const seekTrack = document.getElementById('seekTrack');
+            const seekBuffered = document.getElementById('seekBuffered');
+            const seekProgress = document.getElementById('seekProgress');
+            const seekThumb = document.getElementById('seekThumb');
+
             let hidePanelTimer = null;
-            
+            let isFirstOpen = true;
+            let isDragging = false;
+            let wasPlayingBeforeDrag = false;
+
             // ВАЖНО: Укажите правильные имена файлов
             const videoFiles = ['sb01.mp4', 'sb01.mp4'];
             let currentIndex = 0;
 
-            // ----- Функции для Fullscreen API -----
+            // ----- Fullscreen -----
             function enterFullScreen() {
-                const elem = videoContainer; // Переводим в полноэкранный режим весь контейнер с видео
+                const elem = videoContainer;
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                } else if (elem.webkitRequestFullscreen) {
                     elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                } else if (elem.msRequestFullscreen) {
                     elem.msRequestFullscreen();
                 }
             }
@@ -405,30 +435,26 @@
             function exitFullScreen() {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari */
+                } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { /* IE/Edge */
+                } else if (document.msExitFullscreen) {
                     document.msExitFullscreen();
                 }
             }
 
-            // Слушатель для отслеживания изменения полноэкранного режима
             document.addEventListener('fullscreenchange', handleFullscreenChange);
-            document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // Для Safari
-            document.addEventListener('msfullscreenchange', handleFullscreenChange); // Для IE/Edge
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('msfullscreenchange', handleFullscreenChange);
 
             function handleFullscreenChange() {
                 if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-                    // Если мы вышли из полноэкранного режима (например, нажали системную кнопку "назад" или свайп)
-                    // и видео-контейнер всё ещё виден, то... что делать?
-                    // По логике, можно либо ничего не делать, либо закрыть видео. Закроем видео для чистоты интерфейса.
                     if (videoContainer.style.display === 'flex') {
-                        closeVideo(); // Закрываем видео, возвращаясь к звёздам
+                        closeVideo();
                     }
                 }
             }
 
-            // ----- Звездный фон -----
+            // ----- Звёздный фон -----
             let stars = [];
             const ctx = starsCanvas.getContext('2d');
             const STAR_COUNT = 180;
@@ -482,38 +508,30 @@
             resizeHandler();
             drawStars();
 
-            // ----- Функции управления панелью и видео -----
-            // Измените функцию showControlPanel
+            // ----- Панель управления -----
             function showControlPanel() {
                 controlPanel.classList.add('visible');
-                updateLoadingBarVisibility(true); // Показываем полоску
+                seekBar.classList.add('visible');
                 resetHidePanelTimer();
             }
-            
-            // Измените функцию hideControlPanel
+
             function hideControlPanel() {
                 controlPanel.classList.remove('visible');
-                updateLoadingBarVisibility(false); // Скрываем полоску
+                seekBar.classList.remove('visible');
             }
 
-                                let isFirstOpen = true; // Добавьте эту переменную в начало скрипта (рядом с другими let)
-                                
-                                function resetHidePanelTimer() {
-                                    if (hidePanelTimer) clearTimeout(hidePanelTimer);
-                                    
-                                    // При первом открытии даём больше времени (6 секунд), потом по 3 секунды
-                                    const timeoutDuration = isFirstOpen ? 6000 : 3000;
-                                    
-                                    hidePanelTimer = setTimeout(() => {
-                                        controlPanel.classList.remove('visible');
-                                        isFirstOpen = false; // После первого скрытия сбрасываем флаг
-                                    }, timeoutDuration);
-                                }
+            function resetHidePanelTimer() {
+                if (hidePanelTimer) clearTimeout(hidePanelTimer);
+                const timeoutDuration = isFirstOpen ? 6000 : 3000;
+                hidePanelTimer = setTimeout(() => {
+                    controlPanel.classList.remove('visible');
+                    seekBar.classList.remove('visible');
+                    isFirstOpen = false;
+                }, timeoutDuration);
+            }
 
             function loadVideoByIndex(index) {
                 if (index >= 0 && index < videoFiles.length) {
-                    // Формируем правильный URL для GitHub Pages
-                    // Учитываем, что HTML лежит в корне, а видео — в папке viliv
                     const baseUrl = window.location.origin + '/viliv/';
                     const fileName = videoFiles[index];
                     const videoUrl = baseUrl + fileName;
@@ -537,86 +555,114 @@
                 }
             }
 
-            //// dil 
-                                       // ----- Обновлённая функция отслеживания загрузки -----
-                                const loadingProgress = document.getElementById('loadingProgress');
-                                const loadingContainer = document.querySelector('.loading-bar-container');
-                                let isFullyLoaded = false; // Добавьте эту переменную в начало скрипта
-                                
-                                function setupProgressTracking(videoElement) {
-                                    // При обновлении данных о загрузке
-                                    videoElement.addEventListener('progress', function() {
-                                        if (videoElement.buffered.length > 0 && videoElement.duration > 0) {
-                                            const bufferedEnd = videoElement.buffered.end(videoElement.buffered.length - 1);
-                                            const duration = videoElement.duration;
-                                            
-                                            if (duration > 0) {
-                                                const percent = (bufferedEnd / duration) * 100;
-                                                loadingProgress.style.width = percent + '%';
-                                                
-                                                // Если видео полностью загружено и ещё не отмечали
-                                                if (percent >= 99.9 && !isFullyLoaded) {
-                                                    isFullyLoaded = true;
-                                                    loadingProgress.classList.add('complete');
-                                                    
-                                                    // Полностью скрываем контейнер после анимации
-                                                    setTimeout(() => {
-                                                        if (!controlPanel.classList.contains('visible')) {
-                                                            loadingContainer.style.opacity = '0';
-                                                        }
-                                                    }, 1000);
-                                                }
-                                            }
-                                        }
-                                    });
-                                
-                                    // Когда видео полностью загружено (событие canplaythrough)
-                                    videoElement.addEventListener('canplaythrough', function() {
-                                        if (!isFullyLoaded) {
-                                            isFullyLoaded = true;
-                                            loadingProgress.style.width = '100%';
-                                            loadingProgress.classList.add('complete');
-                                            
-                                            setTimeout(() => {
-                                                if (!controlPanel.classList.contains('visible')) {
-                                                    loadingContainer.style.opacity = '0';
-                                                }
-                                            }, 1000);
-                                        }
-                                    });
-                                
-                                    // При смене источника сбрасываем всё
-                                    videoElement.addEventListener('loadstart', function() {
-                                        resetLoadingIndicator();
-                                    });
-                                }
-                                
-                                // Функция сброса индикатора
-                                function resetLoadingIndicator() {
-                                    isFullyLoaded = false;
-                                    loadingProgress.style.width = '0%';
-                                    loadingProgress.classList.remove('complete');
-                                    loadingContainer.style.opacity = '0';
-                                }
-                                
-                                // Функция показа/скрытия полоски вместе с панелью
-                                function updateLoadingBarVisibility(show) {
-                                    if (!isFullyLoaded) {
-                                        loadingContainer.style.opacity = show ? '1' : '0';
-                                    } else {
-                                        loadingContainer.style.opacity = '0';
-                                    }
-                                }
-                                                
+            // ----- Логика Seek Bar -----
+            function updateSeekBar() {
+                if (!playerVideo.duration || isNaN(playerVideo.duration)) return;
+                const percent = (playerVideo.currentTime / playerVideo.duration) * 100;
+                seekProgress.style.width = percent + '%';
+                seekThumb.style.left = percent + '%';
+            }
 
-                // Вызовите эту функцию после создания видео элемента
-                setupProgressTracking(playerVideo);
-            
-            //// dil
+            function updateBuffered() {
+                if (!playerVideo.duration || isNaN(playerVideo.duration)) return;
+                if (playerVideo.buffered.length > 0) {
+                    const bufferedEnd = playerVideo.buffered.end(playerVideo.buffered.length - 1);
+                    const percent = Math.min(100, (bufferedEnd / playerVideo.duration) * 100);
+                    seekBuffered.style.width = percent + '%';
+                }
+            }
 
+            function resetSeekBar() {
+                seekProgress.style.width = '0%';
+                seekThumb.style.left = '0%';
+                seekBuffered.style.width = '0%';
+            }
+
+            // Позиция клика/тапа в процентах (0..1)
+            function getRatioFromEvent(clientX) {
+                const rect = seekTrack.getBoundingClientRect();
+                let ratio = (clientX - rect.left) / rect.width;
+                return Math.min(1, Math.max(0, ratio));
+            }
+
+            function seekToRatio(ratio) {
+                if (!playerVideo.duration || isNaN(playerVideo.duration)) return;
+                playerVideo.currentTime = ratio * playerVideo.duration;
+                const percent = ratio * 100;
+                seekProgress.style.width = percent + '%';
+                seekThumb.style.left = percent + '%';
+            }
+
+            // --- Drag / click ---
+            function onPointerDown(e) {
+                e.stopPropagation();
+                isDragging = true;
+                wasPlayingBeforeDrag = !playerVideo.paused;
+
+                seekBar.classList.add('dragging');
+                seekBar.setPointerCapture && seekBar.setPointerCapture(e.pointerId);
+
+                const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+                if (clientX !== undefined) {
+                    seekToRatio(getRatioFromEvent(clientX));
+                }
+
+                resetHidePanelTimer();
+            }
+
+            function onPointerMove(e) {
+                if (!isDragging) return;
+                e.preventDefault && e.preventDefault();
+                const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+                if (clientX !== undefined) {
+                    seekToRatio(getRatioFromEvent(clientX));
+                }
+            }
+
+            function onPointerUp(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                seekBar.classList.remove('dragging');
+
+                // Если видео играло до начала перетаскивания — продолжаем
+                if (wasPlayingBeforeDrag) {
+                    playerVideo.play().catch(() => {});
+                }
+                resetHidePanelTimer();
+            }
+
+            // Используем pointer events (работают и для мыши, и для тача в современных браузерах)
+            if (window.PointerEvent) {
+                seekBar.addEventListener('pointerdown', onPointerDown);
+                seekBar.addEventListener('pointermove', onPointerMove);
+                seekBar.addEventListener('pointerup', onPointerUp);
+                seekBar.addEventListener('pointercancel', onPointerUp);
+            } else {
+                // Fallback: mouse + touch
+                seekBar.addEventListener('mousedown', onPointerDown);
+                window.addEventListener('mousemove', onPointerMove);
+                window.addEventListener('mouseup', onPointerUp);
+
+                seekBar.addEventListener('touchstart', onPointerDown, { passive: false });
+                window.addEventListener('touchmove', onPointerMove, { passive: false });
+                window.addEventListener('touchend', onPointerUp);
+                window.addEventListener('touchcancel', onPointerUp);
+            }
+
+            // Обновление прогресса при воспроизведении
+            playerVideo.addEventListener('timeupdate', updateSeekBar);
+            playerVideo.addEventListener('progress', updateBuffered);
+            playerVideo.addEventListener('loadedmetadata', function() {
+                resetSeekBar();
+                updateBuffered();
+            });
+            playerVideo.addEventListener('durationchange', updateBuffered);
+            playerVideo.addEventListener('seeked', updateSeekBar);
+            playerVideo.addEventListener('loadstart', resetSeekBar);
+
+            // ----- Закрытие видео -----
             function closeVideo() {
                 playerVideo.pause();
-                // Выходим из полноэкранного режима, если активен
                 exitFullScreen();
                 videoContainer.style.display = 'none';
                 hideControlPanel();
@@ -626,20 +672,19 @@
                 }
                 currentIndex = 0;
                 loadVideoByIndex(0);
-                isFirstOpen = true; // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
-                resetLoadingIndicator(); // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+                isFirstOpen = true;
+                resetSeekBar();
             }
 
-            // ----- Обработчики событий -----
+            // ----- Обработчики -----
             startBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 videoContainer.style.display = 'flex';
                 currentIndex = 0;
                 loadVideoByIndex(0);
-                // Пытаемся войти в полноэкранный режим
                 enterFullScreen();
                 showControlPanel();
-                isFirstOpen = true; // <--- И СЮДА ТОЖЕ
+                isFirstOpen = true;
             });
 
             playBtn.addEventListener('click', (e) => {
@@ -650,7 +695,6 @@
                     })
                     .catch(err => {
                         console.warn('Автовоспроизведение не удалось:', err);
-                        // Пробуем воспроизвести после взаимодействия
                         setTimeout(() => {
                             playerVideo.play().catch(e => {});
                         }, 100);
@@ -669,8 +713,8 @@
                 currentIndex = (currentIndex + 1) % videoFiles.length;
                 loadVideoByIndex(currentIndex);
                 showControlPanel();
+                resetSeekBar();
                 
-                // Пытаемся воспроизвести автоматически после смены
                 setTimeout(() => {
                     playerVideo.play().catch(e => {});
                 }, 200);
@@ -691,7 +735,7 @@
             });
 
             videoContainer.addEventListener('click', (e) => {
-                if (!controlPanel.contains(e.target)) {
+                if (!controlPanel.contains(e.target) && !seekBar.contains(e.target)) {
                     showControlPanel();
                 }
             });
@@ -709,8 +753,7 @@
             // Инициализация
             hideControlPanel();
             loadVideoByIndex(0);
-          })();
-        setupProgressTracking(playerVideo);
+        })();
     </script>
 </body>
 </html>
