@@ -976,9 +976,12 @@ function applyLang(){
     if(val && val !== key) el.innerHTML = val;
   });
   document.getElementById('langLabel').textContent = LANG === 'ru' ? 'EN' : 'RU';
-  document.querySelector('[data-i18n="share"]').textContent = t('share');
-  document.querySelector('[data-i18n="download"]').textContent = t('download');
-  document.querySelector('[data-i18n="theme_label"]').textContent = t('theme_label');
+  const shareEl = document.querySelector('[data-i18n="share"]');
+  const dlEl = document.querySelector('[data-i18n="download"]');
+  const themeEl = document.querySelector('[data-i18n="theme_label"]');
+  if (shareEl) shareEl.textContent = t('share');
+  if (dlEl) dlEl.textContent = t('download');
+  if (themeEl) themeEl.textContent = t('theme_label');
   buildNav();
   buildNews();
 }
