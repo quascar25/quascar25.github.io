@@ -975,13 +975,19 @@ function applyLang(){
     const val = t(key);
     if(val && val !== key) el.innerHTML = val;
   });
-  document.getElementById('langLabel').textContent = LANG === 'ru' ? 'EN' : 'RU';
+
+  const langLabel = document.getElementById('langLabel');
+  if (langLabel) langLabel.textContent = LANG === 'ru' ? 'EN' : 'RU';
+
   const shareEl = document.querySelector('[data-i18n="share"]');
-  const dlEl = document.querySelector('[data-i18n="download"]');
-  const themeEl = document.querySelector('[data-i18n="theme_label"]');
   if (shareEl) shareEl.textContent = t('share');
+
+  const dlEl = document.querySelector('[data-i18n="download"]');
   if (dlEl) dlEl.textContent = t('download');
+
+  const themeEl = document.querySelector('[data-i18n="theme_label"]');
   if (themeEl) themeEl.textContent = t('theme_label');
+
   buildNav();
   buildNews();
 }
