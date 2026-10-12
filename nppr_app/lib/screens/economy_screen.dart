@@ -31,7 +31,7 @@ class EconomyScreen extends StatelessWidget {
           SectionCard(
             title: 'Земля',
             child: Column(
-              children: const [
+              children: [
                 _kv('Сельхозземля',
                     'Долгосрочная аренда с продлением'),
                 _kv('Садовые/дачные (до 12 соток)',
