@@ -3,17 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>НППР — Власть Народу</title>
 <meta name="description" content="Народно-патриотическая партия России — Власть Народу. Государство народа как национальная идея.">
+<meta name="theme-color" content="#1A3A6B">
 <meta property="og:title" content="НППР — Власть Народу">
 <meta property="og:description" content="Программа партии. Государство народа. Народная демократия.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://quascar25.github.io/nppr_app/">
-<meta property="og:image" content="https://quascar25.github.io/nppr_app/preview.jpg">
-<meta name="theme-color" content="#1A3A6B">
-
-  
-<title>НППР — Власть Народу</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
@@ -27,114 +23,98 @@
     --muted:#6B7280;
     --divider:#E5E7EB;
     --shadow:0 4px 20px rgba(0,0,0,0.06);
+    --hero-grad:linear-gradient(135deg,#1A3A6B 0%,#0D1F3C 100%);
+  }
+  [data-theme="dark"]{
+    --primary:#7DA9E8;
+    --accent:#FF4D6D;
+    --bg:#0D1117;
+    --surface:#161B22;
+    --text:#E6EDF3;
+    --muted:#8B949E;
+    --divider:#30363D;
+    --shadow:0 4px 20px rgba(0,0,0,0.3);
+    --hero-grad:linear-gradient(135deg,#1F2A44 0%,#0D1117 100%);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
   body{
     font-family:'Inter',system-ui,-apple-system,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    line-height:1.55;
+    background:var(--bg);color:var(--text);line-height:1.55;
     -webkit-font-smoothing:antialiased;
+    transition:background .3s,color .3s;
   }
   h1,h2,h3{font-family:'Montserrat',sans-serif;color:var(--primary);line-height:1.2;}
-
-  /* ===== Layout ===== */
   .app{display:flex;min-height:100vh;}
 
-  /* ===== Sidebar ===== */
+  /* Sidebar */
   .sidebar{
-    width:260px;
-    background:var(--bg);
+    width:260px;background:var(--bg);
     border-right:1px solid var(--divider);
     padding:20px 0;
-    position:fixed;
-    top:0;left:0;bottom:0;
-    overflow-y:auto;
-    transition:transform .3s ease;
+    position:fixed;top:0;left:0;bottom:0;
+    overflow-y:auto;transition:transform .3s ease;
     z-index:100;
   }
-  .brand{
-    display:flex;align-items:center;gap:12px;
-    padding:0 20px 20px;
-    border-bottom:1px solid var(--divider);
-    margin-bottom:16px;
-  }
+  .brand{display:flex;align-items:center;gap:12px;padding:0 20px 20px;border-bottom:1px solid var(--divider);margin-bottom:16px;}
   .brand-logo{
-    width:44px;height:44px;
-    background:linear-gradient(135deg,var(--primary),#0D1F3C);
-    border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
+    width:44px;height:44px;background:var(--hero-grad);
+    border-radius:12px;display:flex;align-items:center;justify-content:center;
     color:#fff;font-size:22px;
   }
   .brand-text h1{font-size:16px;font-weight:800;color:var(--primary);}
   .brand-text p{font-size:12px;color:var(--muted);}
 
   .nav-item{
-    display:flex;align-items:center;gap:12px;
-    padding:11px 20px;
-    cursor:pointer;
-    color:var(--primary);
-    font-size:14.5px;
-    font-weight:500;
-    transition:background .15s;
-    border-left:3px solid transparent;
+    display:flex;align-items:center;gap:12px;padding:11px 20px;
+    cursor:pointer;color:var(--primary);font-size:14.5px;font-weight:500;
+    transition:background .15s;border-left:3px solid transparent;
   }
   .nav-item:hover{background:var(--surface);}
-  .nav-item.active{
-    background:var(--surface);
-    border-left-color:var(--accent);
-    color:var(--primary);
-    font-weight:600;
-  }
+  .nav-item.active{background:var(--surface);border-left-color:var(--accent);font-weight:600;}
   .nav-item .ico{font-size:18px;width:22px;text-align:center;}
 
-  /* ===== Main ===== */
-  .main{
-    flex:1;
-    margin-left:260px;
-    padding:32px 40px 80px;
-    max-width:1000px;
-  }
+  /* Main */
+  .main{flex:1;margin-left:260px;padding:32px 40px 80px;max-width:1000px;}
 
-  /* ===== Topbar (mobile) ===== */
+  /* Topbar */
   .topbar{
-    display:none;
-    position:sticky;top:0;
-    background:rgba(255,255,255,0.95);
+    display:none;position:sticky;top:0;
+    background:color-mix(in srgb, var(--bg) 95%, transparent);
     backdrop-filter:blur(10px);
-    padding:12px 16px;
-    border-bottom:1px solid var(--divider);
-    z-index:50;
-    align-items:center;gap:12px;
+    padding:12px 16px;border-bottom:1px solid var(--divider);
+    z-index:50;align-items:center;gap:12px;
   }
-  .burger{
-    font-size:22px;cursor:pointer;
-    background:none;border:none;color:var(--primary);
-    padding:6px 10px;border-radius:8px;
-  }
+  .burger{font-size:22px;cursor:pointer;background:none;border:none;color:var(--primary);padding:6px 10px;border-radius:8px;}
   .burger:hover{background:var(--surface);}
-  .topbar-title{font-weight:700;color:var(--primary);font-size:15px;}
+  .topbar-title{font-weight:700;color:var(--primary);font-size:15px;flex:1;}
 
-  /* ===== Screens ===== */
+  /* Toolbar */
+  .toolbar{
+    display:flex;gap:8px;justify-content:flex-end;
+    margin-bottom:20px;flex-wrap:wrap;
+  }
+  .tool-btn{
+    background:var(--surface);border:1px solid var(--divider);
+    color:var(--primary);padding:8px 14px;border-radius:10px;
+    cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;
+    display:flex;align-items:center;gap:6px;
+    transition:all .15s;
+  }
+  .tool-btn:hover{background:var(--bg);border-color:var(--primary);transform:translateY(-1px);}
+  .tool-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  /* Screens */
   .screen{display:none;animation:fade .3s ease;}
   .screen.active{display:block;}
   @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-
-  .screen-title{
-    font-size:28px;font-weight:800;
-    margin-bottom:6px;
-  }
+  .screen-title{font-size:28px;font-weight:800;margin-bottom:6px;}
   .screen-sub{color:var(--muted);font-size:14px;margin-bottom:24px;}
 
-  /* ===== Hero ===== */
+  /* Hero */
   .hero{
-    background:linear-gradient(135deg,var(--primary) 0%,#0D1F3C 100%);
-    color:#fff;
-    border-radius:20px;
-    padding:36px 32px;
-    margin-bottom:28px;
-    box-shadow:var(--shadow);
+    background:var(--hero-grad);color:#fff;border-radius:20px;
+    padding:36px 32px;margin-bottom:28px;box-shadow:var(--shadow);
     position:relative;overflow:hidden;
   }
   .hero::after{
@@ -145,207 +125,140 @@
   .hero h1{color:#fff;font-size:34px;font-weight:800;margin-bottom:8px;}
   .hero p{color:#C8D6E5;font-size:14.5px;max-width:480px;margin-bottom:20px;}
   .hero .btn{
-    background:var(--accent);color:#fff;
-    border:none;padding:12px 24px;
-    border-radius:12px;font-weight:600;font-size:14.5px;
-    cursor:pointer;font-family:inherit;
-    transition:transform .15s,box-shadow .15s;
+    background:var(--accent);color:#fff;border:none;padding:12px 24px;
+    border-radius:12px;font-weight:600;font-size:14.5px;cursor:pointer;
+    font-family:inherit;transition:transform .15s,box-shadow .15s;
   }
   .hero .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,16,46,.35);}
 
-  /* ===== Grid tiles ===== */
+  /* Tiles */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
   .tile{
-    background:var(--surface);
-    border:1px solid var(--divider);
-    border-radius:16px;
-    padding:20px;
-    cursor:pointer;
+    background:var(--surface);border:1px solid var(--divider);
+    border-radius:16px;padding:20px;cursor:pointer;
     transition:transform .15s,box-shadow .15s,border-color .15s;
   }
   .tile:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--primary);}
   .tile .ico{font-size:28px;margin-bottom:14px;}
   .tile h3{font-size:15px;font-weight:600;color:var(--text);}
 
-  /* ===== Card ===== */
+  /* Cards */
   .card{
-    background:var(--bg);
-    border:1px solid var(--divider);
-    border-radius:16px;
-    padding:24px;
-    margin-bottom:18px;
-    box-shadow:var(--shadow);
+    background:var(--bg);border:1px solid var(--divider);
+    border-radius:16px;padding:24px;margin-bottom:18px;box-shadow:var(--shadow);
   }
   .card h3{font-size:17px;font-weight:700;margin-bottom:14px;}
   .card p{font-size:15px;color:var(--text);}
   .card.primary{background:var(--primary);color:#fff;border-color:var(--primary);}
   .card.primary h3,.card.primary p{color:#fff;}
 
-  /* ===== Info table ===== */
-  .itable{
-    border:1px solid var(--divider);
-    border-radius:12px;
-    overflow:hidden;
-  }
+  /* Table */
+  .itable{border:1px solid var(--divider);border-radius:12px;overflow:hidden;}
   .itable .row{
-    display:grid;
-    grid-template-columns:1fr 1.4fr;
-    gap:12px;
-    padding:12px 16px;
-    border-bottom:1px solid var(--divider);
-    font-size:14.5px;
+    display:grid;grid-template-columns:1fr 1.4fr;gap:12px;
+    padding:12px 16px;border-bottom:1px solid var(--divider);font-size:14.5px;
   }
   .itable .row:last-child{border-bottom:none;}
   .itable .row .k{font-weight:600;color:var(--primary);}
   .itable .row .v{color:var(--text);}
 
-  /* ===== Quote ===== */
-  .quote{
-    background:var(--surface);
-    border-left:4px solid var(--accent);
-    border-radius:12px;
-    padding:20px 24px;
-    margin-bottom:18px;
-  }
-  .quote p{
-    font-style:italic;
-    color:var(--primary);
-    font-size:16px;
-    font-weight:500;
-  }
+  /* Quote */
+  .quote{background:var(--surface);border-left:4px solid var(--accent);border-radius:12px;padding:20px 24px;margin-bottom:18px;}
+  .quote p{font-style:italic;color:var(--primary);font-size:16px;font-weight:500;}
   .quote span{display:block;margin-top:10px;font-size:13px;color:var(--muted);font-style:normal;}
 
-  /* ===== Stats ===== */
-  .stat-row{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 0;
-  }
+  /* Stats */
+  .stat-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
   .stat-row .label{font-size:14.5px;}
-  .stat-row .badge{
-    background:rgba(200,16,46,.1);
-    color:var(--accent);
-    font-weight:700;font-size:13px;
-    padding:5px 12px;border-radius:8px;
-  }
+  .stat-row .badge{background:rgba(200,16,46,.1);color:var(--accent);font-weight:700;font-size:13px;padding:5px 12px;border-radius:8px;}
 
-  /* ===== Progress ===== */
+  /* Progress */
   .progress{margin-bottom:14px;}
-  .progress .line{
-    display:flex;justify-content:space-between;
-    font-size:14px;margin-bottom:6px;
-  }
+  .progress .line{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;}
   .progress .line b{font-weight:700;}
-  .progress .bar{
-    height:8px;background:var(--divider);
-    border-radius:6px;overflow:hidden;
-  }
+  .progress .bar{height:8px;background:var(--divider);border-radius:6px;overflow:hidden;}
   .progress .bar > div{height:100%;border-radius:6px;}
 
-  /* ===== List ===== */
+  /* List */
   .list{list-style:none;}
-  .list li{
-    display:flex;gap:12px;
-    padding:8px 0;
-    font-size:14.5px;
-    align-items:flex-start;
-  }
-  .list li::before{
-    content:'✓';
-    color:var(--accent);
-    font-weight:700;
-    flex-shrink:0;
-  }
+  .list li{display:flex;gap:12px;padding:8px 0;font-size:14.5px;align-items:flex-start;}
+  .list li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;}
   .list.cross li::before{content:'✕';}
   .list.num{counter-reset:n;}
   .list.num li{counter-increment:n;}
   .list.num li::before{
-    content:counter(n);
-    background:var(--primary);
-    color:#fff;
-    width:24px;height:24px;
-    border-radius:8px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:12px;
+    content:counter(n);background:var(--primary);color:#fff;
+    width:24px;height:24px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:12px;
   }
 
-  /* ===== Pyramid ===== */
+  /* Pyramid */
   .pyramid-step{
-    background:var(--surface);
-    border:1px solid var(--divider);
-    border-radius:10px;
-    padding:12px 16px;
-    text-align:center;
-    font-size:14px;
-    font-weight:600;
-    color:var(--primary);
-    margin-bottom:6px;
+    background:var(--surface);border:1px solid var(--divider);
+    border-radius:10px;padding:12px 16px;text-align:center;
+    font-size:14px;font-weight:600;color:var(--primary);margin-bottom:6px;
   }
   .pyramid-step.top{background:rgba(200,16,46,.1);border-color:var(--accent);color:var(--accent);}
   .pyramid-arrow{text-align:center;color:var(--muted);margin:2px 0;font-size:14px;}
 
-  /* ===== Chips ===== */
+  /* Chips */
   .chips{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip{
-    background:var(--surface);
-    border:1px solid var(--divider);
-    padding:7px 14px;
-    border-radius:20px;
-    font-size:13.5px;
-  }
+  .chip{background:var(--surface);border:1px solid var(--divider);padding:7px 14px;border-radius:20px;font-size:13.5px;}
 
-  /* ===== Конституция ===== */
+  /* Violations */
   .violation{
-    display:flex;gap:12px;
-    padding:12px;
+    display:flex;gap:12px;padding:12px;
     background:rgba(200,16,46,.05);
     border:1px solid rgba(200,16,46,.2);
-    border-radius:10px;
-    margin-bottom:8px;
-    align-items:flex-start;
+    border-radius:10px;margin-bottom:8px;align-items:flex-start;
   }
-  .violation .art{
-    background:var(--accent);
-    color:#fff;
-    font-size:11px;font-weight:700;
-    padding:4px 9px;
-    border-radius:6px;
-    flex-shrink:0;
-  }
+  .violation .art{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;flex-shrink:0;}
   .violation .desc{font-size:14px;}
 
-  /* ===== Splash ===== */
+  /* News */
+  .news-item{
+    display:flex;gap:16px;padding:18px;
+    background:var(--bg);border:1px solid var(--divider);
+    border-radius:14px;margin-bottom:12px;
+    box-shadow:var(--shadow);
+  }
+  .news-date{
+    background:var(--primary);color:#fff;
+    padding:8px 12px;border-radius:10px;
+    font-size:12px;font-weight:700;text-align:center;
+    flex-shrink:0;min-width:70px;
+  }
+  .news-body h3{font-size:16px;margin-bottom:6px;color:var(--primary);}
+  .news-body p{font-size:14px;color:var(--text);}
+  .news-tag{
+    display:inline-block;background:var(--surface);
+    color:var(--muted);font-size:11px;font-weight:600;
+    padding:2px 8px;border-radius:6px;margin-top:8px;
+  }
+
+  /* Splash */
   #splash{
-    position:fixed;inset:0;
-    background:linear-gradient(135deg,var(--primary),#0D1F3C);
+    position:fixed;inset:0;background:var(--hero-grad);
     display:flex;align-items:center;justify-content:center;
-    z-index:9999;
-    transition:opacity .5s;
+    z-index:9999;transition:opacity .5s;
   }
   #splash.hide{opacity:0;pointer-events:none;}
   .splash-inner{text-align:center;color:#fff;animation:pop .8s ease;}
   .splash-logo{
-    width:110px;height:110px;
-    background:rgba(255,255,255,.1);
-    border:2px solid rgba(255,255,255,.2);
-    border-radius:28px;
+    width:110px;height:110px;background:rgba(255,255,255,.1);
+    border:2px solid rgba(255,255,255,.2);border-radius:28px;
     display:flex;align-items:center;justify-content:center;
-    font-size:52px;
-    margin:0 auto 24px;
+    font-size:52px;margin:0 auto 24px;
   }
   .splash-inner h1{color:#fff;font-size:22px;font-weight:700;}
   .splash-inner p{color:#C8D6E5;font-size:13px;margin-top:8px;}
   @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
 
-  /* ===== Overlay (mobile) ===== */
-  .overlay{
-    display:none;
-    position:fixed;inset:0;
-    background:rgba(0,0,0,.4);
-    z-index:90;
-  }
+  /* Overlay */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;}
   .overlay.show{display:block;}
 
-  /* ===== Mobile ===== */
+  /* Mobile */
   @media (max-width:860px){
     .sidebar{transform:translateX(-100%);}
     .sidebar.open{transform:translateX(0);}
@@ -354,424 +267,811 @@
     .hero h1{font-size:26px;}
     .hero{padding:28px 22px;}
     .screen-title{font-size:22px;}
+    .toolbar{justify-content:flex-start;}
+    .news-item{flex-direction:column;}
+    .news-date{min-width:auto;align-self:flex-start;}
   }
 </style>
 </head>
 <body>
 
-<!-- ===== SPLASH ===== -->
 <div id="splash">
   <div class="splash-inner">
     <div class="splash-logo">⭐</div>
-    <h1>НППР — Власть Народу</h1>
-    <p>Государство народа — национальная идея</p>
+    <h1 data-i18n="brand_full">НППР — Власть Народу</h1>
+    <p data-i18n="tagline">Государство народа — национальная идея</p>
   </div>
 </div>
 
 <div class="app">
-
-  <!-- ===== SIDEBAR ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-logo">⭐</div>
       <div class="brand-text">
-        <h1>НППР</h1>
-        <p>Власть Народу</p>
+        <h1 data-i18n="brand_short">НППР</h1>
+        <p data-i18n="brand_sub">Власть Народу</p>
       </div>
     </div>
-    <nav id="nav">
-      <div class="nav-item active" data-screen="home"><span class="ico">🏠</span>Главная</div>
-      <div class="nav-item" data-screen="program"><span class="ico">📜</span>Программа</div>
-      <div class="nav-item" data-screen="quality"><span class="ico">🎯</span>Качество жизни</div>
-      <div class="nav-item" data-screen="control"><span class="ico">📊</span>Механизм контроля</div>
-      <div class="nav-item" data-screen="democracy"><span class="ico">🗳️</span>Демократия</div>
-      <div class="nav-item" data-screen="economy"><span class="ico">💰</span>Экономика</div>
-      <div class="nav-item" data-screen="social"><span class="ico">🤝</span>Соцполитика</div>
-      <div class="nav-item" data-screen="constitution"><span class="ico">⚖️</span>Конституция</div>
-      <div class="nav-item" data-screen="about"><span class="ico">ℹ️</span>О партии</div>
-    </nav>
+    <nav id="nav"></nav>
   </aside>
 
   <div class="overlay" id="overlay"></div>
 
-  <!-- ===== MAIN ===== -->
   <main class="main">
-
-    <!-- Topbar mobile -->
     <div class="topbar">
       <button class="burger" id="burger">☰</button>
-      <span class="topbar-title">НППР — Власть Народу</span>
+      <span class="topbar-title" data-i18n="brand_full">НППР — Власть Народу</span>
     </div>
 
-    <!-- ===== HOME ===== -->
-    <section class="screen active" id="screen-home">
-      <div class="hero">
-        <h1>Власть<br>Народу</h1>
-        <p>Государство народа как национальная идея. Хозяин страны — народ, а чиновники — лишь нанимаемые управляющие.</p>
-        <button class="btn" onclick="go('program')">Узнать больше</button>
-      </div>
-      <h2 class="screen-title" style="font-size:20px;">Разделы</h2>
-      <p class="screen-sub">Программа партии «НППР — Власть Народу»</p>
-      <div class="grid">
-        <div class="tile" onclick="go('program')"><div class="ico">📜</div><h3>Программа</h3></div>
-        <div class="tile" onclick="go('quality')"><div class="ico">🎯</div><h3>Качество жизни</h3></div>
-        <div class="tile" onclick="go('control')"><div class="ico">📊</div><h3>Механизм контроля</h3></div>
-        <div class="tile" onclick="go('democracy')"><div class="ico">🗳️</div><h3>Народная демократия</h3></div>
-        <div class="tile" onclick="go('economy')"><div class="ico">💰</div><h3>Экономика</h3></div>
-        <div class="tile" onclick="go('social')"><div class="ico">🤝</div><h3>Соцполитика</h3></div>
-        <div class="tile" onclick="go('constitution')"><div class="ico">⚖️</div><h3>Конституция</h3></div>
-        <div class="tile" onclick="go('about')"><div class="ico">ℹ️</div><h3>О партии</h3></div>
-      </div>
-    </section>
+    <div class="toolbar">
+      <button class="tool-btn" id="langToggle" title="Language">
+        <span>🌐</span><span id="langLabel">EN</span>
+      </button>
+      <button class="tool-btn" id="themeToggle" title="Theme">
+        <span id="themeIcon">🌙</span><span id="themeLabel">Тема</span>
+      </button>
+      <button class="tool-btn" id="shareBtn" title="Share">
+        <span>📤</span><span data-i18n="share">Поделиться</span>
+      </button>
+      <a class="tool-btn" href="program.pdf" download title="Download PDF">
+        <span>📄</span><span data-i18n="download">Скачать PDF</span>
+      </a>
+    </div>
 
-    <!-- ===== PROGRAM ===== -->
-    <section class="screen" id="screen-program">
-      <h1 class="screen-title">Программа партии</h1>
-      <p class="screen-sub">Принята на Учредительном Съезде 21.02.2016</p>
-
-      <div class="card">
-        <h3>Метаданные</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Дата подписания</span><span class="v">21.02.2016</span></div>
-          <div class="row"><span class="k">Дата публикации</span><span class="v">23.09.2016</span></div>
-          <div class="row"><span class="k">Принята</span><span class="v">Учредительный Съезд</span></div>
-          <div class="row"><span class="k">Мировоззрение</span><span class="v">Социогуманизм</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Вводная часть</h3>
-        <p>В 1993 г. в России совершилась буржуазная революция, ставя целью сделать страну богатой, а людей свободными и счастливыми. Однако к 2016 г. экономический потенциал государства составил лишь 75% от дореформенного уровня. Коррупция поразила все структуры власти, взлёт смертности унёс жизни более 13 млн человек, расслоение общества достигло драматических размеров, геополитическое положение значительно ухудшилось.</p>
-      </div>
-
-      <div class="card">
-        <h3>Ключевая статистика</h3>
-        <div class="stat-row"><span class="label">Падение экономики</span><span class="badge">до 75%</span></div>
-        <div class="stat-row"><span class="label">Жертвы смертности</span><span class="badge">13+ млн</span></div>
-        <div class="stat-row"><span class="label">Расслоение общества</span><span class="badge">драматическое</span></div>
-        <div class="stat-row"><span class="label">Коррупция</span><span class="badge">все структуры власти</span></div>
-      </div>
-
-      <div class="card">
-        <h3>Пять ключевых вопросов</h3>
-        <div class="itable">
-          <div class="row"><span class="k">1. Цель развития</span><span class="v">Качество жизни</span></div>
-          <div class="row"><span class="k">2. Механизм контроля</span><span class="v">Обратная связь по ИДЖН</span></div>
-          <div class="row"><span class="k">3. Форма устройства</span><span class="v">Народная демократия</span></div>
-          <div class="row"><span class="k">4. Тип экономики</span><span class="v">Экономика здравого смысла</span></div>
-          <div class="row"><span class="k">5. Соцполитика</span><span class="v">Главенство социальной политики</span></div>
-        </div>
-      </div>
-
-      <div class="quote">
-        <p>«Носителем суверенитета и единственным источником власти в РФ является её многонациональный народ… Народ осуществляет свою власть»</p>
-        <span>— Конституция РФ, ст. 3</span>
-      </div>
-    </section>
-
-    <!-- ===== QUALITY ===== -->
-    <section class="screen" id="screen-quality">
-      <h1 class="screen-title">Качество жизни</h1>
-      <p class="screen-sub">Цель, объединяющая всех</p>
-
-      <div class="card">
-        <p>На смену экономическим параметрам приходит новая цель — качество жизни. Она отражает, насколько людям хорошо или плохо, счастливы они или страдают в реально существующих условиях.</p>
-      </div>
-
-      <div class="card">
-        <h3>Структура качества жизни</h3>
-        <div class="progress">
-          <div class="line"><span>Экономическое благополучие</span><b style="color:var(--primary)">33%</b></div>
-          <div class="bar"><div style="width:33%;background:var(--primary)"></div></div>
-        </div>
-        <div class="progress">
-          <div class="line"><span>Духовно-эмоциональная атмосфера</span><b style="color:var(--accent)">67%</b></div>
-          <div class="bar"><div style="width:67%;background:var(--accent)"></div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Параметры качества жизни</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Жизнеспособность</span><span class="v">Рождаемость, смертность, продолжительность жизни</span></div>
-          <div class="row"><span class="k">Духовное благополучие</span><span class="v">Самоубийства, убийства, свадьбы, сохранение семей</span></div>
-          <div class="row"><span class="k">Справедливость</span><span class="v">Грабежи, разбои, поляризация доходов (10%/10%)</span></div>
-          <div class="row"><span class="k">Экономический потенциал</span><span class="v">Промпроизводство, сельхоз, инвестиции</span></div>
-          <div class="row"><span class="k">Уровень жизни</span><span class="v">Доля ЗП в ВВП, товарооборот, услуги, образование, жильё</span></div>
-          <div class="row"><span class="k">Вложения в будущее</span><span class="v">Бюджет на образование, культуру, спорт, экология</span></div>
-        </div>
-      </div>
-
-      <div class="card primary" style="text-align:center;">
-        <h3 style="font-size:20px;">Индекс Достойной Жизни Населения</h3>
-        <p style="letter-spacing:3px;opacity:.85;">ИДЖН</p>
-      </div>
-    </section>
-
-    <!-- ===== CONTROL ===== -->
-    <section class="screen" id="screen-control">
-      <h1 class="screen-title">Механизм контроля</h1>
-      <p class="screen-sub">Управление через обратную связь</p>
-
-      <div class="card">
-        <p>Желание Отечеству добра не спасает от причинения ему зла. Требуется надёжный механизм контроля над правильностью политических решений. Таковым является управление государством через обратную связь по конечному результату — динамике ИДЖН.</p>
-      </div>
-
-      <div class="card">
-        <h3>Схема контроля</h3>
-        <div id="controlSteps"></div>
-      </div>
-
-      <div class="card">
-        <h3>«Красные флажки»</h3>
-        <ul class="list">
-          <li>Выход за пределы в мирное время запрещён</li>
-          <li>Обеспечивает силу ст. 7 Конституции РФ</li>
-          <li>Социальное государство → достойная жизнь</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ===== DEMOCRACY ===== -->
-    <section class="screen" id="screen-democracy">
-      <h1 class="screen-title">Народная демократия</h1>
-      <p class="screen-sub">Власть большинства народа</p>
-
-      <div class="card">
-        <h3>Типы демократии</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Рабовладельческая</span><span class="v">Рабовладельцы</span></div>
-          <div class="row"><span class="k">Вольных городов</span><span class="v">Состоятельные горожане</span></div>
-          <div class="row"><span class="k">Буржуазная</span><span class="v">Владеющие капиталом</span></div>
-          <div class="row"><span class="k">Номенклатурная</span><span class="v">Партийная номенклатура</span></div>
-          <div class="row"><span class="k" style="color:var(--accent)">Народная</span><span class="v"><b>Народ</b></span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Проблемы буржуазной демократии</h3>
-        <ul class="list cross">
-          <li>Доминирование богатых в парламенте</li>
-          <li>Выборы президента — клоунада</li>
-          <li>Низкий профессионализм власти</li>
-          <li>Затруднён социальный лифт</li>
-          <li>Нет национально-пропорциональной представительности</li>
-          <li>Фальсификации на выборах</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Пирамида власти</h3>
-        <div class="pyramid-step top">Высший Народный Совет (ВНС)</div>
-        <div class="pyramid-arrow">▲</div>
-        <div class="pyramid-step">Региональные Народные советы</div>
-        <div class="pyramid-arrow">▲</div>
-        <div class="pyramid-step">Местные Народные советы</div>
-        <div class="pyramid-arrow">▲</div>
-        <div class="pyramid-step">Корпус народных депутатов (80–100 тыс.)</div>
-        <div class="pyramid-arrow">▲</div>
-        <div class="pyramid-step">Жители выдвигают 2–3 тыс. кандидатов</div>
-      </div>
-
-      <div class="card">
-        <h3>Ключевые элементы</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Президент</span><span class="v">Избирается на 5 лет из 3 кандидатур ВНС</span></div>
-          <div class="row"><span class="k">Отзыв депутата</span><span class="v">Ежегодный отчёт перед избирателями</span></div>
-          <div class="row"><span class="k">Исполнительная власть</span><span class="v">Назначается сверху вниз</span></div>
-          <div class="row"><span class="k">Народный суд</span><span class="v">Пирамида снизу вверх</span></div>
-          <div class="row"><span class="k">Партии</span><span class="v">Площадки для программ, списки отменяются</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== ECONOMY ===== -->
-    <section class="screen" id="screen-economy">
-      <h1 class="screen-title">Экономика здравого смысла</h1>
-      <p class="screen-sub">Уважается любая собственность, если она справедлива</p>
-
-      <div class="card">
-        <h3>Три сектора экономики</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Государственный</span><span class="v">Народная: воздух, земля, ресурсы, энергетика, транспорт, ОПК, наука (60–70% ВВП)</span></div>
-          <div class="row"><span class="k">Коллективный</span><span class="v">Народные предприятия: кооперативы, артели</span></div>
-          <div class="row"><span class="k">Индивидуальный</span><span class="v">Частная, групповая, семейная</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Земля</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Сельхозземля</span><span class="v">Долгосрочная аренда с продлением</span></div>
-          <div class="row"><span class="k">Садовые/дачные (до 12 соток)</span><span class="v">Пожизненно с наследованием</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Социальный пай</h3>
-        <p>Наука, безопасность, пенсии, культура, образование, здравоохранение, спорт, резервы. Прозрачен для народного контроля.</p>
-      </div>
-
-      <div class="card">
-        <h3>Народный банк</h3>
-        <ul class="list">
-          <li>Финансирование развития</li>
-          <li>Расчёты с населением</li>
-          <li>Пенсии, сбережения</li>
-          <li>Беспроцентные ссуды</li>
-        </ul>
-      </div>
-
-      <div class="card primary">
-        <h3>Историческая справка: НЭП 1921–1927</h3>
-        <div class="stat-row"><span class="label" style="color:#fff">Рост промышленности</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">44% / год</span></div>
-        <div class="stat-row"><span class="label" style="color:#fff">Доходы работающих</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">×3</span></div>
-        <div class="stat-row"><span class="label" style="color:#fff">Преступность</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">×2 ↓</span></div>
-        <div class="stat-row"><span class="label" style="color:#fff">Естественный прирост</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">выше дореволюционного</span></div>
-      </div>
-
-      <div class="card">
-        <h3>Современные примеры</h3>
-        <div class="chips">
-          <span class="chip">Китай</span>
-          <span class="chip">Тайвань</span>
-          <span class="chip">Индия</span>
-          <span class="chip">Вьетнам</span>
-          <span class="chip">Узбекистан</span>
-          <span class="chip">Беларусь</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== SOCIAL ===== -->
-    <section class="screen" id="screen-social">
-      <h1 class="screen-title">Социальная политика</h1>
-      <p class="screen-sub">Главная обязанность власти — интересы народа</p>
-
-      <div class="card">
-        <p>В государстве народа сутью социальной политики является удовлетворение интересов населения не по остаточному принципу, а как главная обязанность власти.</p>
-      </div>
-
-      <div class="card">
-        <h3>Базовые потребности (бесплатно)</h3>
-        <ul class="list num">
-          <li>Подушевые нормативы жилой площади</li>
-          <li>Жилищно-коммунальное обслуживание</li>
-          <li>Здравоохранение</li>
-          <li>Дошкольное воспитание</li>
-          <li>Среднее и высшее государственное образование</li>
-          <li>Детский летний отдых</li>
-          <li>Общественный транспорт</li>
-          <li>Юридические услуги</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Принципы</h3>
-        <ul class="list">
-          <li>Свобода повышения благополучия за счёт труда</li>
-          <li>Конкурентоспособная оплата бюджетников</li>
-          <li>Прогрессивная шкала налогов</li>
-          <li>Ратификация ст. 20 Конвенции ООН против коррупции</li>
-          <li>Отмена коммерческой тайны для крупных операций</li>
-          <li>Поддержка профсоюзов</li>
-          <li>Наука — самостоятельное функционирование</li>
-          <li>Религия отделена от государства</li>
-          <li>Запрет пропаганды жестокости, стяжательства, порока</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ===== CONSTITUTION ===== -->
-    <section class="screen" id="screen-constitution">
-      <h1 class="screen-title">Защита Конституции</h1>
-      <p class="screen-sub">Социогуманизм — новая формация</p>
-
-      <div class="quote">
-        <p>«Носителем суверенитета и единственным источником власти в РФ является её многонациональный народ»</p>
-        <span>— Конституция РФ, ст. 3</span>
-      </div>
-
-      <div class="card">
-        <h3>Социогуманизм</h3>
-        <p>Новая общественно-экономическая формация, идущая на смену капитализму и коммунизму. Легитимность определяется Основами конституционного строя РФ.</p>
-      </div>
-
-      <div class="card">
-        <h3>Противоречия либерального строя</h3>
-        <div id="violations"></div>
-      </div>
-
-      <div class="card primary">
-        <h3>Призыв</h3>
-        <p>Общественная сила, объединяющая лучших представителей народа, вооружённых передовой научной идеологией — «НППР — Власть Народу».</p>
-      </div>
-    </section>
-
-    <!-- ===== ABOUT ===== -->
-    <section class="screen" id="screen-about">
-      <h1 class="screen-title">О партии</h1>
-      <p class="screen-sub">Народно-патриотическая партия России</p>
-
-      <div class="card" style="text-align:center;">
-        <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--primary),#0D1F3C);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;margin:0 auto 16px;">⭐</div>
-        <h3 style="font-size:20px;">НППР — Власть Народу</h3>
-        <p style="color:var(--muted);font-size:13px;margin-top:6px;">Народно-патриотическая партия России</p>
-      </div>
-
-      <div class="card">
-        <h3>Основные сведения</h3>
-        <div class="itable">
-          <div class="row"><span class="k">Полное название</span><span class="v">Народно-патриотическая партия России — Власть Народу</span></div>
-          <div class="row"><span class="k">Сокращение</span><span class="v">НППР — Власть Народу</span></div>
-          <div class="row"><span class="k">Дата основания</span><span class="v">21 февраля 2016</span></div>
-          <div class="row"><span class="k">Принята</span><span class="v">Учредительный Съезд</span></div>
-          <div class="row"><span class="k">Идеология</span><span class="v">Социогуманизм</span></div>
-          <div class="row"><span class="k">Проект</span><span class="v">Народное государство (с 1997)</span></div>
-          <div class="row"><span class="k">Организация</span><span class="v">Ассоциация независимых учёных «Россия XX–XXI»</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Контакты</h3>
-        <div class="itable">
-          <div class="row"><span class="k">🌐 Сайт</span><span class="v">nppr-vlastnarodu.ru</span></div>
-          <div class="row"><span class="k">✉️ Email</span><span class="v">info@nppr-vlastnarodu.ru</span></div>
-          <div class="row"><span class="k">📢 Соцсети</span><span class="v">Telegram · VK · YouTube</span></div>
-        </div>
-      </div>
-    </section>
-
+    <div id="screensContainer"></div>
   </main>
 </div>
 
 <script>
-  // ===== Navigation =====
-  function go(name){
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById('screen-' + name);
-    if(target) target.classList.add('active');
-
-    document.querySelectorAll('.nav-item').forEach(n => {
-      n.classList.toggle('active', n.dataset.screen === name);
-    });
-
-    // close mobile sidebar
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-
-    window.scrollTo({top:0, behavior:'smooth'});
+/* ============================================================
+   1. КОНТЕНТ — переведён и структурирован
+   ============================================================ */
+const I18N = {
+  ru: {
+    brand_short:'НППР', brand_sub:'Власть Народу', brand_full:'НППР — Власть Народу',
+    tagline:'Государство народа — национальная идея',
+    share:'Поделиться', download:'Скачать PDF', theme_label:'Тема', lang_label:'EN',
+    // nav
+    nav_home:'Главная', nav_program:'Программа', nav_quality:'Качество жизни',
+    nav_control:'Механизм контроля', nav_democracy:'Демократия', nav_economy:'Экономика',
+    nav_social:'Соцполитика', nav_constitution:'Конституция', nav_news:'Новости', nav_about:'О партии',
+    // home
+    hero_title:'Власть<br>Народу',
+    hero_sub:'Государство народа как национальная идея. Хозяин страны — народ, а чиновники — лишь нанимаемые управляющие.',
+    hero_btn:'Узнать больше',
+    sections_title:'Разделы', sections_sub:'Программа партии «НППР — Власть Народу»',
+    // program
+    program_title:'Программа партии',
+    program_sub:'Принята на Учредительном Съезде 21.02.2016',
+    program_meta:'Метаданные',
+    program_intro_title:'Вводная часть',
+    program_intro:'В 1993 г. в России совершилась буржуазная революция, ставя целью сделать страну богатой, а людей свободными и счастливыми. Однако к 2016 г. экономический потенциал государства составил лишь 75% от дореформенного уровня. Коррупция поразила все структуры власти, взлёт смертности унёс жизни более 13 млн человек, расслоение общества достигло драматических размеров, геополитическое положение значительно ухудшилось.',
+    program_stats:'Ключевая статистика',
+    program_questions:'Пять ключевых вопросов',
+    program_quote:'«Носителем суверенитета и единственным источником власти в РФ является её многонациональный народ… Народ осуществляет свою власть»',
+    program_quote_author:'— Конституция РФ, ст. 3',
+    // quality
+    quality_title:'Качество жизни',
+    quality_sub:'Цель, объединяющая всех',
+    quality_intro:'На смену экономическим параметрам приходит новая цель — качество жизни. Она отражает, насколько людям хорошо или плохо, счастливы они или страдают в реально существующих условиях.',
+    quality_structure:'Структура качества жизни',
+    quality_econ:'Экономическое благополучие',
+    quality_spirit:'Духовно-эмоциональная атмосфера',
+    quality_params:'Параметры качества жизни',
+    quality_idjn:'Индекс Достойной Жизни Населения',
+    // control
+    control_title:'Механизм контроля',
+    control_sub:'Управление через обратную связь',
+    control_intro:'Желание Отечеству добра не спасает от причинения ему зла. Требуется надёжный механизм контроля над правильностью политических решений. Таковым является управление государством через обратную связь по конечному результату — динамике ИДЖН.',
+    control_scheme:'Схема контроля',
+    control_flags:'«Красные флажки»',
+    // democracy
+    demo_title:'Народная демократия',
+    demo_sub:'Власть большинства народа',
+    demo_types:'Типы демократии',
+    demo_problems:'Проблемы буржуазной демократии',
+    demo_pyramid:'Пирамида власти',
+    demo_elements:'Ключевые элементы',
+    // economy
+    econ_title:'Экономика здравого смысла',
+    econ_sub:'Уважается любая собственность, если она справедлива',
+    econ_sectors:'Три сектора экономики',
+    econ_land:'Земля',
+    econ_pie:'Социальный пай',
+    econ_pie_text:'Наука, безопасность, пенсии, культура, образование, здравоохранение, спорт, резервы. Прозрачен для народного контроля.',
+    econ_bank:'Народный банк',
+    econ_nep:'Историческая справка: НЭП 1921–1927',
+    econ_examples:'Современные примеры',
+    // social
+    social_title:'Социальная политика',
+    social_sub:'Главная обязанность власти — интересы народа',
+    social_intro:'В государстве народа сутью социальной политики является удовлетворение интересов населения не по остаточному принципу, а как главная обязанность власти.',
+    social_base:'Базовые потребности (бесплатно)',
+    social_principles:'Принципы',
+    // constitution
+    const_title:'Защита Конституции',
+    const_sub:'Социогуманизм — новая формация',
+    const_quote:'«Носителем суверенитета и единственным источником власти в РФ является её многонациональный народ»',
+    const_quote_author:'— Конституция РФ, ст. 3',
+    const_socio:'Социогуманизм',
+    const_socio_text:'Новая общественно-экономическая формация, идущая на смену капитализму и коммунизму. Легитимность определяется Основами конституционного строя РФ.',
+    const_violations:'Противоречия либерального строя',
+    const_appeal:'Призыв',
+    const_appeal_text:'Общественная сила, объединяющая лучших представителей народа, вооружённых передовой научной идеологией — «НППР — Власть Народу».',
+    // about
+    about_title:'О партии',
+    about_sub:'Народно-патриотическая партия России',
+    about_full:'Народно-патриотическая партия России',
+    about_main:'Основные сведения',
+    about_contacts:'Контакты',
+    // news
+    news_title:'Новости',
+    news_sub:'Актуальные события партии',
+  },
+  en: {
+    brand_short:'NPPR', brand_sub:'Power to the People', brand_full:'NPPR — Power to the People',
+    tagline:'The State of the People as a national idea',
+    share:'Share', download:'Download PDF', theme_label:'Theme', lang_label:'RU',
+    nav_home:'Home', nav_program:'Program', nav_quality:'Quality of Life',
+    nav_control:'Control Mechanism', nav_democracy:'Democracy', nav_economy:'Economy',
+    nav_social:'Social Policy', nav_constitution:'Constitution', nav_news:'News', nav_about:'About',
+    hero_title:'Power<br>to the People',
+    hero_sub:'The State of the People as a national idea. The people own the country; officials are just hired managers.',
+    hero_btn:'Learn more',
+    sections_title:'Sections', sections_sub:'Program of the party "NPPR — Power to the People"',
+    program_title:'Party Program',
+    program_sub:'Adopted at the Founding Congress on 21.02.2016',
+    program_meta:'Metadata',
+    program_intro_title:'Introduction',
+    program_intro:'In 1993 a bourgeois revolution took place in Russia, aiming to make the country rich and its people free and happy. However, by 2016, the state\'s economic potential was only 75% of the pre-reform level. Corruption struck all branches of power, the surge in mortality claimed over 13 million lives, social stratification reached dramatic proportions, and the geopolitical position deteriorated significantly.',
+    program_stats:'Key statistics',
+    program_questions:'Five key questions',
+    program_quote:'"The bearer of sovereignty and the sole source of power in the Russian Federation is its multinational people… The people exercise their power"',
+    program_quote_author:'— Constitution of the RF, Art. 3',
+    quality_title:'Quality of Life',
+    quality_sub:'A goal that unites everyone',
+    quality_intro:'A new goal replaces economic parameters — quality of life. It reflects how well or badly people live, whether they are happy or suffering in real conditions.',
+    quality_structure:'Structure of quality of life',
+    quality_econ:'Economic well-being',
+    quality_spirit:'Spiritual and emotional atmosphere',
+    quality_params:'Parameters of quality of life',
+    quality_idjn:'Index of Decent Life of the Population',
+    control_title:'Control Mechanism',
+    control_sub:'Feedback-driven governance',
+    control_intro:'Good intentions alone do not prevent harm. A reliable mechanism is needed to control the correctness of political decisions. This is governance through feedback on the final result — the dynamics of the IDLP.',
+    control_scheme:'Control scheme',
+    control_flags:'"Red flags"',
+    demo_title:'People\'s Democracy',
+    demo_sub:'Rule of the majority of the people',
+    demo_types:'Types of democracy',
+    demo_problems:'Problems of bourgeois democracy',
+    demo_pyramid:'Pyramid of power',
+    demo_elements:'Key elements',
+    econ_title:'Common-Sense Economy',
+    econ_sub:'Any property is respected if it is just',
+    econ_sectors:'Three sectors of the economy',
+    econ_land:'Land',
+    econ_pie:'Social share',
+    econ_pie_text:'Science, security, pensions, culture, education, healthcare, sports, reserves. Transparent for public control.',
+    econ_bank:'People\'s Bank',
+    econ_nep:'Historical reference: NEP 1921–1927',
+    econ_examples:'Modern examples',
+    social_title:'Social Policy',
+    social_sub:'The main duty of power is the interests of the people',
+    social_intro:'In the state of the people, the essence of social policy is to satisfy the interests of the population not on a residual basis, but as the main duty of power.',
+    social_base:'Basic needs (free of charge)',
+    social_principles:'Principles',
+    const_title:'Defending the Constitution',
+    const_sub:'Sociohumanism — a new formation',
+    const_quote:'"The bearer of sovereignty and the sole source of power in the Russian Federation is its multinational people"',
+    const_quote_author:'— Constitution of the RF, Art. 3',
+    const_socio:'Sociohumanism',
+    const_socio_text:'A new socio-economic formation replacing capitalism and communism. Its legitimacy is determined by the Foundations of the constitutional order of the RF.',
+    const_violations:'Contradictions of the liberal order',
+    const_appeal:'Appeal',
+    const_appeal_text:'A public force uniting the best representatives of the people, armed with advanced scientific ideology — "NPPR — Power to the People".',
+    about_title:'About the Party',
+    about_sub:'People\'s Patriotic Party of Russia',
+    about_full:'People\'s Patriotic Party of Russia',
+    about_main:'Main information',
+    about_contacts:'Contacts',
+    news_title:'News',
+    news_sub:'Current events of the party',
   }
+};
 
-  document.querySelectorAll('.nav-item').forEach(item => {
+/* ===== НОВОСТИ — добавляй сюда ===== */
+const NEWS = [
+  {
+    date:'2024-01-15',
+    ru:{ title:'Обновление программы партии', desc:'Опубликована расширенная версия программы с уточнёнными параметрами ИДЖН.', tag:'Программа' },
+    en:{ title:'Party program update', desc:'An expanded version of the program with refined IDLP parameters has been published.', tag:'Program' }
+  },
+  {
+    date:'2023-11-04',
+    ru:{ title:'День народного единства', desc:'Партия провела ряд мероприятий в регионах, посвящённых единству народа.', tag:'Событие' },
+    en:{ title:'National Unity Day', desc:'The party held a series of regional events dedicated to the unity of the people.', tag:'Event' }
+  },
+  {
+    date:'2023-06-12',
+    ru:{ title:'Форум «Россия XX–XXI»', desc:'Обсуждение Проекта народного государства в научной печати.', tag:'Наука' },
+    en:{ title:'Forum "Russia XX–XXI"', desc:'Discussion of the People\'s State Project in scientific press.', tag:'Science' }
+  }
+];
+
+/* ===== НАВИГАЦИЯ ===== */
+const NAV = [
+  {id:'home', ico:'🏠', key:'nav_home'},
+  {id:'program', ico:'📜', key:'nav_program'},
+  {id:'quality', ico:'🎯', key:'nav_quality'},
+  {id:'control', ico:'📊', key:'nav_control'},
+  {id:'democracy', ico:'🗳️', key:'nav_democracy'},
+  {id:'economy', ico:'💰', key:'nav_economy'},
+  {id:'social', ico:'🤝', key:'nav_social'},
+  {id:'constitution', ico:'⚖️', key:'nav_constitution'},
+  {id:'news', ico:'📰', key:'nav_news'},
+  {id:'about', ico:'ℹ️', key:'nav_about'}
+];
+
+/* ============================================================
+   2. РЕНДЕР ЭКРАНОВ
+   ============================================================ */
+function renderScreens(){
+  const c = document.getElementById('screensContainer');
+  c.innerHTML = '';
+
+  // ---------- HOME ----------
+  c.innerHTML += `
+  <section class="screen active" id="screen-home">
+    <div class="hero">
+      <h1 data-i18n-html="hero_title">Власть<br>Народу</h1>
+      <p data-i18n="hero_sub"></p>
+      <button class="btn" onclick="go('program')" data-i18n="hero_btn">Узнать больше</button>
+    </div>
+    <h2 class="screen-title" style="font-size:20px" data-i18n="sections_title"></h2>
+    <p class="screen-sub" data-i18n="sections_sub"></p>
+    <div class="grid">
+      ${NAV.filter(n=>n.id!=='home').map(n=>`
+        <div class="tile" onclick="go('${n.id}')">
+          <div class="ico">${n.ico}</div>
+          <h3 data-i18n="${n.key}"></h3>
+        </div>
+      `).join('')}
+    </div>
+  </section>`;
+
+  // ---------- PROGRAM ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-program">
+    <h1 class="screen-title" data-i18n="program_title"></h1>
+    <p class="screen-sub" data-i18n="program_sub"></p>
+    <div class="card">
+      <h3 data-i18n="program_meta"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="p_date">Дата подписания</span><span class="v">21.02.2016</span></div>
+        <div class="row"><span class="k" data-i18n="p_pub">Дата публикации</span><span class="v">23.09.2016</span></div>
+        <div class="row"><span class="k" data-i18n="p_adopted">Принята</span><span class="v" data-i18n="p_adopted_v">Учредительный Съезд</span></div>
+        <div class="row"><span class="k" data-i18n="p_ideo">Мировоззрение</span><span class="v" data-i18n="p_ideo_v">Социогуманизм</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="program_intro_title"></h3>
+      <p data-i18n="program_intro"></p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="program_stats"></h3>
+      <div class="stat-row"><span class="label" data-i18n="s1">Падение экономики</span><span class="badge" data-i18n="s1v">до 75%</span></div>
+      <div class="stat-row"><span class="label" data-i18n="s2">Жертвы смертности</span><span class="badge" data-i18n="s2v">13+ млн</span></div>
+      <div class="stat-row"><span class="label" data-i18n="s3">Расслоение общества</span><span class="badge" data-i18n="s3v">драматическое</span></div>
+      <div class="stat-row"><span class="label" data-i18n="s4">Коррупция</span><span class="badge" data-i18n="s4v">все структуры власти</span></div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="program_questions"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="q1">1. Цель развития</span><span class="v" data-i18n="q1v">Качество жизни</span></div>
+        <div class="row"><span class="k" data-i18n="q2">2. Механизм контроля</span><span class="v" data-i18n="q2v">Обратная связь по ИДЖН</span></div>
+        <div class="row"><span class="k" data-i18n="q3">3. Форма устройства</span><span class="v" data-i18n="q3v">Народная демократия</span></div>
+        <div class="row"><span class="k" data-i18n="q4">4. Тип экономики</span><span class="v" data-i18n="q4v">Экономика здравого смысла</span></div>
+        <div class="row"><span class="k" data-i18n="q5">5. Соцполитика</span><span class="v" data-i18n="q5v">Главенство социальной политики</span></div>
+      </div>
+    </div>
+    <div class="quote">
+      <p data-i18n="program_quote"></p>
+      <span data-i18n="program_quote_author"></span>
+    </div>
+  </section>`;
+
+  // ---------- QUALITY ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-quality">
+    <h1 class="screen-title" data-i18n="quality_title"></h1>
+    <p class="screen-sub" data-i18n="quality_sub"></p>
+    <div class="card"><p data-i18n="quality_intro"></p></div>
+    <div class="card">
+      <h3 data-i18n="quality_structure"></h3>
+      <div class="progress">
+        <div class="line"><span data-i18n="quality_econ"></span><b style="color:var(--primary)">33%</b></div>
+        <div class="bar"><div style="width:33%;background:var(--primary)"></div></div>
+      </div>
+      <div class="progress">
+        <div class="line"><span data-i18n="quality_spirit"></span><b style="color:var(--accent)">67%</b></div>
+        <div class="bar"><div style="width:67%;background:var(--accent)"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="quality_params"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="qp1">Жизнеспособность</span><span class="v" data-i18n="qp1v">Рождаемость, смертность, продолжительность жизни</span></div>
+        <div class="row"><span class="k" data-i18n="qp2">Духовное благополучие</span><span class="v" data-i18n="qp2v">Самоубийства, убийства, свадьбы, сохранение семей</span></div>
+        <div class="row"><span class="k" data-i18n="qp3">Справедливость</span><span class="v" data-i18n="qp3v">Грабежи, разбои, поляризация доходов (10%/10%)</span></div>
+        <div class="row"><span class="k" data-i18n="qp4">Экономический потенциал</span><span class="v" data-i18n="qp4v">Промпроизводство, сельхоз, инвестиции</span></div>
+        <div class="row"><span class="k" data-i18n="qp5">Уровень жизни</span><span class="v" data-i18n="qp5v">Доля ЗП в ВВП, товарооборот, услуги, образование, жильё</span></div>
+        <div class="row"><span class="k" data-i18n="qp6">Вложения в будущее</span><span class="v" data-i18n="qp6v">Бюджет на образование, культуру, спорт, экология</span></div>
+      </div>
+    </div>
+    <div class="card primary" style="text-align:center">
+      <h3 style="font-size:20px" data-i18n="quality_idjn"></h3>
+      <p style="letter-spacing:3px;opacity:.85">ИДЖН / IDLP</p>
+    </div>
+  </section>`;
+
+  // ---------- CONTROL ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-control">
+    <h1 class="screen-title" data-i18n="control_title"></h1>
+    <p class="screen-sub" data-i18n="control_sub"></p>
+    <div class="card"><p data-i18n="control_intro"></p></div>
+    <div class="card">
+      <h3 data-i18n="control_scheme"></h3>
+      <div id="controlSteps"></div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="control_flags"></h3>
+      <ul class="list">
+        <li data-i18n="cf1">Выход за пределы в мирное время запрещён</li>
+        <li data-i18n="cf2">Обеспечивает силу ст. 7 Конституции РФ</li>
+        <li data-i18n="cf3">Социальное государство → достойная жизнь</li>
+      </ul>
+    </div>
+  </section>`;
+
+  // ---------- DEMOCRACY ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-democracy">
+    <h1 class="screen-title" data-i18n="demo_title"></h1>
+    <p class="screen-sub" data-i18n="demo_sub"></p>
+    <div class="card">
+      <h3 data-i18n="demo_types"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="dt1">Рабовладельческая</span><span class="v" data-i18n="dt1v">Рабовладельцы</span></div>
+        <div class="row"><span class="k" data-i18n="dt2">Вольных городов</span><span class="v" data-i18n="dt2v">Состоятельные горожане</span></div>
+        <div class="row"><span class="k" data-i18n="dt3">Буржуазная</span><span class="v" data-i18n="dt3v">Владеющие капиталом</span></div>
+        <div class="row"><span class="k" data-i18n="dt4">Номенклатурная</span><span class="v" data-i18n="dt4v">Партийная номенклатура</span></div>
+        <div class="row"><span class="k" style="color:var(--accent)" data-i18n="dt5">Народная</span><span class="v"><b data-i18n="dt5v">Народ</b></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="demo_problems"></h3>
+      <ul class="list cross">
+        <li data-i18n="dp1">Доминирование богатых в парламенте</li>
+        <li data-i18n="dp2">Выборы президента — клоунада</li>
+        <li data-i18n="dp3">Низкий профессионализм власти</li>
+        <li data-i18n="dp4">Затруднён социальный лифт</li>
+        <li data-i18n="dp5">Нет национально-пропорциональной представительности</li>
+        <li data-i18n="dp6">Фальсификации на выборах</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 data-i18n="demo_pyramid"></h3>
+      <div class="pyramid-step top" data-i18n="py1">Высший Народный Совет (ВНС)</div>
+      <div class="pyramid-arrow">▲</div>
+      <div class="pyramid-step" data-i18n="py2">Региональные Народные советы</div>
+      <div class="pyramid-arrow">▲</div>
+      <div class="pyramid-step" data-i18n="py3">Местные Народные советы</div>
+      <div class="pyramid-arrow">▲</div>
+      <div class="pyramid-step" data-i18n="py4">Корпус народных депутатов (80–100 тыс.)</div>
+      <div class="pyramid-arrow">▲</div>
+      <div class="pyramid-step" data-i18n="py5">Жители выдвигают 2–3 тыс. кандидатов</div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="demo_elements"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="de1">Президент</span><span class="v" data-i18n="de1v">Избирается на 5 лет из 3 кандидатур ВНС</span></div>
+        <div class="row"><span class="k" data-i18n="de2">Отзыв депутата</span><span class="v" data-i18n="de2v">Ежегодный отчёт перед избирателями</span></div>
+        <div class="row"><span class="k" data-i18n="de3">Исполнительная власть</span><span class="v" data-i18n="de3v">Назначается сверху вниз</span></div>
+        <div class="row"><span class="k" data-i18n="de4">Народный суд</span><span class="v" data-i18n="de4v">Пирамида снизу вверх</span></div>
+        <div class="row"><span class="k" data-i18n="de5">Партии</span><span class="v" data-i18n="de5v">Площадки для программ, списки отменяются</span></div>
+      </div>
+    </div>
+  </section>`;
+
+  // ---------- ECONOMY ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-economy">
+    <h1 class="screen-title" data-i18n="econ_title"></h1>
+    <p class="screen-sub" data-i18n="econ_sub"></p>
+    <div class="card">
+      <h3 data-i18n="econ_sectors"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="es1">Государственный</span><span class="v" data-i18n="es1v">Народная: воздух, земля, ресурсы, энергетика, транспорт, ОПК, наука (60–70% ВВП)</span></div>
+        <div class="row"><span class="k" data-i18n="es2">Коллективный</span><span class="v" data-i18n="es2v">Народные предприятия: кооперативы, артели</span></div>
+        <div class="row"><span class="k" data-i18n="es3">Индивидуальный</span><span class="v" data-i18n="es3v">Частная, групповая, семейная</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="econ_land"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="el1">Сельхозземля</span><span class="v" data-i18n="el1v">Долгосрочная аренда с продлением</span></div>
+        <div class="row"><span class="k" data-i18n="el2">Садовые/дачные (до 12 соток)</span><span class="v" data-i18n="el2v">Пожизненно с наследованием</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="econ_pie"></h3>
+      <p data-i18n="econ_pie_text"></p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="econ_bank"></h3>
+      <ul class="list">
+        <li data-i18n="eb1">Финансирование развития</li>
+        <li data-i18n="eb2">Расчёты с населением</li>
+        <li data-i18n="eb3">Пенсии, сбережения</li>
+        <li data-i18n="eb4">Беспроцентные ссуды</li>
+      </ul>
+    </div>
+    <div class="card primary">
+      <h3 data-i18n="econ_nep"></h3>
+      <div class="stat-row"><span class="label" style="color:#fff" data-i18n="en1">Рост промышленности</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff" data-i18n="en1v">44% / год</span></div>
+      <div class="stat-row"><span class="label" style="color:#fff" data-i18n="en2">Доходы работающих</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">×3</span></div>
+      <div class="stat-row"><span class="label" style="color:#fff" data-i18n="en3">Преступность</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff">×2 ↓</span></div>
+      <div class="stat-row"><span class="label" style="color:#fff" data-i18n="en4">Естественный прирост</span><span class="badge" style="background:rgba(255,255,255,.15);color:#fff" data-i18n="en4v">выше дореволюционного</span></div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="econ_examples"></h3>
+      <div class="chips">
+        <span class="chip">Китай / China</span>
+        <span class="chip">Тайвань / Taiwan</span>
+        <span class="chip">Индия / India</span>
+        <span class="chip">Вьетнам / Vietnam</span>
+        <span class="chip">Узбекистан / Uzbekistan</span>
+        <span class="chip">Беларусь / Belarus</span>
+      </div>
+    </div>
+  </section>`;
+
+  // ---------- SOCIAL ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-social">
+    <h1 class="screen-title" data-i18n="social_title"></h1>
+    <p class="screen-sub" data-i18n="social_sub"></p>
+    <div class="card"><p data-i18n="social_intro"></p></div>
+    <div class="card">
+      <h3 data-i18n="social_base"></h3>
+      <ul class="list num">
+        <li data-i18n="sb1">Подушевые нормативы жилой площади</li>
+        <li data-i18n="sb2">Жилищно-коммунальное обслуживание</li>
+        <li data-i18n="sb3">Здравоохранение</li>
+        <li data-i18n="sb4">Дошкольное воспитание</li>
+        <li data-i18n="sb5">Среднее и высшее государственное образование</li>
+        <li data-i18n="sb6">Детский летний отдых</li>
+        <li data-i18n="sb7">Общественный транспорт</li>
+        <li data-i18n="sb8">Юридические услуги</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 data-i18n="social_principles"></h3>
+      <ul class="list">
+        <li data-i18n="sp1">Свобода повышения благополучия за счёт труда</li>
+        <li data-i18n="sp2">Конкурентоспособная оплата бюджетников</li>
+        <li data-i18n="sp3">Прогрессивная шкала налогов</li>
+        <li data-i18n="sp4">Ратификация ст. 20 Конвенции ООН против коррупции</li>
+        <li data-i18n="sp5">Отмена коммерческой тайны для крупных операций</li>
+        <li data-i18n="sp6">Поддержка профсоюзов</li>
+        <li data-i18n="sp7">Наука — самостоятельное функционирование</li>
+        <li data-i18n="sp8">Религия отделена от государства</li>
+        <li data-i18n="sp9">Запрет пропаганды жестокости, стяжательства, порока</li>
+      </ul>
+    </div>
+  </section>`;
+
+  // ---------- CONSTITUTION ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-constitution">
+    <h1 class="screen-title" data-i18n="const_title"></h1>
+    <p class="screen-sub" data-i18n="const_sub"></p>
+    <div class="quote">
+      <p data-i18n="const_quote"></p>
+      <span data-i18n="const_quote_author"></span>
+    </div>
+    <div class="card">
+      <h3 data-i18n="const_socio"></h3>
+      <p data-i18n="const_socio_text"></p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="const_violations"></h3>
+      <div id="violations"></div>
+    </div>
+    <div class="card primary">
+      <h3 data-i18n="const_appeal"></h3>
+      <p data-i18n="const_appeal_text"></p>
+    </div>
+  </section>`;
+
+  // ---------- NEWS ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-news">
+    <h1 class="screen-title" data-i18n="news_title"></h1>
+    <p class="screen-sub" data-i18n="news_sub"></p>
+    <div id="newsList"></div>
+  </section>`;
+
+  // ---------- ABOUT ----------
+  c.innerHTML += `
+  <section class="screen" id="screen-about">
+    <h1 class="screen-title" data-i18n="about_title"></h1>
+    <p class="screen-sub" data-i18n="about_sub"></p>
+    <div class="card" style="text-align:center">
+      <div style="width:80px;height:80px;background:var(--hero-grad);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;margin:0 auto 16px">⭐</div>
+      <h3 style="font-size:20px" data-i18n="brand_full"></h3>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px" data-i18n="about_full"></p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="about_main"></h3>
+      <div class="itable">
+        <div class="row"><span class="k" data-i18n="af1">Полное название</span><span class="v" data-i18n="af1v">Народно-патриотическая партия России — Власть Народу</span></div>
+        <div class="row"><span class="k" data-i18n="af2">Сокращение</span><span class="v" data-i18n="af2v">НППР — Власть Народу</span></div>
+        <div class="row"><span class="k" data-i18n="af3">Дата основания</span><span class="v">21.02.2016</span></div>
+        <div class="row"><span class="k" data-i18n="af4">Идеология</span><span class="v" data-i18n="af4v">Социогуманизм</span></div>
+        <div class="row"><span class="k" data-i18n="af5">Проект</span><span class="v" data-i18n="af5v">Народное государство (с 1997)</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="about_contacts"></h3>
+      <div class="itable">
+        <div class="row"><span class="k">🌐</span><span class="v">nppr-vlastnarodu.ru</span></div>
+        <div class="row"><span class="k">✉️</span><span class="v">info@nppr-vlastnarodu.ru</span></div>
+        <div class="row"><span class="k">📢</span><span class="v">Telegram · VK · YouTube</span></div>
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ===== Расширенный словарь (то, что не влезло в базовый) ===== */
+const EXTRA = {
+  ru: {
+    p_date:'Дата подписания', p_pub:'Дата публикации', p_adopted:'Принята',
+    p_adopted_v:'Учредительный Съезд', p_ideo:'Мировоззрение', p_ideo_v:'Социогуманизм',
+    s1:'Падение экономики', s1v:'до 75%', s2:'Жертвы смертности', s2v:'13+ млн',
+    s3:'Расслоение общества', s3v:'драматическое', s4:'Коррупция', s4v:'все структуры власти',
+    q1:'1. Цель развития', q1v:'Качество жизни',
+    q2:'2. Механизм контроля', q2v:'Обратная связь по ИДЖН',
+    q3:'3. Форма устройства', q3v:'Народная демократия',
+    q4:'4. Тип экономики', q4v:'Экономика здравого смысла',
+    q5:'5. Соцполитика', q5v:'Главенство социальной политики',
+    qp1:'Жизнеспособность', qp1v:'Рождаемость, смертность, продолжительность жизни',
+    qp2:'Духовное благополучие', qp2v:'Самоубийства, убийства, свадьбы, сохранение семей',
+    qp3:'Справедливость', qp3v:'Грабежи, разбои, поляризация доходов',
+    qp4:'Экономический потенциал', qp4v:'Промпроизводство, сельхоз, инвестиции',
+    qp5:'Уровень жизни', qp5v:'Доля ЗП в ВВП, товарооборот, услуги, образование, жильё',
+    qp6:'Вложения в будущее', qp6v:'Бюджет на образование, культуру, спорт, экология',
+    cf1:'Выход за пределы в мирное время запрещён',
+    cf2:'Обеспечивает силу ст. 7 Конституции РФ',
+    cf3:'Социальное государство → достойная жизнь',
+    dt1:'Рабовладельческая', dt1v:'Рабовладельцы',
+    dt2:'Вольных городов', dt2v:'Состоятельные горожане',
+    dt3:'Буржуазная', dt3v:'Владеющие капиталом',
+    dt4:'Номенклатурная', dt4v:'Партийная номенклатура',
+    dt5:'Народная', dt5v:'Народ',
+    dp1:'Доминирование богатых в парламенте', dp2:'Выборы президента — клоунада',
+    dp3:'Низкий профессионализм власти', dp4:'Затруднён социальный лифт',
+    dp5:'Нет национально-пропорциональной представительности', dp6:'Фальсификации на выборах',
+    py1:'Высший Народный Совет (ВНС)', py2:'Региональные Народные советы',
+    py3:'Местные Народные советы', py4:'Корпус народных депутатов (80–100 тыс.)',
+    py5:'Жители выдвигают 2–3 тыс. кандидатов',
+    de1:'Президент', de1v:'Избирается на 5 лет из 3 кандидатур ВНС',
+    de2:'Отзыв депутата', de2v:'Ежегодный отчёт перед избирателями',
+    de3:'Исполнительная власть', de3v:'Назначается сверху вниз',
+    de4:'Народный суд', de4v:'Пирамида снизу вверх',
+    de5:'Партии', de5v:'Площадки для программ, списки отменяются',
+    es1:'Государственный', es1v:'Народная: воздух, земля, ресурсы, энергетика, транспорт, ОПК, наука (60–70% ВВП)',
+    es2:'Коллективный', es2v:'Народные предприятия: кооперативы, артели',
+    es3:'Индивидуальный', es3v:'Частная, групповая, семейная',
+    el1:'Сельхозземля', el1v:'Долгосрочная аренда с продлением',
+    el2:'Садовые/дачные (до 12 соток)', el2v:'Пожизненно с наследованием',
+    eb1:'Финансирование развития', eb2:'Расчёты с населением',
+    eb3:'Пенсии, сбережения', eb4:'Беспроцентные ссуды',
+    en1:'Рост промышленности', en1v:'44% / год', en2:'Доходы работающих',
+    en3:'Преступность', en4:'Естественный прирост', en4v:'выше дореволюционного',
+    sb1:'Подушевые нормативы жилой площади', sb2:'Жилищно-коммунальное обслуживание',
+    sb3:'Здравоохранение', sb4:'Дошкольное воспитание',
+    sb5:'Среднее и высшее государственное образование', sb6:'Детский летний отдых',
+    sb7:'Общественный транспорт', sb8:'Юридические услуги',
+    sp1:'Свобода повышения благополучия за счёт труда', sp2:'Конкурентоспособная оплата бюджетников',
+    sp3:'Прогрессивная шкала налогов', sp4:'Ратификация ст. 20 Конвенции ООН против коррупции',
+    sp5:'Отмена коммерческой тайны для крупных операций', sp6:'Поддержка профсоюзов',
+    sp7:'Наука — самостоятельное функционирование', sp8:'Религия отделена от государства',
+    sp9:'Запрет пропаганды жестокости, стяжательства, порока',
+    af1:'Полное название', af1v:'Народно-патриотическая партия России — Власть Народу',
+    af2:'Сокращение', af2v:'НППР — Власть Народу', af3:'Дата основания',
+    af4:'Идеология', af4v:'Социогуманизм', af5:'Проект', af5v:'Народное государство (с 1997)',
+  },
+  en: {
+    p_date:'Date signed', p_pub:'Date published', p_adopted:'Adopted',
+    p_adopted_v:'Founding Congress', p_ideo:'Ideology', p_ideo_v:'Sociohumanism',
+    s1:'Economic decline', s1v:'to 75%', s2:'Mortality toll', s2v:'13M+',
+    s3:'Social stratification', s3v:'dramatic', s4:'Corruption', s4v:'all branches of power',
+    q1:'1. Development goal', q1v:'Quality of life',
+    q2:'2. Control mechanism', q2v:'Feedback via IDLP',
+    q3:'3. Form of government', q3v:'People\'s democracy',
+    q4:'4. Type of economy', q4v:'Common-sense economy',
+    q5:'5. Social policy', q5v:'Primacy of social policy',
+    qp1:'Vitality', qp1v:'Birth rate, mortality, life expectancy',
+    qp2:'Spiritual well-being', qp2v:'Suicides, murders, marriages, family preservation',
+    qp3:'Justice', qp3v:'Robberies, income polarization (10%/10%)',
+    qp4:'Economic potential', qp4v:'Industrial output, agriculture, investments',
+    qp5:'Standard of living', qp5v:'Share of wages in GDP, retail turnover, services, education, housing',
+    qp6:'Investments in the future', qp6v:'Budget for education, culture, sports, ecology',
+    cf1:'Exceeding limits in peacetime is prohibited',
+    cf2:'Ensures the force of Art. 7 of the RF Constitution',
+    cf3:'Welfare state → decent life',
+    dt1:'Slave-owning', dt1v:'Slave owners',
+    dt2:'Free cities', dt2v:'Wealthy citizens',
+    dt3:'Bourgeois', dt3v:'Capital owners',
+    dt4:'Nomenklatura', dt4v:'Party nomenklatura',
+    dt5:'People\'s', dt5v:'The people',
+    dp1:'Dominance of the wealthy in parliament', dp2:'Presidential elections as a circus',
+    dp3:'Low professionalism of the authorities', dp4:'Social lift obstructed',
+    dp5:'No national-proportional representation', dp6:'Election falsifications',
+    py1:'Supreme People\'s Council (SPC)', py2:'Regional People\'s Councils',
+    py3:'Local People\'s Councils', py4:'Corps of People\'s Deputies (80–100 thousand)',
+    py5:'Residents nominate 2–3 thousand candidates',
+    de1:'President', de1v:'Elected for 5 years from 3 SPC candidates',
+    de2:'Recall of a deputy', de2v:'Annual report to voters',
+    de3:'Executive power', de3v:'Appointed top-down',
+    de4:'People\'s Court', de4v:'Pyramid from bottom up',
+    de5:'Parties', de5v:'Platforms for programs, party lists abolished',
+    es1:'State', es1v:'People\'s: air, land, resources, energy, transport, defense, science (60–70% of GDP)',
+    es2:'Collective', es2v:'People\'s enterprises: cooperatives, artels',
+    es3:'Individual', es3v:'Private, group, family',
+    el1:'Agricultural land', el1v:'Long-term lease with renewal',
+    el2:'Garden/dacha plots (up to 12 sotka)', el2v:'Lifelong with inheritance',
+    eb1:'Development financing', eb2:'Settlements with the population',
+    eb3:'Pensions, savings', eb4:'Interest-free loans',
+    en1:'Industrial growth', en1v:'44% / year', en2:'Workers\' income',
+    en3:'Crime', en4:'Natural population growth', en4v:'higher than pre-revolutionary',
+    sb1:'Per-capita housing norms', sb2:'Housing and utilities',
+    sb3:'Healthcare', sb4:'Preschool education',
+    sb5:'Secondary and higher state education', sb6:'Children\'s summer recreation',
+    sb7:'Public transport', sb8:'Legal services',
+    sp1:'Freedom to increase well-being through labor', sp2:'Competitive public-sector pay',
+    sp3:'Progressive tax scale', sp4:'Ratification of Art. 20 of the UN Convention against Corruption',
+    sp5:'Abolition of commercial secrecy for large transactions', sp6:'Support for trade unions',
+    sp7:'Science — independent functioning', sp8:'Religion separated from the state',
+    sp9:'Ban on propaganda of cruelty, acquisitiveness, vice',
+    af1:'Full name', af1v:'People\'s Patriotic Party of Russia — Power to the People',
+    af2:'Abbreviation', af2v:'NPPR — Power to the People', af3:'Founded',
+    af4:'Ideology', af4v:'Sociohumanism', af5:'Project', af5v:'People\'s State (since 1997)',
+  }
+};
+
+/* ============================================================
+   3. ЛОГИКА
+   ============================================================ */
+let LANG = localStorage.getItem('nppr_lang') || 'ru';
+let THEME = localStorage.getItem('nppr_theme') || 'light';
+
+function t(key){
+  return (I18N[LANG] && I18N[LANG][key]) || (EXTRA[LANG] && EXTRA[LANG][key]) || key;
+}
+
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const val = t(key);
+    if(val && val !== key) el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    const val = t(key);
+    if(val && val !== key) el.innerHTML = val;
+  });
+  document.getElementById('langLabel').textContent = LANG === 'ru' ? 'EN' : 'RU';
+  document.querySelector('[data-i18n="share"]').textContent = t('share');
+  document.querySelector('[data-i18n="download"]').textContent = t('download');
+  document.querySelector('[data-i18n="theme_label"]').textContent = t('theme_label');
+  buildNav();
+  buildNews();
+}
+
+function buildNav(){
+  const nav = document.getElementById('nav');
+  const activeId = document.querySelector('.screen.active')?.id.replace('screen-','') || 'home';
+  nav.innerHTML = NAV.map(n => `
+    <div class="nav-item ${n.id===activeId?'active':''}" data-screen="${n.id}">
+      <span class="ico">${n.ico}</span><span>${t(n.key)}</span>
+    </div>
+  `).join('');
+  nav.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => go(item.dataset.screen));
   });
+}
 
-  // ===== Mobile menu =====
+function buildNews(){
+  const box = document.getElementById('newsList');
+  if(!box) return;
+  box.innerHTML = NEWS.map(n => {
+    const local = n[LANG] || n.ru;
+    const d = new Date(n.date);
+    const dateStr = d.toLocaleDateString(LANG === 'ru' ? 'ru-RU' : 'en-GB', {day:'2-digit', month:'short', year:'numeric'});
+    return `
+      <div class="news-item">
+        <div class="news-date">${dateStr}</div>
+        <div class="news-body">
+          <h3>${local.title}</h3>
+          <p>${local.desc}</p>
+          <span class="news-tag">${local.tag}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function go(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + name);
+  if(target) target.classList.add('active');
+  buildNav();
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function applyTheme(){
+  document.documentElement.dataset.theme = THEME;
+  document.getElementById('themeIcon').textContent = THEME === 'dark' ? '☀️' : '🌙';
+}
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  renderScreens();
+  applyTheme();
+  applyLang();
+  buildControlSteps();
+  buildViolations();
+  buildNews();
+
+  // lang toggle
+  document.getElementById('langToggle').addEventListener('click', () => {
+    LANG = LANG === 'ru' ? 'en' : 'ru';
+    localStorage.setItem('nppr_lang', LANG);
+    applyLang();
+  });
+
+  // theme toggle
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    THEME = THEME === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('nppr_theme', THEME);
+    applyTheme();
+  });
+
+  // share
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    const data = {
+      title: t('brand_full'),
+      text: t('tagline'),
+      url: location.href
+    };
+    if(navigator.share){
+      try { await navigator.share(data); } catch(e){}
+    } else {
+      await navigator.clipboard.writeText(location.href);
+      alert(LANG === 'ru' ? 'Ссылка скопирована' : 'Link copied');
+    }
+  });
+
+  // mobile menu
   const burger = document.getElementById('burger');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('overlay');
-
   burger.addEventListener('click', () => {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
@@ -781,63 +1081,91 @@
     overlay.classList.remove('show');
   });
 
-  // ===== Splash =====
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hide');
-  }, 2000);
+  // splash
+  setTimeout(() => document.getElementById('splash').classList.add('hide'), 2000);
 
-  // ===== Контроль: шаги =====
-  const steps = [
-    'ИДЖН — федеральный уровень',
-    'ИДЖН — региональный уровень',
-    'ИДЖН — муниципальный уровень',
-    'Отчёт Правительства перед Госдумой',
-    'Содоклад научных экспертов',
-    '«Красные флажки» — предельные значения',
+  // PWA manifest (генерируется на лету)
+  const manifest = {
+    name: 'НППР — Власть Народу',
+    short_name: 'НППР',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#1A3A6B',
+    theme_color: '#1A3A6B',
+    icons: [{
+      src: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>',
+      sizes: '192x192', type: 'image/svg+xml'
+    }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+});
+
+/* ===== Контроль: шаги ===== */
+function buildControlSteps(){
+  const steps_ru = [
+    'ИДЖН — федеральный уровень','ИДЖН — региональный уровень',
+    'ИДЖН — муниципальный уровень','Отчёт Правительства перед Госдумой',
+    'Содоклад научных экспертов','«Красные флажки» — предельные значения',
     'Отставка Премьера при нарушении'
   ];
+  const steps_en = [
+    'IDLP — federal level','IDLP — regional level',
+    'IDLP — municipal level','Government report to the State Duma',
+    'Co-report of scientific experts','"Red flags" — limit values',
+    'Resignation of the Prime Minister in case of violation'
+  ];
+  const steps = LANG === 'ru' ? steps_ru : steps_en;
   const c = document.getElementById('controlSteps');
+  if(!c) return;
+  c.innerHTML = '';
   steps.forEach((s, i) => {
     const isLast = i === steps.length - 1;
     const div = document.createElement('div');
-    div.style.cssText = `
-      display:flex;align-items:center;gap:12px;
-      padding:12px 14px;border-radius:10px;margin-bottom:6px;
-      background:${isLast ? 'rgba(200,16,46,.08)' : 'var(--surface)'};
-      border:1px solid ${isLast ? 'var(--accent)' : 'var(--divider)'};
-      font-size:14px;font-weight:500;
-    `;
-    div.innerHTML = `
-      <span style="width:26px;height:26px;border-radius:50%;background:${isLast ? 'var(--accent)' : 'var(--primary)'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${i+1}</span>
-      <span>${s}</span>
-    `;
+    div.style.cssText = `display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;margin-bottom:6px;background:${isLast?'rgba(200,16,46,.08)':'var(--surface)'};border:1px solid ${isLast?'var(--accent)':'var(--divider)'};font-size:14px;font-weight:500;`;
+    div.innerHTML = `<span style="width:26px;height:26px;border-radius:50%;background:${isLast?'var(--accent)':'var(--primary)'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${i+1}</span><span>${s}</span>`;
     c.appendChild(div);
     if(!isLast){
-      const arrow = document.createElement('div');
-      arrow.style.cssText = 'text-align:center;color:var(--muted);margin:2px 0;font-size:14px;';
-      arrow.textContent = '↓';
-      c.appendChild(arrow);
+      const a = document.createElement('div');
+      a.style.cssText = 'text-align:center;color:var(--muted);margin:2px 0;font-size:14px;';
+      a.textContent = '↓';
+      c.appendChild(a);
     }
   });
+}
 
-  // ===== Конституция: нарушения =====
-  const violations = [
-    ['ст. 3, пп. 2,3', 'Нет референдума в нужное время'],
-    ['ст. 32, п. 2', 'Нет реального права быть избранным'],
-    ['ст. 19, п. 1,2', 'Нет равенства перед законом'],
-    ['ст. 7, п. 1', 'Нет условий достойной жизни'],
-    ['ст. 8, п. 2', 'Нарушена неприкосновенность госсобственности'],
-    ['ст. 41, п. 1', 'Медпомощь платная'],
-    ['ст. 43, п. 2', 'Нет бесплатного дошкольного и общего образования'],
-    ['ст. 14', 'Финансирование религиозных организаций из бюджета']
+/* ===== Конституция: нарушения ===== */
+function buildViolations(){
+  const v_ru = [
+    ['ст. 3, пп. 2,3','Нет референдума в нужное время'],
+    ['ст. 32, п. 2','Нет реального права быть избранным'],
+    ['ст. 19, п. 1,2','Нет равенства перед законом'],
+    ['ст. 7, п. 1','Нет условий достойной жизни'],
+    ['ст. 8, п. 2','Нарушена неприкосновенность госсобственности'],
+    ['ст. 41, п. 1','Медпомощь платная'],
+    ['ст. 43, п. 2','Нет бесплатного дошкольного и общего образования'],
+    ['ст. 14','Финансирование религиозных организаций из бюджета']
   ];
-  const v = document.getElementById('violations');
-  violations.forEach(([art, desc]) => {
-    const div = document.createElement('div');
-    div.className = 'violation';
-    div.innerHTML = `<span class="art">${art}</span><span class="desc">${desc}</span>`;
-    v.appendChild(div);
-  });
+  const v_en = [
+    ['Art. 3','No referendum at the needed time'],
+    ['Art. 32','No real right to be elected'],
+    ['Art. 19','No equality before the law'],
+    ['Art. 7','No conditions for a decent life'],
+    ['Art. 8','Violation of state property inviolability'],
+    ['Art. 41','Medical care is paid'],
+    ['Art. 43','No free preschool and general education'],
+    ['Art. 14','Funding of religious organizations from the budget']
+  ];
+  const v = LANG === 'ru' ? v_ru : v_en;
+  const box = document.getElementById('violations');
+  if(!box) return;
+  box.innerHTML = v.map(([art, desc]) =>
+    `<div class="violation"><span class="art">${art}</span><span class="desc">${desc}</span></div>`
+  ).join('');
+}
 </script>
 </body>
 </html>
