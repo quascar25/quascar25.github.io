@@ -9,6 +9,13 @@
 <meta property="og:title" content="НППР — Власть Народу">
 <meta property="og:description" content="Программа партии. Государство народа. Народная демократия.">
 <meta property="og:type" content="website">
+
+<meta property="og:image" content="https://quascar25.github.io/nppr_app/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://quascar25.github.io/nppr_app/preview.jpg">
+  
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -111,36 +118,40 @@
   .screen-title{font-size:28px;font-weight:800;margin-bottom:6px;}
   .screen-sub{color:var(--muted);font-size:14px;margin-bottom:24px;}
 
-  /* Hero */
-  .hero{
-    background:var(--hero-grad);color:#fff;border-radius:20px;
-    padding:36px 32px;margin-bottom:28px;box-shadow:var(--shadow);
-    position:relative;overflow:hidden;
-  }
-  .hero::after{
-    content:'';position:absolute;right:-60px;top:-60px;
-    width:200px;height:200px;border-radius:50%;
-    background:radial-gradient(circle,rgba(200,16,46,.35),transparent 70%);
-  }
-  .hero h1{color:#fff;font-size:34px;font-weight:800;margin-bottom:8px;}
-  .hero p{color:#C8D6E5;font-size:14.5px;max-width:480px;margin-bottom:20px;}
-  .hero .btn{
-    background:var(--accent);color:#fff;border:none;padding:12px 24px;
-    border-radius:12px;font-weight:600;font-size:14.5px;cursor:pointer;
-    font-family:inherit;transition:transform .15s,box-shadow .15s;
-  }
-  .hero .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,16,46,.35);}
+ /* Hero */
+.hero{
+  background:var(--hero-grad);color:#fff;border-radius:20px;
+  padding:36px 32px;margin-bottom:28px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:24px;
+}
+.hero::after{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,16,46,.35),transparent 70%);
+}
+.hero-text{flex:1;}
+.hero-img{
+  width:220px;height:220px;
+  object-fit:cover;
+  border-radius:16px;
+  border:2px solid rgba(255,255,255,.2);
+  flex-shrink:0;
+  position:relative;z-index:1;
+}
+.hero h1{color:#fff;font-size:34px;font-weight:800;margin-bottom:8px;}
+.hero p{color:#C8D6E5;font-size:14.5px;max-width:480px;margin-bottom:20px;}
+.hero .btn{
+  background:var(--accent);color:#fff;border:none;padding:12px 24px;
+  border-radius:12px;font-weight:600;font-size:14.5px;cursor:pointer;
+  font-family:inherit;transition:transform .15s,box-shadow .15s;
+}
+.hero .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,16,46,.35);}
 
-  /* Tiles */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
-  .tile{
-    background:var(--surface);border:1px solid var(--divider);
-    border-radius:16px;padding:20px;cursor:pointer;
-    transition:transform .15s,box-shadow .15s,border-color .15s;
-  }
-  .tile:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--primary);}
-  .tile .ico{font-size:28px;margin-bottom:14px;}
-  .tile h3{font-size:15px;font-weight:600;color:var(--text);}
+@media (max-width:640px){
+  .hero{flex-direction:column-reverse;text-align:center;}
+  .hero-img{width:160px;height:160px;}
+}
 
   /* Cards */
   .card{
