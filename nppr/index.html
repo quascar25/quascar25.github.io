@@ -131,14 +131,18 @@
   background:radial-gradient(circle,rgba(200,16,46,.35),transparent 70%);
 }
 .hero-text{flex:1;}
+  
 .hero-img{
-  width:220px;height:220px;
+  width:300px;
+  aspect-ratio:16/9;
   object-fit:cover;
   border-radius:16px;
   border:2px solid rgba(255,255,255,.2);
   flex-shrink:0;
-  position:relative;z-index:1;
+  position:relative;
+  z-index:1;
 }
+  
 .hero h1{color:#fff;font-size:34px;font-weight:800;margin-bottom:8px;}
 .hero p{color:#C8D6E5;font-size:14.5px;max-width:480px;margin-bottom:20px;}
 .hero .btn{
@@ -150,7 +154,7 @@
 
 @media (max-width:640px){
   .hero{flex-direction:column-reverse;text-align:center;}
-  .hero-img{width:160px;height:160px;}
+  .hero-img{width:100%;max-width:280px;aspect-ratio:16/9;}
 }
 
   /* Cards */
