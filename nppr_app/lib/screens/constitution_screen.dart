@@ -6,7 +6,7 @@ import '../widgets/quote_block.dart';
 class ConstitutionScreen extends StatelessWidget {
   const ConstitutionScreen({super.key});
 
-  static const violations = [
+  static final violations = [
     MapEntry('ст. 3, пп. 2,3', 'Нет референдума в нужное время'),
     MapEntry('ст. 32, п. 2', 'Нет реального права быть избранным'),
     MapEntry('ст. 19, п. 1,2', 'Нет равенства перед законом'),
