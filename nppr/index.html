@@ -1043,6 +1043,7 @@ function applyTheme(){
 document.addEventListener('DOMContentLoaded', () => {
   renderScreens();
   applyTheme();
+  applyLang();          // ← ВЕРНУЛИ. Заполняет все data-i18n
   buildControlSteps();
   buildViolations();
   buildNews();
@@ -1052,6 +1053,8 @@ document.addEventListener('DOMContentLoaded', () => {
     LANG = LANG === 'ru' ? 'en' : 'ru';
     localStorage.setItem('nppr_lang', LANG);
     applyLang();
+    buildControlSteps();
+    buildViolations();
   });
 
   // theme toggle
@@ -1092,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // splash
   setTimeout(() => document.getElementById('splash').classList.add('hide'), 2000);
 
-  // PWA manifest (генерируется на лету)
+  // PWA manifest
   const manifest = {
     name: 'НППР — Власть Народу',
     short_name: 'НППР',
