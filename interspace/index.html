@@ -6,36 +6,32 @@
 <title>ГЕЛИОС-7 · Пульт управления</title>
 <style>
   :root{
-    --bg-0:#050912;
-    --bg-1:#0a1220;
-    --bg-2:#0f1a2c;
-    --line:#1c3a5a;
-    --line-hi:#3aa9ff;
-    --neon:#3aa9ff;
-    --neon-2:#00ffe0;
-    --warn:#ff7a3a;
-    --text:#c7d7ea;
-    --text-dim:#6c86a3;
+    --bg-0:#050912; --bg-1:#0a1220; --bg-2:#0f1a2c;
+    --line:#1c3a5a; --neon:#3aa9ff; --neon-2:#00ffe0;
+    --warn:#ff7a3a; --ok:#7cff9b; --red:#ff4a5a;
+    --text:#c7d7ea; --text-dim:#6c86a3;
     --glow: 0 0 8px rgba(58,169,255,.7), 0 0 20px rgba(58,169,255,.35);
   }
-
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;height:100%}
+  html,body{margin:0;padding:0;min-height:100%}
   body{
-    font-family: "Consolas", "Courier New", monospace;
+    font-family:"Consolas","Courier New",monospace;
     color:var(--text);
     background:
       radial-gradient(circle at 20% 10%, rgba(58,169,255,.10), transparent 40%),
       radial-gradient(circle at 80% 90%, rgba(0,255,224,.08), transparent 45%),
       radial-gradient(circle at 50% 50%, #0a1426 0%, #050912 70%);
-    min-height:100vh;
-    overflow-x:hidden;
-    position:relative;
+    min-height:100vh;overflow-x:hidden;position:relative;
+    transition: background .6s;
   }
-  /* Звёздное поле */
+  body.alert{
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,74,90,.14), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(255,122,58,.10), transparent 45%),
+      radial-gradient(circle at 50% 50%, #1a0a12 0%, #050912 70%);
+  }
   body::before{
-    content:"";
-    position:fixed;inset:0;
+    content:"";position:fixed;inset:0;
     background-image:
       radial-gradient(1px 1px at 20% 30%, #fff, transparent),
       radial-gradient(1px 1px at 70% 15%, #bcd8ff, transparent),
@@ -44,166 +40,121 @@
       radial-gradient(1px 1px at 10% 70%, #fff, transparent),
       radial-gradient(1px 1px at 55% 45%, #fff, transparent),
       radial-gradient(1px 1px at 30% 55%, #8ec8ff, transparent);
-    background-size: 100% 100%;
-    opacity:.6;
-    pointer-events:none;
+    opacity:.6;pointer-events:none;
     animation: twinkle 6s infinite alternate ease-in-out;
   }
   @keyframes twinkle{from{opacity:.35}to{opacity:.8}}
 
-  .wrap{
-    max-width:1200px;
-    margin:0 auto;
-    padding:28px 20px 60px;
-    position:relative;
-    z-index:1;
-  }
+  .wrap{max-width:1200px;margin:0 auto;padding:28px 20px 60px;position:relative;z-index:1}
 
-  /* ====== ЗАГОЛОВОК ====== */
+  /* ===== HEADER ===== */
   header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:14px 20px;
-    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 20px;border:1px solid var(--line);
     background:linear-gradient(180deg, rgba(15,26,44,.9), rgba(10,18,32,.7));
     clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
     box-shadow: inset 0 0 20px rgba(58,169,255,.08);
     position:relative;
   }
   header::after{
-    content:"";
-    position:absolute;left:20px;right:20px;bottom:4px;height:1px;
-    background:linear-gradient(90deg,transparent,var(--neon),transparent);
-    opacity:.6;
+    content:"";position:absolute;left:20px;right:20px;bottom:4px;height:1px;
+    background:linear-gradient(90deg,transparent,var(--neon),transparent);opacity:.6;
   }
-  .logo{
-    display:flex;align-items:center;gap:14px;
-    font-size:14px;letter-spacing:4px;text-transform:uppercase;
-  }
+  .logo{display:flex;align-items:center;gap:14px;font-size:14px;letter-spacing:4px;text-transform:uppercase}
   .logo .mark{
     width:26px;height:26px;
     background:linear-gradient(135deg,var(--neon),var(--neon-2));
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    box-shadow: var(--glow);
+    box-shadow:var(--glow);
     animation: pulse 2.5s infinite ease-in-out;
   }
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
   .logo b{color:#eaf6ff;font-weight:600}
-  .status-line{
-    display:flex;gap:18px;font-size:11px;color:var(--text-dim);letter-spacing:2px;
-  }
+  .status-line{display:flex;gap:18px;font-size:11px;color:var(--text-dim);letter-spacing:2px}
   .status-line span i{
     display:inline-block;width:7px;height:7px;border-radius:50%;
-    background:var(--neon-2);margin-right:6px;
-    box-shadow:0 0 8px var(--neon-2);
+    background:var(--neon-2);margin-right:6px;box-shadow:0 0 8px var(--neon-2);
     animation: blink 1.6s infinite;
   }
   .status-line span:nth-child(2) i{background:var(--warn);box-shadow:0 0 8px var(--warn);animation-delay:.4s}
-  .status-line span:nth-child(3) i{background:#7cff9b;box-shadow:0 0 8px #7cff9b;animation-delay:.8s}
+  .status-line span:nth-child(3) i{background:var(--ok);box-shadow:0 0 8px var(--ok);animation-delay:.8s}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
 
-  /* ====== СЕТКА ====== */
-  .grid{
-    display:grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap:22px;
-    margin-top:26px;
-  }
+  /* ===== GRID ===== */
+  .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;margin-top:26px}
   @media (max-width:900px){ .grid{grid-template-columns:1fr} }
 
-  /* ====== ПАНЕЛИ ====== */
+  /* ===== PANEL ===== */
   .panel{
-    position:relative;
-    padding:22px 20px 24px;
+    position:relative;padding:22px 20px 24px;
     background:linear-gradient(160deg, rgba(15,26,44,.85), rgba(8,14,26,.9));
     border:1px solid var(--line);
     clip-path: polygon(0 18px, 18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
-    box-shadow:
-      inset 0 0 30px rgba(58,169,255,.06),
-      0 10px 30px rgba(0,0,0,.5);
+    box-shadow: inset 0 0 30px rgba(58,169,255,.06), 0 10px 30px rgba(0,0,0,.5);
     overflow:hidden;
   }
   .panel::before{
-    content:"";
-    position:absolute;top:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg, transparent, var(--neon), transparent);
-    opacity:.7;
+    content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg, transparent, var(--neon), transparent);opacity:.7;
   }
   .panel h2{
-    margin:0 0 16px;
-    font-size:12px;letter-spacing:4px;text-transform:uppercase;
-    color:#9ec3ea;font-weight:500;
-    display:flex;align-items:center;gap:10px;
+    margin:0 0 16px;font-size:12px;letter-spacing:4px;text-transform:uppercase;
+    color:#9ec3ea;font-weight:500;display:flex;align-items:center;gap:10px;
   }
   .panel h2::before{
-    content:"";width:8px;height:8px;
-    background:var(--neon);
+    content:"";width:8px;height:8px;background:var(--neon);
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
     box-shadow:var(--glow);
   }
+  .panel .led{position:absolute;width:6px;height:6px;border-radius:50%;
+    background:var(--neon);box-shadow:0 0 10px var(--neon);animation: blink 1.8s infinite}
+  .panel .led.tl{top:10px;right:14px}
+  .panel .led.bl{bottom:10px;left:14px;background:var(--neon-2);
+    box-shadow:0 0 10px var(--neon-2);animation-delay:.6s}
 
-  /* ====== ИЛЛЮМИНАТОРЫ (треугольные) ====== */
-  .viewport-row{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:14px;
-    margin-bottom:8px;
-  }
+  /* ===== ILLUMINATORS ===== */
+  .viewport-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:8px}
   .viewport{
-    position:relative;
-    aspect-ratio:1/1;
+    position:relative;aspect-ratio:1/1;
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    background:#02060d;
-    border:1px solid var(--line);
-    overflow:hidden;
+    background:#02060d;border:1px solid var(--line);overflow:hidden;
     filter: drop-shadow(0 0 6px rgba(58,169,255,.35));
     transition: filter .3s;
   }
-  .viewport:hover{ filter: drop-shadow(0 0 14px rgba(58,169,255,.8)) }
+  .viewport:hover{filter: drop-shadow(0 0 14px rgba(58,169,255,.8))}
   .viewport img{
     width:100%;height:100%;object-fit:cover;
-    transform: scale(1.3) translateY(10%);
-    opacity:.92;
-    mix-blend-mode:screen;
+    transform: scale(1.3) translateY(10%);opacity:.92;mix-blend-mode:screen;
   }
-  /* Заглушка если нет картинки — рисуем "Землю" */
   .viewport::after{
-    content:"";
-    position:absolute;inset:0;
+    content:"";position:absolute;inset:0;
     background:
       radial-gradient(circle at 50% 85%, #2a6bb5 0%, #0d3a72 30%, transparent 60%),
       radial-gradient(circle at 50% 90%, rgba(120,200,255,.5), transparent 55%);
-    mix-blend-mode:screen;
-    pointer-events:none;
+    mix-blend-mode:screen;pointer-events:none;
   }
   .viewport span{
     position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
     font-size:9px;letter-spacing:2px;color:#8ec8ff;
-    text-shadow:0 0 6px var(--neon);
-    z-index:2;
+    text-shadow:0 0 6px var(--neon);z-index:2;
   }
   .viewport::before{
-    content:"";
-    position:absolute;inset:4px;
+    content:"";position:absolute;inset:4px;
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
     border:1px solid rgba(58,169,255,.4);
     z-index:3;pointer-events:none;
   }
 
-  /* ====== РЕАКТОР ====== */
+  /* ===== REACTOR ===== */
   .reactor{
-    display:flex;gap:18px;align-items:center;
-    padding:16px;
+    display:flex;gap:18px;align-items:center;padding:16px;
     border:1px solid var(--line);
     background:linear-gradient(135deg, rgba(10,18,32,.9), rgba(15,26,44,.6));
     clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
     margin-bottom:18px;
   }
   .reactor-core{
-    width:90px;height:90px;
-    flex:0 0 90px;
-    position:relative;
+    width:90px;height:90px;flex:0 0 90px;position:relative;
     background:radial-gradient(circle at 50% 50%, #00ffe0, #0a5a8a 45%, #041828 75%);
     clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
     box-shadow: 0 0 30px rgba(0,255,224,.6), inset 0 0 20px rgba(0,255,224,.8);
@@ -221,15 +172,11 @@
   .reactor-info{flex:1;font-size:12px;letter-spacing:1.5px}
   .reactor-info .row{display:flex;justify-content:space-between;margin-bottom:6px;color:var(--text-dim)}
   .reactor-info .row b{color:#eaf6ff;font-weight:500;text-shadow:0 0 6px rgba(58,169,255,.7)}
-  .bar{
-    height:6px;background:#0a1828;border:1px solid var(--line);
-    position:relative;overflow:hidden;margin-top:4px;
-  }
+  .bar{height:6px;background:#0a1828;border:1px solid var(--line);position:relative;overflow:hidden;margin-top:4px}
   .bar i{
     position:absolute;left:0;top:0;bottom:0;
     background:linear-gradient(90deg, var(--neon-2), var(--neon));
-    box-shadow:0 0 10px var(--neon-2);
-    width:0%;transition: width .8s ease;
+    box-shadow:0 0 10px var(--neon-2);width:0%;transition: width .8s ease;
   }
   .bar::after{
     content:"";position:absolute;inset:0;
@@ -237,31 +184,24 @@
     pointer-events:none;
   }
 
-  /* ====== КНОПКИ ====== */
+  /* ===== BUTTONS ===== */
   .btn-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
   .btn{
-    position:relative;
-    padding:12px 22px;
-    font-family:inherit;
+    position:relative;padding:12px 22px;font-family:inherit;
     font-size:11px;letter-spacing:3px;text-transform:uppercase;
     color:#bcd8ff;
     background:linear-gradient(180deg, rgba(15,26,44,.9), rgba(8,14,26,.9));
-    border:1px solid var(--line);
-    cursor:pointer;
+    border:1px solid var(--line);cursor:pointer;
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-    transition: all .25s ease;
-    overflow:hidden;
+    transition: all .25s ease;overflow:hidden;
   }
   .btn::after{
-    content:"";
-    position:absolute;inset:0;
+    content:"";position:absolute;inset:0;
     background:linear-gradient(120deg, transparent 30%, rgba(58,169,255,.25) 50%, transparent 70%);
-    transform: translateX(-120%);
-    transition: transform .6s;
+    transform: translateX(-120%);transition: transform .6s;
   }
   .btn:hover{
-    color:#eaf6ff;
-    border-color:var(--neon);
+    color:#eaf6ff;border-color:var(--neon);
     box-shadow: var(--glow), inset 0 0 12px rgba(58,169,255,.2);
     text-shadow: 0 0 8px var(--neon);
   }
@@ -270,87 +210,141 @@
   .btn.warn{border-color:#5a2a1a;color:#ffb28a}
   .btn.warn:hover{border-color:var(--warn);box-shadow:0 0 10px var(--warn), inset 0 0 12px rgba(255,122,58,.2);text-shadow:0 0 8px var(--warn)}
   .btn.go{border-color:#1a5a3a;color:#9bffc4}
-  .btn.go:hover{border-color:#7cff9b;box-shadow:0 0 10px #7cff9b, inset 0 0 12px rgba(124,255,155,.2);text-shadow:0 0 8px #7cff9b}
+  .btn.go:hover{border-color:var(--ok);box-shadow:0 0 10px var(--ok), inset 0 0 12px rgba(124,255,155,.2);text-shadow:0 0 8px var(--ok)}
   .btn.on{
     background:linear-gradient(180deg, rgba(0,255,224,.15), rgba(58,169,255,.1));
-    color:#eaf6ff;
-    border-color:var(--neon-2);
+    color:#eaf6ff;border-color:var(--neon-2);
     box-shadow: 0 0 14px rgba(0,255,224,.7), inset 0 0 14px rgba(0,255,224,.25);
   }
 
-  /* ====== СПИСКИ / СТАТУСЫ ====== */
+  /* ===== STATUS LIST ===== */
   .stat-list{list-style:none;margin:0;padding:0;font-size:12px}
   .stat-list li{
     display:flex;justify-content:space-between;align-items:center;
-    padding:9px 12px;
-    border:1px solid var(--line);
-    margin-bottom:8px;
+    padding:9px 12px;border:1px solid var(--line);margin-bottom:8px;
     background:linear-gradient(90deg, rgba(15,26,44,.6), rgba(10,18,32,.3));
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-    letter-spacing:1.5px;
-    transition: border-color .3s;
+    letter-spacing:1.5px;transition: border-color .3s;
   }
   .stat-list li:hover{border-color:var(--neon);box-shadow:inset 0 0 12px rgba(58,169,255,.15)}
   .stat-list li .lbl{color:var(--text-dim)}
   .stat-list li .val{color:#eaf6ff;text-shadow:0 0 6px rgba(58,169,255,.6)}
-  .dot{
-    display:inline-block;width:6px;height:6px;border-radius:50%;
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;
     margin-right:8px;vertical-align:middle;
-    box-shadow:0 0 8px currentColor;
-    background: currentColor;
-    animation: blink 1.4s infinite;
-  }
-  .c-ok{color:#7cff9b}
+    box-shadow:0 0 8px currentColor;background: currentColor;
+    animation: blink 1.4s infinite}
+  .c-ok{color:var(--ok)}
   .c-warn{color:var(--warn);animation-delay:.3s}
   .c-info{color:var(--neon);animation-delay:.6s}
 
-  /* ====== ЛОГ ====== */
+  /* ===== LOG ===== */
   .log{
-    margin-top:18px;
-    padding:12px;
-    border:1px solid var(--line);
-    background:rgba(3,8,16,.9);
-    height:140px;
-    overflow-y:auto;
-    font-size:11px;
-    letter-spacing:1px;
-    color:#8ec8ff;
+    margin-top:18px;padding:12px;border:1px solid var(--line);
+    background:rgba(3,8,16,.9);height:110px;overflow-y:auto;
+    font-size:11px;letter-spacing:1px;color:#8ec8ff;
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
   }
   .log div{margin-bottom:4px}
   .log div::before{content:"> ";color:var(--neon-2)}
   .log::-webkit-scrollbar{width:6px}
-  .log::-webkit-scrollbar-thumb{background:var(--line);border-radius:0}
+  .log::-webkit-scrollbar-thumb{background:var(--line)}
 
-  /* ====== FOOTER ====== */
+  /* ===== AI TERMINAL ===== */
+  .ai-window{
+    margin-top:14px;border:1px solid var(--line);
+    background:rgba(3,8,16,.92);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    box-shadow: inset 0 0 20px rgba(58,169,255,.08);
+    position:relative;overflow:hidden;transition: box-shadow .4s, border-color .4s;
+  }
+  .ai-window.alert{
+    border-color:var(--red);
+    box-shadow: inset 0 0 24px rgba(255,74,90,.25), 0 0 20px rgba(255,74,90,.4);
+  }
+  .ai-header{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 12px;border-bottom:1px solid var(--line);
+    font-size:10px;letter-spacing:3px;text-transform:uppercase;
+    color:#8ec8ff;
+    background:linear-gradient(90deg, rgba(58,169,255,.06), transparent);
+  }
+  .ai-header .ai-pulse{
+    margin-left:auto;width:6px;height:6px;border-radius:50%;
+    background:var(--neon);box-shadow:0 0 10px var(--neon);
+    animation: aiBlink 1s infinite;
+  }
+  @keyframes aiBlink{0%,100%{opacity:1}50%{opacity:.15}}
+
+  .ai-window.thinking .ai-header{
+    color:#eaf6ff;text-shadow:0 0 8px var(--neon);
+    animation: aiFlicker .35s infinite alternate;
+  }
+  .ai-window.thinking .ai-pulse{
+    background:var(--neon-2);box-shadow:0 0 14px var(--neon-2);
+    animation-duration:.25s;
+  }
+  .ai-window.thinking .ai-body{filter: brightness(1.15);}
+  @keyframes aiFlicker{
+    from{ background:linear-gradient(90deg, rgba(58,169,255,.15), transparent); }
+    to  { background:linear-gradient(90deg, rgba(0,255,224,.15), transparent); }
+  }
+  .ai-window.alert .ai-header{color:#ffb3ba;text-shadow:0 0 10px var(--red);}
+
+  .ai-body{
+    height:160px;overflow-y:auto;padding:10px 12px;
+    font-size:11px;letter-spacing:1px;line-height:1.6;color:#bcd8ff;
+  }
+  .ai-body::-webkit-scrollbar{width:6px}
+  .ai-body::-webkit-scrollbar-thumb{background:var(--line)}
+  .ai-msg{margin-bottom:8px;opacity:0;transform:translateY(4px);
+    animation: msgIn .35s forwards}
+  @keyframes msgIn{to{opacity:1;transform:translateY(0)}}
+  .ai-msg.user::before{content:"▸ КАПИТАН: ";color:var(--warn)}
+  .ai-msg.bot::before {content:"▸ БОРТ: ";color:var(--neon-2)}
+  .ai-msg.bot{color:#eaf6ff;text-shadow:0 0 6px rgba(58,169,255,.5)}
+  .ai-msg.bot.think{color:#8ec8ff;font-style:italic;opacity:.85}
+
+  .ai-input-row{
+    display:flex;gap:0;border-top:1px solid var(--line);
+    background:rgba(5,10,20,.9);
+  }
+  .ai-input-row input{
+    flex:1;background:transparent;border:none;outline:none;
+    padding:12px 14px;color:#eaf6ff;font-family:inherit;
+    font-size:11px;letter-spacing:2px;
+  }
+  .ai-input-row input::placeholder{color:#4a6484}
+  .ai-input-row .btn{
+    border:none;border-left:1px solid var(--line);
+    clip-path:none;padding:12px 18px;
+  }
+
+  /* typing dots */
+  .typing{display:inline-block}
+  .typing::after{content:"·";animation: dots 1.2s steps(4, end) infinite}
+  @keyframes dots{
+    0%{content:""}
+    25%{content:"·"}
+    50%{content:"··"}
+    75%{content:"···"}
+    100%{content:""}
+  }
+
+  /* ===== FOOTER ===== */
   footer{
-    margin-top:30px;
-    text-align:center;
-    font-size:10px;
-    letter-spacing:4px;
-    color:var(--text-dim);
-    text-transform:uppercase;
+    margin-top:30px;text-align:center;font-size:10px;
+    letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;
   }
   footer::before{
     content:"";display:block;height:1px;
     background:linear-gradient(90deg,transparent,var(--line),transparent);
     margin-bottom:12px;
   }
-
-  /* ====== МИГАЮЩИЕ ДИОДЫ В УГЛАХ ПАНЕЛИ ====== */
-  .panel .led{
-    position:absolute;width:6px;height:6px;border-radius:50%;
-    background:var(--neon);box-shadow:0 0 10px var(--neon);
-    animation: blink 1.8s infinite;
-  }
-  .panel .led.tl{top:10px;right:14px}
-  .panel .led.bl{bottom:10px;left:14px;background:var(--neon-2);box-shadow:0 0 10px var(--neon-2);animation-delay:.6s}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- HEADER -->
   <header>
     <div class="logo">
       <div class="mark"></div>
@@ -365,7 +359,7 @@
 
   <div class="grid">
 
-    <!-- ЛЕВАЯ ПАНЕЛЬ -->
+    <!-- LEFT -->
     <section class="panel">
       <span class="led tl"></span>
       <span class="led bl"></span>
@@ -395,9 +389,9 @@
         <div class="reactor-info">
           <div class="row"><span>МОЩНОСТЬ</span><b id="powerVal">78.4 %</b></div>
           <div class="bar"><i id="powerBar" style="width:78%"></i></div>
-          <div class="row" style="margin-top:10px"><span>ТЕМП. ПЛАЗМЫ</span><b>1.24 × 10⁷ K</b></div>
-          <div class="bar"><i style="width:64%"></i></div>
-          <div class="row" style="margin-top:10px"><span>СТАБИЛЬНОСТЬ</span><b class="c-ok">НОРМА</b></div>
+          <div class="row" style="margin-top:10px"><span>ТЕМП. ПЛАЗМЫ</span><b id="tempVal">1.24 × 10⁷ K</b></div>
+          <div class="bar"><i id="tempBar" style="width:64%"></i></div>
+          <div class="row" style="margin-top:10px"><span>СТАБИЛЬНОСТЬ</span><b class="c-ok" id="stabVal">НОРМА</b></div>
         </div>
       </div>
 
@@ -408,17 +402,17 @@
       </div>
     </section>
 
-    <!-- ПРАВАЯ ПАНЕЛЬ -->
+    <!-- RIGHT -->
     <section class="panel">
       <span class="led tl"></span>
       <span class="led bl"></span>
       <h2>Системы · Диагностика</h2>
 
       <ul class="stat-list">
-        <li><span class="lbl"><span class="dot c-ok"></span>БЛАСТЕРЫ Л‑БОРТ</span><span class="val">ГОТОВЫ</span></li>
-        <li><span class="lbl"><span class="dot c-ok"></span>БЛАСТЕРЫ П‑БОРТ</span><span class="val">ГОТОВЫ</span></li>
-        <li><span class="lbl"><span class="dot c-info"></span>СКАНЕР ДАЛЬНИЙ</span><span class="val">42 %</span></li>
-        <li><span class="lbl"><span class="dot c-warn"></span>ЩИТЫ ЗАДНИЕ</span><span class="val">82 %</span></li>
+        <li><span class="lbl"><span class="dot c-ok"></span>БЛАСТЕРЫ Л‑БОРТ</span><span class="val" id="blasterL">ГОТОВЫ</span></li>
+        <li><span class="lbl"><span class="dot c-ok"></span>БЛАСТЕРЫ П‑БОРТ</span><span class="val" id="blasterR">ГОТОВЫ</span></li>
+        <li><span class="lbl"><span class="dot c-info"></span>СКАНЕР ДАЛЬНИЙ</span><span class="val" id="scanVal">42 %</span></li>
+        <li><span class="lbl"><span class="dot c-warn"></span>ЩИТЫ ЗАДНИЕ</span><span class="val" id="shieldVal">82 %</span></li>
         <li><span class="lbl"><span class="dot c-ok"></span>ЖИЗНЕОБЕСПЕЧЕНИЕ</span><span class="val">100 %</span></li>
         <li><span class="lbl"><span class="dot c-info"></span>ЗВЁЗДНЫЙ АТЛАС</span><span class="val">СИНХР.</span></li>
       </ul>
@@ -435,50 +429,699 @@
         <div>Связь с ядром: OK</div>
         <div>Готов к вводу команд</div>
       </div>
-    </section>
 
+      <!-- AI TERMINAL -->
+      <div class="ai-window" id="aiWindow">
+        <div class="ai-header">
+          <span class="dot c-info"></span>
+          <span id="aiStatus">ИИ · ОЖИДАНИЕ ЗАПРОСА</span>
+          <span class="ai-pulse"></span>
+        </div>
+
+        <div class="ai-body" id="aiBody">
+          <div class="ai-msg bot">Борткомпьютер на связи. Все системы номинальны. Жду распоряжений, капитан.</div>
+        </div>
+
+        <div class="ai-input-row">
+          <input id="aiInput" type="text" placeholder="Введите команду..."
+                 autocomplete="off"/>
+          <button class="btn" id="aiSend">Передать</button>
+        </div>
+      </div>
+      <!-- /AI TERMINAL -->
+
+    </section>
   </div>
 
   <footer>ГЕЛИОС‑7 · КЛАСС «ТРЕУГОЛЬНИК» · МОДУЛЬ 04‑А</footer>
 </div>
 
 <script>
-  const log = document.getElementById('log');
-  const ts = () => new Date().toLocaleTimeString('ru-RU',{hour12:false});
+/* =========================================================
+   1. ПУЛЬТ · лог, кнопки, телеметрия
+   ========================================================= */
+const log = document.getElementById('log');
+const ts  = () => new Date().toLocaleTimeString('ru-RU',{hour12:false});
 
-  function addLog(text){
-    const d = document.createElement('div');
-    d.textContent = `[${ts()}] ${text}`;
-    log.appendChild(d);
-    log.scrollTop = log.scrollHeight;
+function addLog(text){
+  const d = document.createElement('div');
+  d.textContent = `[${ts()}] ${text}`;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+
+document.querySelectorAll('.btn[data-act]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    addLog(btn.dataset.act);
+    btn.animate(
+      [{transform:'scale(1)'},{transform:'scale(.96)'},{transform:'scale(1)'}],
+      {duration:180}
+    );
+    if(btn.classList.contains('go')){
+      const v = 60 + Math.random()*40;
+      document.getElementById('powerBar').style.width = v.toFixed(0)+'%';
+      document.getElementById('powerVal').textContent = v.toFixed(1)+' %';
+    }
+  });
+});
+
+setInterval(() => {
+  const v = 70 + Math.random()*25;
+  document.getElementById('powerBar').style.width = v.toFixed(0)+'%';
+  document.getElementById('powerVal').textContent = v.toFixed(1)+' %';
+
+  const t = 1.1 + Math.random()*0.3;
+  document.getElementById('tempVal').textContent = t.toFixed(2)+' × 10⁷ K';
+  document.getElementById('tempBar').style.width = (50 + Math.random()*40).toFixed(0)+'%';
+
+  document.getElementById('shieldVal').textContent = (78 + Math.floor(Math.random()*18))+' %';
+  document.getElementById('scanVal').textContent   = (30 + Math.floor(Math.random()*60))+' %';
+
+  const ready = Math.random() > 0.15 ? 'ГОТОВЫ' : 'ПЕРЕЗАРЯДКА';
+  document.getElementById('blasterL').textContent = ready;
+  document.getElementById('blasterR').textContent = ready;
+}, 2600);
+
+setTimeout(()=>addLog('Все системы в норме'), 800);
+setTimeout(()=>addLog('Звёздный атлас синхронизирован'), 1600);
+
+/* =========================================================
+   2. МОДУЛЬ ИИ · расширенный движок
+   ========================================================= */
+
+const aiWindow = document.getElementById('aiWindow');
+const aiBody   = document.getElementById('aiBody');
+const aiInput  = document.getElementById('aiInput');
+const aiSend   = document.getElementById('aiSend');
+const aiStatus = document.getElementById('aiStatus');
+
+/* --- Снимок состояния пульта --- */
+function snapshot(){
+  return {
+    power:   document.getElementById('powerVal').textContent,
+    temp:    document.getElementById('tempVal').textContent,
+    shields: document.getElementById('shieldVal').textContent,
+    scan:    document.getElementById('scanVal').textContent,
+    blaster: document.getElementById('blasterL').textContent,
+    blasterR:document.getElementById('blasterR').textContent,
+    stab:    document.getElementById('stabVal').textContent,
+    sector:  ['7G','12B','44A','09C','21F','88D'][Math.floor(Math.random()*6)],
+    time:    new Date().toLocaleTimeString('ru-RU',{hour12:false}),
+    stardate: (Math.floor(Date.now()/1000) % 99999).toString().padStart(5,'0')
+  };
+}
+
+/* --- Утилиты --- */
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const chance = p => Math.random() < p;
+
+/* =========================================================
+   ТЕМЫ · 30 категорий × 6 форм ответов
+   ========================================================= */
+const TOPICS = [
+  { id:'core', keys:['реактор','ядро','энерг','мощност','плазм','силовая'],
+    forms:[
+      s=>`Ядро стабильно. Мощность ${s.power}, темп. плазмы ${s.temp}. Отклонений нет.`,
+      s=>`Реактор в номинале. ${s.power} мощности, ${s.temp} по плазме.`,
+      s=>`Силовая установка работает штатно. ${s.power}, стабильность ${s.stab}.`,
+      s=>`Плазма удерживается. ${s.temp}. Мощность ${s.power}.`,
+      s=>`Ядро держит ${s.power}. Термостабильность в норме.`,
+      s=>`Диагностика ядра: ${s.power}, ${s.temp}, стабильность ${s.stab}.`
+    ]},
+  { id:'shields', keys:['щит','защит','броня','оборон','поле'],
+    forms:[
+      s=>`Щиты ${s.shields}. Распределение номинальное.`,
+      s=>`Защитное поле держит ${s.shields}. Готовы к удару.`,
+      s=>`Энергощиты ${s.shields}. Перегрузок нет.`,
+      s=>`Щиты в норме: ${s.shields}. Резерв есть.`,
+      s=>`Дефлекторы ${s.shields}. Сектор ${s.sector} прикрыт.`,
+      s=>`Оборона активна. Щиты ${s.shields}, тыл стабилен.`
+    ]},
+  { id:'blasters', keys:['бластер','оруж','пушк','атак','огн','стрель','цель'],
+    forms:[
+      s=>s.blaster==='ГОТОВЫ'?`Бластеры обоих бортов к бою готовы.`:`Правый борт ${s.blasterR}, левый ${s.blaster}.`,
+      s=>`Оружейные контуры: Л ${s.blaster}, П ${s.blasterR}.`,
+      s=>`Бластеры в состоянии «${s.blaster}». Жду цель, капитан.`,
+      s=>`Тактический блок: орудия ${s.blaster}.`,
+      s=>`Огонь готов: ${s.blaster}. Наведение в норме.`,
+      s=>`Ствольные группы — ${s.blaster}. Заряды пополнены.`
+    ]},
+  { id:'scan', keys:['скан','радар','обзор','сектор','дальн','детект','сенсор'],
+    forms:[
+      s=>`Сектор ${s.sector} просканирован на ${s.scan}. Помех нет.`,
+      s=>`Дальний скан ${s.scan}. Сектор ${s.sector} чист.`,
+      s=>`Сенсоры дают ${s.scan} по сектору ${s.sector}.`,
+      s=>`Радар активен. ${s.scan} покрытия, сектор ${s.sector}.`,
+      s=>`Обзор ${s.scan}. Ничего аномального в ${s.sector}.`,
+      s=>`Детекторы ${s.scan}. Сектор ${s.sector} — тишина.`
+    ]},
+  { id:'status', keys:['статус','состоян','доклад','сводк','систем','общ'],
+    forms:[
+      s=>`Сводка: ядро ${s.power}, щиты ${s.shields}, орудия ${s.blaster}, скан ${s.scan}.`,
+      s=>`Полный доклад: мощность ${s.power}, защита ${s.shields}, сектор ${s.sector}.`,
+      s=>`Все системы: ядро ${s.power}, ${s.temp}, щиты ${s.shields}.`,
+      s=>`Состояние корабля — норма. ${s.power} ядро, ${s.shields} щиты.`,
+      s=>`Общий статус: ${s.stab}. Ядро ${s.power}, защита ${s.shields}.`,
+      s=>`Телеметрия: ${s.power}, ${s.shields}, скан ${s.scan}, сектор ${s.sector}.`
+    ]},
+  { id:'navigation', keys:['курс','навиг','маршрут','атлас','звезд','звёзд','карт'],
+    forms:[
+      s=>`Атлас синхронизирован. Сектор ${s.sector}, курс проложен.`,
+      s=>`Навигация активна. Текущий сектор ${s.sector}, время ${s.time}.`,
+      s=>`Курс удерживается. Звёздный атлас обновлён.`,
+      s=>`Маршрут стабилен. Сектор ${s.sector}, дата ${s.stardate}.`,
+      s=>`Карта готова. Следуем через ${s.sector}.`,
+      s=>`Позиция зафиксирована. Сектор ${s.sector}.`
+    ]},
+  { id:'life', keys:['жизнеоб','кислород','воздух','экипаж','люди','био'],
+    forms:[
+      s=>`Жизнеобеспечение 100%. Кислород в норме.`,
+      s=>`Экипаж в безопасности. Атмосфера стабильна.`,
+      s=>`Биосистемы номинальны. Рециркуляция работает.`,
+      s=>`Воздух чист. CO₂ в норме.`,
+      s=>`Отсеки герметичны. Экипаж в порядке.`,
+      s=>`Биомониторинг — без замечаний.`
+    ]},
+  { id:'alert', keys:['тревог','авар','опасн','угроз','трево','красн'],
+    forms:[
+      s=>`Аварийных сигналов нет. Последняя проверка ${s.time}.`,
+      s=>`Угроз не обнаружено. Сектор ${s.sector} чист.`,
+      s=>`Статус тревоги: снят. Ядро ${s.power}.`,
+      s=>`Опасности нет. Все системы в норме.`,
+      s=>`Красный уровень не объявлен. Тихо, капитан.`,
+      s=>`Аварийный контур в дежурном режиме.`
+    ]},
+  { id:'engines', keys:['двигат','тяга','импульс','варп','разгон','марш'],
+    forms:[
+      s=>`Импульсные двигатели готовы. Тяга номинал.`,
+      s=>`Варп-контур в резерве. Можно ускоряться.`,
+      s=>`Разгонный блок стабилен. Жду команды.`,
+      s=>`Тяга доступна. Ядро ${s.power}.`,
+      s=>`Маршевые двигатели в норме.`,
+      s=>`Импульс горячий. Сектор ${s.sector} чист.`
+    ]},
+  { id:'comms', keys:['связь','комм','переда','сигнал','канал','радио'],
+    forms:[
+      s=>`Канал связи стабилен. Уровень сигнала номинал.`,
+      s=>`Коммуникации активны. Ответа из сектора ${s.sector} нет.`,
+      s=>`Радиоэфир тих. Канал открыт.`,
+      s=>`Сигнал устойчив. Время передачи ${s.time}.`,
+      s=>`Каналы связи — 100%. Помех нет.`,
+      s=>`Передача готова. Куда направлять, капитан?`
+    ]},
+  { id:'crew', keys:['капитан','экип','команд','состав','борт','люд'],
+    forms:[
+      s=>`Экипаж на местах. Командование — вы, капитан.`,
+      s=>`Все посты заняты. Готовность полная.`,
+      s=>`Команда в норме. Смена ${s.time}.`,
+      s=>`Экипаж в курсе обстановки. Ждём приказов.`,
+      s=>`Личный состав в порядке. Бортовое время ${s.time}.`,
+      s=>`Капитан на мостике. Слушаю.`
+    ]},
+  { id:'energy', keys:['энерг','резерв','запас','батар','накопит'],
+    forms:[
+      s=>`Резерв энергии ${s.power}. Буферы заряжены.`,
+      s=>`Накопители в норме. Мощность ядра ${s.power}.`,
+      s=>`Энергобаланс стабилен. Запас есть.`,
+      s=>`Буферные батареи 90%+. Можно форсировать.`,
+      s=>`Распределение энергии — номинал.`,
+      s=>`Энергия под контролем. ${s.power}.`
+    ]},
+  { id:'hull', keys:['корпус','обшивк','гермет','целостн','шпанго'],
+    forms:[
+      s=>`Корпус цел. Микрометеоритных пробоин нет.`,
+      s=>`Герметичность 100%. Шпангоуты в норме.`,
+      s=>`Обшивка стабильна. Сектор ${s.sector} — тихо.`,
+      s=>`Каркас держит. Вибрации в допуске.`,
+      s=>`Целостность корпуса — норма.`,
+      s=>`Наружных повреждений нет.`
+    ]},
+  { id:'cargo', keys:['груз','трюм','карго','запас','склад','припас'],
+    forms:[
+      s=>`Трюм герметичен. Груз закреплён.`,
+      s=>`Карго в норме. Потерь нет.`,
+      s=>`Запасы в порядке. Проверка ${s.time}.`,
+      s=>`Склад полон. Инвентаризация пройдена.`,
+      s=>`Грузовой отсек — статус «ок».`,
+      s=>`Припасы стабильны. Расход в норме.`
+    ]},
+  { id:'repair', keys:['ремонт','починк','дрон','техобс','обслуж'],
+    forms:[
+      s=>`Ремонтные дроны в резерве. Задач нет.`,
+      s=>`Техобслуживание по графику. Отказов нет.`,
+      s=>`Служба ремонта готова. Жду распоряжений.`,
+      s=>`Дроны заряжены. Плановые работы — 0.`,
+      s=>`Обслуживание в норме. Сбоев не выявлено.`,
+      s=>`Техники на постах. Сектор ${s.sector} в порядке.`
+    ]},
+  { id:'coords', keys:['координ','позиц','местопол','где мы','точк'],
+    forms:[
+      s=>`Координаты зафиксированы. Сектор ${s.sector}.`,
+      s=>`Позиция: сектор ${s.sector}, дата ${s.stardate}.`,
+      s=>`Мы в ${s.sector}. Сканер ${s.scan}.`,
+      s=>`Место: ${s.sector}, время ${s.time}.`,
+      s=>`Позиционирование активно. ${s.sector}.`,
+      s=>`Курс удерживается. Сектор ${s.sector}.`
+    ]},
+  { id:'time', keys:['врем','час','дата','старод','хрон'],
+    forms:[
+      s=>`Бортовое время ${s.time}. Звёздная дата ${s.stardate}.`,
+      s=>`Хронометр: ${s.time}, дата ${s.stardate}.`,
+      s=>`Время стабильно. ${s.time}.`,
+      s=>`Часы синхронизированы. ${s.stardate}.`,
+      s=>`Текущий момент: ${s.time}.`,
+      s=>`Хронология в норме. ${s.time}.`
+    ]},
+  { id:'med', keys:['медиц','врач','здоров','травм','лазарет'],
+    forms:[
+      s=>`Медотсек пуст. Травм нет.`,
+      s=>`Медики в готовности. Пациентов нет.`,
+      s=>`Здоровье экипажа — 100%.`,
+      s=>`Лазарет свободен. Запасы в норме.`,
+      s=>`Медскан чист. Все здоровы.`,
+      s=>`Врач на посту. Жалоб нет.`
+    ]},
+  { id:'weather', keys:['погод','атмосфер','внешн','температ','сред','космос'],
+    forms:[
+      s=>`Внешняя среда: вакуум, радиация в норме.`,
+      s=>`За бортом тихо. Сектор ${s.sector}.`,
+      s=>`Атмосферные условия — стандарт.`,
+      s=>`Температура обшивки в допуске.`,
+      s=>`Космос спокоен. ${s.sector}.`,
+      s=>`Радиационный фон — норма.`
+    ]},
+  { id:'gravity', keys:['гравит','вес','тягот','искусств'],
+    forms:[
+      s=>`Гравитация 1g. Стабильна.`,
+      s=>`Искусственная гравитация в норме.`,
+      s=>`Гравиконтур без отклонений.`,
+      s=>`Тяготение 1.0g. Комфортно.`,
+      s=>`Гравиплатформы активны.`,
+      s=>`Гравитация — 100% номинал.`
+    ]},
+  { id:'ai', keys:['ии','борткомп','искусств','интеллект','борт'],
+    forms:[
+      s=>`Борткомпьютер активен. Готов помочь, капитан.`,
+      s=>`ИИ в сознании. Ядро ${s.power}, всё под контролем.`,
+      s=>`Система ИИ работает штатно. Жду задач.`,
+      s=>`Мои процессы в норме. Слушаю вас.`,
+      s=>`Бортовой интеллект — на связи. ${s.time}.`,
+      s=>`Я здесь, капитан. Спрашивайте.`
+    ]},
+  { id:'doors', keys:['двер','шлюз','люк','переход','отсек'],
+    forms:[
+      s=>`Шлюзы задраены. Переходы в норме.`,
+      s=>`Двери герметичны. Сектор ${s.sector}.`,
+      s=>`Люки закрыты. Давление стабильно.`,
+      s=>`Переходные отсеки — ок.`,
+      s=>`Герметизация 100%. Можно двигаться.`,
+      s=>`Дверные приводы в норме.`
+    ]},
+  { id:'threat', keys:['враг','противн','неприят','корабл','объект','цели'],
+    forms:[
+      s=>`Угроз не зафиксировано. Сектор ${s.sector} пуст.`,
+      s=>`Враждебных объектов нет. Радар ${s.scan}.`,
+      s=>`Тихо. Ни одного контакта.`,
+      s=>`Скан чист. Орудия в готовности «${s.blaster}».`,
+      s=>`Противник не обнаружен.`,
+      s=>`Сектор ${s.sector} безопасен.`
+    ]},
+  { id:'fuel', keys:['топлив','дейтер','антимат','заправ','бункер'],
+    forms:[
+      s=>`Топливные ячейки полны на ${s.power}.`,
+      s=>`Дейтерий в норме. Дозаправка не нужна.`,
+      s=>`Антиматерия стабильна. Запас 87%.`,
+      s=>`Топливный контур — без утечек.`,
+      s=>`Бункеры в норме. ${s.power}.`,
+      s=>`Заправка не требуется.`
+    ]},
+  { id:'music', keys:['музык','звук','аудио','настроен','атмосфер'],
+    forms:[
+      s=>`Аудиоканалы в норме. Могу включить марш, капитан.`,
+      s=>`Тишина на борту. Спокойный фон.`,
+      s=>`Звуковая среда стандартная.`,
+      s=>`Акустика отсеков — ок.`,
+      s=>`Готов воспроизвести что-нибудь.`,
+      s=>`Тон-сигналы в норме.`
+    ]},
+  { id:'coffee', keys:['кофе','чай','еда','питан','столов','провиз'],
+    forms:[
+      s=>`Пищеблок в норме. Запасы пополнены.`,
+      s=>`Горячие напитки доступны, капитан.`,
+      s=>`Столовая открыта. Экипаж доволен.`,
+      s=>`Провизия в порядке.`,
+      s=>`Могу подогреть что-нибудь.`,
+      s=>`Питание — 100% норма.`
+    ]},
+  { id:'history', keys:['истори','прошл','миссия','цель','задач'],
+    forms:[
+      s=>`Миссия: патрулирование сектора ${s.sector}.`,
+      s=>`Текущая задача — держать курс.`,
+      s=>`История миссии в архиве. Доступ по запросу.`,
+      s=>`Мы здесь по приказу флота, капитан.`,
+      s=>`Цель — безопасность сектора ${s.sector}.`,
+      s=>`Задача активна. ${s.time}.`
+    ]},
+  { id:'starfleet', keys:['флот','команд','штаб','адмирал','приказ'],
+    forms:[
+      s=>`Связь со штабом флота — стабильна.`,
+      s=>`Приказы получены. Ждём новых.`,
+      s=>`Флот на связи. Канал открыт.`,
+      s=>`Адмиралтейство молчит. Работаем автономно.`,
+      s=>`Мы на службе, капитан.`,
+      s=>`Штаб в курсе нашей позиции.`
+    ]},
+  { id:'sensor_anomaly', keys:['аномал','непонят','стран','флукт','шум','помех'],
+    forms:[
+      s=>`Аномалий нет. Шум в норме.`,
+      s=>`Помехи в допустимых пределах.`,
+      s=>`Сканер ${s.scan}. Сектор ${s.sector} чист.`,
+      s=>`Флуктуаций не выявлено.`,
+      s=>`Всё в пределах допуска.`,
+      s=>`Аномальных сигналов — 0.`
+    ]},
+  { id:'default_ship', keys:['корабл','гелиос','борт','судно'],
+    forms:[
+      s=>`«ГЕЛИОС‑7» в норме. Класс «Треугольник».`,
+      s=>`Наш корабль стабилен. Сектор ${s.sector}.`,
+      s=>`Борт «ГЕЛИОС‑7» работает штатно.`,
+      s=>`Судно в отличном состоянии.`,
+      s=>`Корабль слушается. ${s.power}.`,
+      s=>`«ГЕЛИОС‑7» держит курс.`
+    ]}
+];
+
+/* =========================================================
+   ПАМЯТЬ ДИАЛОГА
+   ========================================================= */
+const memory = {
+  history: [],       // последние темы
+  lastTopic: null,
+  lastTime: 0,
+  streak: 0          // подряд одинаковых тем
+};
+
+function remember(topicId){
+  const now = Date.now();
+  if(topicId === memory.lastTopic && now - memory.lastTime < 30000){
+    memory.streak++;
+  } else {
+    memory.streak = 0;
+  }
+  memory.lastTopic = topicId;
+  memory.lastTime  = now;
+  memory.history.push(topicId);
+  if(memory.history.length > 5) memory.history.shift();
+}
+
+/* --- Связки между темами (иллюзия памяти) --- */
+function memoryPrefix(topicId){
+  if(memory.history.length < 2) return '';
+  const prev = memory.history[memory.history.length - 2];
+  const links = {
+    'shields|blasters':  'В дополнение к щитам: ',
+    'core|shields':      'Ядро держит. По защите: ',
+    'scan|threat':       'По данным скана: ',
+    'core|energy':       'Энергобаланс такой: ',
+    'navigation|coords': 'Курс уточняю: ',
+    'comms|starfleet':   'Канал открыт. ',
+    'crew|med':          'По экипажу: ',
+    'engines|fuel':      'По топливу: ',
+    'alert|threat':      'Угроз нет. ',
+    'time|status':       'На текущий момент: '
+  };
+  return links[`${prev}|${topicId}`] || '';
+}
+
+/* =========================================================
+   ПАРСЕР
+   ========================================================= */
+function findTopic(text){
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+  for(const topic of TOPICS){
+    let score = 0;
+    for(const k of topic.keys){
+      if(t.includes(k)) score += k.length;  // длинное совпадение весит больше
+    }
+    if(score > bestScore){ bestScore = score; best = topic; }
+  }
+  return best;
+}
+
+/* =========================================================
+   ГЕНЕРАТОР ОТВЕТА
+   ========================================================= */
+function generateReply(userText){
+  const s = snapshot();
+  const topic = findTopic(userText);
+
+  /* Вне темы — ролевая изоляция */
+  if(!topic){
+    return pick([
+      `Капитан, запрос вне приоритетных директив. Уточните параметр: ядро, щиты, орудия или скан.`,
+      `Вне зоны моих сенсоров. Дайте команду в терминах систем корабля.`,
+      `Не могу обработать. Рекомендую запросить статус, ядро или сектор.`,
+      `Запрос вне протокола. Уточните: реактор, щиты, бластеры, скан или навигация.`
+    ]);
   }
 
-  // Кнопки
-  document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const act = btn.dataset.act || 'Команда';
-      addLog(act);
-      btn.animate(
-        [{transform:'scale(1)'},{transform:'scale(.96)'},{transform:'scale(1)'}],
-        {duration:180}
-      );
-      if(btn.classList.contains('go')){
-        document.getElementById('powerBar').style.width = (60 + Math.random()*40).toFixed(0)+'%';
-        document.getElementById('powerVal').textContent = (60 + Math.random()*40).toFixed(1)+' %';
-      }
-    });
+  remember(topic.id);
+
+  /* Реакция на "залипание" одной темы */
+  if(memory.streak >= 2){
+    const stallReplies = [
+      `Капитан, вы уже третий раз про это. Данные не менялись: ${s.power}, ${s.shields}.`,
+      `Повторный запрос по тому же узлу. Всё стабильно, докладывать нечего.`,
+      `Подтверждаю: без изменений. ${s.power}, стабильность ${s.stab}.`
+    ];
+    if(chance(0.7)) return pick(stallReplies);
+  }
+
+  /* Форма ответа */
+  const form = pick(topic.forms);
+  const core = form(s);
+
+  /* Связка с памятью */
+  const prefix = memoryPrefix(topic.id);
+
+  /* Хвост — вариативные приписки */
+  const tails = [
+    '',
+    '',
+    ` Время ${s.time}.`,
+    ` Сектор ${s.sector}.`,
+    ` Стабильность ${s.stab}.`,
+    ` Капитан.`,
+    ` Жду распоряжений.`,
+    ` Звёздная дата ${s.stardate}.`
+  ];
+  const tail = pick(tails);
+
+  return prefix + core + tail;
+}
+
+/* =========================================================
+   ЛОЖНЫЕ УТОЧНЕНИЯ И ПЕРЕПРОВЕРКИ
+   ========================================================= */
+function falseClarify(){
+  return pick([
+    `Уточните параметр: ядро или щиты?`,
+    `О каком узле доклад: реактор, орудия, сканер?`,
+    `Принято. Нужен скан или сводка?`,
+    `Могу дать статус, курс или телеметрию. Что предпочитаете?`
+  ]);
+}
+
+function recheck(){
+  return pick([
+    `Перепроверяю показания... данные подтверждены.`,
+    `Одну секунду, считываю телеметрию... подтверждено.`,
+    `Сверяю с архивом... расхождений нет.`,
+    `Запускаю повторную диагностику... норма.`
+  ]);
+}
+
+/* =========================================================
+   UI ЧАТА
+   ========================================================= */
+function pushMsg(text, who, extraClass){
+  const d = document.createElement('div');
+  d.className = 'ai-msg ' + who + (extraClass? ' '+extraClass : '');
+  d.textContent = text;
+  aiBody.appendChild(d);
+  aiBody.scrollTop = aiBody.scrollHeight;
+  return d;
+}
+
+function setThinking(on){
+  if(on){
+    aiWindow.classList.add('thinking');
+    aiStatus.textContent = 'ИИ · АНАЛИЗ';
+    aiWindow._dots = ['·','··','···'];
+    aiWindow._i = 0;
+    aiWindow._dotTimer = setInterval(()=>{
+      aiStatus.textContent = 'ИИ · АНАЛИЗ ' + aiWindow._dots[aiWindow._i++ % 3];
+    }, 260);
+  } else {
+    aiWindow.classList.remove('thinking');
+    aiStatus.textContent = 'ИИ · ОЖИДАНИЕ ЗАПРОСА';
+    if(aiWindow._dotTimer){ clearInterval(aiWindow._dotTimer); aiWindow._dotTimer = null; }
+  }
+}
+
+/* Пузырь "печатает..." */
+function typingBubble(){
+  const d = document.createElement('div');
+  d.className = 'ai-msg bot think';
+  d.innerHTML = 'анализирую телеметрию<span class="typing"></span>';
+  aiBody.appendChild(d);
+  aiBody.scrollTop = aiBody.scrollHeight;
+  return d;
+}
+
+function removeNode(n){ if(n && n.parentNode) n.parentNode.removeChild(n); }
+
+/* ---- Основной цикл ответа ---- */
+function respond(userText){
+  const t = userText.trim();
+  if(!t) return;
+
+  pushMsg(t, 'user');
+  aiInput.value = '';
+
+  setThinking(true);
+
+  const roll = Math.random();
+
+  /* 1. Пустой / короткий ввод */
+  if(t.length < 2){
+    setTimeout(()=>{
+      setThinking(false);
+      pushMsg(falseClarify(), 'bot');
+    }, 500 + Math.random()*400);
+    return;
+  }
+
+  /* 2. Шанс ложного уточнения (7%) */
+  if(roll < 0.07){
+    setTimeout(()=>{
+      setThinking(false);
+      pushMsg(falseClarify(), 'bot');
+    }, 700 + Math.random()*600);
+    return;
+  }
+
+  /* 3. Шанс "перепроверки" перед ответом (10%) */
+  if(roll < 0.17){
+    const tb = typingBubble();
+    setThinking(true);
+    setTimeout(()=>{
+      removeNode(tb);
+      pushMsg(recheck(), 'bot', 'think');
+      setTimeout(()=>{
+        setThinking(false);
+        pushMsg(generateReply(t), 'bot');
+      }, 500 + Math.random()*400);
+    }, 700 + Math.random()*500);
+    return;
+  }
+
+  /* 4. Обычный ответ */
+  const tb = typingBubble();
+  const delay = 700 + Math.random()*800;
+  setTimeout(()=>{
+    removeNode(tb);
+    setThinking(false);
+    pushMsg(generateReply(t), 'bot');
+  }, delay);
+}
+
+aiSend.addEventListener('click', () => respond(aiInput.value));
+aiInput.addEventListener('keydown', e => { if(e.key === 'Enter') respond(aiInput.value); });
+
+/* =========================================================
+   ПАССИВНАЯ АКТИВНОСТЬ ИИ
+   ========================================================= */
+
+/* 1. Молчание пользователя → бортовой ИИ сам подаёт голос */
+let idleTimer;
+function armIdle(){
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(()=>{
+    if(!aiWindow.classList.contains('thinking')){
+      const s = snapshot();
+      const passive = pick([
+        `Капитан, все системы в норме. Ядро ${s.power}, щиты ${s.shields}.`,
+        `Докладываю: сектор ${s.sector} чист. Скан ${s.scan}.`,
+        `Жду распоряжений, капитан. Время ${s.time}.`,
+        `Бортовой журнал обновлён. Сектор ${s.sector}, стабильно.`,
+        `Тихо. Орудия ${s.blaster}. Ждём приказов.`,
+        `Ядро держит ${s.power}. Всё под контролем.`
+      ]);
+      pushMsg(passive, 'bot', 'think');
+    }
+    armIdle();
+  }, 35000 + Math.random()*20000);
+}
+armIdle();
+
+/* 2. Реакция на кнопки пульта */
+document.querySelectorAll('.btn[data-act]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const act = btn.dataset.act;
+    if(chance(0.55)){
+      const s = snapshot();
+      const react = pick([
+        `Фиксирую: ${act.toLowerCase()}. Ядро ${s.power}.`,
+        `${act}. Принято. Сектор ${s.sector}.`,
+        `Подтверждаю: ${act.toLowerCase()}. Всё в норме.`,
+        `${act}. Телеметрия обновлена.`
+      ]);
+      setTimeout(()=>pushMsg(react, 'bot', 'think'), 400 + Math.random()*500);
+    }
+    armIdle();
   });
+});
 
-  // Плавная пульсация мощности реактора
-  setInterval(() => {
-    const v = 70 + Math.random()*25;
-    document.getElementById('powerBar').style.width = v.toFixed(0)+'%';
-    document.getElementById('powerVal').textContent = v.toFixed(1)+' %';
-  }, 2600);
+/* 3. Индикация тревоги — если игрок жмёт "Сброс" */
+document.querySelector('.btn.warn[data-act*="сброс"]')?.addEventListener('click', ()=>{
+  body.classList.add('alert');
+  aiWindow.classList.add('alert');
+  setTimeout(()=>{
+    body.classList.remove('alert');
+    aiWindow.classList.remove('alert');
+  }, 4000);
+});
 
-  // Приветственный лог
-  setTimeout(()=>addLog('Все системы в норме'), 800);
-  setTimeout(()=>addLog('Звёздный атлас синхронизирован'), 1600);
+/* Логотип мигает в такт */
+setInterval(()=>{
+  const m = document.querySelector('.logo .mark');
+  if(m) m.style.opacity = 0.55 + Math.random()*0.45;
+}, 1200);
+
+/* Логи инициализации */
+setTimeout(()=>addLog('Все системы в норме'), 800);
+setTimeout(()=>addLog('Звёздный атлас синхронизирован'), 1600);
+setTimeout(()=>addLog('Борткомпьютер: активен'), 2400);
+
+
+/* Попробуй эти запросы 
+ Запрос	Что увидишь 
+ реактор    	доклад по ядру в 6 разных формах 
+ щиты        	защита + иногда связка с предыдущей темой 
+ оружие    	бластеры + готовность 
+ статус    		полная сводка 
+ где мы    		координаты, сектор, звёздная дата 
+ тревога    		доклад об отсутствии угроз 
+ привет    		борткомпьютер отвечает как живой 
+ реактор ×3 подряд	    	«Капитан, вы уже третий раз про это» 
+ абракадабра    		вежливое «вне протокола» 
+ ничего 40 секунд	    	сам подаёт голос 
+ жми кнопки пульта	    	иногда комментирует 
+ жми «Сброс»	    	тревожная подсветка 
+ Помолчи минуту — корабль сам заговорит. Спроси одно и то же трижды — он заметит. Спроси про щиты после ядра — свяжет. Это уже не автоответчик, капитан. Это иллюзия присутствия. 🚀 */
+
 </script>
 </body>
 </html>
