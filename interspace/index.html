@@ -200,6 +200,31 @@
     background:rgba(5,10,20,.6);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px));
   }
+
+  /* ===== ОТПЕЧАТОК МЫСЛИ ===== */
+  .thought-box{
+    width:30px;height:30px;
+    margin-left:14px;
+    border:1px solid var(--line);
+    background:#02060d;
+    position:relative;
+    box-shadow: inset 0 0 6px rgba(58,169,255,.3);
+    flex-shrink:0;
+    transition: box-shadow .3s;
+  }
+  .thought-box::before{
+    content:"";
+    position:absolute;inset:0;
+    border:1px solid rgba(58,169,255,.25);
+    pointer-events:none;
+  }
+  .thought-box.thinking{
+    box-shadow: inset 0 0 10px rgba(0,255,224,.5), 0 0 8px rgba(0,255,224,.35);
+  }
+  .thought-box canvas{
+    display:block;
+    image-rendering: pixelated;
+  }
 </style>
 </head>
 <body>
@@ -218,6 +243,9 @@
     <div class="ai-header">
       <span class="dot"></span>
       <span id="aiStatus">ИИ · ИНИЦИАЛИЗАЦИЯ</span>
+      <div class="thought-box" id="thoughtBox">
+        <canvas id="aiThought" width="30" height="30"></canvas>
+      </div>
       <span class="pulse"></span>
     </div>
 
@@ -239,6 +267,105 @@
 
 <script src="ai-core.js"></script>
 <script>
+/* =========================================================
+   1. ОТПЕЧАТОК МЫСЛИ (модуль Thought)
+   Хэш текста + снимок состояния → узор 6×6 на canvas 30×30
+   ========================================================= */
+const Thought = (function(){
+  const canvas = document.getElementById('aiThought');
+  const box    = document.getElementById('thoughtBox');
+  const ctx    = canvas.getContext('2d');
+  const N      = 6;
+  const CELL   = 30 / N;
+
+  let animTimer = null;
+
+  /* FNV-1a 32-bit */
+  function hash32(str){
+    let h = 0x811c9dc5;
+    for(let i = 0; i < str.length; i++){
+      h ^= str.charCodeAt(i);
+      h = (h * 0x01000193) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function bitsFrom(hash, snap){
+    const mix = hash32(
+      hash + '|' + snap.power + '|' + snap.shields + '|' + snap.scan
+    );
+    const bits = [];
+    let v = mix;
+    for(let i = 0; i < N*N; i++){
+      v = ((v * 1103515245) + 12345) >>> 0;
+      bits.push((v >>> 16) & 1);
+    }
+    return bits;
+  }
+
+  function draw(bits, alpha){
+    ctx.clearRect(0, 0, 30, 30);
+    for(let i = 0; i < bits.length; i++){
+      const x = i % N, y = Math.floor(i / N);
+      if(bits[i]){
+        const cyan = (i * 7 + bits.length) % 3 === 0;
+        ctx.fillStyle = cyan
+          ? `rgba(0,255,224,${alpha})`
+          : `rgba(58,169,255,${alpha})`;
+        ctx.fillRect(x*CELL + 1, y*CELL + 1, CELL - 2, CELL - 2);
+      } else if(alpha > 0.4){
+        ctx.fillStyle = `rgba(58,169,255,${alpha * 0.08})`;
+        ctx.fillRect(x*CELL + 2, y*CELL + 2, CELL - 4, CELL - 4);
+      }
+    }
+  }
+
+  function buildBase(text, snap){
+    return bitsFrom(hash32(text), snap);
+  }
+
+  function jitter(bits){
+    return bits.map(b => Math.random() < 0.15 ? 1 - b : b);
+  }
+
+  function animate(text, snap){
+    if(animTimer) clearInterval(animTimer);
+
+    const base = buildBase(text, snap);
+    box.classList.add('thinking');
+
+    const start = Date.now();
+    const DURATION = 2000;
+    const FRAME    = 120;
+
+    animTimer = setInterval(() => {
+      const elapsed = Date.now() - start;
+
+      if(elapsed >= DURATION){
+        clearInterval(animTimer);
+        animTimer = null;
+        box.classList.remove('thinking');
+        draw(base, 1);
+        return;
+      }
+
+      const phase = Math.sin(elapsed / 100) * 0.5 + 0.5;
+      const alpha = 0.4 + phase * 0.6;
+      draw(jitter(base), alpha);
+    }, FRAME);
+  }
+
+  function freeze(){
+    if(animTimer){ clearInterval(animTimer); animTimer = null; }
+    box.classList.remove('thinking');
+  }
+
+  return { animate, freeze, hash32, buildBase, draw };
+})();
+
+/* =========================================================
+   2. ОСНОВНОЙ ЦИКЛ ИНТЕРФЕЙСА
+   ========================================================= */
 (function(){
   const aiWindow = document.getElementById('aiWindow');
   const aiBody   = document.getElementById('aiBody');
@@ -248,18 +375,19 @@
   const statusTx = document.getElementById('statusText');
   const clock    = document.getElementById('clock');
 
+  /* --- часы --- */
   setInterval(()=>{
     clock.textContent = new Date().toLocaleTimeString('ru-RU',{hour12:false});
   }, 1000);
 
-  /* модель уже встроена в AI — init без аргументов */
+  /* --- инициализация ИИ --- */
   AI.init();
 
   statusTx.textContent = 'КАНАЛ АКТИВЕН';
   aiStatus.textContent = 'ИИ · ОЖИДАНИЕ ЗАПРОСА';
   aiBody.innerHTML = '';
-  pushMsg('Борткомпьютер «ГЕЛИОС‑7» на связи. Все системы номинальны. Жду распоряжений, капитан.', 'bot');
 
+  /* --- сообщения --- */
   function pushMsg(text, who, extra){
     const d = document.createElement('div');
     d.className = 'ai-msg ' + who + (extra? ' '+extra : '');
@@ -270,6 +398,12 @@
   }
   function removeNode(n){ if(n && n.parentNode) n.parentNode.removeChild(n); }
 
+  /* --- приветствие --- */
+  const hello = 'Борткомпьютер «ГЕЛИОС‑7» на связи. Все системы номинальны. Жду распоряжений, капитан.';
+  pushMsg(hello, 'bot');
+  Thought.animate(hello, AI.snapshot());
+
+  /* --- индикация "думает" --- */
   function setThinking(on){
     if(on){
       aiWindow.classList.add('thinking');
@@ -287,6 +421,7 @@
     }
   }
 
+  /* --- пузырь "печатает" --- */
   function typingBubble(){
     const d = document.createElement('div');
     d.className = 'ai-msg bot think';
@@ -296,53 +431,78 @@
     return d;
   }
 
+  /* --- вывод ответа ИИ + отпечаток --- */
+  function emitBot(text, extra){
+    pushMsg(text, 'bot', extra);
+    Thought.animate(text, AI.snapshot());
+  }
+
+  /* =========================================================
+     ЦИКЛ ОТВЕТА
+     ========================================================= */
   function respond(text){
     const t = text.trim();
     if(!t) return;
+
     pushMsg(t, 'user');
     aiInput.value = '';
     setThinking(true);
+
     const roll = Math.random();
 
+    /* короткий ввод */
     if(t.length < 2){
-      setTimeout(()=>{ setThinking(false); pushMsg(AI.clarify(), 'bot'); },
-        500 + Math.random()*400);
+      setTimeout(()=>{
+        setThinking(false);
+        emitBot(AI.clarify());
+      }, 500 + Math.random()*400);
       return;
     }
+
+    /* ложное уточнение (7%) */
     if(roll < 0.07){
-      setTimeout(()=>{ setThinking(false); pushMsg(AI.clarify(), 'bot'); },
-        700 + Math.random()*600);
+      setTimeout(()=>{
+        setThinking(false);
+        emitBot(AI.clarify());
+      }, 700 + Math.random()*600);
       return;
     }
+
+    /* перепроверка (10%) */
     if(roll < 0.17){
       const tb = typingBubble();
       setTimeout(()=>{
         removeNode(tb);
-        pushMsg(AI.recheck(), 'bot', 'think');
+        emitBot(AI.recheck(), 'think');
         setTimeout(()=>{
           setThinking(false);
-          pushMsg(AI.respond(t), 'bot');
+          emitBot(AI.respond(t));
         }, 500 + Math.random()*400);
       }, 700 + Math.random()*500);
       return;
     }
+
+    /* обычный ответ */
     const tb = typingBubble();
     setTimeout(()=>{
       removeNode(tb);
       setThinking(false);
-      pushMsg(AI.respond(t), 'bot');
+      emitBot(AI.respond(t));
     }, 700 + Math.random()*800);
   }
 
   aiSend.addEventListener('click', () => respond(aiInput.value));
   aiInput.addEventListener('keydown', e => { if(e.key === 'Enter') respond(aiInput.value); });
 
+  /* =========================================================
+     ПАССИВНАЯ АКТИВНОСТЬ
+     ========================================================= */
   let idleTimer;
   function armIdle(){
     clearTimeout(idleTimer);
     idleTimer = setTimeout(()=>{
       if(!aiWindow.classList.contains('thinking')){
-        pushMsg(AI.passive(), 'bot', 'think');
+        emitBot(AI.passive(), 'think');
       }
       armIdle();
     }, 35000 + Math.random()*20000);
@@ -350,18 +510,18 @@
   armIdle();
   aiInput.addEventListener('input', armIdle);
 
+  /* =========================================================
+     СЮЖЕТНЫЕ СОБЫТИЯ
+     ========================================================= */
+  setInterval(() => {
+    const ev = AI.tickStory();
+    if(ev && !aiWindow.classList.contains('thinking')){
+      emitBot(ev, 'think');
+      AI.pushStory(ev);
+    }
+  }, 90000);
+
 })();
-
-/* сюжет: раз в 90 секунд проверяем события */
-setInterval(() => {
-  const ev = AI.tickStory();
-  if(ev){
-    pushMsg(ev, 'bot', 'think');
-    AI.pushStory(ev);
-  }
-}, 90000);
-
-  
 </script>
 </body>
 </html>
