@@ -351,6 +351,17 @@
   aiInput.addEventListener('input', armIdle);
 
 })();
+
+/* сюжет: раз в 90 секунд проверяем события */
+setInterval(() => {
+  const ev = AI.tickStory();
+  if(ev){
+    pushMsg(ev, 'bot', 'think');
+    AI.pushStory(ev);
+  }
+}, 90000);
+
+  
 </script>
 </body>
 </html>
