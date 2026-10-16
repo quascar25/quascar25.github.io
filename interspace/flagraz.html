@@ -2,13 +2,13 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Развивающийся флаг</title>
+<title>Развивающийся флаг v4</title>
 <style>
   html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    background: #1e2637;
+    background: #1e2637; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -33,74 +33,148 @@ const ctx = canvas.getContext('2d');
 const W = canvas.width;   // 50
 const H = canvas.height;  // 30
 
-// Вытягиваем ImageData один раз — потом просто перезаписываем пиксели
-let img = ctx.createImageData(W, H);
-let buf = img.data;
+const img = ctx.createImageData(W, H);
+const buf = img.data;
 
-// Фон — тёмно-сине-серый
+// Фон — тёмно-сине-серый (тот же, что и у body)
 const BG = { r: 30, g: 38, b: 55 };
-// Цвет флага — красный
-const FLAG = { r: 200, g: 20, b: 30 };
+// Красный флаг
+const FLAG = { r: 200, g: 22, b: 32 };
+
+// Границы «номинального» полотна внутри квадратика
+const FX0 = 3, FX1 = W - 4;   // 3..46
+const FY0 = 4, FY1 = H - 5;   // 4..25
+const FW = FX1 - FX0;
+const FH = FY1 - FY0;
+const CX = FX0 + FW / 2;
+const CY = FY0 + FH / 2;
 
 let animating = true;
 let startTime = performance.now();
 let frozenPhase = 0;
 let phase = 0;
 
+// Дешёвый 2D-псевдошум: сумма несоизмеримых синусов.
+// Диапазон примерно [-1..1], плавный, без библиотек.
+function noise2(x, y, t) {
+  return (
+    Math.sin( x * 1.7 + y * 2.3 + t * 0.9) * 0.5 +
+    Math.sin( x * 2.9 - y * 1.3 + t * 1.7) * 0.3 +
+    Math.sin(-x * 4.1 + y * 3.7 + t * 2.3) * 0.2
+  );
+}
+
+// Основная функция отрисовки кадра.
+// t — фаза анимации в секундах.
 function drawFlag(t) {
-  // Фаза анимации (в секундах)
   phase = t;
 
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
       const idx = (y * W + x) * 4;
 
-      // Полотно флага: занимает, скажем, область с отступом 3px по краям
-      const fx0 = 3, fx1 = W - 4;   // [3..46]
-      const fy0 = 4, fy1 = H - 5;   // [4..25]
-
-      // Нормализованные координаты внутри полотна
-      const nx = (x - fx0) / (fx1 - fx0); // 0..1 слева направо
-      const ny = (y - fy0) / (fy1 - fy0); // 0..1 сверху вниз
-
-      // Насколько "внутри" полотна (плавные края, чтобы не было рваных пикселей)
-      const insideX = Math.min(nx, 1 - nx);
-      const insideY = Math.min(ny, 1 - ny);
-      const edge = Math.min(insideX, insideY);
+      // Нормализованные координаты внутри номинального полотна
+      const nx = (x - FX0) / FW;  // 0..1 слева направо
+      const ny = (y - FY0) / FH;  // 0..1 сверху вниз
 
       let isFlag = false;
-      if (nx >= 0 && nx <= 1 && ny >= 0 && ny <= 1) {
-        // Волна смещает полотно по вертикали в зависимости от X и времени
-        const wave1 = Math.sin(nx * Math.PI * 3 + phase * 4) * 1.6;
-        const wave2 = Math.sin(nx * Math.PI * 6 - phase * 2.5) * 0.7;
-        const offset = wave1 + wave2;
+      let shade = 1;
 
-        // Слегка сужаем полотно у правого края (эффект развевания)
-        const taper = 1 - 0.25 * nx;
+      if (nx >= -0.05 && nx <= 1.05 && ny >= -0.15 && ny <= 1.15) {
+        // ---------- ДВУМЕРНАЯ ДЕФОРМАЦИЯ ----------
 
-        // Проверяем, попадает ли пиксель в деформированное полотно
-        const centerY = (fy0 + fy1) / 2 + offset;
-        const halfH = ((fy1 - fy0) / 2) * taper;
-        if (y >= centerY - halfH && y <= centerY + halfH) {
+        // 1) Главная волна по длине
+        const w1 = Math.sin(nx * Math.PI * 3.0 + t * 4.0) * 1.8;
+
+        // 2) Вторая гармоника по длине (бежит медленнее, назад)
+        const w2 = Math.sin(nx * Math.PI * 6.0 - t * 2.5) * 0.7;
+
+        // 3) Поперечная волна по высоте, связанная с X (перекручивание)
+        const w3 = Math.sin(ny * Math.PI * 3.0 + t * 3.2 + nx * 2.0) * 1.2;
+
+        // 4) Мелкий шум, чтобы полотно не было «пластиковым»
+        const nz = noise2(nx * 6.0, ny * 4.0, t) * 0.6;
+
+        // Итоговое вертикальное смещение
+        const offY = w1 + w2 + w3 + nz;
+
+        // Горизонтальное смещение (складки в перспективе)
+        const offX = Math.sin(ny * Math.PI * 2.0 + t * 1.9 + nx * 1.5) * 0.9;
+
+        // Сужение к правому краю (полотно «улетает»)
+        const taper = 1 - 0.22 * nx;
+
+        // Полувысота полотна в данной точке
+        const halfH = (FH / 2) * taper;
+
+        // Реальная вертикальная координата точки полотна
+        const yReal = CY + (ny - 0.5) * FH + offY;
+        const xReal = FX0 + nx * FW + offX;
+
+        // Насколько пиксель близок к «телу» полотна по вертикали и горизонтали
+        const dy = Math.abs(y - yReal);
+        const dx = Math.abs(x - xReal);
+
+        if (dy <= halfH && dx <= FW * 0.55) {
           isFlag = true;
+
+          // Наклон полотна — приблизительная производная offset по X и Y.
+          // Чем сильнее наклон к наблюдателю — тем светлее.
+          const eps = 0.02;
+          const ox = nx + eps;
+          const oy = ny + eps;
+
+          const offYx =
+            Math.sin(ox * Math.PI * 3.0 + t * 4.0) * 1.8 +
+            Math.sin(ox * Math.PI * 6.0 - t * 2.5) * 0.7 +
+            Math.sin(ny * Math.PI * 3.0 + t * 3.2 + ox * 2.0) * 1.2 +
+            noise2(ox * 6.0, ny * 4.0, t) * 0.6;
+
+          const offYy =
+            Math.sin(nx * Math.PI * 3.0 + t * 4.0) * 1.8 +
+            Math.sin(nx * Math.PI * 6.0 - t * 2.5) * 0.7 +
+            Math.sin(oy * Math.PI * 3.0 + t * 3.2 + nx * 2.0) * 1.2 +
+            noise2(nx * 6.0, oy * 4.0, t) * 0.6;
+
+          const dYx = (offYx - offY) / eps;
+          const dYy = (offYy - offY) / eps;
+
+          // Псевдо-нормаль к поверхности полотна
+          // (полотно — поверхность z = offY(x, y), свет падает «сверху-спереди»)
+          const nxv = -dYx;
+          const nyv = -dYy;
+          const nzv = 1.0;
+          const nlen = Math.sqrt(nxv*nxv + nyv*nyv + nzv*nzv) || 1;
+
+          // Направление света
+          const lx = -0.3, ly = -0.5, lz = 1.0;
+          const llen = Math.sqrt(lx*lx + ly*ly + lz*lz);
+
+          const dot = (nxv*lx + nyv*ly + nzv*lz) / (nlen * llen);
+
+          // Базовое освещение + затенение по краям полотна
+          const edgeFall = Math.min(
+            Math.min(nx, 1 - nx) * 2.2,
+            Math.min(ny, 1 - ny) * 2.2
+          );
+          const edgeShade = 0.65 + 0.35 * Math.min(1, edgeFall);
+
+          shade = (0.55 + 0.55 * dot) * edgeShade;
+          // Лёгкая неоднородность ткани
+          shade *= 0.9 + 0.1 * noise2(nx * 20.0, ny * 15.0, t * 0.5);
+          shade = Math.max(0.35, Math.min(1.25, shade));
         }
       }
 
       let r, g, b;
 
       if (isFlag) {
-        // Красный с лёгким затемнением по краям и по волнам (объём)
-        const shade =
-          0.75 +
-          0.25 * Math.sin(nx * Math.PI * 4 + phase * 5) +
-          0.15 * (1 - edge);
-        const s = Math.max(0.45, Math.min(1.15, shade));
-        r = Math.min(255, FLAG.r * s);
-        g = FLAG.g * s * 0.6;
-        b = FLAG.b * s * 0.7;
+        r = Math.min(255, FLAG.r * shade);
+        g = Math.min(255, FLAG.g * shade * 0.55);
+        b = Math.min(255, FLAG.b * shade * 0.6);
       } else {
-        // Фон: тёмно-сине-серый с лёгким градиентом
-        const v = 0.85 + 0.15 * (1 - y / H);
+        // Фон — с очень лёгким вертикальным градиентом, чтобы квадратик «дышал»
+        const v = 0.92 + 0.08 * (1 - y / H);
         r = BG.r * v;
         g = BG.g * v;
         b = BG.b * v;
@@ -127,11 +201,9 @@ function loop(now) {
 // Клик по флагу — пауза / возобновление
 canvas.addEventListener('click', () => {
   if (animating) {
-    // Останавливаем: запоминаем текущую фазу
     frozenPhase = phase;
     animating = false;
   } else {
-    // Возобновляем: сбрасываем startTime, чтобы фаза продолжилась
     startTime = performance.now();
     animating = true;
   }
