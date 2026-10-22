@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vibor.html — прототип</title>
+<style>
+  :root {
+    --bg: #2b1e1e;
+    --panel: #3a2a2a;
+    --accent: #a33;
+    --line: #6b4444;
+    --text: #e8dede;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: linear-gradient(180deg, #3a2a2a 0%, #2b1e1e 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+  .tabs { display: flex; gap: 4px; }
+  .tab {
+    flex: 1; padding: 10px; text-align: center; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--line);
+    border-bottom: none; border-radius: 6px 6px 0 0;
+    color: var(--text); font-size: 14px;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); }
+  .preview {
+    display: block; width: 100%; height: auto; max-height: 220px;
+    object-fit: cover; border: 1px solid var(--line);
+    border-top: none; background: #241a1a;
+  }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 0 0 6px 6px; padding: 14px;
+  }
+  h3 { margin: 0 0 8px; font-size: 14px; color: #d8a0a0; font-weight: 500; }
+  .subject {
+    background: #241a1a; border: 1px solid var(--line);
+    border-radius: 4px; padding: 12px; margin-bottom: 12px;
+    font-size: 15px; line-height: 1.5;
+  }
+  .subject .q { color: #d8a0a0; font-size: 13px; margin-bottom: 4px; }
+  .list {
+    background: #241a1a; border: 1px solid var(--line);
+    border-radius: 4px; padding: 8px; height: 140px;
+    overflow-y: auto; font-family: ui-monospace, monospace;
+    font-size: 13px; line-height: 1.6;
+  }
+  .list div { white-space: pre; }
+  .btn {
+    background: var(--accent); color: #fff; border: 1px solid #c44;
+    border-radius: 4px; padding: 8px 16px; cursor: pointer;
+    font-size: 14px; margin-top: 10px;
+  }
+  .btn:hover { background: #b44; }
+  .btn.ghost { background: transparent; border-color: var(--line); }
+  .btn.big { width: 100%; padding: 14px; font-size: 16px; }
+  textarea {
+    width: 100%; min-height: 80px; resize: vertical;
+    background: #241a1a; border: 1px solid var(--line);
+    border-radius: 4px; color: var(--text); padding: 8px;
+    font-family: ui-monospace, monospace; font-size: 13px;
+  }
+  .hint { font-size: 12px; color: #a88; margin-top: 4px; }
+  .hidden { display: none; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="vote">Голосование</div>
+    <div class="tab" data-tab="watch">Наблюдение</div>
+  </div>
+
+  <img src="preview.jpg" alt="" class="preview" onerror="this.style.display='none'">
+
+  <!-- ЗАКЛАДКА 1: ГОЛОСОВАНИЕ (минимум) -->
+  <div class="panel" id="tab-vote">
+    <div class="subject">
+      <div class="q">Предмет голосования</div>
+      <div id="subjectText">— предмет не задан —</div>
+    </div>
+    <button class="btn big" id="btnVote">Голосовать</button>
+    <div class="hint" id="voteStatus"></div>
+  </div>
+
+  <!-- ЗАКЛАДКА 2: НАБЛЮДЕНИЕ (всё остальное) -->
+  <div class="panel hidden" id="tab-watch">
+    <h3>Файл голосования (код + 1/0/N)</h3>
+    <div class="list" id="fileList"><div>— файл пуст —</div></div>
+
+    <h3 style="margin-top:16px;">Проверка чужих характеристик</h3>
+    <textarea id="checkInput" placeholder="Вставьте строки, полученные от других..."></textarea>
+    <button class="btn ghost" id="btnCheck">Проверить</button>
+    <div class="hint" id="checkResult"></div>
+
+    <h3 style="margin-top:16px;">Своя характеристика</h3>
+    <button class="btn ghost" id="btnMake">Сформировать строку</button>
+    <textarea id="myChar" readonly placeholder="Ваша строка-характеристика..."></textarea>
+    <button class="btn ghost" id="btnCopy" style="margin-top:4px;">Копировать</button>
+
+    <h3 style="margin-top:16px;">Обмен файлом (без сервера)</h3>
+    <div class="toolbar">
+      <button class="btn ghost" id="btnExport">Экспорт файла</button>
+      <label class="btn ghost" style="display:inline-block; text-align:center;">
+        Импорт файла
+        <input type="file" id="fileImport" accept=".json,.txt" style="display:none;">
+      </label>
+    </div>
+
+    <h3 style="margin-top:16px;">Сверка кода с эталоном</h3>
+    <div class="toolbar">
+      <button class="btn ghost" id="btnHashSelf">Показать SHA-256 моего файла</button>
+      <label class="btn ghost" style="display:inline-block; text-align:center;">
+        Выбрать vibor.html
+        <input type="file" id="fileHash" accept=".html,.htm" style="display:none;">
+      </label>
+    </div>
+    <textarea id="myHash" readonly placeholder="SHA-256 вашего файла..."></textarea>
+    <div class="hint" id="hashStatus">Эталонный хеш публикуется отдельно.</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = 'vibor_state_v2';
+
+// ---------- крипто ----------
+function makeCode(len = 64) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  let out = '';
+  for (let i = 0; i < len; i++) out += chars[arr[i] % chars.length];
+  return out;
+}
+async function hashArrayBuffer(buf) {
+  const d = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function sha256(str) {
+  return hashArrayBuffer(new TextEncoder().encode(str));
+}
+
+// ---------- состояние ----------
+const state = {
+  subject: '— предмет не задан —', // сюда можно вписать вопрос
+  myCode: null,
+  myVote: null,
+  fileLines: []
+};
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    if (p && typeof p === 'object') {
+      state.subject = p.subject || state.subject;
+      state.myCode = p.myCode || null;
+      state.myVote = p.myVote || null;
+      state.fileLines = Array.isArray(p.fileLines) ? p.fileLines : [];
+    }
+  } catch (e) {}
+}
+
+// ---------- закладки ----------
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    $('tab-vote').classList.toggle('hidden', t.dataset.tab !== 'vote');
+    $('tab-watch').classList.toggle('hidden', t.dataset.tab !== 'watch');
+  });
+});
+
+// ---------- рендер ----------
+function renderSubject() { $('subjectText').textContent = state.subject; }
+function renderFile() {
+  const el = $('fileList');
+  if (!state.fileLines.length) { el.innerHTML = '<div>— файл пуст —</div>'; return; }
+  el.innerHTML = state.fileLines.map(l => `<div>${l}</div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function renderStatus() {
+  if (state.myVote === null) {
+    $('voteStatus').textContent = '';
+  } else {
+    $('voteStatus').textContent = `Вы проголосовали: ${state.myVote}. Код сохранён локально.`;
+  }
+}
+
+// ---------- голосование (минимум) ----------
+$('btnVote').addEventListener('click', () => {
+  if (state.myVote !== null) {
+    alert('Вы уже проголосовали. Повторное голосование в прототипе запрещено.');
+    return;
+  }
+  const choice = prompt('Ваш голос: 1 — за, 0 — против, N — воздержался');
+  if (!['1', '0', 'N'].includes(choice)) {
+    alert('Некорректный ввод. Допустимо: 1, 0, N');
+    return;
+  }
+  state.myCode = makeCode(64);
+  state.myVote = choice;
+  state.fileLines.push(`${state.myCode} ${choice}`);
+  saveState();
+  renderFile(); renderStatus();
+  alert('Голос учтён. Код сохранён. Проверить себя можно во вкладке «Наблюдение».');
+});
+
+// ---------- проверка чужих ----------
+$('btnCheck').addEventListener('click', async () => {
+  const input = $('checkInput').value.trim();
+  const out = $('checkResult');
+  if (!input) { out.textContent = 'Вставьте строки для проверки.'; return; }
+  const lines = input.split('\n').map(s => s.trim()).filter(Boolean);
+  const results = [];
+  for (const line of lines) {
+    const parts = line.split(/\s+/);
+    if (parts.length < 2) { results.push(`✗ Некорректная строка: ${line}`); continue; }
+    const [code, vote] = parts;
+    const found = state.fileLines.find(l => l.startsWith(code + ' '));
+    if (!found) results.push(`✗ Код ${code.slice(0,8)}… отсутствует`);
+    else {
+      const actual = found.split(' ')[1];
+      if (actual === vote) results.push(`✓ Код ${code.slice(0,8)}… есть, голос совпадает (${vote})`);
+      else results.push(`⚠ Код ${code.slice(0,8)}… есть, но голос в файле: ${actual}, заявлен: ${vote}`);
+    }
+  }
+  const blockHash = await sha256(input);
+  out.innerHTML = results.join('<br>') + `<br><br>SHA-256 блока: <b>${blockHash}</b>`;
+});
+
+// ---------- своя характеристика ----------
+$('btnMake').addEventListener('click', async () => {
+  if (!state.myCode) { alert('Сначала проголосуйте.'); return; }
+  const hash = await sha256(state.myCode + ' ' + state.myVote);
+  $('myChar').value = `${state.myCode} ${state.myVote} ${hash}`;
+  alert('Строка сформирована.');
+});
+$('btnCopy').addEventListener('click', async () => {
+  const ta = $('myChar');
+  if (!ta.value) return;
+  try { await navigator.clipboard.writeText(ta.value); alert('Скопировано.'); }
+  catch { ta.select(); document.execCommand('copy'); alert('Скопировано (fallback).'); }
+});
+
+// ---------- экспорт / импорт ----------
+$('btnExport').addEventListener('click', async () => {
+  const payload = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    subject: state.subject,
+    fileLines: state.fileLines,
+    fileHash: await sha256(state.fileLines.join('\n'))
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'vibor-file.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+$('fileImport').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    let incoming = [];
+    try {
+      const p = JSON.parse(text);
+      if (Array.isArray(p.fileLines)) incoming = p.fileLines;
+    } catch {}
+    if (!incoming.length) {
+      incoming = text.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+    const existing = new Set(state.fileLines.map(l => l.split(' ')[0]));
+    let added = 0;
+    for (const line of incoming) {
+      const code = line.split(' ')[0];
+      if (!existing.has(code)) { state.fileLines.push(line); existing.add(code); added++; }
+    }
+    saveState(); renderFile();
+    alert(`Импорт завершён. Добавлено: ${added}. Всего: ${state.fileLines.length}.`);
+  } catch (err) {
+    alert('Ошибка импорта: ' + err.message);
+  } finally { e.target.value = ''; }
+});
+
+// ---------- SHA-256 своего файла ----------
+$('btnHashSelf').addEventListener('click', async () => {
+  const out = $('myHash'), status = $('hashStatus');
+  try {
+    const res = await fetch(location.href, { cache: 'no-store' });
+    if (!res.ok) throw new Error('fetch failed');
+    const buf = await res.arrayBuffer();
+    out.value = await hashArrayBuffer(buf);
+    status.textContent = 'Хеш посчитан автоматически. Сверьте с эталоном.';
+  } catch {
+    status.textContent = 'Автоматически не удалось. Выберите vibor.html вручную.';
+    alert('Браузер не даёт прочитать собственный файл. Нажмите «Выбрать vibor.html».');
+  }
+});
+$('fileHash').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const buf = await file.arrayBuffer();
+    $('myHash').value = await hashArrayBuffer(buf);
+    $('hashStatus').textContent = `Хеш файла «${file.name}» (${file.size} байт). Сверьте с эталоном.`;
+  } catch (err) { alert('Ошибка: ' + err.message); }
+  finally { e.target.value = ''; }
+});
+
+// ---------- старт ----------
+loadState();
+renderSubject();
+renderFile();
+renderStatus();
+</script>
+</body>
+</html>
