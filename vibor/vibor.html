@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vibor.html — прототип</title>
+<style>
+  :root {
+    --bg: #2b1e1e;
+    --panel: #3a2a2a;
+    --accent: #a33;
+    --line: #6b4444;
+    --text: #e8dede;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: linear-gradient(180deg, #3a2a2a 0%, #2b1e1e 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tab {
+    flex: 1; padding: 10px; text-align: center; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--line);
+    border-bottom: none; border-radius: 6px 6px 0 0;
+    color: var(--text); font-size: 14px;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 0 0 6px 6px; padding: 14px;
+  }
+  h3 { margin: 0 0 8px; font-size: 14px; color: #d8a0a0; font-weight: 500; }
+  .list {
+    background: #241a1a; border: 1px solid var(--line);
+    border-radius: 4px; padding: 8px; height: 140px;
+    overflow-y: auto; font-family: ui-monospace, monospace;
+    font-size: 13px; line-height: 1.6;
+  }
+  .list div { white-space: pre; }
+  .btn {
+    background: var(--accent); color: #fff; border: 1px solid #c44;
+    border-radius: 4px; padding: 8px 16px; cursor: pointer;
+    font-size: 14px; margin-top: 10px;
+  }
+  .btn:hover { background: #b44; }
+  .btn.ghost { background: transparent; border-color: var(--line); }
+  textarea {
+    width: 100%; min-height: 90px; resize: vertical;
+    background: #241a1a; border: 1px solid var(--line);
+    border-radius: 4px; color: var(--text); padding: 8px;
+    font-family: ui-monospace, monospace; font-size: 13px;
+  }
+  .row { display: flex; gap: 8px; align-items: flex-start; }
+  .row > * { flex: 1; }
+  .rules { font-size: 14px; line-height: 1.7; }
+  .rules h4 { color: #d8a0a0; margin: 14px 0 4px; font-weight: 500; }
+  .rules ul { margin: 0; padding-left: 20px; }
+  .hint { font-size: 12px; color: #a88; margin-top: 4px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="vote">Голосование</div>
+    <div class="tab" data-tab="rules">Правила</div>
+  </div>
+
+  <!-- ЗАКЛАДКА 1 -->
+  <div class="panel" id="tab-vote">
+    <h3>Файл голосования (код + 1/0/N)</h3>
+    <div class="list" id="fileList">
+      <div>— файл ещё не загружен —</div>
+    </div>
+    <button class="btn" id="btnVote">Голосовать</button>
+
+    <h3 style="margin-top:16px;">Проверка: вставьте строки характеристик от других</h3>
+    <textarea id="checkInput" placeholder="Вставьте сюда строки, полученные от других голосующих..."></textarea>
+    <button class="btn ghost" id="btnCheck">Проверить</button>
+    <div class="hint" id="checkResult"></div>
+
+    <h3 style="margin-top:16px;">Сформировать свою характеристику</h3>
+    <button class="btn ghost" id="btnMake">Сформировать строку</button>
+    <textarea id="myChar" readonly placeholder="Здесь появится ваша строка-характеристика..."></textarea>
+    <button class="btn ghost" id="btnCopy" style="margin-top:4px;">Копировать</button>
+  </div>
+
+  <!-- ЗАКЛАДКА 2 -->
+  <div class="panel hidden" id="tab-rules">
+    <div class="rules">
+      <h4>1. Сроки</h4>
+      <ul>
+        <li>Руководитель избирается на 1 срок.</li>
+        <li>Немедленное переизбрание запрещено.</li>
+      </ul>
+      <h4>2. Отзыв</h4>
+      <ul>
+        <li>Инициируется группой не менее 10% членов.</li>
+        <li>Выносится на проверяемое голосование по схеме приложения.</li>
+      </ul>
+      <h4>3. Подгруппы</h4>
+      <ul>
+        <li>Решения принимаются советом с ротацией.</li>
+        <li>Подгруппы имеют альтернативные каналы лидерства.</li>
+      </ul>
+      <h4>4. Полномочия</h4>
+      <ul>
+        <li>Руководитель не имеет полномочий сверх уставных.</li>
+        <li>Все протоколы публикуются.</li>
+      </ul>
+      <h4>5. Проверяемость</h4>
+      <ul>
+        <li>Каждый голосующий может локально проверить свой код в файле.</li>
+        <li>Сумма считается локально, сверка хешей файла — между участниками.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- утилиты ----------
+const $ = id => document.getElementById(id);
+
+function makeCode(len = 64) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let out = '';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  for (let i = 0; i < len; i++) out += chars[arr[i] % chars.length];
+  return out;
+}
+
+function hashStr(str) {
+  // простой детерминированный хеш для прототипа (не криптостойкий)
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+// ---------- состояние ----------
+const state = {
+  myCode: null,       // код текущего пользователя
+  myVote: null,       // '1' | '0' | 'N'
+  fileLines: []       // массив строк "код 1"
+};
+
+// ---------- закладки ----------
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    $('tab-vote').classList.toggle('hidden', t.dataset.tab !== 'vote');
+    $('tab-rules').classList.toggle('hidden', t.dataset.tab !== 'rules');
+  });
+});
+
+// ---------- рендер файла ----------
+function renderFile() {
+  const el = $('fileList');
+  if (!state.fileLines.length) {
+    el.innerHTML = '<div>— файл пуст —</div>';
+    return;
+  }
+  el.innerHTML = state.fileLines.map(l => `<div>${l}</div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ---------- голосование ----------
+$('btnVote').addEventListener('click', () => {
+  if (state.myVote !== null) {
+    alert('Вы уже проголосовали. Повторное голосование в прототипе запрещено.');
+    return;
+  }
+  const choice = prompt('Ваш голос: 1 — за, 0 — против, N — воздержался');
+  if (!['1', '0', 'N'].includes(choice)) {
+    alert('Некорректный ввод. Допустимо: 1, 0, N');
+    return;
+  }
+  state.myCode = makeCode(64);
+  state.myVote = choice;
+  const line = `${state.myCode} ${choice}`;
+  state.fileLines.push(line);
+  renderFile();
+  alert('Голос учтён. Ваш код сохранён локально. Сохраните его — по нему вы сможете проверить себя.');
+});
+
+// ---------- проверка чужих характеристик ----------
+$('btnCheck').addEventListener('click', () => {
+  const input = $('checkInput').value.trim();
+  const out = $('checkResult');
+  if (!input) { out.textContent = 'Вставьте строки для проверки.'; return; }
+
+  const lines = input.split('\n').map(s => s.trim()).filter(Boolean);
+  const results = [];
+
+  for (const line of lines) {
+    const parts = line.split(/\s+/);
+    if (parts.length < 2) { results.push(`✗ Некорректная строка: ${line}`); continue; }
+    const [code, vote] = parts;
+    const found = state.fileLines.find(l => l.startsWith(code + ' '));
+    if (!found) {
+      results.push(`✗ Код ${code.slice(0,8)}… отсутствует в файле`);
+    } else {
+      const actual = found.split(' ')[1];
+      if (actual === vote) results.push(`✓ Код ${code.slice(0,8)}… присутствует, голос совпадает (${vote})`);
+      else results.push(`⚠ Код ${code.slice(0,8)}… присутствует, но голос в файле: ${actual}, заявлен: ${vote}`);
+    }
+  }
+
+  // проверка хеша всего вставленного блока
+  const blockHash = hashStr(input);
+  out.innerHTML = results.join('<br>') + `<br><br>Хеш вставленного блока: <b>${blockHash}</b>`;
+});
+
+// ---------- формирование своей характеристики ----------
+$('btnMake').addEventListener('click', () => {
+  if (!state.myCode) {
+    alert('Сначала проголосуйте — тогда появится ваш код.');
+    return;
+  }
+  const hash = hashStr(state.myCode + ' ' + state.myVote);
+  const line = `${state.myCode} ${state.myVote} ${hash}`;
+  $('myChar').value = line;
+  alert('Строка сформирована. Её можно отправить другому голосующему по запросу.');
+});
+
+// ---------- копирование ----------
+$('btnCopy').addEventListener('click', async () => {
+  const ta = $('myChar');
+  if (!ta.value) return;
+  try {
+    await navigator.clipboard.writeText(ta.value);
+    alert('Скопировано.');
+  } catch {
+    ta.select();
+    document.execCommand('copy');
+    alert('Скопировано (fallback).');
+  }
+});
+
+// ---------- стартовый рендер ----------
+renderFile();
+</script>
+</body>
+</html>
