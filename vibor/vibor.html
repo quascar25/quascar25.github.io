@@ -120,6 +120,18 @@
       </label>
     </div>
     <div class="hint">Экспорт сохраняет список голосов в JSON. Импорт загружает чужой список и объединяет с вашим.</div>
+
+    <h3 style="margin-top:16px;">Сверка кода с эталоном</h3>
+    <div class="toolbar">
+      <button class="btn ghost" id="btnHashSelf">Показать SHA-256 моего файла</button>
+      <label class="btn ghost" style="display:inline-block; text-align:center;">
+        Выбрать vibor.html
+        <input type="file" id="fileHash" accept=".html,.htm" style="display:none;">
+      </label>
+    </div>
+    <textarea id="myHash" readonly placeholder="Здесь появится SHA-256 вашего файла..."></textarea>
+    <div class="hint" id="hashStatus">Эталонный хеш публикуется отдельно (PDF/архив). Сверьте с ним.</div>
+    
   </div>
 
   <!-- ЗАКЛАДКА 2: ПРАВИЛА -->
