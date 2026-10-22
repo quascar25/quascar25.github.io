@@ -396,6 +396,49 @@ $('fileImport').addEventListener('change', async (e) => {
   }
 });
 
+// ---------- SHA-256 своего файла ----------
+async function hashArrayBuffer(buf) {
+  const digest = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(digest))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hashFile(file) {
+  const buf = await file.arrayBuffer();
+  return hashArrayBuffer(buf);
+}
+
+// Режим 1: автоматически, если страница открыта с сервера
+$('btnHashSelf').addEventListener('click', async () => {
+  const out = $('myHash');
+  const status = $('hashStatus');
+  try {
+    const res = await fetch(location.href, { cache: 'no-store' });
+    if (!res.ok) throw new Error('fetch не удался');
+    const buf = await res.arrayBuffer();
+    const hash = await hashArrayBuffer(buf);
+    out.value = hash;
+    status.textContent = 'Хеш посчитан автоматически (страница открыта с сервера). Сверьте с эталоном.';
+  } catch (e) {
+    status.textContent = 'Автоматически не удалось (страница открыта как файл). Выберите vibor.html вручную.';
+    alert('Браузер не даёт прочитать собственный файл с диска. Нажмите «Выбрать vibor.html» и укажите файл вручную.');
+  }
+});
+
+// Режим 2: вручную через выбор файла
+$('fileHash').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const hash = await hashFile(file);
+    $('myHash').value = hash;
+    $('hashStatus').textContent = `Хеш файла «${file.name}» (${file.size} байт). Сверьте с эталоном.`;
+  } catch (err) {
+    alert('Ошибка: ' + err.message);
+  } finally {
+    e.target.value = '';
+  }
+});  
 // ---------- старт ----------
 loadState();
 renderFile();
