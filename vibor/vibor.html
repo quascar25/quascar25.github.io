@@ -21,7 +21,7 @@
     min-height: 100vh;
   }
   .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
-  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tabs { display: flex; gap: 4px; }
   .tab {
     flex: 1; padding: 10px; text-align: center; cursor: pointer;
     background: var(--panel); border: 1px solid var(--line);
@@ -29,6 +29,20 @@
     color: var(--text); font-size: 14px;
   }
   .tab.active { background: var(--accent); border-color: var(--accent); }
+
+  /* Картинка сразу после кнопок закладок */
+  .preview {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 260px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0;
+    background: #241a1a;
+  }
+
   .panel {
     background: var(--panel); border: 1px solid var(--line);
     border-radius: 0 0 6px 6px; padding: 14px;
@@ -54,13 +68,17 @@
     border-radius: 4px; color: var(--text); padding: 8px;
     font-family: ui-monospace, monospace; font-size: 13px;
   }
-  .row { display: flex; gap: 8px; align-items: flex-start; }
-  .row > * { flex: 1; }
   .rules { font-size: 14px; line-height: 1.7; }
   .rules h4 { color: #d8a0a0; margin: 14px 0 4px; font-weight: 500; }
   .rules ul { margin: 0; padding-left: 20px; }
   .hint { font-size: 12px; color: #a88; margin-top: 4px; }
   .hidden { display: none; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .desc p { line-height: 1.7; }
+  .desc code {
+    background: #241a1a; border: 1px solid var(--line);
+    padding: 1px 5px; border-radius: 3px; font-size: 12px;
+  }
 </style>
 </head>
 <body>
@@ -68,9 +86,14 @@
   <div class="tabs">
     <div class="tab active" data-tab="vote">Голосование</div>
     <div class="tab" data-tab="rules">Правила</div>
+    <div class="tab" data-tab="desc">Описание</div>
   </div>
 
-  <!-- ЗАКЛАДКА 1 -->
+  <!-- Картинка сразу после кнопок закладок -->
+  <img src="preview.jpg" alt="Ленин и сцены социализма" class="preview"
+       onerror="this.style.display='none'">
+
+  <!-- ЗАКЛАДКА 1: ГОЛОСОВАНИЕ -->
   <div class="panel" id="tab-vote">
     <h3>Файл голосования (код + 1/0/N)</h3>
     <div class="list" id="fileList">
@@ -87,9 +110,19 @@
     <button class="btn ghost" id="btnMake">Сформировать строку</button>
     <textarea id="myChar" readonly placeholder="Здесь появится ваша строка-характеристика..."></textarea>
     <button class="btn ghost" id="btnCopy" style="margin-top:4px;">Копировать</button>
+
+    <h3 style="margin-top:16px;">Обмен файлом (без сервера)</h3>
+    <div class="toolbar">
+      <button class="btn ghost" id="btnExport">Экспорт файла</button>
+      <label class="btn ghost" style="display:inline-block; text-align:center;">
+        Импорт файла
+        <input type="file" id="fileImport" accept=".json,.txt" style="display:none;">
+      </label>
+    </div>
+    <div class="hint">Экспорт сохраняет список голосов в JSON. Импорт загружает чужой список и объединяет с вашим.</div>
   </div>
 
-  <!-- ЗАКЛАДКА 2 -->
+  <!-- ЗАКЛАДКА 2: ПРАВИЛА -->
   <div class="panel hidden" id="tab-rules">
     <div class="rules">
       <h4>1. Сроки</h4>
@@ -119,36 +152,85 @@
       </ul>
     </div>
   </div>
+
+  <!-- ЗАКЛАДКА 3: ОПИСАНИЕ -->
+  <div class="panel hidden" id="tab-desc">
+    <div class="desc">
+      <h3>Что это</h3>
+      <p>Прототип проверяемого голосования. Работает локально в браузере, без сервера. Каждый голосующий получает случайный код, голосует, и может локально проверить, что его голос присутствует в файле, а сумма посчитана из всех голосов.</p>
+
+      <h3>Как проверить</h3>
+      <ul>
+        <li>Проголосуйте — приложение создаст ваш код и сохранит его в браузере (<code>localStorage</code>).</li>
+        <li>Экспортируйте файл и передайте другому любым способом.</li>
+        <li>Другой импортирует файл, проголосует, экспортирует свой — и так далее.</li>
+        <li>Вставьте чужие строки в окно проверки: приложение локально найдёт коды в файле и сверит голоса.</li>
+        <li>Хеш блока считается через <code>crypto.subtle.digest</code> (SHA-256) — сверяйте хеши между людьми, чтобы убедиться, что файлы одинаковые.</li>
+      </ul>
+
+      <h3>Что не входит в прототип</h3>
+      <ul>
+        <li>Защита от подмены приложения (нужен аудит сборки всеми сторонами).</li>
+        <li>Защита от принуждения (код можно «забыть», но при сопровождении это не спасает).</li>
+        <li>Юридическая сила — её нет и быть не может без смены институтов.</li>
+      </ul>
+
+      <h3>Правила движения</h3>
+      <p>Смотрите закладку «Правила»: сроки, отзыв, подгруппы, полномочия, проверяемость. Это минимум, без которого схема превращается в ритуал.</p>
+    </div>
+  </div>
 </div>
 
 <script>
-// ---------- утилиты ----------
 const $ = id => document.getElementById(id);
+const STORAGE_KEY = 'vibor_state_v1';
 
+// ---------- крипто ----------
 function makeCode(len = 64) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let out = '';
   const arr = new Uint8Array(len);
   crypto.getRandomValues(arr);
+  let out = '';
   for (let i = 0; i < len; i++) out += chars[arr[i] % chars.length];
   return out;
 }
 
-function hashStr(str) {
-  // простой детерминированный хеш для прототипа (не криптостойкий)
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (h * 31 + str.charCodeAt(i)) >>> 0;
-  }
-  return h.toString(16).padStart(8, '0');
+async function sha256(str) {
+  const buf = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(digest))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // ---------- состояние ----------
 const state = {
-  myCode: null,       // код текущего пользователя
-  myVote: null,       // '1' | '0' | 'N'
-  fileLines: []       // массив строк "код 1"
+  myCode: null,
+  myVote: null,
+  fileLines: []
 };
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Не удалось сохранить состояние:', e);
+  }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      state.myCode = parsed.myCode || null;
+      state.myVote = parsed.myVote || null;
+      state.fileLines = Array.isArray(parsed.fileLines) ? parsed.fileLines : [];
+    }
+  } catch (e) {
+    console.warn('Не удалось загрузить состояние:', e);
+  }
+}
 
 // ---------- закладки ----------
 document.querySelectorAll('.tab').forEach(t => {
@@ -157,10 +239,11 @@ document.querySelectorAll('.tab').forEach(t => {
     t.classList.add('active');
     $('tab-vote').classList.toggle('hidden', t.dataset.tab !== 'vote');
     $('tab-rules').classList.toggle('hidden', t.dataset.tab !== 'rules');
+    $('tab-desc').classList.toggle('hidden', t.dataset.tab !== 'desc');
   });
 });
 
-// ---------- рендер файла ----------
+// ---------- рендер ----------
 function renderFile() {
   const el = $('fileList');
   if (!state.fileLines.length) {
@@ -169,6 +252,14 @@ function renderFile() {
   }
   el.innerHTML = state.fileLines.map(l => `<div>${l}</div>`).join('');
   el.scrollTop = el.scrollHeight;
+}
+
+function renderMyChar() {
+  if (!state.myCode) {
+    $('myChar').value = '';
+    return;
+  }
+  $('myChar').value = `${state.myCode} ${state.myVote}`;
 }
 
 // ---------- голосование ----------
@@ -184,14 +275,15 @@ $('btnVote').addEventListener('click', () => {
   }
   state.myCode = makeCode(64);
   state.myVote = choice;
-  const line = `${state.myCode} ${choice}`;
-  state.fileLines.push(line);
+  state.fileLines.push(`${state.myCode} ${choice}`);
+  saveState();
   renderFile();
+  renderMyChar();
   alert('Голос учтён. Ваш код сохранён локально. Сохраните его — по нему вы сможете проверить себя.');
 });
 
 // ---------- проверка чужих характеристик ----------
-$('btnCheck').addEventListener('click', () => {
+$('btnCheck').addEventListener('click', async () => {
   const input = $('checkInput').value.trim();
   const out = $('checkResult');
   if (!input) { out.textContent = 'Вставьте строки для проверки.'; return; }
@@ -213,20 +305,18 @@ $('btnCheck').addEventListener('click', () => {
     }
   }
 
-  // проверка хеша всего вставленного блока
-  const blockHash = hashStr(input);
-  out.innerHTML = results.join('<br>') + `<br><br>Хеш вставленного блока: <b>${blockHash}</b>`;
+  const blockHash = await sha256(input);
+  out.innerHTML = results.join('<br>') + `<br><br>SHA-256 блока: <b>${blockHash}</b>`;
 });
 
 // ---------- формирование своей характеристики ----------
-$('btnMake').addEventListener('click', () => {
+$('btnMake').addEventListener('click', async () => {
   if (!state.myCode) {
     alert('Сначала проголосуйте — тогда появится ваш код.');
     return;
   }
-  const hash = hashStr(state.myCode + ' ' + state.myVote);
-  const line = `${state.myCode} ${state.myVote} ${hash}`;
-  $('myChar').value = line;
+  const hash = await sha256(state.myCode + ' ' + state.myVote);
+  $('myChar').value = `${state.myCode} ${state.myVote} ${hash}`;
   alert('Строка сформирована. Её можно отправить другому голосующему по запросу.');
 });
 
@@ -244,8 +334,72 @@ $('btnCopy').addEventListener('click', async () => {
   }
 });
 
-// ---------- стартовый рендер ----------
+// ---------- экспорт / импорт ----------
+$('btnExport').addEventListener('click', async () => {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    fileLines: state.fileLines,
+    fileHash: await sha256(state.fileLines.join('\n'))
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'vibor-file.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+$('fileImport').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    let incoming = [];
+    let ok = false;
+
+    // пытаемся распарсить как JSON
+    try {
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed.fileLines)) {
+        incoming = parsed.fileLines;
+        ok = true;
+      }
+    } catch { /* не JSON — пробуем как простой текст */ }
+
+    if (!ok) {
+      incoming = text.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+
+    // объединяем без дублей по коду
+    const existing = new Set(state.fileLines.map(l => l.split(' ')[0]));
+    let added = 0;
+    for (const line of incoming) {
+      const code = line.split(' ')[0];
+      if (!existing.has(code)) {
+        state.fileLines.push(line);
+        existing.add(code);
+        added++;
+      }
+    }
+
+    saveState();
+    renderFile();
+    alert(`Импорт завершён. Добавлено строк: ${added}. Всего в файле: ${state.fileLines.length}.`);
+  } catch (err) {
+    alert('Ошибка импорта: ' + err.message);
+  } finally {
+    e.target.value = '';
+  }
+});
+
+// ---------- старт ----------
+loadState();
 renderFile();
+renderMyChar();
 </script>
 </body>
 </html>
