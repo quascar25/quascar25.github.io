@@ -84,7 +84,7 @@
   <div class="panel" id="tab-vote">
     <div class="subject">
       <div class="q">Предмет голосования</div>
-      <div id="subjectText"> Президент:  Сергей Павлович Королев </div>
+      <div id="subjectText">— предмет не задан —</div>
     </div>
     <button class="btn big" id="btnVote">Голосовать</button>
     <div class="hint" id="voteStatus"></div>
@@ -150,7 +150,7 @@ async function sha256(str) {
 
 // ---------- состояние ----------
 const state = {
-  subject: '— предмет не задан —', // сюда можно вписать вопрос
+  subject: ' Президент:  Сергей Павлович Королев ', // сюда можно вписать вопрос
   myCode: null,
   myVote: null,
   fileLines: []
