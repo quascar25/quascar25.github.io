@@ -239,89 +239,116 @@
     return lines.join('\n');
   }
 
-  function findSymmetry() {
+    function findSymmetry() {
     if (!state.dataset) return '> Сначала сгенерируйте данные (кнопка «ГЕНЕРАТОР ЗНАЧЕНИЙ»).';
     const data = state.dataset;
 
     // Признаки
     for (const d of data) d.feat = features(d.N);
 
-    // Разбиение train/test, стратифицированно по режимам
-    const train = [], test = [];
+    // Убираем признаки-утечки режима: длину N и число цифр
+    const LEAKY = new Set(['bit_length', 'digit_count']);
+    const featNames = Object.keys(data[0].feat).filter(f => !LEAKY.has(f));
+
+    // Группируем по режимам
     const byMode = {};
     for (const d of data) (byMode[d.mode] = byMode[d.mode] || []).push(d);
-    for (const m in byMode) {
-      const arr = byMode[m].slice().sort(() => Math.random() - 0.5);
+
+    const modeResults = [];   // { id, name, trainR2, testR2, baselineR2, top }
+    const allImportance = {};
+
+    for (const m of MODES) {
+      const arr = (byMode[m.id] || []).slice();
+      if (arr.length < 10) continue; // слишком мало для честного split
+
+      // Перемешиваем и делим внутри режима
+      arr.sort(() => Math.random() - 0.5);
       const cut = Math.floor(arr.length * (1 - TEST_FRACTION));
-      train.push(...arr.slice(0, cut));
-      test.push(...arr.slice(cut));
-    }
+      const train = arr.slice(0, cut);
+      const test = arr.slice(cut);
+      if (train.length < 6 || test.length < 4) continue;
 
-    const featNames = Object.keys(train[0].feat);
+      // Baseline: среднее по train
+      const baselineTree = { leaf: true, value: mean(train) };
+      const baselineR2 = r2(baselineTree, test);
 
-    // Baseline: предсказание средним (на нормализованном target)
-    const baselineR2 = r2({ leaf: true, value: mean(train) }, test);
+      // Дерево глубины 3 — обучаем ТОЛЬКО на train этого режима
+      const tree = bestSplit(train, featNames, 0, 3);
+      const trainR2 = r2(tree, train);
+      const testR2 = r2(tree, test);
 
-    // Дерево глубины 3
-    const tree = bestSplit(train, featNames, 0, 3);
-    const trainR2 = r2(tree, train);
-    const testR2 = r2(tree, test);
-
-    // Важность признаков
-    const importance = {};
-    (function walk(t) {
-      if (t.leaf) return;
-      importance[t.f] = (importance[t.f] || 0) + 1;
-      walk(t.left); walk(t.right);
-    })(tree);
-    const top = Object.entries(importance).sort((a,b)=>b[1]-a[1]).slice(0,5);
-
-    // Разбивка по режимам
-    const perMode = {};
-    for (const m of MODES) {
-      const tm = test.filter(d => d.mode === m.id);
-      if (tm.length > 3) perMode[m.id] = r2(tree, tm);
-    }
-
-    const lines = [];
-    lines.push('=== СТАТИСТИЧЕСКИЙ АНАЛИЗ (нормализованный target) ===');
-    lines.push('Target: log2(x) - 0.5*log2(N)  — отклонение от тривиального тренда.');
-    lines.push('');
-    lines.push(`Train R²: ${trainR2.toFixed(3)}   Test R²: ${testR2.toFixed(3)}   Baseline: ${baselineR2.toFixed(3)}`);
-    lines.push('');
-    lines.push('R² по режимам (test):');
-    for (const m of MODES) {
-      if (perMode[m.id] !== undefined) {
-        lines.push(`  режим ${m.id} (${m.name}): ${perMode[m.id].toFixed(3)}`);
+      // Важность внутри режима
+      const importance = {};
+      (function walk(t) {
+        if (t.leaf) return;
+        importance[t.f] = (importance[t.f] || 0) + 1;
+        walk(t.left); walk(t.right);
+      })(tree);
+      for (const f in importance) {
+        allImportance[f] = (allImportance[f] || 0) + importance[f];
       }
+      const top = Object.entries(importance).sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+      modeResults.push({ id: m.id, name: m.name, trainR2, testR2, baselineR2, top });
+    }
+
+    // Сводка
+    const lines = [];
+    lines.push('=== СТАТИСТИЧЕСКИЙ АНАЛИЗ (per-mode, без утечки режима) ===');
+    lines.push('Target: log2(x) - 0.5*log2(N).  Обучение и тест — внутри каждого режима.');
+    lines.push('Признаки-утечки (bit_length, digit_count) исключены.');
+    lines.push('');
+
+    if (modeResults.length === 0) {
+      lines.push('Недостаточно данных для анализа.');
+      return lines.join('\n');
+    }
+
+    lines.push('Результаты по режимам:');
+    lines.push('  режим | train R² | test R² | baseline | топ-признак');
+    lines.push('  ------+----------+---------+----------+-----------');
+    for (const r of modeResults) {
+      const topStr = r.top.length ? r.top.map(([f,c]) => `${f}(${c})`).join(', ') : '—';
+      lines.push(`  ${String(r.id).padStart(5)} | ${r.trainR2.toFixed(3).padStart(8)} | ${r.testR2.toFixed(3).padStart(7)} | ${r.baselineR2.toFixed(3).padStart(8)} | ${topStr}`);
     }
     lines.push('');
-    lines.push('Топ-признаки (по использованию в дереве):');
-    if (top.length === 0) lines.push('  (дерево не нашло разбиений)');
-    else top.forEach(([f, c]) => lines.push(`  ${f}: ${c}`));
 
+    // Средний test R² по режимам
+    const avgTest = modeResults.reduce((s, r) => s + r.testR2, 0) / modeResults.length;
+    const avgBaseline = modeResults.reduce((s, r) => s + r.baselineR2, 0) / modeResults.length;
+    const delta = avgTest - avgBaseline;
+    const strongModes = modeResults.filter(r => r.testR2 > 0.1).length;
+    const weakModes = modeResults.filter(r => r.testR2 > 0.03).length;
+
+    lines.push(`Средний test R² по режимам: ${avgTest.toFixed(3)}   Baseline: ${avgBaseline.toFixed(3)}   Δ = ${delta.toFixed(3)}`);
+    lines.push(`Режимов с R² > 0.1: ${strongModes} из ${modeResults.length}`);
+    lines.push(`Режимов с R² > 0.03: ${weakModes} из ${modeResults.length}`);
     lines.push('');
-    const delta = testR2 - baselineR2;
-    const stableModes = Object.values(perMode).filter(v => v > 0.05).length;
-    // Проверка: не является ли топ-признак тривиальным (длина)
-    const trivialTop = top.length > 0 && (top[0][0] === 'bit_length' || top[0][0] === 'digit_count');
 
-    if (delta > 0.1 && stableModes >= 3 && !trivialTop) {
-      lines.push('>>> ВЕРДИКТ: ЕСТЬ СИГНАЛ (не тривиальный)');
-      lines.push(`    ΔR² = ${delta.toFixed(3)}, стабильных режимов: ${stableModes}.`);
-      lines.push(`    Топ-признак: ${top[0] ? top[0][0] : '—'} — не длина N.`);
-    } else if (delta > 0.03) {
+    // Топ-признаки суммарно
+    const topAll = Object.entries(allImportance).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    lines.push('Топ-признаки суммарно по всем режимам:');
+    if (topAll.length === 0) lines.push('  (дерево не нашло разбиений)');
+    else topAll.forEach(([f,c]) => lines.push(`  ${f}: ${c}`));
+    lines.push('');
+
+    // Вердикт
+    if (strongModes >= 3 && delta > 0.1) {
+      lines.push('>>> ВЕРДИКТ: ЕСТЬ СИГНАЛ (устойчивый, внутри режимов)');
+      lines.push(`    ${strongModes} режимов с R² > 0.1, средний Δ = ${delta.toFixed(3)}.`);
+      lines.push('    Связь не объясняется длиной N и не является утечкой режима.');
+    } else if (weakModes >= 3 && delta > 0.03) {
       lines.push('>>> ВЕРДИКТ: СЛАБЫЙ СИГНАЛ');
-      lines.push(`    ΔR² = ${delta.toFixed(3)}, стабильных режимов: ${stableModes}.`);
-      if (trivialTop) lines.push('    Внимание: топ-признак — длина N (тривиально).');
+      lines.push(`    ${weakModes} режимов с R² > 0.03, средний Δ = ${delta.toFixed(3)}.`);
+      lines.push('    Требуется проверка на большей выборке.');
     } else {
       lines.push('>>> ВЕРДИКТ: СИГНАЛА НЕТ');
-      lines.push(`    ΔR² = ${delta.toFixed(3)} (ниже порога 0.03).`);
-      lines.push('    Устойчивой нетривиальной закономерности не обнаружено.');
+      lines.push(`    Средний Δ = ${delta.toFixed(3)}, режимов с R² > 0.1: ${strongModes}.`);
+      lines.push('    Внутри режимов устойчивой нетривиальной связи не обнаружено.');
     }
     lines.push('');
-    lines.push('Примечание: target нормализован — тривиальный тренд «длина N ↔ длина x»');
-    lines.push('вычтен. Если сигнал остался, он не объясняется длиной N.');
+    lines.push('Примечание: если сигнал есть, он должен проявляться ВНУТРИ режима,');
+    lines.push('где длина N и режим фиксированы. Тогда это кандидат в закономерность.');
 
     return lines.join('\n');
   }
