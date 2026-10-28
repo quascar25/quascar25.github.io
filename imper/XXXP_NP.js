@@ -474,37 +474,41 @@
     const results = { prime: [], composite: [] };
 
     for (let t = 0; t < trials; t++) {
-      // Простые x,y
-      const xp = randomPrime(20);
-      const yp = randomPrime(20);
+      // Простые x,y — гарантируем РАЗНЫЕ
+      let xp = randomPrime(20);
+      let yp = randomPrime(20);
+      let guard = 0;
+      while (yp === xp && guard++ < 100) yp = randomPrime(20);
+
       const Np = xp * yp;
-      // φ(N) для простых x,y: (x-1)(y-1) = N - (x+y) + 1
-      // Отсюда: x+y = N - φ(N) + 1. Но φ(N) мы НЕ знаем — вычисляем через x,y.
+      // φ(N) для РАЗНЫХ простых: (x-1)(y-1) — вычисляем НАПРЯМУЮ, без факторизации
       const phi = (xp - 1) * (yp - 1);
       const sum = Np - phi + 1; // = x+y
-      // Решаем t^2 - sum*t + N = 0
       const disc = sum * sum - 4 * Np;
       const sqrtDisc = Math.sqrt(disc);
       const xRec = (sum + sqrtDisc) / 2;
       const yRec = (sum - sqrtDisc) / 2;
-      // Ошибка восстановления
       const err = Math.abs(xRec - xp) / xp + Math.abs(yRec - yp) / yp;
       results.prime.push(err);
     }
 
     for (let t = 0; t < trials; t++) {
-      // Составные x,y
       let xc, yc;
       do { xc = randInt(2**19, 2**20); } while (isPrime(xc));
       do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
+      // гарантируем взаимную простоту (иначе формула φ(xy)=φ(x)φ(y) неверна)
+      let guard = 0;
+      while (gcd(xc, yc) !== 1 && guard++ < 100) {
+        do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
+      }
       const Nc = xc * yc;
-      // φ(N) для составных вычисляем честно через факторизацию (медленно, но для теста ок)
-      const phi = eulerPhi(Nc);
+      // φ(N) через известные x,y (НЕ через факторизацию N!)
+      const phi = eulerPhi(xc) * eulerPhi(yc);
       const sum = Nc - phi + 1;
       const disc = sum * sum - 4 * Nc;
       let err;
       if (disc < 0) {
-        err = 1; // восстановление невозможно
+        err = 1;
       } else {
         const sqrtDisc = Math.sqrt(disc);
         const xRec = (sum + sqrtDisc) / 2;
