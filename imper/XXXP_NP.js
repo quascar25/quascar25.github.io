@@ -113,10 +113,29 @@
   }
 
   function modularFeatures(N) {
-    return {
-      mod3: N % 3, mod7: N % 7, mod9: N % 9, mod11: N % 11,
-      mod13: N % 13, mod37: N % 37, mod101: N % 101
-    };
+    const smallPrimes = [3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101];
+    const f = {};
+    for (const p of smallPrimes) {
+      f['mod' + p] = N % p;
+    }
+    // Квадратичные вычеты: символ Лежандра для нескольких простых
+    // (N/p) = N^((p-1)/2) mod p, значения: 0, 1, p-1
+    for (const p of [3,5,7,11,13,17,19,23,29,31]) {
+      let leg;
+      if (N % p === 0) leg = 0;
+      else {
+        // быстрое возведение в степень по модулю
+        let base = N % p, exp = (p - 1) / 2, res = 1;
+        while (exp > 0) {
+          if (exp & 1) res = (res * base) % p;
+          base = (base * base) % p;
+          exp >>= 1;
+        }
+        leg = res === 1 ? 1 : -1;
+      }
+      f['leg' + p] = leg;
+    }
+    return f;
   }
 
   function bitFeatures(N) {
