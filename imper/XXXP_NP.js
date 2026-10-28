@@ -353,5 +353,116 @@
     return lines.join('\n');
   }
 
-  window.XXXP_NP = { generate, findSymmetry };
+    // ---------- Закладка 2: SEARCH FOR FORM ----------
+  function formTask() {
+    return [
+      '=== SEARCH FOR FORM ===',
+      '',
+      'Постановка задачи (не «симметрия цифр», а структура):',
+      '',
+      'Дано: N = x*y, x,y неизвестны.',
+      'Цель: найти функцию F(N), которая:',
+      '  1) инвариантна относительно выбора множителя (F(N) не зависит от того,',
+      '     какой из x,y назван «первым»);',
+      '  2) различает пары (x,y) с одинаковым N сильнее, чем случайная догадка;',
+      '  3) вычислима за полином от log N.',
+      '',
+      'Ключевое отличие от «симметрии цифр»:',
+      '  Цифры N — это запись в позиционной системе, она НЕ согласована с умножением.',
+      '  N mod 10 не связан с x mod 10 и y mod 10 (кроме mod 2 и mod 5).',
+      '  Поэтому искать надо в структуре мультипликативной группы Z_N*,',
+      '  а не в десятичных цифрах.',
+      '',
+      'Кандидаты в F(N):',
+      '  - порядок группы Z_N* = φ(N);',
+      '  - длина периода N по модулю малых простых;',
+      '  - символ Лежандра (N/p) для многих p;',
+      '  - приближённое отношение x/y через непрерывные дроби √N;',
+      '  - спектр оператора умножения на N в Z_N*.',
+      '',
+      'Эксперимент ниже проверяет первую гипотезу:',
+      '  «каноническая форма» — нормировка N на его НОД с малыми простыми,',
+      '  и проверка, различает ли она x и y лучше, чем случайность.'
+    ].join('\n');
+  }
+
+  function formExperiment() {
+    // Берём пары с общим множителем и без, считаем «каноническую форму»
+    // как вектор (N mod p) по малым простым, нормированный на gcd(N,p).
+    // Проверяем: различает ли этот вектор x и y (т.е. асимметрию).
+    const smallPrimes = [3,5,7,11,13,17,19,23,29,31,37,41,43,47];
+    const results = [];
+
+    for (let trial = 0; trial < 200; trial++) {
+      // генерируем пару с общим множителем
+      const g = randInt(2, 50);
+      const x = g * randInt(2**20, 2**22);
+      const y = g * randInt(2**20, 2**22);
+      const N = x * y;
+
+      // каноническая форма: N mod p, нормированный на gcd(N,p)
+      const vec = smallPrimes.map(p => {
+        const gnp = gcd(N % p === 0 ? p : N % p, p);
+        return gnp === 0 ? 0 : (N % p) / gnp;
+      });
+
+      // асимметрия x,y
+      const asym = Math.log2(x) - Math.log2(y);
+
+      // корреляция между компонентами vec и asym
+      results.push({ vec, asym });
+    }
+
+    // Считаем корреляцию Пирсона для каждой компоненты
+    const n = results.length;
+    const meanAsym = results.reduce((s,r)=>s+r.asym,0)/n;
+    const varAsym = results.reduce((s,r)=>s+(r.asym-meanAsym)**2,0)/n;
+
+    const corrs = smallPrimes.map((p, idx) => {
+      const comp = results.map(r => r.vec[idx]);
+      const meanC = comp.reduce((s,v)=>s+v,0)/n;
+      const varC = comp.reduce((s,v)=>s+(v-meanC)**2,0)/n;
+      if (varC === 0) return { p, corr: 0 };
+      let cov = 0;
+      for (let i = 0; i < n; i++) cov += (comp[i]-meanC)*(results[i].asym-meanAsym);
+      cov /= n;
+      return { p, corr: cov / Math.sqrt(varC*varAsym) };
+    });
+
+    corrs.sort((a,b)=>Math.abs(b.corr)-Math.abs(a.corr));
+
+    const lines = [];
+    lines.push('=== ЭКСПЕРИМЕНТ: КАНОНИЧЕСКАЯ ФОРМА ===');
+    lines.push('');
+    lines.push('Гипотеза: вектор (N mod p)/gcd(N mod p, p) по малым p');
+    lines.push('коррелирует с асимметрией log2(x) - log2(y).');
+    lines.push('');
+    lines.push('Корреляции (по убыванию |r|):');
+    for (const c of corrs.slice(0, 8)) {
+      lines.push(`  p=${String(c.p).padStart(3)}  r = ${c.corr.toFixed(4)}`);
+    }
+    lines.push('');
+    const maxCorr = Math.abs(corrs[0].corr);
+    lines.push(`Максимальная |r|: ${maxCorr.toFixed(4)}`);
+    lines.push('');
+    if (maxCorr > 0.3) {
+      lines.push('>>> ВЕРДИКТ: ЕСТЬ КОРРЕЛЯЦИЯ');
+      lines.push('    Каноническая форма различает x и y сильнее случайного.');
+      lines.push('    Это кандидат в F(N), требует проверки на больших N.');
+    } else if (maxCorr > 0.1) {
+      lines.push('>>> ВЕРДИКТ: СЛАБАЯ КОРРЕЛЯЦИЯ');
+      lines.push('    Возможно, сигнал есть, но выборка мала (200 пар).');
+    } else {
+      lines.push('>>> ВЕРДИКТ: КОРРЕЛЯЦИИ НЕТ');
+      lines.push('    Каноническая форма по малым простым не различает x и y.');
+      lines.push('    Искать нужно в другом инварианте (порядок Z_N*, спектр).');
+    }
+    lines.push('');
+    lines.push('Примечание: это проверка одной гипотезы, а не доказательство.');
+    lines.push('Отрицательный результат тоже ценен: он сужает область поиска.');
+
+    return lines.join('\n');
+  }
+
+  window.XXXP_NP = { generate, findSymmetry, formTask, formExperiment };
 })();
