@@ -503,11 +503,16 @@
       const xRec = (S + sqrtD) / 2n;
       const yRec = (S - sqrtD) / 2n;
 
-      // относительная ошибка в BigInt-арифметике (масштаб 1e6)
-      const ex = xRec > BigInt(xp) ? xRec - BigInt(xp) : BigInt(xp) - xRec;
-      const ey = yRec > BigInt(yp) ? yRec - BigInt(yp) : BigInt(yp) - yRec;
-      const err = Number(ex * 1000000n / BigInt(xp)) / 1000000 +
-                  Number(ey * 1000000n / BigInt(yp)) / 1000000;
+      // сравниваем как множества: min/max с обеих сторон
+      const recMin = xRec < yRec ? xRec : yRec;
+      const recMax = xRec < yRec ? yRec : xRec;
+      const trueMin = BigInt(Math.min(xp, yp));
+      const trueMax = BigInt(Math.max(xp, yp));
+
+      const eMin = recMin > trueMin ? recMin - trueMin : trueMin - recMin;
+      const eMax = recMax > trueMax ? recMax - trueMax : trueMax - recMax;
+      const err = Number(eMin * 1000000n / trueMin) / 1000000 +
+                  Number(eMax * 1000000n / trueMax) / 1000000;
       results.prime.push(err);
     }
 
@@ -536,10 +541,17 @@
         const sqrtD = BigInt(Math.round(Math.sqrt(Number(D))));
         const xRec = (S + sqrtD) / 2n;
         const yRec = (S - sqrtD) / 2n;
-        const ex = xRec > BigInt(xc) ? xRec - BigInt(xc) : BigInt(xc) - xRec;
-        const ey = yRec > BigInt(yc) ? yRec - BigInt(yc) : BigInt(yc) - yRec;
-        err = Number(ex * 1000000n / BigInt(xc)) / 1000000 +
-              Number(ey * 1000000n / BigInt(yc)) / 1000000;
+
+      // сравниваем как множества: min/max с обеих сторон
+      const recMin = xRec < yRec ? xRec : yRec;
+      const recMax = xRec < yRec ? yRec : xRec;
+      const trueMin = BigInt(Math.min(xc, yc));
+      const trueMax = BigInt(Math.max(xc, yc));
+
+      const eMin = recMin > trueMin ? recMin - trueMin : trueMin - recMin;
+      const eMax = recMax > trueMax ? recMax - trueMax : trueMax - recMax;
+      const err = Number(eMin * 1000000n / trueMin) / 1000000 +
+                  Number(eMax * 1000000n / trueMax) / 1000000;
       }
       results.composite.push(err);
     }
