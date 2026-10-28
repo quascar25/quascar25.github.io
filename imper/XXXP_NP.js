@@ -606,5 +606,108 @@
     return result;
   }
 
-  window.XXXP_NP = { generate, findSymmetry, formTask, formExperiment, formStructure };
+
+
+  // ---------- ЧЕТВЁРТАЯ КНОПКА: ПРОВЕРКА КАНДИДАТА ----------
+  // Сюда вставляется формула-кандидат F(N) -> {x, y} или -> {sum, product}.
+  // Пока — заглушка. Когда ИИ даст формулу, замените тело candidateRecover.
+  function candidateRecover(N) {
+    // ВХОД: N (BigInt)
+    // ВЫХОД: { x: BigInt, y: BigInt } — восстановленные множители,
+    //        либо null, если формула не применима.
+    //
+    // ПРИМЕР ЗАГОТОВКИ (не работает для общих N, только для простых x,y):
+    //   const phi = ...;  // если формула даёт φ(N)
+    //   const S = N - phi + 1n;
+    //   const D = S*S - 4n*N;
+    //   ...
+    //
+    // ПОКА: возвращаем null — «кандидат не задан».
+    return null;
+  }
+
+  function formCandidate() {
+    if (!state.dataset) return '> Сначала сгенерируйте данные (кнопка «ГЕНЕРАТОР ЗНАЧЕНИЙ»).';
+
+    // Проверяем кандидата на ТРЁХ наборах:
+    //   1) простые x,y      — эталон: ошибка должна быть ~0, если формула верна
+    //   2) составные x,y    — цель: здесь формула должна работать, если она решает задачу
+    //   3) гладкие x,y      — промежуточный случай
+
+    const sets = [
+      { name: 'простые x,y',   gen: () => [randomPrime(20), randomPrime(20)] },
+      { name: 'составные x,y', gen: () => {
+          let a, b;
+          do { a = randInt(2**19, 2**20); } while (isPrime(a));
+          do { b = randInt(2**19, 2**20); } while (isPrime(b));
+          return [a, b];
+        } },
+      { name: 'гладкие x,y',   gen: () => {
+          const small = [2,3,5,7,11,13];
+          let a = 1, b = 1;
+          while (bitLength(a) < 20) a *= small[randInt(0, small.length-1)];
+          while (bitLength(b) < 20) b *= small[randInt(0, small.length-1)];
+          return [a, b];
+        } }
+    ];
+
+    const trials = 100;
+    const lines = [];
+    lines.push('=== ПРОВЕРКА КАНДИДАТА ===');
+    lines.push('');
+    lines.push('Формула-кандидат: candidateRecover(N) -> {x, y}');
+    lines.push('Эталон: структура φ(N) даёт ошибку 0 для простых, ~4e5 для составных.');
+    lines.push('Кандидат считается решающим задачу, если ошибка ~0 И для составных.');
+    lines.push('');
+
+    let anyWorked = false;
+
+    for (const s of sets) {
+      let sumErr = 0, ok = 0, notApplied = 0;
+      for (let t = 0; t < trials; t++) {
+        const [x, y] = s.gen();
+        const N = BigInt(x) * BigInt(y);
+        let rec;
+        try { rec = candidateRecover(N); }
+        catch (e) { rec = null; }
+        if (!rec || rec.x == null || rec.y == null) { notApplied++; continue; }
+        // сравниваем как множества
+        const recMin = rec.x < rec.y ? rec.x : rec.y;
+        const recMax = rec.x < rec.y ? rec.y : rec.x;
+        const trueMin = BigInt(Math.min(x, y));
+        const trueMax = BigInt(Math.max(x, y));
+        const eMin = recMin > trueMin ? recMin - trueMin : trueMin - recMin;
+        const eMax = recMax > trueMax ? recMax - trueMax : trueMax - recMax;
+        const err = Number(eMin * 1000000n / trueMin) / 1000000 +
+                    Number(eMax * 1000000n / trueMax) / 1000000;
+        sumErr += err;
+        if (err < 1e-6) ok++;
+      }
+      const applied = trials - notApplied;
+      const meanErr = applied > 0 ? sumErr / applied : Infinity;
+
+      lines.push(`Набор: ${s.name}`);
+      lines.push(`  применимо: ${applied}/${trials}   точно (<1e-6): ${ok}/${applied}   средняя ошибка: ${applied > 0 ? meanErr.toExponential(3) : '—'}`);
+      if (ok > 0) anyWorked = true;
+      lines.push('');
+    }
+
+    if (!anyWorked) {
+      lines.push('>>> ВЕРДИКТ: КАНДИДАТ НЕ ЗАДАН ИЛИ НЕ РАБОТАЕТ');
+      lines.push('    candidateRecover(N) возвращает null — формула ещё не вставлена.');
+      lines.push('    Когда ИИ даст формулу, замените тело candidateRecover.');
+    } else {
+      lines.push('>>> ВЕРДИКТ: КАНДИДАТ РАБОТАЕТ НА ЧАСТИ НАБОРОВ');
+      lines.push('    Смотрите, на каких наборах ошибка ~0, а на каких — большая.');
+      lines.push('    Решение задачи = ошибка ~0 И на составных x,y.');
+    }
+    lines.push('');
+    lines.push('Примечание: эталон — φ(N): 0 для простых, ~4e5 для составных.');
+    lines.push('Кандидат, дающий 0 и там, и там, — это и есть искомый аппарат.');
+
+    return lines.join('\n');
+  }
+
+  window.XXXP_NP = { generate, findSymmetry, formTask, formExperiment, formStructure, formCandidate };
+
 })();
