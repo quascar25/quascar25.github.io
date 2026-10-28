@@ -465,55 +465,64 @@
   }
 
   function formStructure() {
-    // Проверяем: для простых x,y пара (N, φ(N)) даёт x+y и xy,
-    // значит x и y восстанавливаются решением квадратного уравнения.
-    // Это РЕАЛЬНАЯ структура — сигнал должен быть сильным.
-    // Сравниваем с составными x,y, где φ(N) так просто не работает.
-
     const trials = 200;
     const results = { prime: [], composite: [] };
 
+    // ---------- ПРОСТЫЕ x,y ----------
     for (let t = 0; t < trials; t++) {
-      // Простые x,y — гарантируем РАЗНЫЕ
       let xp = randomPrime(20);
       let yp = randomPrime(20);
       let guard = 0;
       while (yp === xp && guard++ < 100) yp = randomPrime(20);
 
-      const Np = xp * yp;
-      // φ(N) для РАЗНЫХ простых: (x-1)(y-1) — вычисляем НАПРЯМУЮ, без факторизации
-      const phi = (xp - 1) * (yp - 1);
-      const sum = Np - phi + 1; // = x+y
-      const disc = sum * sum - 4 * Np;
-      const sqrtDisc = Math.sqrt(disc);
-      const xRec = (sum + sqrtDisc) / 2;
-      const yRec = (sum - sqrtDisc) / 2;
-      const err = Math.abs(xRec - xp) / xp + Math.abs(yRec - yp) / yp;
+      const Np = BigInt(xp) * BigInt(yp);
+      // φ(N) для РАЗНЫХ простых: (x-1)(y-1), вычисляем напрямую
+      const phi = BigInt(xp - 1) * BigInt(yp - 1);
+      const S = Np - phi + 1n;          // x+y, точно
+      const D = S * S - 4n * Np;        // (x-y)^2, точно в BigInt
+
+      // извлекаем корень: D ~ (x-y)^2 ~ 2^40, Number безопасен
+      const sqrtD = BigInt(Math.round(Math.sqrt(Number(D))));
+      const xRec = (S + sqrtD) / 2n;
+      const yRec = (S - sqrtD) / 2n;
+
+      // относительная ошибка в BigInt-арифметике (масштаб 1e6)
+      const ex = xRec > BigInt(xp) ? xRec - BigInt(xp) : BigInt(xp) - xRec;
+      const ey = yRec > BigInt(yp) ? yRec - BigInt(yp) : BigInt(yp) - yRec;
+      const err = Number(ex * 1000000n / BigInt(xp)) / 1000000 +
+                  Number(ey * 1000000n / BigInt(yp)) / 1000000;
       results.prime.push(err);
     }
 
+    // ---------- СОСТАВНЫЕ x,y (взаимно простые) ----------
     for (let t = 0; t < trials; t++) {
       let xc, yc;
       do { xc = randInt(2**19, 2**20); } while (isPrime(xc));
       do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
-      // гарантируем взаимную простоту (иначе формула φ(xy)=φ(x)φ(y) неверна)
+      // гарантируем взаимную простоту: иначе φ(xy) ≠ φ(x)φ(y)
       let guard = 0;
       while (gcd(xc, yc) !== 1 && guard++ < 100) {
         do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
       }
-      const Nc = xc * yc;
+
+      const Nc = BigInt(xc) * BigInt(yc);
       // φ(N) через известные x,y (НЕ через факторизацию N!)
-      const phi = eulerPhi(xc) * eulerPhi(yc);
-      const sum = Nc - phi + 1;
-      const disc = sum * sum - 4 * Nc;
+      const phi = BigInt(eulerPhi(xc)) * BigInt(eulerPhi(yc));
+      const S = Nc - phi + 1n;
+      const D = S * S - 4n * Nc;
+
       let err;
-      if (disc < 0) {
+      if (D < 0n) {
+        // восстановление невозможно — формула S = N - φ + 1 неверна для составных
         err = 1;
       } else {
-        const sqrtDisc = Math.sqrt(disc);
-        const xRec = (sum + sqrtDisc) / 2;
-        const yRec = (sum - sqrtDisc) / 2;
-        err = Math.abs(xRec - xc) / xc + Math.abs(yRec - yc) / yc;
+        const sqrtD = BigInt(Math.round(Math.sqrt(Number(D))));
+        const xRec = (S + sqrtD) / 2n;
+        const yRec = (S - sqrtD) / 2n;
+        const ex = xRec > BigInt(xc) ? xRec - BigInt(xc) : BigInt(xc) - xRec;
+        const ey = yRec > BigInt(yc) ? yRec - BigInt(yc) : BigInt(yc) - yRec;
+        err = Number(ex * 1000000n / BigInt(xc)) / 1000000 +
+              Number(ey * 1000000n / BigInt(yc)) / 1000000;
       }
       results.composite.push(err);
     }
@@ -529,25 +538,27 @@
     lines.push('которая решается квадратным уравнением за полином.');
     lines.push('Для составных x,y это НЕ работает так просто.');
     lines.push('');
+    lines.push('Все вычисления — в BigInt (без потери точности double).');
+    lines.push('');
     lines.push('Средняя относительная ошибка восстановления x,y:');
     lines.push(`  простые x,y:    ${meanPrime.toExponential(3)}`);
     lines.push(`  составные x,y:  ${meanComp.toExponential(3)}`);
     lines.push('');
-    if (meanPrime < 1e-10 && meanComp > 1e-3) {
+    if (meanPrime < 1e-9 && meanComp > 1e-3) {
       lines.push('>>> ВЕРДИКТ: СТРУКТУРА ЕСТЬ (как и ожидалось)');
       lines.push('    Для простых x,y восстановление точное — это реальная структура,');
       lines.push('    а не шум. Для составных — не работает без факторизации.');
       lines.push('    Это подтверждает: сигнал надо искать в структуре, а не в цифрах.');
-    } else if (meanPrime < 1e-10) {
+    } else if (meanPrime < 1e-9) {
       lines.push('>>> ВЕРДИКТ: СТРУКТУРА ЕСТЬ для простых, но и для составных тоже.');
       lines.push('    Проверьте, не упростилась ли задача.');
     } else {
       lines.push('>>> ВЕРДИКТ: ЧТО-ТО НЕ ТАК');
-      lines.push('    Восстановление для простых не точное — проверьте eulerPhi.');
+      lines.push('    Восстановление для простых не точное — проверьте BigInt-арифметику.');
     }
     lines.push('');
     lines.push('Вывод: этот эксперимент — контрольный. Он показывает, как выглядит');
-    lines.push('РЕАЛЬНЫЙ сигнал (ошибка ~1e-12) в отличие от шума (r ~ 0.14).');
+    lines.push('РЕАЛЬНЫЙ сигнал (ошибка ~0) в отличие от шума (r ~ 0.14).');
     lines.push('Искать нужно структуру, дающую такую же точность за полином.');
 
     return lines.join('\n');
