@@ -259,7 +259,7 @@
 
     const featNames = Object.keys(train[0].feat);
 
-    // Baseline: предсказание средним
+    // Baseline: предсказание средним (на нормализованном target)
     const baselineR2 = r2({ leaf: true, value: mean(train) }, test);
 
     // Дерево глубины 3
@@ -267,14 +267,14 @@
     const trainR2 = r2(tree, train);
     const testR2 = r2(tree, test);
 
-    // Важность признаков (по числу использований)
+    // Важность признаков
     const importance = {};
     (function walk(t) {
       if (t.leaf) return;
       importance[t.f] = (importance[t.f] || 0) + 1;
       walk(t.left); walk(t.right);
     })(tree);
-    const top = Object.entries(importance).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const top = Object.entries(importance).sort((a,b)=>b[1]-a[1]).slice(0,5);
 
     // Разбивка по режимам
     const perMode = {};
@@ -284,8 +284,10 @@
     }
 
     const lines = [];
-    lines.push('=== СТАТИСТИЧЕСКИЙ АНАЛИЗ ===');
-    lines.push(`Train R²: ${trainR2.toFixed(3)}   Test R²: ${testR2.toFixed(3)}   Baseline (среднее): ${baselineR2.toFixed(3)}`);
+    lines.push('=== СТАТИСТИЧЕСКИЙ АНАЛИЗ (нормализованный target) ===');
+    lines.push('Target: log2(x) - 0.5*log2(N)  — отклонение от тривиального тренда.');
+    lines.push('');
+    lines.push(`Train R²: ${trainR2.toFixed(3)}   Test R²: ${testR2.toFixed(3)}   Baseline: ${baselineR2.toFixed(3)}`);
     lines.push('');
     lines.push('R² по режимам (test):');
     for (const m of MODES) {
@@ -299,26 +301,27 @@
     else top.forEach(([f, c]) => lines.push(`  ${f}: ${c}`));
 
     lines.push('');
-    // Вердикт
     const delta = testR2 - baselineR2;
     const stableModes = Object.values(perMode).filter(v => v > 0.05).length;
+    // Проверка: не является ли топ-признак тривиальным (длина)
+    const trivialTop = top.length > 0 && (top[0][0] === 'bit_length' || top[0][0] === 'digit_count');
 
-    if (delta > 0.1 && stableModes >= 3) {
-      lines.push('>>> ВЕРДИКТ: ЕСТЬ СИГНАЛ');
-      lines.push(`    Устойчивая связь между признаками N и длиной x.`);
+    if (delta > 0.1 && stableModes >= 3 && !trivialTop) {
+      lines.push('>>> ВЕРДИКТ: ЕСТЬ СИГНАЛ (не тривиальный)');
       lines.push(`    ΔR² = ${delta.toFixed(3)}, стабильных режимов: ${stableModes}.`);
+      lines.push(`    Топ-признак: ${top[0] ? top[0][0] : '—'} — не длина N.`);
     } else if (delta > 0.03) {
       lines.push('>>> ВЕРДИКТ: СЛАБЫЙ СИГНАЛ');
       lines.push(`    ΔR² = ${delta.toFixed(3)}, стабильных режимов: ${stableModes}.`);
-      lines.push('    Требуется дополнительная проверка.');
+      if (trivialTop) lines.push('    Внимание: топ-признак — длина N (тривиально).');
     } else {
       lines.push('>>> ВЕРДИКТ: СИГНАЛА НЕТ');
       lines.push(`    ΔR² = ${delta.toFixed(3)} (ниже порога 0.03).`);
-      lines.push('    Устойчивой закономерности не обнаружено.');
+      lines.push('    Устойчивой нетривиальной закономерности не обнаружено.');
     }
     lines.push('');
-    lines.push('Примечание: младшие биты N всегда коррелируют с младшими битами x,y —');
-    lines.push('это известный факт, а не находка. Ищем связь со СТАРШИМИ битами и цифрами.');
+    lines.push('Примечание: target нормализован — тривиальный тренд «длина N ↔ длина x»');
+    lines.push('вычтен. Если сигнал остался, он не объясняется длиной N.');
 
     return lines.join('\n');
   }
