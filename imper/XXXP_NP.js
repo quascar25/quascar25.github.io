@@ -464,5 +464,104 @@
     return lines.join('\n');
   }
 
-  window.XXXP_NP = { generate, findSymmetry, formTask, formExperiment };
+  function formStructure() {
+    // Проверяем: для простых x,y пара (N, φ(N)) даёт x+y и xy,
+    // значит x и y восстанавливаются решением квадратного уравнения.
+    // Это РЕАЛЬНАЯ структура — сигнал должен быть сильным.
+    // Сравниваем с составными x,y, где φ(N) так просто не работает.
+
+    const trials = 200;
+    const results = { prime: [], composite: [] };
+
+    for (let t = 0; t < trials; t++) {
+      // Простые x,y
+      const xp = randomPrime(20);
+      const yp = randomPrime(20);
+      const Np = xp * yp;
+      // φ(N) для простых x,y: (x-1)(y-1) = N - (x+y) + 1
+      // Отсюда: x+y = N - φ(N) + 1. Но φ(N) мы НЕ знаем — вычисляем через x,y.
+      const phi = (xp - 1) * (yp - 1);
+      const sum = Np - phi + 1; // = x+y
+      // Решаем t^2 - sum*t + N = 0
+      const disc = sum * sum - 4 * Np;
+      const sqrtDisc = Math.sqrt(disc);
+      const xRec = (sum + sqrtDisc) / 2;
+      const yRec = (sum - sqrtDisc) / 2;
+      // Ошибка восстановления
+      const err = Math.abs(xRec - xp) / xp + Math.abs(yRec - yp) / yp;
+      results.prime.push(err);
+    }
+
+    for (let t = 0; t < trials; t++) {
+      // Составные x,y
+      let xc, yc;
+      do { xc = randInt(2**19, 2**20); } while (isPrime(xc));
+      do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
+      const Nc = xc * yc;
+      // φ(N) для составных вычисляем честно через факторизацию (медленно, но для теста ок)
+      const phi = eulerPhi(Nc);
+      const sum = Nc - phi + 1;
+      const disc = sum * sum - 4 * Nc;
+      let err;
+      if (disc < 0) {
+        err = 1; // восстановление невозможно
+      } else {
+        const sqrtDisc = Math.sqrt(disc);
+        const xRec = (sum + sqrtDisc) / 2;
+        const yRec = (sum - sqrtDisc) / 2;
+        err = Math.abs(xRec - xc) / xc + Math.abs(yRec - yc) / yc;
+      }
+      results.composite.push(err);
+    }
+
+    const meanPrime = results.prime.reduce((s,v)=>s+v,0)/trials;
+    const meanComp = results.composite.reduce((s,v)=>s+v,0)/trials;
+
+    const lines = [];
+    lines.push('=== ЭКСПЕРИМЕНТ: СТРУКТУРА φ(N) ===');
+    lines.push('');
+    lines.push('Гипотеза: для простых x,y пара (N, φ(N)) даёт систему');
+    lines.push('  x+y = N - φ(N) + 1,  xy = N,');
+    lines.push('которая решается квадратным уравнением за полином.');
+    lines.push('Для составных x,y это НЕ работает так просто.');
+    lines.push('');
+    lines.push('Средняя относительная ошибка восстановления x,y:');
+    lines.push(`  простые x,y:    ${meanPrime.toExponential(3)}`);
+    lines.push(`  составные x,y:  ${meanComp.toExponential(3)}`);
+    lines.push('');
+    if (meanPrime < 1e-10 && meanComp > 1e-3) {
+      lines.push('>>> ВЕРДИКТ: СТРУКТУРА ЕСТЬ (как и ожидалось)');
+      lines.push('    Для простых x,y восстановление точное — это реальная структура,');
+      lines.push('    а не шум. Для составных — не работает без факторизации.');
+      lines.push('    Это подтверждает: сигнал надо искать в структуре, а не в цифрах.');
+    } else if (meanPrime < 1e-10) {
+      lines.push('>>> ВЕРДИКТ: СТРУКТУРА ЕСТЬ для простых, но и для составных тоже.');
+      lines.push('    Проверьте, не упростилась ли задача.');
+    } else {
+      lines.push('>>> ВЕРДИКТ: ЧТО-ТО НЕ ТАК');
+      lines.push('    Восстановление для простых не точное — проверьте eulerPhi.');
+    }
+    lines.push('');
+    lines.push('Вывод: этот эксперимент — контрольный. Он показывает, как выглядит');
+    lines.push('РЕАЛЬНЫЙ сигнал (ошибка ~1e-12) в отличие от шума (r ~ 0.14).');
+    lines.push('Искать нужно структуру, дающую такую же точность за полином.');
+
+    return lines.join('\n');
+  }
+
+  // φ(N) через факторизацию (для теста, N ~ 2^40 — быстро)
+  function eulerPhi(n) {
+    let result = n;
+    let m = n;
+    for (let p = 2; p * p <= m; p++) {
+      if (m % p === 0) {
+        while (m % p === 0) m /= p;
+        result -= result / p;
+      }
+    }
+    if (m > 1) result -= result / m;
+    return result;
+  }
+
+  window.XXXP_NP = { generate, findSymmetry, formTask, formExperiment, formStructure };
 })();
