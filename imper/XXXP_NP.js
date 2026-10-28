@@ -468,6 +468,23 @@
     const trials = 200;
     const results = { prime: [], composite: [] };
 
+
+        // ДИАГНОСТИКА: одна пара, все числа напечатаны
+    const xd = 1000003, yd = 1000033; // два простых
+    const Nd = BigInt(xd) * BigInt(yd);
+    const phid = BigInt(xd - 1) * BigInt(yd - 1);
+    const Sd = Nd - phid + 1n;
+    const Dd = Sd * Sd - 4n * Nd;
+    const sqd = BigInt(Math.round(Math.sqrt(Number(Dd))));
+    const xdRec = (Sd + sqd) / 2n;
+    console.log('DIAG x=', xd, 'y=', yd);
+    console.log('DIAG N=', Nd.toString());
+    console.log('DIAG phi=', phid.toString());
+    console.log('DIAG S=x+y=', Sd.toString(), ' ожидалось', (xd+yd).toString());
+    console.log('DIAG D=', Dd.toString(), ' ожидалось', ((xd-yd)**2).toString());
+    console.log('DIAG sqrtD=', sqd.toString(), ' ожидалось', Math.abs(xd-yd));
+    console.log('DIAG xRec=', xdRec.toString());
+
     // ---------- ПРОСТЫЕ x,y ----------
     for (let t = 0; t < trials; t++) {
       let xp = randomPrime(20);
