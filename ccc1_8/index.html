@@ -4,220 +4,333 @@
 <meta charset="UTF-8">
 <title>1С 8.3 — прототип</title>
 <style>
-  html, body {
-    margin: 0; padding: 0; height: 100%;
-    background: #ffffff;
-    font-family: "Segoe UI", Tahoma, sans-serif;
-    font-size: 14px;
-  }
-
-  /* Верхняя панель кнопок */
-  .toolbar {
-    display: flex;
-    align-items: stretch;
-    gap: 6px;
-    padding: 8px;
-    border-bottom: 2px solid #a8c8e8; /* светло-синяя рамка */
-    background: #f8fbff;
-  }
-
-  /* Кнопка с картинкой 1С */
-  .btn-logo {
-    width: 54px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fffbe6;
-    border: 1px solid #a8c8e8;
-    cursor: pointer;
-  }
-  .btn-logo img {
-    max-width: 44px;
-    max-height: 32px;
-    display: block;
-  }
-  .btn-logo .fallback {
-    font-size: 11px;
-    color: #cc0000;
-    text-align: center;
-    line-height: 1.1;
-  }
-
-  /* Обычные кнопки */
-  .btn {
-    background: #fffbe6;          /* светло-жёлтый */
-    color: #cc0000;               /* красный текст */
-    border: 1px solid #a8c8e8;    /* светло-синяя рамка */
-    padding: 8px 18px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-  .btn:hover {
-    background: #fff4c2;
-    border-color: #7fb0e0;
-  }
-  .btn:active {
-    background: #ffeaa0;
-  }
-
-  /* Рабочая область */
-  .workspace {
-    margin: 10px;
-    border: 1px solid #a8c8e8;
-    min-height: calc(100vh - 120px);
-    background: #ffffff;
-    padding: 14px;
-    overflow: auto;
-  }
-
-  .workspace h2 {
-    margin: 0 0 10px 0;
-    font-size: 16px;
-    color: #2a5a8a;
-  }
-
-  /* Таблица журнала */
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  th, td {
-    border: 1px solid #d0e0f0;
-    padding: 6px 8px;
-    text-align: left;
-  }
-  th {
-    background: #eef5fc;
-    color: #2a5a8a;
-    font-weight: 600;
-  }
-  tr:nth-child(even) td {
-    background: #fafcff;
-  }
-
-  /* Форма прихода */
-  .form-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
-  }
-  .form-row label {
-    min-width: 110px;
-    color: #2a5a8a;
-  }
-  .form-row input, .form-row select {
-    border: 1px solid #a8c8e8;
-    padding: 5px 8px;
-    font-size: 14px;
-    min-width: 200px;
-  }
-
-  /* Строка состояния */
-  .statusbar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 26px;
-    line-height: 26px;
-    padding: 0 10px;
-    border-top: 1px solid #a8c8e8;
-    background: #f8fbff;
-    color: #2a5a8a;
-    font-size: 12px;
-  }
+  html, body { margin:0; padding:0; height:100%; background:#fff;
+    font-family:"Segoe UI", Tahoma, sans-serif; font-size:14px; }
+  .toolbar { display:flex; align-items:stretch; gap:6px; padding:8px;
+    border-bottom:2px solid #a8c8e8; background:#f8fbff; flex-wrap:wrap; }
+  .btn-logo { width:54px; padding:0; display:flex; align-items:center;
+    justify-content:center; background:#fffbe6; border:1px solid #a8c8e8; cursor:pointer; }
+  .btn-logo img { max-width:44px; max-height:32px; display:block; }
+  .btn-logo .fallback { font-size:11px; color:#cc0000; text-align:center; line-height:1.1; }
+  .btn { background:#fffbe6; color:#cc0000; border:1px solid #a8c8e8;
+    padding:8px 16px; cursor:pointer; font-size:14px; font-weight:600; letter-spacing:.3px; }
+  .btn:hover { background:#fff4c2; border-color:#7fb0e0; }
+  .btn:active { background:#ffeaa0; }
+  .workspace { margin:10px; border:1px solid #a8c8e8;
+    min-height:calc(100vh - 130px); background:#fff; padding:14px; overflow:auto; }
+  .workspace h2 { margin:0 0 10px 0; font-size:16px; color:#2a5a8a; }
+  table { border-collapse:collapse; width:100%; }
+  th, td { border:1px solid #d0e0f0; padding:6px 8px; text-align:left; }
+  th { background:#eef5fc; color:#2a5a8a; font-weight:600; }
+  tr:nth-child(even) td { background:#fafcff; }
+  .form-row { display:flex; gap:10px; margin-bottom:8px; align-items:center; }
+  .form-row label { min-width:120px; color:#2a5a8a; }
+  .form-row input, .form-row select { border:1px solid #a8c8e8;
+    padding:5px 8px; font-size:14px; min-width:200px; }
+  .statusbar { position:fixed; bottom:0; left:0; right:0; height:26px;
+    line-height:26px; padding:0 10px; border-top:1px solid #a8c8e8;
+    background:#f8fbff; color:#2a5a8a; font-size:12px; }
+  .line-table th, .line-table td { font-size:13px; padding:4px 6px; }
+  .total { font-weight:700; color:#2a5a8a; }
+  .actions { margin-top:10px; display:flex; gap:8px; }
 </style>
 </head>
 <body>
 
-  <!-- Верхняя панель -->
-  <div class="toolbar">
-    <button class="btn-logo" id="btn-logo" title="Журнал документов">
-      <img src="1с8.3.png" alt="1С"
-           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="fallback" style="display:none;">1С<br>8.3</span>
-    </button>
-    <button class="btn" id="btn-journal">Журнал</button>
-    <button class="btn" id="btn-income">Приход</button>
-  </div>
+<div class="toolbar">
+  <button class="btn-logo" id="btn-logo" title="Журнал документов">
+    <img src="1с8.3.png" alt="1С"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+    <span class="fallback" style="display:none;">1С<br>8.3</span>
+  </button>
+  <button class="btn" id="btn-journal">Журнал</button>
+  <button class="btn" id="btn-income">Приход</button>
+  <button class="btn" id="btn-expense">Расход</button>
+  <button class="btn" id="btn-report">Отчет</button>
+  <button class="btn" id="btn-nom">Номенклатура</button>
+  <button class="btn" id="btn-org">Организации</button>
+  <button class="btn" id="btn-emp">Сотрудники</button>
+</div>
 
-  <!-- Рабочая область -->
-  <div class="workspace" id="workspace">
-    <h2>Журнал документов</h2>
-    <p style="color:#888;">Здесь будет таблица документов (пока пусто).</p>
-  </div>
+<div class="workspace" id="workspace"></div>
+<div class="statusbar" id="statusbar">Готово</div>
 
-  <!-- Строка состояния -->
-  <div class="statusbar" id="statusbar">Готово</div>
-
+<script src="data.js"></script>
 <script>
-  const workspace = document.getElementById('workspace');
-  const statusbar = document.getElementById('statusbar');
+(function () {
+  'use strict';
 
-  function setStatus(text) {
-    statusbar.textContent = text;
+  // ---------- Хранилище: localStorage поверх data.js ----------
+  const LS_KEY = '1c_proto_db_v1';
+  let DB;
+
+  function loadDB() {
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved) { DB = JSON.parse(saved); return; }
+    } catch (e) { /* ignore */ }
+    // копия из data.js
+    DB = JSON.parse(JSON.stringify(window.DB));
+    saveDB();
+  }
+  function saveDB() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(DB)); } catch (e) {}
   }
 
+  function nextId(arr) {
+    return arr.reduce((m, x) => Math.max(m, x.id), 0) + 1;
+  }
+
+  // ---------- Утилиты ----------
+  const ws = document.getElementById('workspace');
+  const sb = document.getElementById('statusbar');
+  const setStatus = t => { sb.textContent = t; };
+  const esc = s => String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const fmt = n => (Number(n) || 0).toLocaleString('ru-RU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const today = () => new Date().toISOString().slice(0,10);
+
+  // ---------- Журнал ----------
   function showJournal() {
-    workspace.innerHTML = `
+    const docs = DB.documents.slice().sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+    let rows = '';
+    if (!docs.length) {
+      rows = `<tr><td colspan="6" style="color:#888;text-align:center;">Нет документов</td></tr>`;
+    } else {
+      for (const d of docs) {
+        const org = DB.organizations.find(o => o.id === d.orgId);
+        rows += `<tr>
+          <td>${esc(d.date)}</td>
+          <td>${esc(d.type)}</td>
+          <td>${esc(org ? org.name : '—')}</td>
+          <td>${d.lines.length}</td>
+          <td class="total">${fmt(d.total)}</td>
+          <td><button class="btn" style="padding:2px 8px;font-size:12px;"
+                onclick="window.__delDoc(${d.id})">Удалить</button></td>
+        </tr>`;
+      }
+    }
+    ws.innerHTML = `
       <h2>Журнал документов</h2>
       <table>
-        <thead>
-          <tr>
-            <th>Дата</th>
-            <th>Тип</th>
-            <th>Номенклатура</th>
-            <th>Количество</th>
-            <th>Сумма</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="5" style="color:#888; text-align:center;">Нет документов</td></tr>
-        </tbody>
-      </table>
-    `;
-    setStatus('Журнал документов открыт');
+        <thead><tr>
+          <th>Дата</th><th>Тип</th><th>Организация</th>
+          <th>Позиций</th><th>Сумма</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    setStatus(`Журнал: ${docs.length} документ(ов)`);
   }
 
-  function showIncome() {
-    workspace.innerHTML = `
-      <h2>Приход</h2>
-      <div class="form-row">
-        <label>Дата:</label>
-        <input type="date" id="inc-date">
-      </div>
+  window.__delDoc = function (id) {
+    if (!confirm('Удалить документ?')) return;
+    DB.documents = DB.documents.filter(d => d.id !== id);
+    saveDB(); showJournal();
+  };
+
+  // ---------- Форма документа (Приход/Расход) ----------
+  function showDocForm(type) {
+    const orgOptions = DB.organizations.map(o =>
+      `<option value="${o.id}">${esc(o.name)}</option>`).join('');
+    const empOptions = DB.employees.map(e =>
+      `<option value="${e.id}">${esc(e.name)}</option>`).join('');
+    const nomOptions = DB.nomenclature.map(n =>
+      `<option value="${n.id}">${esc(n.name)} (${esc(n.unit)})</option>`).join('');
+
+    ws.innerHTML = `
+      <h2>${type}</h2>
+      <div class="form-row"><label>Дата:</label>
+        <input type="date" id="doc-date" value="${today()}"></div>
+      <div class="form-row"><label>Организация:</label>
+        <select id="doc-org">${orgOptions}</select></div>
+      <div class="form-row"><label>Сотрудник:</label>
+        <select id="doc-emp">${empOptions}</select></div>
+
+      <h2 style="margin-top:16px;">Табличная часть</h2>
       <div class="form-row">
         <label>Номенклатура:</label>
-        <input type="text" id="inc-nom" placeholder="Название">
+        <select id="line-nom">${nomOptions}</select>
+        <label style="min-width:auto;">Кол-во:</label>
+        <input type="number" id="line-qty" value="1" min="0.001" step="0.001" style="min-width:100px;">
+        <label style="min-width:auto;">Цена:</label>
+        <input type="number" id="line-price" value="0" min="0" step="0.01" style="min-width:120px;">
+        <button class="btn" id="btn-add-line">Добавить</button>
       </div>
-      <div class="form-row">
-        <label>Количество:</label>
-        <input type="number" id="inc-qty" value="1" min="1">
-      </div>
-      <div class="form-row">
-        <label>Сумма:</label>
-        <input type="number" id="inc-sum" value="0" min="0" step="0.01">
-      </div>
-      <div class="form-row">
-        <button class="btn" id="btn-save-income">Сохранить (заглушка)</button>
+
+      <table class="line-table" id="lines-table">
+        <thead><tr>
+          <th>Номенклатура</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="actions">
+        <button class="btn" id="btn-save-doc">Провести и сохранить</button>
+        <button class="btn" id="btn-cancel-doc">Отмена</button>
       </div>
     `;
-    setStatus('Форма прихода открыта');
 
-    document.getElementById('btn-save-income').addEventListener('click', () => {
-      setStatus('Сохранение пока не реализовано (нет базы)');
-      alert('Сохранение пока не реализовано — это только прототип интерфейса.');
+    const lines = []; // {nomId, qty, price}
+    const tbody = ws.querySelector('#lines-table tbody');
+
+    function renderLines() {
+      if (!lines.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:#888;text-align:center;">Нет строк</td></tr>`;
+        return;
+      }
+      let total = 0;
+      tbody.innerHTML = lines.map((l, i) => {
+        const nom = DB.nomenclature.find(n => n.id === l.nomId);
+        const sum = l.qty * l.price;
+        total += sum;
+        return `<tr>
+          <td>${esc(nom ? nom.name : '?')}</td>
+          <td>${l.qty}</td>
+          <td>${fmt(l.price)}</td>
+          <td>${fmt(sum)}</td>
+          <td><button class="btn" style="padding:2px 8px;font-size:12px;"
+                onclick="window.__delLine(${i})">×</button></td>
+        </tr>`;
+      }).join('') +
+      `<tr><td colspan="3" class="total" style="text-align:right;">Итого:</td>
+         <td class="total">${fmt(total)}</td><td></td></tr>`;
+    }
+
+    window.__delLine = function (i) {
+      lines.splice(i, 1); renderLines();
+    };
+
+    ws.querySelector('#btn-add-line').addEventListener('click', () => {
+      const nomId = +ws.querySelector('#line-nom').value;
+      const qty = parseFloat(ws.querySelector('#line-qty').value) || 0;
+      const price = parseFloat(ws.querySelector('#line-price').value) || 0;
+      if (qty <= 0) { alert('Количество должно быть > 0'); return; }
+      lines.push({ nomId, qty, price });
+      renderLines();
+      ws.querySelector('#line-qty').value = 1;
+      ws.querySelector('#line-price').value = 0;
     });
+
+    ws.querySelector('#btn-cancel-doc').addEventListener('click', showJournal);
+
+    ws.querySelector('#btn-save-doc').addEventListener('click', () => {
+      if (!lines.length) { alert('Добавьте хотя бы одну строку'); return; }
+      const date = ws.querySelector('#doc-date').value || today();
+      const orgId = +ws.querySelector('#doc-org').value;
+      const empId = +ws.querySelector('#doc-emp').value;
+      const total = lines.reduce((s, l) => s + l.qty * l.price, 0);
+      DB.documents.push({
+        id: nextId(DB.documents),
+        type, date, orgId, empId,
+        lines: lines.map(l => ({ nomId: l.nomId, qty: l.qty, price: l.price, sum: l.qty * l.price })),
+        total
+      });
+      saveDB();
+      setStatus(`${type} сохранён`);
+      showJournal();
+    });
+
+    renderLines();
+    setStatus(`Форма: ${type}`);
   }
 
+  // ---------- Отчёт ----------
+  function showReport() {
+    ws.innerHTML = `
+      <h2>Отчёт «Приход / Расход»</h2>
+      <div class="form-row">
+        <label>С даты:</label><input type="date" id="rep-from" value="">
+        <label style="min-width:auto;">По дату:</label><input type="date" id="rep-to" value="">
+        <button class="btn" id="btn-rep-run">Сформировать</button>
+      </div>
+      <div id="rep-result"></div>
+    `;
+    const run = () => {
+      const from = ws.querySelector('#rep-from').value;
+      const to = ws.querySelector('#rep-to').value;
+      let inc = 0, exp = 0, nInc = 0, nExp = 0;
+      for (const d of DB.documents) {
+        if (from && d.date < from) continue;
+        if (to && d.date > to) continue;
+        if (d.type === 'Приход') { inc += d.total; nInc++; }
+        else if (d.type === 'Расход') { exp += d.total; nExp++; }
+      }
+      ws.querySelector('#rep-result').innerHTML = `
+        <table style="max-width:520px;margin-top:12px;">
+          <thead><tr><th>Показатель</th><th>Кол-во док.</th><th>Сумма</th></tr></thead>
+          <tbody>
+            <tr><td>Приход</td><td>${nInc}</td><td class="total">${fmt(inc)}</td></tr>
+            <tr><td>Расход</td><td>${nExp}</td><td class="total">${fmt(exp)}</td></tr>
+            <tr><td>Сальдо</td><td>—</td><td class="total">${fmt(inc - exp)}</td></tr>
+          </tbody>
+        </table>`;
+      setStatus(`Отчёт: приход ${fmt(inc)}, расход ${fmt(exp)}`);
+    };
+    ws.querySelector('#btn-rep-run').addEventListener('click', run);
+    run();
+    setStatus('Отчёт открыт');
+  }
+
+  // ---------- Справочники ----------
+  function showCatalog(kind) {
+    const titles = { nomenclature: 'Номенклатура', organizations: 'Организации', employees: 'Сотрудники' };
+    const cols = {
+      nomenclature: [['name','Наименование'],['unit','Ед. изм.']],
+      organizations: [['name','Наименование'],['inn','ИНН']],
+      employees: [['name','ФИО'],['position','Должность']]
+    };
+    const arr = DB[kind];
+    const c = cols[kind];
+
+    let head = c.map(([k, t]) => `<th>${t}</th>`).join('');
+    let rows = arr.map(item =>
+      `<tr>${c.map(([k]) => `<td>${esc(item[k])}</td>`).join('')}
+        <td><button class="btn" style="padding:2px 8px;font-size:12px;"
+              onclick="window.__delCat('${kind}',${item.id})">Удалить</button></td></tr>`
+    ).join('');
+    if (!arr.length) rows = `<tr><td colspan="${c.length+1}" style="color:#888;text-align:center;">Пусто</td></tr>`;
+
+    const inputs = c.map(([k, t]) =>
+      `<div class="form-row"><label>${t}:</label><input id="new-${k}" type="text"></div>`).join('');
+
+    ws.innerHTML = `
+      <h2>${titles[kind]}</h2>
+      <table><thead><tr>${head}<th></th></tr></thead><tbody>${rows}</tbody></table>
+      <h2 style="margin-top:18px;">Добавить</h2>
+      ${inputs}
+      <button class="btn" id="btn-add-cat">Добавить</button>
+    `;
+
+    ws.querySelector('#btn-add-cat').addEventListener('click', () => {
+      const obj = { id: nextId(arr) };
+      for (const [k] of c) obj[k] = ws.querySelector('#new-' + k).value.trim();
+      if (!obj[c[0][0]]) { alert('Заполните первое поле'); return; }
+      arr.push(obj); saveDB(); showCatalog(kind);
+    });
+
+    window.__delCat = function (k, id) {
+      if (!confirm('Удалить запись?')) return;
+      DB[k] = DB[k].filter(x => x.id !== id);
+      saveDB(); showCatalog(k);
+    };
+
+    setStatus(`${titles[kind]}: ${arr.length} записей`);
+  }
+
+  // ---------- Кнопки ----------
   document.getElementById('btn-logo').addEventListener('click', showJournal);
   document.getElementById('btn-journal').addEventListener('click', showJournal);
-  document.getElementById('btn-income').addEventListener('click', showIncome);
+  document.getElementById('btn-income').addEventListener('click', () => showDocForm('Приход'));
+  document.getElementById('btn-expense').addEventListener('click', () => showDocForm('Расход'));
+  document.getElementById('btn-report').addEventListener('click', showReport);
+  document.getElementById('btn-nom').addEventListener('click', () => showCatalog('nomenclature'));
+  document.getElementById('btn-org').addEventListener('click', () => showCatalog('organizations'));
+  document.getElementById('btn-emp').addEventListener('click', () => showCatalog('employees'));
 
-  // По умолчанию — журнал
+  // ---------- Старт ----------
+  loadDB();
   showJournal();
+})();
 </script>
 
 </body>
