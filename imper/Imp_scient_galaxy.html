@@ -137,6 +137,16 @@
       catch (e) { print(output2, '> ОШИБКА: ' + e.message); }
     }, 50);
   });
+
+  document.getElementById('btn-form-structure').addEventListener('click', () => {
+    print(output2, '> Эксперимент: структура φ(N)...');
+    setTimeout(() => {
+      try { print(output2, window.XXXP_NP.formStructure()); }
+      catch (e) { print(output2, '> ОШИБКА: ' + e.message); }
+    }, 50);
+  });
+
+  
 </script>
 
 </body>
