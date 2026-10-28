@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Imperial Scientist's Terminal_7</title>
+<title>Imperial Scientist's Terminal_8</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100%;
@@ -89,6 +89,7 @@
       <button id="btn-form-task">ПОСТАНОВКА ЗАДАЧИ</button>
       <button id="btn-form-experiment">ЭКСПЕРИМЕНТ: КАНОНИЧЕСКАЯ ФОРМА</button>
       <button id="btn-form-structure">ЭКСПЕРИМЕНТ: СТРУКТУРА φ(N)</button>
+      <button id="btn-form-candidate">ПРОВЕРКА КАНДИДАТА</button>
     </div>
   </div>
 </div>
@@ -142,6 +143,14 @@
     print(output2, '> Эксперимент: структура φ(N)...');
     setTimeout(() => {
       try { print(output2, window.XXXP_NP.formStructure()); }
+      catch (e) { print(output2, '> ОШИБКА: ' + e.message); }
+    }, 50);
+  });
+
+    document.getElementById('btn-form-candidate').addEventListener('click', () => {
+    print(output2, '> Проверка кандидата...');
+    setTimeout(() => {
+      try { print(output2, window.XXXP_NP.formCandidate()); }
       catch (e) { print(output2, '> ОШИБКА: ' + e.message); }
     }, 50);
   });
