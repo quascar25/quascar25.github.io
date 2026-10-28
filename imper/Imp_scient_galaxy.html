@@ -5,15 +5,10 @@
 <title>Imperial Scientist's Terminal</title>
 <style>
   html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: #000;
-    color: #c8d0d8;
+    margin: 0; padding: 0; height: 100%;
+    background: #000; color: #c8d0d8;
     font-family: "Courier New", monospace;
   }
-
-  /* Космический фон: звёзды через радиальные градиенты */
   body {
     background:
       radial-gradient(1px 1px at 10% 20%, #fff 100%, transparent 100%),
@@ -27,76 +22,40 @@
       radial-gradient(1.5px 1.5px at 60% 60%, #fff 100%, transparent 100%),
       radial-gradient(1px 1px at 5% 85%, #fff 100%, transparent 100%),
       radial-gradient(ellipse at 50% 50%, #0a1420 0%, #000 70%);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-repeat: no-repeat; background-size: 100% 100%;
   }
-
   h1 {
-    text-align: center;
-    font-size: 22px;
-    letter-spacing: 3px;
-    color: #a8c0d0;
-    margin: 20px 0 10px 0;
-    text-shadow: 0 0 8px #3050a0;
+    text-align: center; font-size: 22px; letter-spacing: 3px;
+    color: #a8c0d0; margin: 20px 0 10px 0; text-shadow: 0 0 8px #3050a0;
   }
-
   .panel {
-    width: 80%;
-    max-width: 900px;
-    margin: 0 auto;
-    border: 1px solid #888;
-    background: rgba(20, 25, 30, 0.85);
-    padding: 20px;
+    width: 80%; max-width: 900px; margin: 0 auto;
+    border: 1px solid #888; background: rgba(20, 25, 30, 0.85); padding: 20px;
   }
-
-  .panel-title {
-    font-size: 16px;
-    color: #d0d8e0;
-    margin-bottom: 12px;
-    letter-spacing: 2px;
-  }
-
-  .inner-panel {
-    border: 1px solid #888;
-    background: rgba(10, 15, 20, 0.9);
-    padding: 15px;
-    min-height: 200px;
-    margin-bottom: 15px;
-  }
-
-  .controls {
-    display: flex;
-    gap: 15px;
-  }
-
-  button {
-    flex: 1;
+  .tabs { display: flex; gap: 10px; margin-bottom: 12px; }
+  .tab {
+    flex: 1; text-align: center; padding: 8px;
+    border: 1px solid #888; cursor: pointer;
+    font-size: 14px; letter-spacing: 2px; color: #a8c0d0;
     background: transparent;
-    color: #c8d0d8;
-    border: 1px solid #888;
-    padding: 10px;
-    font-family: "Courier New", monospace;
-    font-size: 14px;
-    cursor: pointer;
-    letter-spacing: 1px;
   }
-
-  button:hover {
-    border-color: #a0c0e0;
-    color: #e0f0ff;
+  .tab.active { border-color: #a0c0e0; color: #e0f0ff; background: rgba(80,120,180,0.15); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .inner-panel {
+    border: 1px solid #888; background: rgba(10, 15, 20, 0.9);
+    padding: 15px; min-height: 200px; margin-bottom: 15px;
   }
-
-  button:active {
-    background: rgba(80, 120, 180, 0.2);
+  .controls { display: flex; gap: 15px; }
+  button {
+    flex: 1; background: transparent; color: #c8d0d8;
+    border: 1px solid #888; padding: 10px;
+    font-family: "Courier New", monospace; font-size: 14px;
+    cursor: pointer; letter-spacing: 1px;
   }
-
-  pre {
-    margin: 0;
-    white-space: pre-wrap;
-    font-size: 13px;
-    line-height: 1.4;
-    color: #b0d0b0;
-  }
+  button:hover { border-color: #a0c0e0; color: #e0f0ff; }
+  button:active { background: rgba(80, 120, 180, 0.2); }
+  pre { margin: 0; white-space: pre-wrap; font-size: 13px; line-height: 1.4; color: #b0d0b0; }
 </style>
 </head>
 <body>
@@ -104,48 +63,77 @@
 <h1>IMPERIAL SCIENTIST'S TERMINAL OF THE GALAXY</h1>
 
 <div class="panel">
-  <div class="panel-title">// SYMMETRY GENERATOR</div>
-
-  <div class="inner-panel" id="output">
-    <pre>> Ожидание команды...</pre>
+  <div class="tabs">
+    <div class="tab active" data-tab="tab1">// SYMMETRY GENERATOR</div>
+    <div class="tab" data-tab="tab2">// SEARCH FOR FORM</div>
   </div>
 
-  <div class="controls">
-    <button id="btn-generate">ГЕНЕРАТОР ЗНАЧЕНИЙ</button>
-    <button id="btn-symmetry">СИММЕТРИИ ХАОСА</button>
+  <!-- ЗАКЛАДКА 1 -->
+  <div class="tab-content active" id="tab1">
+    <div class="inner-panel" id="output">
+      <pre>> Ожидание команды...</pre>
+    </div>
+    <div class="controls">
+      <button id="btn-generate">ГЕНЕРАТОР ЗНАЧЕНИЙ</button>
+      <button id="btn-symmetry">СИММЕТРИИ ХАОСА</button>
+    </div>
+  </div>
+
+  <!-- ЗАКЛАДКА 2 -->
+  <div class="tab-content" id="tab2">
+    <div class="inner-panel" id="output2">
+      <pre>> SEARCH FOR FORM
+> Ожидание команды...</pre>
+    </div>
+    <div class="controls">
+      <button id="btn-form-task">ПОСТАНОВКА ЗАДАЧИ</button>
+      <button id="btn-form-experiment">ЭКСПЕРИМЕНТ: КАНОНИЧЕСКАЯ ФОРМА</button>
+    </div>
   </div>
 </div>
 
 <script src="XXXP_NP.js"></script>
 <script>
+  // Переключение закладок
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
   const output = document.getElementById('output');
+  const output2 = document.getElementById('output2');
 
-  function print(text) {
-    output.innerHTML = '<pre>' + text + '</pre>';
-  }
+  function print(el, text) { el.innerHTML = '<pre>' + text + '</pre>'; }
 
-  document.getElementById('btn-generate').addEventListener('click', async () => {
-    print('> Генерация пар...');
-    // небольшая задержка, чтобы интерфейс успел обновиться
-    setTimeout(async () => {
-      try {
-        const res = await window.XXXP_NP.generate();
-        print(res);
-      } catch (e) {
-        print('> ОШИБКА: ' + e.message);
-      }
+  document.getElementById('btn-generate').addEventListener('click', () => {
+    print(output, '> Генерация пар...');
+    setTimeout(() => {
+      try { print(output, window.XXXP_NP.generate()); }
+      catch (e) { print(output, '> ОШИБКА: ' + e.message); }
     }, 50);
   });
 
-  document.getElementById('btn-symmetry').addEventListener('click', async () => {
-    print('> Поиск симметрий в хаосе...');
-    setTimeout(async () => {
-      try {
-        const res = await window.XXXP_NP.findSymmetry();
-        print(res);
-      } catch (e) {
-        print('> ОШИБКА: ' + e.message);
-      }
+  document.getElementById('btn-symmetry').addEventListener('click', () => {
+    print(output, '> Поиск симметрий в хаосе...');
+    setTimeout(() => {
+      try { print(output, window.XXXP_NP.findSymmetry()); }
+      catch (e) { print(output, '> ОШИБКА: ' + e.message); }
+    }, 50);
+  });
+
+  document.getElementById('btn-form-task').addEventListener('click', () => {
+    print(output2, window.XXXP_NP.formTask());
+  });
+
+  document.getElementById('btn-form-experiment').addEventListener('click', () => {
+    print(output2, '> Эксперимент: каноническая форма...');
+    setTimeout(() => {
+      try { print(output2, window.XXXP_NP.formExperiment()); }
+      catch (e) { print(output2, '> ОШИБКА: ' + e.message); }
     }, 50);
   });
 </script>
