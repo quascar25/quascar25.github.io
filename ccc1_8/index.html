@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>1С 8.3 — прототип</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #ffffff;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 14px;
+  }
+
+  /* Верхняя панель кнопок */
+  .toolbar {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    padding: 8px;
+    border-bottom: 2px solid #a8c8e8; /* светло-синяя рамка */
+    background: #f8fbff;
+  }
+
+  /* Кнопка с картинкой 1С */
+  .btn-logo {
+    width: 54px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fffbe6;
+    border: 1px solid #a8c8e8;
+    cursor: pointer;
+  }
+  .btn-logo img {
+    max-width: 44px;
+    max-height: 32px;
+    display: block;
+  }
+  .btn-logo .fallback {
+    font-size: 11px;
+    color: #cc0000;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  /* Обычные кнопки */
+  .btn {
+    background: #fffbe6;          /* светло-жёлтый */
+    color: #cc0000;               /* красный текст */
+    border: 1px solid #a8c8e8;    /* светло-синяя рамка */
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .btn:hover {
+    background: #fff4c2;
+    border-color: #7fb0e0;
+  }
+  .btn:active {
+    background: #ffeaa0;
+  }
+
+  /* Рабочая область */
+  .workspace {
+    margin: 10px;
+    border: 1px solid #a8c8e8;
+    min-height: calc(100vh - 120px);
+    background: #ffffff;
+    padding: 14px;
+    overflow: auto;
+  }
+
+  .workspace h2 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #2a5a8a;
+  }
+
+  /* Таблица журнала */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #d0e0f0;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  th {
+    background: #eef5fc;
+    color: #2a5a8a;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td {
+    background: #fafcff;
+  }
+
+  /* Форма прихода */
+  .form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .form-row label {
+    min-width: 110px;
+    color: #2a5a8a;
+  }
+  .form-row input, .form-row select {
+    border: 1px solid #a8c8e8;
+    padding: 5px 8px;
+    font-size: 14px;
+    min-width: 200px;
+  }
+
+  /* Строка состояния */
+  .statusbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 10px;
+    border-top: 1px solid #a8c8e8;
+    background: #f8fbff;
+    color: #2a5a8a;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Верхняя панель -->
+  <div class="toolbar">
+    <button class="btn-logo" id="btn-logo" title="Журнал документов">
+      <img src="1с8.3.png" alt="1С"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="fallback" style="display:none;">1С<br>8.3</span>
+    </button>
+    <button class="btn" id="btn-journal">Журнал</button>
+    <button class="btn" id="btn-income">Приход</button>
+  </div>
+
+  <!-- Рабочая область -->
+  <div class="workspace" id="workspace">
+    <h2>Журнал документов</h2>
+    <p style="color:#888;">Здесь будет таблица документов (пока пусто).</p>
+  </div>
+
+  <!-- Строка состояния -->
+  <div class="statusbar" id="statusbar">Готово</div>
+
+<script>
+  const workspace = document.getElementById('workspace');
+  const statusbar = document.getElementById('statusbar');
+
+  function setStatus(text) {
+    statusbar.textContent = text;
+  }
+
+  function showJournal() {
+    workspace.innerHTML = `
+      <h2>Журнал документов</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Тип</th>
+            <th>Номенклатура</th>
+            <th>Количество</th>
+            <th>Сумма</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5" style="color:#888; text-align:center;">Нет документов</td></tr>
+        </tbody>
+      </table>
+    `;
+    setStatus('Журнал документов открыт');
+  }
+
+  function showIncome() {
+    workspace.innerHTML = `
+      <h2>Приход</h2>
+      <div class="form-row">
+        <label>Дата:</label>
+        <input type="date" id="inc-date">
+      </div>
+      <div class="form-row">
+        <label>Номенклатура:</label>
+        <input type="text" id="inc-nom" placeholder="Название">
+      </div>
+      <div class="form-row">
+        <label>Количество:</label>
+        <input type="number" id="inc-qty" value="1" min="1">
+      </div>
+      <div class="form-row">
+        <label>Сумма:</label>
+        <input type="number" id="inc-sum" value="0" min="0" step="0.01">
+      </div>
+      <div class="form-row">
+        <button class="btn" id="btn-save-income">Сохранить (заглушка)</button>
+      </div>
+    `;
+    setStatus('Форма прихода открыта');
+
+    document.getElementById('btn-save-income').addEventListener('click', () => {
+      setStatus('Сохранение пока не реализовано (нет базы)');
+      alert('Сохранение пока не реализовано — это только прототип интерфейса.');
+    });
+  }
+
+  document.getElementById('btn-logo').addEventListener('click', showJournal);
+  document.getElementById('btn-journal').addEventListener('click', showJournal);
+  document.getElementById('btn-income').addEventListener('click', showIncome);
+
+  // По умолчанию — журнал
+  showJournal();
+</script>
+
+</body>
+</html>
