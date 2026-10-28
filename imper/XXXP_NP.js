@@ -516,52 +516,44 @@
       results.prime.push(err);
     }
 
+
     // ---------- СОСТАВНЫЕ x,y (взаимно простые) ----------
     for (let t = 0; t < trials; t++) {
       let xc, yc;
       do { xc = randInt(2**19, 2**20); } while (isPrime(xc));
       do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
-      // гарантируем взаимную простоту: иначе φ(xy) ≠ φ(x)φ(y)
       let guard = 0;
       while (gcd(xc, yc) !== 1 && guard++ < 100) {
         do { yc = randInt(2**19, 2**20); } while (isPrime(yc));
       }
 
       const Nc = BigInt(xc) * BigInt(yc);
-      // φ(N) через известные x,y (НЕ через факторизацию N!)
-
       const phi = BigInt(eulerPhi(xc)) * BigInt(eulerPhi(yc));
-
       const S = Nc - phi + 1n;
       const D = S * S - 4n * Nc;
 
-      let err;
+      let err;                                   // ← одна err на весь блок
       if (D < 0n) {
-        // восстановление невозможно — формула S = N - φ + 1 неверна для составных
         err = 1;
       } else {
         const sqrtD = BigInt(Math.round(Math.sqrt(Number(D))));
         const xRec = (S + sqrtD) / 2n;
         const yRec = (S - sqrtD) / 2n;
 
-      // сравниваем как множества: min/max с обеих сторон
-      const recMin = xRec < yRec ? xRec : yRec;
-      const recMax = xRec < yRec ? yRec : xRec;
-      const trueMin = BigInt(Math.min(xc, yc));
-      const trueMax = BigInt(Math.max(xc, yc));
+        const recMin = xRec < yRec ? xRec : yRec;
+        const recMax = xRec < yRec ? yRec : xRec;
+        const trueMin = BigInt(Math.min(xc, yc));
+        const trueMax = BigInt(Math.max(xc, yc));
 
-      const eMin = recMin > trueMin ? recMin - trueMin : trueMin - recMin;
-      const eMax = recMax > trueMax ? recMax - trueMax : trueMax - recMax;
-      const err = Number(eMin * 1000000n / trueMin) / 1000000 +
-                  Number(eMax * 1000000n / trueMax) / 1000000;
+        const eMin = recMin > trueMin ? recMin - trueMin : trueMin - recMin;
+        const eMax = recMax > trueMax ? recMax - trueMax : trueMax - recMax;
+        err = Number(eMin * 1000000n / trueMin) / 1000000 +
+              Number(eMax * 1000000n / trueMax) / 1000000;   // ← err =, не const err
       }
 
-      if (isNaN(err) || err < 0) {
-        console.log('DIAG comp xc=', xc, 'yc=', yc, 'phiXc=', eulerPhi(xc), 'phiYc=', eulerPhi(yc), 'S=', S.toString(), 'D=', D.toString(), 'err=', err);
-      }
-      
       results.composite.push(err);
     }
+    
 
     const meanPrime = results.prime.reduce((s,v)=>s+v,0)/trials;
     const meanComp = results.composite.reduce((s,v)=>s+v,0)/trials;
