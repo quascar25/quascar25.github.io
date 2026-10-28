@@ -529,7 +529,9 @@
 
       const Nc = BigInt(xc) * BigInt(yc);
       // φ(N) через известные x,y (НЕ через факторизацию N!)
+
       const phi = BigInt(eulerPhi(xc)) * BigInt(eulerPhi(yc));
+
       const S = Nc - phi + 1n;
       const D = S * S - 4n * Nc;
 
@@ -553,6 +555,11 @@
       const err = Number(eMin * 1000000n / trueMin) / 1000000 +
                   Number(eMax * 1000000n / trueMax) / 1000000;
       }
+
+      if (isNaN(err) || err < 0) {
+        console.log('DIAG comp xc=', xc, 'yc=', yc, 'phiXc=', eulerPhi(xc), 'phiYc=', eulerPhi(yc), 'S=', S.toString(), 'D=', D.toString(), 'err=', err);
+      }
+      
       results.composite.push(err);
     }
 
