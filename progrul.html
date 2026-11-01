@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Рулетка — прогноз</title>
+<style>
+  :root { --blue: #1e3a8a; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    background: #000; color: #cfe0ff;
+    font-family: ui-monospace, Consolas, monospace;
+  }
+  h1 { font-size: 16px; color: #7aa2ff; font-weight: 600; margin: 0 0 12px; }
+  .box {
+    background: var(--blue);
+    border: 1px solid #3b5bdb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    background: #0b1220;
+    color: #dbe7ff;
+    border: 1px solid #3b5bdb;
+    border-radius: 6px;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+  }
+  textarea { height: 110px; }
+  input[type="text"] { height: 40px; margin-bottom: 8px; }
+  button {
+    background: #2563eb; color: #fff;
+    border: 0; border-radius: 6px;
+    padding: 10px 16px; font-size: 14px;
+    cursor: pointer; font-weight: 600;
+  }
+  button:hover { background: #3b82f6; }
+  .label { font-size: 12px; color: #8fb0ff; margin-bottom: 6px; }
+  .note { font-size: 11px; color: #7f92b8; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>РУЛЕТКА · формальный прогноз (без подгонки)</h1>
+
+<div class="box">
+  <div class="label">История (тысячи чисел через пробел)</div>
+  <textarea id="history"></textarea>
+</div>
+
+<div class="box">
+  <div class="label">Новое выпавшее число (0–36)</div>
+  <input type="text" id="newNumber" placeholder="например: 17" autocomplete="off">
+  <button id="btn">Добавить и прогноз</button>
+  <div class="label" style="margin-top:12px;">Прогноз (18 чисел)</div>
+  <textarea id="forecast" readonly></textarea>
+  <div class="note">Прогноз = ранжирование по исторической частоте. Матожидание отрицательное. Это не предсказание.</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const N = 37;          // чисел рулетки: 0..36
+  const TOP = 18;        // сколько чисел в прогнозе
+  const WINDOW = 2000;   // максимум хранимых бросков
+
+  const histEl = document.getElementById("history");
+  const newEl  = document.getElementById("newNumber");
+  const fcEl   = document.getElementById("forecast");
+  const btn    = document.getElementById("btn");
+
+  // --- генерация честной синтетики ---
+  function makeHistory(n) {
+    const a = [];
+    for (let i = 0; i < n; i++) a.push(Math.floor(Math.random() * N));
+    return a;
+  }
+
+  // --- парсинг строки в массив чисел 0..36 ---
+  function parseHistory(s) {
+    return s.split(/\s+/)
+      .map(t => t.trim())
+      .filter(t => t !== "")
+      .map(Number)
+      .filter(v => Number.isInteger(v) && v >= 0 && v < N);
+  }
+
+  // --- частоты ---
+  function frequencies(arr) {
+    const f = new Array(N).fill(0);
+    for (const v of arr) f[v]++;
+    return f;
+  }
+
+  // --- «свежесть»: индекс последнего появления ---
+  function lastSeen(arr) {
+    const ls = new Array(N).fill(-1);
+    for (let i = 0; i < arr.length; i++) ls[arr[i]] = i;
+    return ls;
+  }
+
+  // --- прогноз: топ по частоте, тай-брейк по свежести ---
+  function forecast(arr) {
+    const f = frequencies(arr);
+    const ls = lastSeen(arr);
+    const idx = Array.from({length: N}, (_, i) => i);
+    idx.sort((a, b) => (f[b] - f[a]) || (ls[b] - ls[a]));
+    return idx.slice(0, TOP);
+  }
+
+  // --- хи-квадрат отклонение от равномерности ---
+  function chiSquare(arr) {
+    const f = frequencies(arr);
+    const exp = arr.length / N;
+    let chi = 0;
+    for (let i = 0; i < N; i++) {
+      const d = f[i] - exp;
+      chi += (d * d) / exp;
+    }
+    return { chi, df: N - 1, n: arr.length };
+  }
+
+  // грубая оценка: для df=36 критическое значение ~ 51 (p=0.05)
+  function chiVerdict({ chi, n }) {
+    if (n < 200) return "выборка мала — вывод невозможен";
+    if (chi < 51) return "в пределах шума (перекоса нет)";
+    if (chi < 70) return "слабый перекос (может быть шум)";
+    return "сильный перекос (проверь данные)";
+  }
+
+  // --- обновление UI ---
+  function renderHistory(arr) {
+    histEl.value = arr.join(" ");
+  }
+
+  function renderForecast(arr) {
+    const f = forecast(arr);
+    fcEl.value = f.join(" ");
+    const cs = chiSquare(arr);
+    console.log(
+      "[прогноз]", f.join(" "), "\n" +
+      "[хи-квадрат]", cs.chi.toFixed(2),
+      "df =", cs.df, "n =", cs.n, "→", chiVerdict(cs)
+    );
+  }
+
+  // --- инициализация ---
+  let data = makeHistory(1000);
+  renderHistory(data);
+  renderForecast(data);
+
+  // --- обработка кнопки ---
+  btn.addEventListener("click", function () {
+    const raw = newEl.value.trim();
+    if (raw === "") return;
+    const v = Number(raw);
+    if (!Number.isInteger(v) || v < 0 || v >= N) {
+      alert("Введи целое число от 0 до 36");
+      return;
+    }
+
+    // добавляем в конец, удаляем первое
+    data.push(v);
+    if (data.length > WINDOW) data.shift();
+
+    renderHistory(data);
+    renderForecast(data);
+    newEl.value = "";
+    newEl.focus();
+  });
+
+  // Enter в поле ввода = нажатие кнопки
+  newEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") btn.click();
+  });
+})();
+</script>
+</body>
+</html>
