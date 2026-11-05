@@ -1,4 +1,4 @@
-// app.js
+// app.js — обновлённый обработчик теста 2 и буфера
 const $log = document.getElementById('log');
 const $chart = document.getElementById('chart');
 const ctx = $chart.getContext('2d');
@@ -33,6 +33,8 @@ function drawWeights(p, label) {
 
 document.getElementById('btn-net').onclick = () => {
   baseParams = Net.init();
+  Shame.reset();
+  Buffer.reset();
   log('=== 1) Сеть 10 параметров создана ===');
   Net.list(baseParams).forEach(([n, v]) => log(`  ${n} = ${v.toFixed(3)}`));
   drawWeights(baseParams, 'Базовая сеть');
@@ -49,7 +51,7 @@ document.getElementById('btn-test1').onclick = () => {
 document.getElementById('btn-buffer').onclick = () => {
   if (!baseParams) return log('Сначала создайте сеть.');
   log('=== 3) Болевой модуль: перестройка весов (SGD) ===');
-  const { params, history } = Pain.run(baseParams, Tests.test1, 1.0, 300, 0.01);
+  const { params, history } = Pain.run(baseParams, Tests.test1, 1.0, 500, 0.01);
   Buffer.freeze(params, { steps: history.length });
   log(`  Эпох: ${history.length}`);
   log(`  Боль: ${history[0].toFixed(4)} -> ${history[history.length-1].toFixed(4)}`);
@@ -67,9 +69,11 @@ document.getElementById('btn-test2').onclick = () => {
   lastTest2.forEach(r => log(`  (${r.x},${r.y}) -> ${r.out} (цель ${r.target}) ${r.ok ? 'OK' : 'FAIL'}`));
   log(`  Точность: ${(Tests.accuracy(lastTest2) * 100).toFixed(1)}%`);
 
+  log('  Обучение пробы стыда на весах буфера...');
+  Shame.trainProbe(buf, Tests.test1);
   const shame = Shame.report(buf, Tests.test2);
-  log('  Стыд:');
-  shame.forEach(s => log(`    (${s.x},${s.y}) shame=${s.shame} (${s.level})`));
+  log('  Стыд (с весов буфера):');
+  shame.forEach(s => log(`    (${s.x},${s.y}) out=${s.out} ok=${s.ok} shame=${s.shame} (${s.level})`));
 };
 
 document.getElementById('btn-compare').onclick = () => {
@@ -79,5 +83,4 @@ document.getElementById('btn-compare').onclick = () => {
   log(`  Тест 1 (до буфера): ${(a1 * 100).toFixed(1)}%`);
   log(`  Тест 2 (после буфера): ${(a2 * 100).toFixed(1)}%`);
   log(`  Разница: ${((a2 - a1) * 100).toFixed(1)} п.п.`);
-  log('  Наблюдение: сравните, переносится ли «правильность» на новые ситуации.');
 };
