@@ -1,4 +1,4 @@
-// app.js — обновлённый обработчик теста 2 и буфера
+// app.js — обновлённый обработчик теста 2
 const $log = document.getElementById('log');
 const $chart = document.getElementById('chart');
 const ctx = $chart.getContext('2d');
@@ -70,10 +70,19 @@ document.getElementById('btn-test2').onclick = () => {
   log(`  Точность: ${(Tests.accuracy(lastTest2) * 100).toFixed(1)}%`);
 
   log('  Обучение пробы стыда на весах буфера...');
-  Shame.trainProbe(buf, Tests.test1);
+  const { degenerate } = Shame.trainProbe(buf, Tests.test1);
+  if (degenerate) {
+    log('  [РЕЗУЛЬТАТ] Проба стыда на весах выродилась: на идеальном буфере все примеры «правильные»,');
+    log('  разделять нечего. Это ожидаемо: идеальный буфер не нуждается в стыде с весов.');
+    log('  Стыд с весов работает как детектор «буфер не идеален», а не как детектор ошибки на входе.');
+  }
+
   const shame = Shame.report(buf, Tests.test2);
-  log('  Стыд (с весов буфера):');
-  shame.forEach(s => log(`    (${s.x},${s.y}) out=${s.out} ok=${s.ok} shame=${s.shame} (${s.level})`));
+  log('  Гибридный стыд (weights | output | total):');
+  shame.forEach(s => log(
+    `    (${s.x},${s.y}) out=${s.out} ok=${s.ok} ` +
+    `w=${s.shameWeights} o=${s.shameOutput} total=${s.shameTotal} (${s.level})`
+  ));
 };
 
 document.getElementById('btn-compare').onclick = () => {
