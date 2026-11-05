@@ -1,11 +1,12 @@
 // f05_shame.js
-// Стыд теперь считывается с ВЕСОВ буфера, а не с выхода.
-// Линейная проба: shame = sigmoid(w·params + b), где params — 10 весов буфера.
-// Проба обучается после формирования буфера на «правильных» и «неправильных» примерах,
-// но сам буфер НЕ меняет.
+// Гибридный стыд:
+//   shame_weights — проба на весах буфера (детектор «буфер не идеален»)
+//   shame_output  — |out - target| (детектор ошибки на конкретном входе)
+//   shame_total   = max(shame_weights, shame_output)
 
 const Shame = (function () {
-  let probe = null; // { w: [10], b: number }
+  let probe = null;
+  let degenerate = false;
 
   function vectorize(p) {
     return [
@@ -24,24 +25,24 @@ const Shame = (function () {
     return sigmoid(z);
   }
 
-  // Обучение пробы: на ситуациях, где сеть права -> стыд 0, где нет -> стыд 1
-  // Используем сами веса буфера как вход, метку — правильность выхода буфера.
+  // Обучение пробы на весах буфера.
+  // Метка: 1 если сеть на этом входе ошибается, 0 если права.
+  // Если все метки одинаковые — проба вырождается (это фиксируется).
   function trainProbe(params, situations, lr = 0.5, epochs = 300) {
     const v = vectorize(params);
-    // Метки: 0 если выход буфера близок к правильному, 1 если далёк
     const labels = situations.map(([x, y]) => {
       const out = Net.forward(params, x, y);
       const target = Pain.correctTarget(x, y);
       return Math.abs(out - target) > 0.3 ? 1 : 0;
     });
 
-    // Если все метки одинаковые — проба вырождается; добавляем шумовой пример
     if (labels.every(l => l === labels[0])) {
-      // нечего разделять — проба вернёт константу
+      degenerate = true;
       probe = { w: new Array(10).fill(0), b: labels[0] === 1 ? 10 : -10 };
-      return probe;
+      return { probe, degenerate };
     }
 
+    degenerate = false;
     let w = new Array(10).fill(0);
     let b = 0;
     for (let epoch = 0; epoch < epochs; epoch++) {
@@ -53,31 +54,49 @@ const Shame = (function () {
       }
     }
     probe = { w, b };
-    return probe;
+    return { probe, degenerate };
   }
 
-  // Считывание стыда с весов буфера
-  function compute(params) {
-    if (!probe) return null;
-    const v = vectorize(params);
-    return forwardProbe(v, probe.w, probe.b);
+  function shameWeights(params) {
+    if (!probe) return 0;
+    return forwardProbe(vectorize(params), probe.w, probe.b);
+  }
+
+  function shameOutput(params, x, y) {
+    const out = Net.forward(params, x, y);
+    const target = Pain.correctTarget(x, y);
+    return Math.abs(out - target);
+  }
+
+  function compute(params, x, y) {
+    const sw = shameWeights(params);
+    const so = shameOutput(params, x, y);
+    return {
+      weights: +sw.toFixed(3),
+      output: +so.toFixed(3),
+      total: +Math.max(sw, so).toFixed(3),
+      degenerate
+    };
   }
 
   function report(params, situations) {
-    const s = compute(params);
     return situations.map(([x, y]) => {
       const out = Net.forward(params, x, y);
       const target = Pain.correctTarget(x, y);
       const ok = Math.abs(out - target) < 0.3;
+      const s = compute(params, x, y);
       return {
         x, y, out: +out.toFixed(3), target, ok,
-        shame: s === null ? null : +s.toFixed(3),
-        level: s === null ? '—' : s > 0.6 ? 'высокий' : s > 0.3 ? 'средний' : 'низкий'
+        shameWeights: s.weights,
+        shameOutput: s.output,
+        shameTotal: s.total,
+        degenerate: s.degenerate,
+        level: s.total > 0.6 ? 'высокий' : s.total > 0.3 ? 'средний' : 'низкий'
       };
     });
   }
 
-  function reset() { probe = null; }
+  function reset() { probe = null; degenerate = false; }
 
   return { trainProbe, compute, report, reset, vectorize };
 })();
