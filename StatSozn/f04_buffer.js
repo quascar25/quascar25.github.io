@@ -1,4 +1,4 @@
-// f04_buffer.js — добавляем функцию порчи буфера
+ // f04_buffer.js — частичная порча буфера
 const Buffer = (function () {
   let frozen = null;
   let meta = null;
@@ -14,17 +14,24 @@ const Buffer = (function () {
   function get() { return frozen; }
   function info() { return meta; }
 
-  // Порча: добавляем шум к весам
-  function corrupt(noise = 0.3, seed = 123) {
+  // Частичная порча: mode = 'soft' (b2 и w2[1]) | 'hard' (несколько весов)
+  function corrupt(mode = 'soft', noise = 0.8, seed = 123) {
     if (!frozen) return null;
     let s = seed;
     const rnd = () => { s = (s * 9301 + 49297) % 233280; return (s / 233280 - 0.5) * 2; };
     corrupted = Net.clone(frozen);
-    corrupted.w1 = corrupted.w1.map(v => v + rnd() * noise);
-    corrupted.b1 = corrupted.b1.map(v => v + rnd() * noise);
-    corrupted.w2 = corrupted.w2.map(v => v + rnd() * noise);
-    corrupted.b2 = corrupted.b2 + rnd() * noise;
-    corrupted.temp = Math.max(0.1, Math.min(5, corrupted.temp + rnd() * noise));
+
+    if (mode === 'soft') {
+      // ломаем только выходной слой — часть ситуаций испортится, часть останется
+      corrupted.w2[1] += rnd() * noise;
+      corrupted.b2 += rnd() * noise;
+    } else {
+      // 'hard' — ломаем несколько весов, но не все
+      corrupted.w1[1] += rnd() * noise;
+      corrupted.w2[1] += rnd() * noise;
+      corrupted.b2 += rnd() * noise;
+      corrupted.temp = Math.max(0.1, Math.min(5, corrupted.temp + rnd() * noise * 0.5));
+    }
     return corrupted;
   }
 
