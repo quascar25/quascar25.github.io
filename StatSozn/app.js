@@ -48,11 +48,13 @@ document.getElementById('btn-test1').onclick = () => {
 
 document.getElementById('btn-buffer').onclick = () => {
   if (!baseParams) return log('Сначала создайте сеть.');
-  log('=== 3) Болевой модуль: перестройка весов ===');
-  const { params, history } = Pain.run(baseParams, Tests.test1);
+  log('=== 3) Болевой модуль: перестройка весов (SGD) ===');
+  const { params, history } = Pain.run(baseParams, Tests.test1, 1.0, 300, 0.01);
   Buffer.freeze(params, { steps: history.length });
-  log(`  Шагов боли: ${history.length}`);
-  log(`  Боль: ${history[0].toFixed(3)} -> ${history[history.length - 1].toFixed(3)}`);
+  log(`  Эпох: ${history.length}`);
+  log(`  Боль: ${history[0].toFixed(4)} -> ${history[history.length-1].toFixed(4)}`);
+  const mid = Math.floor(history.length / 2);
+  log(`  Боль на середине: ${history[mid].toFixed(4)}`);
   log('  Буфер статичного сознания сформирован (заморожен).');
   drawWeights(params, 'Буфер (после боли)');
 };
