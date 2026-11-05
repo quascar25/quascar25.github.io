@@ -1,0 +1,35 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StatSozn — статичное сознание</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>StatSozn: полигон статичного сознания</h1>
+  <div class="controls">
+    <button id="btn-net">1) Сформировать нейросеть 10</button>
+    <button id="btn-test1">2) Тест 1 (до буфера)</button>
+    <button id="btn-buffer">3) Сформировать буфер (болевой модуль)</button>
+    <button id="btn-test2">4) Тест 2 (после буфера)</button>
+    <button id="btn-compare">5) Сравнение тестов</button>
+  </div>
+  <div class="panels">
+    <div class="panel">
+      <h2>Лог</h2>
+      <pre id="log"></pre>
+    </div>
+    <div class="panel">
+      <h2>Веса</h2>
+      <canvas id="chart" width="480" height="320"></canvas>
+    </div>
+  </div>
+  <script src="f01_net.js"></script>
+  <script src="f02_pain.js"></script>
+  <script src="f03_tests.js"></script>
+  <script src="f04_buffer.js"></script>
+  <script src="f05_shame.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
