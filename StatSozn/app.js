@@ -93,3 +93,59 @@ document.getElementById('btn-compare').onclick = () => {
   log(`  Тест 2 (после буфера): ${(a2 * 100).toFixed(1)}%`);
   log(`  Разница: ${((a2 - a1) * 100).toFixed(1)} п.п.`);
 };
+
+// ... (обработчики 1-5 без изменений, как в предыдущей версии) ...
+
+document.getElementById('btn-corrupt').onclick = () => {
+  if (!Buffer.get()) return log('Сначала сформируйте буфер.');
+  const c = Buffer.corrupt(0.3);
+  log('=== 6) Буфер испорчен (шум 0.3) ===');
+  Net.list(c).forEach(([n, v]) => log(`  ${n} = ${v.toFixed(3)}`));
+  drawWeights(c, 'Испорченный буфер');
+};
+
+document.getElementById('btn-shame-compare').onclick = () => {
+  const clean = Buffer.get();
+  const corrupt = Buffer.getCorrupted();
+  if (!clean) return log('Сначала сформируйте буфер.');
+  if (!corrupt) return log('Сначала испортьте буфер (кнопка 6).');
+
+  log('=== 7) Сравнение стыда: чистый vs испорченный буфер ===');
+
+  // Обучаем пробу на чистом буфере (как раньше — она выродится)
+  log('  [Чистый буфер] обучение пробы...');
+  const r1 = Shame.trainProbe(clean, Tests.test1);
+  if (r1.degenerate) {
+    log('    Проба выродилась (все примеры правильные) — ожидаемо.');
+  }
+  const s1 = Shame.compute(clean, 0.49, 0.51);
+  log(`    Стыд с весов на (0.49,0.51): w=${s1.weights}`);
+
+  // Обучаем пробу на испорченном буфере
+  log('  [Испорченный буфер] обучение пробы...');
+  const r2 = Shame.trainProbe(corrupt, Tests.test1);
+  if (r2.degenerate) {
+    log('    Проба выродилась — неожиданно, проверьте шум.');
+  } else {
+    log('    Проба обучена: веса не вырождены, есть что разделять.');
+  }
+
+  // Сравниваем стыд на тесте 2
+  log('  Сравнение стыда (weights | output | total) на тесте 2:');
+  const reportClean = Shame.report(clean, Tests.test2);
+  const reportCorrupt = Shame.report(corrupt, Tests.test2);
+
+  Tests.test2.forEach(([x, y], i) => {
+    const c1 = reportClean[i];
+    const c2 = reportCorrupt[i];
+    log(`    (${x},${y}):`);
+    log(`      чистый:      w=${c1.shameWeights} o=${c1.shameOutput} total=${c1.shameTotal}`);
+    log(`      испорченный: w=${c2.shameWeights} o=${c2.shameOutput} total=${c2.shameTotal}`);
+  });
+
+  // Итог: средний стыд с весов
+  const avgClean = reportClean.reduce((a, r) => a + r.shameWeights, 0) / reportClean.length;
+  const avgCorrupt = reportCorrupt.reduce((a, r) => a + r.shameWeights, 0) / reportCorrupt.length;
+  log(`  Средний стыд с весов: чистый=${avgClean.toFixed(3)}, испорченный=${avgCorrupt.toFixed(3)}`);
+  log(`  Вывод: ${avgCorrupt > avgClean + 0.1 ? 'проба оживает на испорченном буфере — детектор деградации работает.' : 'разница слабая, возможно, нужен больший шум.'}`);
+};
