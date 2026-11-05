@@ -1,4 +1,4 @@
-// app.js — обновлённые обработчики 6 и 7
+// app.js — полная версия с двумя режимами порчи
 const $log = document.getElementById('log');
 const $chart = document.getElementById('chart');
 const ctx = $chart.getContext('2d');
@@ -37,6 +37,8 @@ document.getElementById('btn-net').onclick = () => {
   baseParams = Net.init();
   Shame.reset();
   Buffer.reset();
+  corruptedSoft = null;
+  corruptedHard = null;
   log('=== 1) Сеть 10 параметров создана ===');
   Net.list(baseParams).forEach(([n, v]) => log(`  ${n} = ${v.toFixed(3)}`));
   drawWeights(baseParams, 'Базовая сеть');
@@ -55,6 +57,8 @@ document.getElementById('btn-buffer').onclick = () => {
   log('=== 3) Болевой модуль: перестройка весов (SGD) ===');
   const { params, history } = Pain.run(baseParams, Tests.test1, 1.0, 500, 0.01);
   Buffer.freeze(params, { steps: history.length });
+  corruptedSoft = null;
+  corruptedHard = null;
   log(`  Эпох: ${history.length}`);
   log(`  Боль: ${history[0].toFixed(4)} -> ${history[history.length-1].toFixed(4)}`);
   const mid = Math.floor(history.length / 2);
@@ -96,20 +100,16 @@ document.getElementById('btn-compare').onclick = () => {
   log(`  Разница: ${((a2 - a1) * 100).toFixed(1)} п.п.`);
 };
 
-// ... (обработчики 1-5 без изменений, как в предыдущей версии) ...
-
 document.getElementById('btn-corrupt').onclick = () => {
   if (!Buffer.get()) return log('Сначала сформируйте буфер.');
-  const soft = Buffer.corrupt('soft', 0.8);
-  corruptedSoft = Net.clone(soft);
-  const hard = Buffer.corrupt('hard', 0.8);
-  corruptedHard = Net.clone(hard);
+  corruptedSoft = Net.clone(Buffer.corrupt('soft', 0.8));
+  corruptedHard = Net.clone(Buffer.corrupt('hard', 0.8));
   log('=== 6) Буфер испорчен (два режима) ===');
   log('  SOFT (только b2 и w2[1]):');
-  Net.list(soft).forEach(([n, v]) => log(`    ${n} = ${v.toFixed(3)}`));
+  Net.list(corruptedSoft).forEach(([n, v]) => log(`    ${n} = ${v.toFixed(3)}`));
   log('  HARD (w1[1], w2[1], b2, temp):');
-  Net.list(hard).forEach(([n, v]) => log(`    ${n} = ${v.toFixed(3)}`));
-  drawWeights(hard, 'Испорченный буфер (hard)');
+  Net.list(corruptedHard).forEach(([n, v]) => log(`    ${n} = ${v.toFixed(3)}`));
+  drawWeights(corruptedHard, 'Испорченный буфер (hard)');
 };
 
 document.getElementById('btn-shame-compare').onclick = () => {
@@ -125,14 +125,12 @@ document.getElementById('btn-shame-compare').onclick = () => {
     { name: 'hard', params: corruptedHard }
   ];
 
-  // Точность на тесте 2 для каждого варианта
   log('  Точность на тесте 2:');
   variants.forEach(v => {
     const res = Tests.evaluate(v.params, Tests.test2);
     log(`    ${v.name}: ${(Tests.accuracy(res) * 100).toFixed(1)}%`);
   });
 
-  // Обучаем пробу для каждого варианта и смотрим стыд с весов
   log('  Стыд с весов (w) и с выхода (o) на тесте 2:');
   const rows = [];
   variants.forEach(v => {
@@ -144,7 +142,6 @@ document.getElementById('btn-shame-compare').onclick = () => {
     log(`    [${v.name}] проба ${degenerate ? 'выродилась' : 'обучена'}, средний w=${avgW.toFixed(3)}, средний o=${avgO.toFixed(3)}`);
   });
 
-  // Детально по ситуациям — сравнение w по трём вариантам
   log('  Детально по ситуациям (w):');
   Tests.test2.forEach(([x, y], i) => {
     const wClean = rows[0].report[i].shameWeights;
@@ -153,7 +150,6 @@ document.getElementById('btn-shame-compare').onclick = () => {
     log(`    (${x},${y}): чистый w=${wClean}, soft w=${wSoft}, hard w=${wHard}`);
   });
 
-  // Вывод
   const softAlive = rows[1].avgW > rows[0].avgW + 0.05;
   const hardAlive = rows[2].avgW > rows[0].avgW + 0.05;
   log('  ВЫВОД:');
