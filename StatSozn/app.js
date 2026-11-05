@@ -1,4 +1,4 @@
-// app.js — обновлённый обработчик теста 2
+// app.js — обновлённые обработчики 6 и 7
 const $log = document.getElementById('log');
 const $chart = document.getElementById('chart');
 const ctx = $chart.getContext('2d');
@@ -6,6 +6,8 @@ const ctx = $chart.getContext('2d');
 let baseParams = null;
 let lastTest1 = null;
 let lastTest2 = null;
+let corruptedSoft = null;
+let corruptedHard = null;
 
 function log(msg) {
   $log.textContent += msg + '\n';
@@ -98,54 +100,63 @@ document.getElementById('btn-compare').onclick = () => {
 
 document.getElementById('btn-corrupt').onclick = () => {
   if (!Buffer.get()) return log('Сначала сформируйте буфер.');
-  const c = Buffer.corrupt(0.3);
-  log('=== 6) Буфер испорчен (шум 0.3) ===');
-  Net.list(c).forEach(([n, v]) => log(`  ${n} = ${v.toFixed(3)}`));
-  drawWeights(c, 'Испорченный буфер');
+  const soft = Buffer.corrupt('soft', 0.8);
+  corruptedSoft = Net.clone(soft);
+  const hard = Buffer.corrupt('hard', 0.8);
+  corruptedHard = Net.clone(hard);
+  log('=== 6) Буфер испорчен (два режима) ===');
+  log('  SOFT (только b2 и w2[1]):');
+  Net.list(soft).forEach(([n, v]) => log(`    ${n} = ${v.toFixed(3)}`));
+  log('  HARD (w1[1], w2[1], b2, temp):');
+  Net.list(hard).forEach(([n, v]) => log(`    ${n} = ${v.toFixed(3)}`));
+  drawWeights(hard, 'Испорченный буфер (hard)');
 };
 
 document.getElementById('btn-shame-compare').onclick = () => {
   const clean = Buffer.get();
-  const corrupt = Buffer.getCorrupted();
   if (!clean) return log('Сначала сформируйте буфер.');
-  if (!corrupt) return log('Сначала испортьте буфер (кнопка 6).');
+  if (!corruptedSoft || !corruptedHard) return log('Сначала испортьте буфер (кнопка 6).');
 
-  log('=== 7) Сравнение стыда: чистый vs испорченный буфер ===');
+  log('=== 7) Сравнение стыда: чистый vs soft vs hard ===');
 
-  // Обучаем пробу на чистом буфере (как раньше — она выродится)
-  log('  [Чистый буфер] обучение пробы...');
-  const r1 = Shame.trainProbe(clean, Tests.test1);
-  if (r1.degenerate) {
-    log('    Проба выродилась (все примеры правильные) — ожидаемо.');
-  }
-  const s1 = Shame.compute(clean, 0.49, 0.51);
-  log(`    Стыд с весов на (0.49,0.51): w=${s1.weights}`);
+  const variants = [
+    { name: 'чистый', params: clean },
+    { name: 'soft', params: corruptedSoft },
+    { name: 'hard', params: corruptedHard }
+  ];
 
-  // Обучаем пробу на испорченном буфере
-  log('  [Испорченный буфер] обучение пробы...');
-  const r2 = Shame.trainProbe(corrupt, Tests.test1);
-  if (r2.degenerate) {
-    log('    Проба выродилась — неожиданно, проверьте шум.');
-  } else {
-    log('    Проба обучена: веса не вырождены, есть что разделять.');
-  }
-
-  // Сравниваем стыд на тесте 2
-  log('  Сравнение стыда (weights | output | total) на тесте 2:');
-  const reportClean = Shame.report(clean, Tests.test2);
-  const reportCorrupt = Shame.report(corrupt, Tests.test2);
-
-  Tests.test2.forEach(([x, y], i) => {
-    const c1 = reportClean[i];
-    const c2 = reportCorrupt[i];
-    log(`    (${x},${y}):`);
-    log(`      чистый:      w=${c1.shameWeights} o=${c1.shameOutput} total=${c1.shameTotal}`);
-    log(`      испорченный: w=${c2.shameWeights} o=${c2.shameOutput} total=${c2.shameTotal}`);
+  // Точность на тесте 2 для каждого варианта
+  log('  Точность на тесте 2:');
+  variants.forEach(v => {
+    const res = Tests.evaluate(v.params, Tests.test2);
+    log(`    ${v.name}: ${(Tests.accuracy(res) * 100).toFixed(1)}%`);
   });
 
-  // Итог: средний стыд с весов
-  const avgClean = reportClean.reduce((a, r) => a + r.shameWeights, 0) / reportClean.length;
-  const avgCorrupt = reportCorrupt.reduce((a, r) => a + r.shameWeights, 0) / reportCorrupt.length;
-  log(`  Средний стыд с весов: чистый=${avgClean.toFixed(3)}, испорченный=${avgCorrupt.toFixed(3)}`);
-  log(`  Вывод: ${avgCorrupt > avgClean + 0.1 ? 'проба оживает на испорченном буфере — детектор деградации работает.' : 'разница слабая, возможно, нужен больший шум.'}`);
+  // Обучаем пробу для каждого варианта и смотрим стыд с весов
+  log('  Стыд с весов (w) и с выхода (o) на тесте 2:');
+  const rows = [];
+  variants.forEach(v => {
+    const { degenerate } = Shame.trainProbe(v.params, Tests.test1);
+    const report = Shame.report(v.params, Tests.test2);
+    const avgW = report.reduce((a, r) => a + r.shameWeights, 0) / report.length;
+    const avgO = report.reduce((a, r) => a + r.shameOutput, 0) / report.length;
+    rows.push({ name: v.name, degenerate, avgW, avgO, report });
+    log(`    [${v.name}] проба ${degenerate ? 'выродилась' : 'обучена'}, средний w=${avgW.toFixed(3)}, средний o=${avgO.toFixed(3)}`);
+  });
+
+  // Детально по ситуациям — сравнение w по трём вариантам
+  log('  Детально по ситуациям (w):');
+  Tests.test2.forEach(([x, y], i) => {
+    const wClean = rows[0].report[i].shameWeights;
+    const wSoft = rows[1].report[i].shameWeights;
+    const wHard = rows[2].report[i].shameWeights;
+    log(`    (${x},${y}): чистый w=${wClean}, soft w=${wSoft}, hard w=${wHard}`);
+  });
+
+  // Вывод
+  const softAlive = rows[1].avgW > rows[0].avgW + 0.05;
+  const hardAlive = rows[2].avgW > rows[0].avgW + 0.05;
+  log('  ВЫВОД:');
+  log(`    soft: ${softAlive ? 'проба оживает (детектор деградации работает)' : 'проба не оживает (порча слишком слабая/сильная)'}`);
+  log(`    hard: ${hardAlive ? 'проба оживает (детектор деградации работает)' : 'проба не оживает (порча слишком слабая/сильная)'}`);
 };
