@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Активное зрение — эксперимент</title>
+<style>
+  body {
+    background: #111;
+    color: #ccc;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  #status {
+    font-size: 20px;
+    letter-spacing: 2px;
+    padding: 8px 24px;
+    border: 1px solid #555;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 12px;
+  }
+  #status.recall {
+    color: #6f6;
+    border-color: #6f6;
+  }
+  #status:hover {
+    background: #222;
+  }
+  #wrap {
+    position: relative;
+    width: 400px;
+    height: 400px; /* 50 * 8 — увеличиваем для наглядности */
+  }
+  canvas {
+    position: absolute;
+    left: 0; top: 0;
+    image-rendering: pixelated;
+    width: 400px;
+    height: 400px;
+  }
+  #scene {
+    width: 50px;
+    height: 50px;
+    /* растянем до 400x400 через CSS */
+  }
+  #box {
+    /* квадратик 3x3 пиксела, т.е. 3 * 8 = 24px на экране */
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ff0;
+    position: absolute;
+    box-sizing: border-box;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  #info {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #888;
+    max-width: 500px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  #log {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+  }
+</style>
+</head>
+<body>
+
+<div id="status">наблюдение</div>
+
+<div id="wrap">
+  <canvas id="scene" width="50" height="50"></canvas>
+  <div id="box"></div>
+</div>
+
+<div id="info">
+  Фаза 1: води курсором по картинке — считываются 3×3 патчи (100 кадров).<br>
+  Затем кликни на «наблюдение» → начнётся «воспоминание». Квадратик пойдёт сам.
+</div>
+<div id="log"></div>
+
+<script>
+// ------------------ Параметры ------------------
+const SIZE = 50;              // картинка 50x50
+const PATCH = 3;              // патч 3x3
+const MAX_FRAMES = 100;       // сколько кадров запомнить
+const PERIOD_MS = 100;        // период записи
+const SCALE = 8;              // 50 -> 400 экранных пикселей
+
+// ------------------ Сцена ------------------
+const scene = document.getElementById('scene');
+const sctx = scene.getContext('2d', { willReadFrequently: true });
+
+function drawScene() {
+  sctx.fillStyle = '#000';
+  sctx.fillRect(0, 0, SIZE, SIZE);
+
+  sctx.strokeStyle = '#999';
+  sctx.lineWidth = 1;
+
+  // круг
+  sctx.beginPath();
+  sctx.arc(16, 16, 10, 0, Math.PI * 2);
+  sctx.stroke();
+
+  // треугольник
+  sctx.beginPath();
+  sctx.moveTo(35, 10);
+  sctx.lineTo(45, 30);
+  sctx.lineTo(25, 30);
+  sctx.closePath();
+  sctx.stroke();
+
+  // квадрат
+  sctx.strokeStyle = '#ccc';
+  sctx.strokeRect(14, 32, 18, 14);
+
+  // пара линий
+  sctx.strokeStyle = '#aaa';
+  sctx.beginPath();
+  sctx.moveTo(35, 38);
+  sctx.lineTo(46, 46);
+  sctx.stroke();
+}
+
+// ------------------ Чтение патча ------------------
+// Возвращает массив из 9 яркостей (0..255). За границей — 0.
+function readPatch(cx, cy) {
+  const arr = new Array(PATCH * PATCH).fill(0);
+  const half = (PATCH - 1) / 2; // 1
+  for (let dy = -half; dy <= half; dy++) {
+    for (let dx = -half; dx <= half; dx++) {
+      const x = cx + dx;
+      const y = cy + dy;
+      const idx = (dy + half) * PATCH + (dx + half);
+      if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
+        arr[idx] = 0;
+        continue;
+      }
+      const d = sctx.getImageData(x, y, 1, 1).data;
+      // серая яркость
+      arr[idx] = (d[0] + d[1] + d[2]) / 3 | 0;
+    }
+  }
+  return arr;
+}
+
+// ------------------ Состояние ------------------
+let phase = 'observe';         // 'observe' | 'recall' | 'done'
+let memory = [];               // [{t, x, y, patch:[9]}]
+let lastRecordTime = 0;
+let recallIndex = 0;           // индекс текущего кадра в памяти
+let recallTimer = null;
+
+const statusEl = document.getElementById('status');
+const boxEl = document.getElementById('box');
+const logEl = document.getElementById('log');
+const wrap = document.getElementById('wrap');
+
+// Позиция квадратика (в координатах картинки 0..49)
+let boxX = 25, boxY = 25;
+function placeBox(x, y) {
+  boxX = x; boxY = y;
+  // CSS: центр квадратика в (x+0.5, y+0.5) картинки
+  // картинка растянута до 400px, значит 1 пиксель = 8 экранных
+  const px = (x + 0.5) * SCALE;
+  const py = (y + 0.5) * SCALE;
+  boxEl.style.left = px + 'px';
+  boxEl.style.top = py + 'px';
+}
+
+// ------------------ Фаза наблюдения ------------------
+function onMouseMove(e) {
+  if (phase !== 'observe') return;
+
+  const rect = scene.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / SCALE);
+  const y = Math.floor((e.clientY - rect.top) / SCALE);
+  if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) return;
+
+  placeBox(x, y);
+
+  const now = performance.now();
+  if (now - lastRecordTime < PERIOD_MS) return;
+  lastRecordTime = now;
+
+  const patch = readPatch(x, y);
+  memory.push({ t: memory.length, x, y, patch });
+  logEl.textContent = `записано кадров: ${memory.length} / ${MAX_FRAMES}`;
+
+  if (memory.length >= MAX_FRAMES) {
+    phase = 'done';
+    statusEl.textContent = 'воспоминание';
+    statusEl.classList.add('recall');
+    logEl.textContent = 'наблюдение завершено. Кликни на «воспоминание».';
+  }
+}
+
+scene.addEventListener('mousemove', onMouseMove);
+// на случай, если курсор за пределами — используем контейнер
+wrap.addEventListener('mousemove', onMouseMove);
+
+// ------------------ Поиск ближайшего патча ------------------
+function nearest(patch) {
+  let best = 0, bestD = Infinity;
+  for (let i = 0; i < memory.length; i++) {
+    const m = memory[i];
+    let d = 0;
+    for (let k = 0; k < 9; k++) {
+      const diff = m.patch[k] - patch[k];
+      d += diff * diff;
+    }
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  return { idx: best, dist: Math.sqrt(bestD) };
+}
+
+// ------------------ Фаза воспоминания ------------------
+function startRecall() {
+  if (phase !== 'done' && phase !== 'recall') return;
+  if (phase === 'recall') {
+    // пауза/стоп
+    clearInterval(recallTimer);
+    recallTimer = null;
+    phase = 'done';
+    statusEl.textContent = 'воспоминание (пауза)';
+    return;
+  }
+  phase = 'recall';
+  statusEl.textContent = 'воспоминание (идёт)';
+  // стартуем с первой записанной точки
+  recallIndex = 0;
+  placeBox(memory[0].x, memory[0].y);
+
+  recallTimer = setInterval(recallStep, 100);
+}
+
+function recallStep() {
+  if (phase !== 'recall') return;
+
+  // 1. Что я вижу сейчас?
+  const curPatch = readPatch(boxX, boxY);
+
+  // 2. Что из памяти похоже на это?
+  const { idx, dist } = nearest(curPatch);
+
+  // 3. Куда двигаться? К координате найденного кадра.
+  const target = memory[idx];
+
+  // если уже почти в цели — берём следующий кадр
+  let nextIdx = idx;
+  if (Math.abs(target.x - boxX) <= 0 && Math.abs(target.y - boxY) <= 0) {
+    nextIdx = (idx + 1) % memory.length;
+  }
+  const next = memory[nextIdx];
+
+  // 4. Шаг на 1 пиксель к цели
+  const dx = Math.sign(next.x - boxX);
+  const dy = Math.sign(next.y - boxY);
+  let nx = boxX + dx;
+  let ny = boxY + dy;
+
+  // не выходим за границы
+  nx = Math.max(0, Math.min(SIZE - 1, nx));
+  ny = Math.max(0, Math.min(SIZE - 1, ny));
+
+  placeBox(nx, ny);
+
+  logEl.textContent =
+    `шаг ${memory.length ? idx : '-'} | ` +
+    `позиция (${nx},${ny}) | ` +
+    `ошибка предсказания: ${dist.toFixed(1)} | ` +
+    `следую к (${next.x},${next.y})`;
+}
+
+// ------------------ Клик по надписи ------------------
+statusEl.addEventListener('click', () => {
+  if (phase === 'observe') {
+    logEl.textContent = 'сначала подвинь курсором по картинке, чтобы записать кадры';
+    return;
+  }
+  startRecall();
+});
+
+// ------------------ Инициализация ------------------
+drawScene();
+placeBox(25, 25);
+</script>
+</body>
+</html>
