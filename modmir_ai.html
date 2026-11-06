@@ -203,69 +203,57 @@ function nearest(patch, prevIdx) {
 }
 
 // ------------------ Фаза воспоминания ------------------
-function startRecall() {
 
+let recallIdx = 0;
+
+function startRecall() {
   if (phase === 'recall') {
-    clearInterval(recallTimer);
-    recallTimer = null;
-    phase = 'done';
-    statusEl.textContent = 'воспоминание (пауза)';
+    clearInterval(recallTimer); recallTimer = null;
+    phase = 'done'; statusEl.textContent = 'воспоминание (пауза)';
     return;
   }
-  if (phase !== 'done') return;
-
+  if (phase !== 'done' || memory.length === 0) return;
   phase = 'recall';
   statusEl.textContent = 'воспоминание (идёт)';
-  prevRecallIdx = -1;
-  placeBox(memory[0].x, memory[0].y);
+
+  // стартовый индекс — по патчу в первой записанной точке
+  const startPatch = readPatch(memory[0].x, memory[0].y);
+  const { idx } = nearest(startPatch, -1);
+  recallIdx = idx >= 0 ? idx : 0;
+  placeBox(memory[recallIdx].x, memory[recallIdx].y);
 
   recallTimer = setInterval(recallStep, PERIOD_MS);
-
-  let prevPos = null;
 }
-
-
 
 function recallStep() {
   if (phase !== 'recall') return;
 
-  const curPatch = readPatch(boxX, boxY);
-  const { idx, dist } = nearest(curPatch, -1); // без исключения
-  if (idx < 0) return;
+  // идём строго вперёд по записанной последовательности
+  recallIdx = (recallIdx + 1) % memory.length;
+  const target = memory[recallIdx];
 
-  const m = memory[idx];
-
-  // если узнал своё место — идём дальше по времени
-  let stepDx = Math.sign(m.dx);
-  let stepDy = Math.sign(m.dy);
-
-  const atPlace = (m.x === boxX && m.y === boxY);
-  if (atPlace) {
-    const nn = memory[(idx + 1) % memory.length];
-    stepDx = Math.sign(nn.x - boxX);
-    stepDy = Math.sign(nn.y - boxY);
-  }
-
-  let nx = boxX + stepDx;
-  let ny = boxY + stepDy;
-
-  // не откатываться на предыдущую позицию
-  if (prevPos && nx === prevPos.x && ny === prevPos.y) {
-    const nn = memory[(idx + 1) % memory.length];
-    nx = boxX + Math.sign(nn.x - boxX);
-    ny = boxY + Math.sign(nn.y - boxY);
-  }
-
+  // шаг на 1 пиксель к target
+  let nx = boxX + Math.sign(target.x - boxX);
+  let ny = boxY + Math.sign(target.y - boxY);
   nx = Math.max(0, Math.min(SIZE - 1, nx));
   ny = Math.max(0, Math.min(SIZE - 1, ny));
 
-  prevPos = { x: boxX, y: boxY };
+  // если дошли до target — перескакиваем на следующий кадр в этом же тике
+  if (nx === target.x && ny === target.y) {
+    recallIdx = (recallIdx + 1) % memory.length;
+  }
+
   placeBox(nx, ny);
 
+  const curPatch = readPatch(nx, ny);
+  const { idx: nearIdx, dist } = nearest(curPatch, -1);
+
   logEl.textContent =
-    `idx=${idx} pos=(${nx},${ny}) dist=${dist.toFixed(1)} ` +
-    `atPlace=${atPlace} dir=(${m.dx},${m.dy})`;
+    `walk=${recallIdx} pos=(${nx},${ny}) target=(${target.x},${target.y}) ` +
+    `nearest=${nearIdx} dist=${dist.toFixed(1)}`;
 }
+
+
 // ------------------ Клик по надписи ------------------
 statusEl.addEventListener('click', () => {
   if (phase === 'loading') return;
