@@ -204,6 +204,7 @@ function nearest(patch, prevIdx) {
 
 // ------------------ Фаза воспоминания ------------------
 function startRecall() {
+
   if (phase === 'recall') {
     clearInterval(recallTimer);
     recallTimer = null;
@@ -219,48 +220,52 @@ function startRecall() {
   placeBox(memory[0].x, memory[0].y);
 
   recallTimer = setInterval(recallStep, PERIOD_MS);
+
+  let prevPos = null;
 }
+
+
 
 function recallStep() {
   if (phase !== 'recall') return;
 
-  // 1. Что я вижу сейчас?
   const curPatch = readPatch(boxX, boxY);
-
-  // 2. Что из памяти похоже на это? (исключая прошлый шаг)
-  const { idx, dist } = nearest(curPatch, prevRecallIdx);
-
+  const { idx, dist } = nearest(curPatch, -1); // без исключения
   if (idx < 0) return;
+
   const m = memory[idx];
 
-  // 3. Куда двигаться? Берём направление движения, записанное в этом кадре.
-  //    Т.е. «я узнал место → иду туда, куда шёл тогда».
-  const stepDx = Math.sign(m.dx);
-  const stepDy = Math.sign(m.dy);
+  // если узнал своё место — идём дальше по времени
+  let stepDx = Math.sign(m.dx);
+  let stepDy = Math.sign(m.dy);
+
+  const atPlace = (m.x === boxX && m.y === boxY);
+  if (atPlace) {
+    const nn = memory[(idx + 1) % memory.length];
+    stepDx = Math.sign(nn.x - boxX);
+    stepDy = Math.sign(nn.y - boxY);
+  }
 
   let nx = boxX + stepDx;
   let ny = boxY + stepDy;
 
-  // если направление нулевое — шагнём к следующему по времени кадру
-  if (stepDx === 0 && stepDy === 0) {
+  // не откатываться на предыдущую позицию
+  if (prevPos && nx === prevPos.x && ny === prevPos.y) {
     const nn = memory[(idx + 1) % memory.length];
     nx = boxX + Math.sign(nn.x - boxX);
     ny = boxY + Math.sign(nn.y - boxY);
   }
 
-  // не выходим за границы
   nx = Math.max(0, Math.min(SIZE - 1, nx));
   ny = Math.max(0, Math.min(SIZE - 1, ny));
 
+  prevPos = { x: boxX, y: boxY };
   placeBox(nx, ny);
-  prevRecallIdx = idx;
 
   logEl.textContent =
-    `idx=${idx} pos=(${nx},${ny}) ` +
-    `dist=${dist.toFixed(1)} ` +
-    `dir=(${m.dx},${m.dy})`;
+    `idx=${idx} pos=(${nx},${ny}) dist=${dist.toFixed(1)} ` +
+    `atPlace=${atPlace} dir=(${m.dx},${m.dy})`;
 }
-
 // ------------------ Клик по надписи ------------------
 statusEl.addEventListener('click', () => {
   if (phase === 'loading') return;
