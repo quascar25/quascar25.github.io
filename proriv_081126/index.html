@@ -143,7 +143,7 @@
 
     /* ЧЕЛОВЕК: такая же схема — кристалл сверху, мир + панель в строку */
     #humanStage {
-      display: grid;
+      display: none;
       grid-template-columns: 1fr 1fr;   /* ← одинаково, но сцена не на всю ширину */
       grid-template-areas:
         "crystal crystal"
@@ -152,6 +152,9 @@
       width: 100%;
       justify-items: stretch;
       align-items: start;
+    }
+    body.human #humanStage {
+      display: grid;
     }
     #humanStage > .panel:nth-child(1) { grid-area: crystal; }
     #humanStage > .panel:nth-child(2) { grid-area: world; }
