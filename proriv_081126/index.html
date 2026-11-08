@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>upper-lattice: два канала обучения</title>
+<style>
+  body {
+    background: #0a0a0a; color: #bbb; font-family: monospace;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px; margin: 0;
+  }
+  h1 { font-size: 14px; letter-spacing: 3px; color: #666; margin: 0 0 12px; font-weight: normal; }
+  #stage {
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .panel {
+    border: 1px solid #222; background: #0f0f0f; padding: 8px;
+  }
+  .label { font-size: 11px; color: #555; letter-spacing: 1px; margin-bottom: 6px; }
+  #cubeCv { display: block; }
+  #sceneCv { display: block; cursor: crosshair; }
+  #side { width: 220px; }
+  #errbar { height: 8px; background: #1a1a1a; margin: 4px 0 8px; }
+  #errfill { height: 100%; width: 0%; background: #6f6; transition: width 0.1s; }
+  #audit { font-size: 11px; color: #888; height: 140px; overflow-y: auto; line-height: 1.5; }
+  #audit .w { color: #fc6; }
+  #audit .m { color: #69f; }
+  #audit .ok { color: #6f6; }
+  #audit .bad { color: #f66; }
+  #scanner { font-size: 11px; color: #888; margin-top: 8px; }
+  #legend { font-size: 10px; color: #555; margin-top: 8px; line-height: 1.6; }
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 4px; vertical-align: middle; }
+  #controls { font-size: 11px; color: #777; margin-top: 8px; }
+  #controls label { display: block; margin: 4px 0; }
+  input[type=range] { width: 100%; }
+</style>
+</head>
+<body>
+
+<h1>UPPER-LATTICE · ДВА КАНАЛА ОБУЧЕНИЯ</h1>
+
+<div id="stage">
+  <!-- КУБИК -->
+  <div class="panel">
+    <div class="label">МИНИ-СЕТЬ · 100 ПАРАМЕТРОВ</div>
+    <canvas id="cubeCv" width="340" height="340"></canvas>
+  </div>
+
+  <!-- СЦЕНА -->
+  <div class="panel">
+    <div class="label">СЦЕНА · ДВИГАЙ ПРИМИТИВЫ МЫШЬЮ</div>
+    <canvas id="sceneCv" width="340" height="340"></canvas>
+  </div>
+
+  <!-- ПАНЕЛЬ -->
+  <div class="panel" id="side">
+    <div class="label">ОШИБКА ПРЕДСКАЗАНИЯ</div>
+    <div id="errbar"><div id="errfill"></div></div>
+    <div id="errval" style="font-size:11px;color:#666;">0.000</div>
+
+    <div class="label" style="margin-top:12px;">ЖУРНАЛ АУДИТА</div>
+    <div id="audit"></div>
+
+    <div id="scanner" class="label" style="margin-top:12px;">СКАНЕР</div>
+    <div id="scanval" style="font-size:11px;color:#666;">—</div>
+
+    <div id="controls">
+      <label>частота консолидации: <span id="consVal">20</span> тиков
+        <input type="range" id="cons" min="5" max="100" value="20">
+      </label>
+      <label>сила регулятора: <span id="regVal">0.15</span>
+        <input type="range" id="reg" min="1" max="50" value="15">
+      </label>
+      <label>
+        <input type="checkbox" id="pause" checked> пауза обучения
+      </label>
+    </div>
+
+    <div id="legend">
+      <div><span class="dot" style="background:#69f;"></span>динамическая память (медленно)</div>
+      <div><span class="dot" style="background:#fc6;"></span>регулятор весов (точечно)</div>
+      <div><span class="dot" style="background:#6f6;"></span>резервный параметр задействован</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// МИНИ-СЕТЬ
+// вход: 6 (x,y трёх примитивов) → скрытый 10 (tanh) → выход 6
+// параметров: 6*10 + 10 + 10*6 + 6 = 136... ужмём до 100:
+// вход 4 (x,y квадрата и треугольника), скрытый 10, выход 4
+// 4*10 + 10 + 10*4 + 4 = 94 + 6 резервных = 100
+// ============================================================
+const N_IN = 4;        // x,y квадрата + x,y треугольника
+const N_HID = 10;
+const N_OUT = 4;       // предсказанные x,y квадрата и треугольника
+const N_MAIN = N_IN*N_HID + N_HID + N_HID*N_OUT + N_OUT; // 94
+const N_TOTAL = 100;   // + 6 резервных
+
+// веса: плоский массив
+const W = new Float32Array(N_TOTAL);
+const W0 = new Float32Array(N_TOTAL); // для аудита «было»
+
+// инициализация малыми случайными
+for (let i = 0; i < N_MAIN; i++) W[i] = (Math.random() - 0.5) * 0.5;
+// резервные = 0
+for (let i = N_MAIN; i < N_TOTAL; i++) W[i] = 0;
+
+// индексы весов в плоском массиве
+function idxIn(i, h) { return i*N_HID + h; }              // 0..39
+function idxHidB(h) { return N_IN*N_HID + h; }            // 40..49
+function idxOut(h, o) { return N_IN*N_HID + N_HID + h*N_OUT + o; } // 50..89
+function idxOutB(o) { return N_IN*N_HID + N_HID + N_HID*N_OUT + o; } // 90..93
+
+// forward pass
+function forward(x) {
+  const hid = new Float32Array(N_HID);
+  for (let h = 0; h < N_HID; h++) {
+    let s = W[idxHidB(h)];
+    for (let i = 0; i < N_IN; i++) s += x[i] * W[idxIn(i, h)];
+    hid[h] = Math.tanh(s);
+  }
+  const out = new Float32Array(N_OUT);
+  for (let o = 0; o < N_OUT; o++) {
+    let s = W[idxOutB(o)];
+    for (let h = 0; h < N_HID; h++) s += hid[h] * W[idxOut(h, o)];
+    out[o] = s;
+  }
+  return { hid, out };
+}
+
+// ============================================================
+// СЦЕНА
+// ============================================================
+const sceneCv = document.getElementById('sceneCv');
+const sctx = sceneCv.getContext('2d');
+const SW = 340, SH = 340;
+
+const prims = {
+  circle: { x: 80,  y: 80,  r: 14, color: '#6cf', dragging: false },
+  tri:    { x: 250, y: 120, r: 16, color: '#f96', dragging: false },
+  square: { x: 170, y: 250, r: 14, color: '#9f6', dragging: false },
+};
+
+// последний фактический и предсказанный
+let lastPred = null;
+let lastActual = null;
+let errorNow = 0;
+
+function drawScene() {
+  sctx.fillStyle = '#0a0a0a';
+  sctx.fillRect(0, 0, SW, SH);
+  // сетка
+  sctx.strokeStyle = '#151515';
+  sctx.lineWidth = 1;
+  for (let i = 0; i <= SW; i += 20) {
+    sctx.beginPath(); sctx.moveTo(i, 0); sctx.lineTo(i, SH); sctx.stroke();
+    sctx.beginPath(); sctx.moveTo(0, i); sctx.lineTo(SW, i); sctx.stroke();
+  }
+
+  // круг
+  sctx.fillStyle = prims.circle.color;
+  sctx.beginPath();
+  sctx.arc(prims.circle.x, prims.circle.y, prims.circle.r, 0, Math.PI*2);
+  sctx.fill();
+
+  // треугольник
+  const t = prims.tri;
+  sctx.beginPath();
+  sctx.moveTo(t.x, t.y - t.r);
+  sctx.lineTo(t.x + t.r, t.y + t.r*0.7);
+  sctx.lineTo(t.x - t.r, t.y + t.r*0.7);
+  sctx.closePath();
+  sctx.fill();
+
+  // квадрат
+  const s = prims.square;
+  sctx.fillRect(s.x - s.r, s.y - s.r, s.r*2, s.r*2);
+
+  // предсказание для квадрата (контур)
+  if (lastPred) {
+    sctx.strokeStyle = 'rgba(255,204,102,0.6)';
+    sctx.lineWidth = 1.5;
+    sctx.strokeRect(lastPred[2] - s.r, lastPred[3] - s.r, s.r*2, s.r*2);
+  }
+}
+
+// нормализация координат в [-1,1]
+function norm(v, max) { return (v / max) * 2 - 1; }
+
+// текущий вход сети: x,y квадрата и треугольника
+function currentInput() {
+  return [
+    norm(prims.square.x, SW),
+    norm(prims.square.y, SH),
+    norm(prims.tri.x, SW),
+    norm(prims.tri.y, SH),
+  ];
+}
+// фактический выход (что должно быть предсказано)
+function currentActual() {
+  return [
+    norm(prims.square.x, SW),
+    norm(prims.square.y, SH),
+    norm(prims.tri.x, SW),
+    norm(prims.tri.y, SH),
+  ];
+}
+
+/////////////////////////////////
+
+  // ============================================================
+// ОБУЧЕНИЕ: ДВА КАНАЛА
+// ============================================================
+
+// буфер динамической памяти
+const memBuf = [];        // {x: Float32Array(4), y: Float32Array(4)}
+const MEM_CAP = 60;
+
+// подсветка узлов кубика: {until, color}
+const flashes = new Array(N_TOTAL).fill(null);
+
+function flash(i, color, ms = 600) {
+  flashes[i] = { until: performance.now() + ms, color };
+}
+
+// ошибка текущего предсказания
+function computeError() {
+  const x = currentInput();
+  const actual = currentActual();
+  const { out } = forward(x);
+  let e = 0;
+  for (let i = 0; i < N_OUT; i++) e += (out[i] - actual[i]) ** 2;
+  return { err: e / N_OUT, out, actual, x };
+}
+
+// КАНАЛ 1: динамическая память (синий)
+// пишем пару (вход, фактический выход) в буфер.
+// раз в consN тиков — консолидация: сдвигаем веса к среднему по буферу.
+function memoryStep() {
+  const x = currentInput();
+  const y = currentActual();
+  memBuf.push({ x: Float32Array.from(x), y: Float32Array.from(y) });
+  if (memBuf.length > MEM_CAP) memBuf.shift();
+}
+
+let consCounter = 0;
+let consN = 20;
+
+function consolidate() {
+  if (memBuf.length < 5) return;
+  // усреднённый градиент по буферу (упрощённо: сдвиг к среднему выходу)
+  // для каждого веса — маленький шаг по численному градиенту на подвыборке
+  const lr = 0.02;
+  const sample = memBuf.slice(-15);
+  const grads = new Float32Array(N_MAIN);
+
+  for (const s of sample) {
+    const { hid, out } = forward(s.x);
+    const delta = new Float32Array(N_OUT);
+    for (let o = 0; o < N_OUT; o++) delta[o] = out[o] - s.y[o];
+
+    // выходные веса
+    for (let o = 0; o < N_OUT; o++) {
+      grads[idxOutB(o)] += delta[o];
+      for (let h = 0; h < N_HID; h++) grads[idxOut(h, o)] += delta[o] * hid[h];
+    }
+    // скрытые (через производную tanh)
+    for (let h = 0; h < N_HID; h++) {
+      let back = 0;
+      for (let o = 0; o < N_OUT; o++) back += delta[o] * W[idxOut(h, o)];
+      back *= (1 - hid[h]*hid[h]);
+      grads[idxHidB(h)] += back;
+      for (let i = 0; i < N_IN; i++) grads[idxIn(i, h)] += back * s.x[i];
+    }
+  }
+
+  // применяем
+  for (let i = 0; i < N_MAIN; i++) {
+    const g = grads[i] / sample.length;
+    if (Math.abs(g) > 1e-4) {
+      W0[i] = W[i];
+      W[i] -= lr * g;
+      // синее мерцание, слабое
+      if (Math.random() < 0.3) flash(i, '#69f', 400);
+    }
+  }
+}
+
+// КАНАЛ 2: регулятор весов (жёлтый)
+// раз в regN тиков: выбираем 1-3 параметра с наибольшим |gradient|,
+// правим сильно, проверяем на тестовом наборе, откатываем при регрессии.
+let regN = 8;
+let regCounter = 0;
+let regStrength = 0.15;
+
+function regulatorStep() {
+  const x = currentInput();
+  const actual = currentActual();
+  const { hid, out } = forward(x);
+  const delta = new Float32Array(N_OUT);
+  for (let o = 0; o < N_OUT; o++) delta[o] = out[o] - actual[o];
+
+  // градиенты по всем весам
+  const grads = new Float32Array(N_MAIN);
+  for (let o = 0; o < N_OUT; o++) {
+    grads[idxOutB(o)] = delta[o];
+    for (let h = 0; h < N_HID; h++) grads[idxOut(h, o)] = delta[o] * hid[h];
+  }
+  for (let h = 0; h < N_HID; h++) {
+    let back = 0;
+    for (let o = 0; o < N_OUT; o++) back += delta[o] * W[idxOut(h, o)];
+    back *= (1 - hid[h]*hid[h]);
+    grads[idxHidB(h)] = back;
+    for (let i = 0; i < N_IN; i++) grads[idxIn(i, h)] = back * x[i];
+  }
+
+  // топ-3 по |g|
+  const order = [];
+  for (let i = 0; i < N_MAIN; i++) order.push([i, Math.abs(grads[i])]);
+  order.sort((a, b) => b[1] - a[1]);
+
+  // тестовый набор: несколько фиксированных входов
+  const testInputs = [
+    [0, 0, 0, 0],
+    [0.5, -0.5, -0.5, 0.5],
+    [-0.7, 0.3, 0.3, -0.7],
+  ];
+  const before = testInputs.map(ti => forward(ti).out.slice());
+
+  // применяем правку
+  const edited = [];
+  for (let k = 0; k < Math.min(3, order.length); k++) {
+    const i = order[k][0];
+    if (order[k][1] < 1e-4) break;
+    const g = grads[i];
+    W0[i] = W[i];
+    W[i] -= regStrength * g;
+    edited.push(i);
+    flash(i, '#fc6', 800);
+  }
+  if (edited.length === 0) return;
+
+  // проверка на тестовом наборе
+  const after = testInputs.map(ti => forward(ti).out.slice());
+  let regression = 0;
+  for (let j = 0; j < testInputs.length; j++) {
+    for (let o = 0; o < N_OUT; o++) {
+      const d = Math.abs(after[j][o] - before[j][o]);
+      if (d > 0.15) regression++;
+    }
+  }
+
+  if (regression > 0) {
+    // откат
+    for (const i of edited) W[i] = W0[i];
+    for (const i of edited) flash(i, '#f66', 600);
+    audit(`✗ откат ${edited.length} пар. (регрессия ${regression})`, 'bad');
+  } else {
+    audit(
+      `✓ правка #${edited.join(',')} ` +
+      edited.map(i => `[${W0[i].toFixed(2)}→${W[i].toFixed(2)}]`).join(' '),
+      'w'
+    );
+  }
+}
+
+// ============================================================
+// АУДИТ И СКАНЕР
+// ============================================================
+const auditEl = document.getElementById('audit');
+function audit(text, cls) {
+  const div = document.createElement('div');
+  div.className = cls || '';
+  div.textContent = text;
+  auditEl.appendChild(div);
+  while (auditEl.children.length > 30) auditEl.removeChild(auditEl.firstChild);
+  auditEl.scrollTop = auditEl.scrollHeight;
+}
+
+const scanEl = document.getElementById('scanval');
+let scannerPred = null;
+
+function scannerStep() {
+  // «сканер»: предсказывает, вырастет ли ошибка на следующем тике.
+  // простая эвристика: если |ошибка| растёт — предсказываем рост.
+  const e = errorNow;
+  if (scannerPred === null) {
+    scannerPred = { expected: e, ok: null };
+    return;
+  }
+  const dir = e > scannerPred.expected ? '↑' : '↓';
+  const ok = (dir === '↑' && e > scannerPred.expected) ||
+             (dir === '↓' && e < scannerPred.expected);
+  scanEl.textContent =
+    `прогноз ${dir} | факт ${e.toFixed(3)} | ` +
+    (e > scannerPred.expected ? 'рост' : 'падение');
+  scannerPred = { expected: e, ok };
+}
+
+// ============================================================
+// КУБИК (2D-изометрия)
+// ============================================================
+const cubeCv = document.getElementById('cubeCv');
+const cctx = cubeCv.getContext('2d');
+const CW = 340, CH = 340;
+let angle = 0;
+
+function project(x, y, z) {
+  // изометрия с медленным вращением
+  const cos = Math.cos(angle), sin = Math.sin(angle);
+  const rx = x*cos - z*sin;
+  const rz = x*sin + z*cos;
+  const px = CW/2 + (rx - rz) * 0.7;
+  const py = CH/2 + (rx + rz) * 0.35 - y * 0.9;
+  return { px, py };
+}
+
+function drawCube() {
+  cctx.fillStyle = '#0a0a0a';
+  cctx.fillRect(0, 0, CW, CH);
+
+  const s = 120; // половина стороны куба
+  // 8 углов
+  const corners = [
+    [-s,-s,-s],[s,-s,-s],[s,s,-s],[-s,s,-s],
+    [-s,-s, s],[s,-s, s],[s,s, s],[-s,s, s],
+  ];
+  const p = corners.map(c => project(c[0], c[1], c[2]));
+
+  // рёбра
+  const edges = [
+    [0,1],[1,2],[2,3],[3,0],
+    [4,5],[5,6],[6,7],[7,4],
+    [0,4],[1,5],[2,6],[3,7],
+  ];
+  cctx.strokeStyle = 'rgba(80,80,80,0.5)';
+  cctx.lineWidth = 1;
+  for (const [a, b] of edges) {
+    cctx.beginPath();
+    cctx.moveTo(p[a].px, p[a].py);
+    cctx.lineTo(p[b].px, p[b].py);
+    cctx.stroke();
+  }
+
+  // 100 узлов: 10x10x1, распределяем по «стенкам» куба
+  // сделаем 10x10 на передней грани для читаемости
+  const N = 10;
+  const now = performance.now();
+  for (let gy = 0; gy < N; gy++) {
+    for (let gx = 0; gx < N; gx++) {
+      const i = gy*N + gx;
+      // позиция на передней грани (z = s)
+      const lx = -s + (gx + 0.5) * (2*s/N);
+      const ly = -s + (gy + 0.5) * (2*s/N);
+      const { px, py } = project(lx, ly, s);
+
+      // размер и яркость по весу
+      const w = W[i] || 0;
+      const mag = Math.min(1, Math.abs(w) * 1.5);
+      let color = `rgba(60, 120, 200, ${0.15 + mag*0.6})`;
+      if (i >= N_MAIN) color = `rgba(80, 80, 80, ${0.1 + mag*0.5})`; // резерв
+
+      // вспышка
+      const f = flashes[i];
+      if (f && now < f.until) {
+        const t = (f.until - now) / 600;
+        cctx.fillStyle = f.color;
+        cctx.globalAlpha = Math.min(1, t);
+      } else {
+        cctx.fillStyle = color;
+        cctx.globalAlpha = 1;
+      }
+      const r = 4 + mag * 3;
+      cctx.beginPath();
+      cctx.arc(px, py, r, 0, Math.PI*2);
+      cctx.fill();
+      cctx.globalAlpha = 1;
+    }
+  }
+
+  // подпись
+  cctx.fillStyle = '#333';
+  cctx.font = '10px monospace';
+  cctx.fillText(`main: ${N_MAIN} | резерв: ${N_TOTAL - N_MAIN}`, 8, CH - 8);
+}
+
+// ============================================================
+// МЫШЬ
+// ============================================================
+let dragTarget = null;
+sceneCv.addEventListener('mousedown', e => {
+  const rect = sceneCv.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  for (const k in prims) {
+    const p = prims[k];
+    if (Math.hypot(mx - p.x, my - p.y) < p.r + 8) {
+      dragTarget = k;
+      break;
+    }
+  }
+});
+sceneCv.addEventListener('mousemove', e => {
+  if (!dragTarget) return;
+  const rect = sceneCv.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const p = prims[dragTarget];
+  p.x = Math.max(p.r, Math.min(SW - p.r, mx));
+  p.y = Math.max(p.r, Math.min(SH - p.r, my));
+});
+window.addEventListener('mouseup', () => { dragTarget = null; });
+
+// ============================================================
+// ЦИКЛ
+// ============================================================
+const errFill = document.getElementById('errfill');
+const errVal = document.getElementById('errval');
+
+const pauseEl = document.getElementById('pause');
+const consEl = document.getElementById('cons');
+const regEl = document.getElementById('reg');
+const consVal = document.getElementById('consVal');
+const regVal = document.getElementById('regVal');
+
+consEl.addEventListener('input', () => { consN = +consEl.value; consVal.textContent = consN; });
+regEl.addEventListener('input', () => { regStrength = +regEl.value / 100; regVal.textContent = regStrength.toFixed(2); });
+
+let tick = 0;
+let lastErr = 0;
+
+function loop() {
+  angle += 0.004;
+
+  // оценка ошибки
+  const { err, out, actual, x } = computeError();
+  errorNow = err;
+  lastPred = out;
+  lastActual = actual;
+
+  // визуализация ошибки
+  const pct = Math.min(100, err * 300);
+  errFill.style.width = pct + '%';
+  errFill.style.background = err < 0.01 ? '#6f6' : err < 0.05 ? '#fc6' : '#f66';
+  errVal.textContent = err.toFixed(4);
+
+  // обучение
+  if (!pauseEl.checked) {
+    tick++;
+    memoryStep();
+    consCounter++;
+    if (consCounter >= consN) { consolidate(); consCounter = 0; }
+    regCounter++;
+    if (regCounter >= regN) { regulatorStep(); regCounter = 0; }
+  }
+
+  if (tick % 5 === 0) scannerStep();
+
+  drawScene();
+  drawCube();
+
+  requestAnimationFrame(loop);
+}
+
+audit('система инициализирована', '');
+audit(`параметров: ${N_TOTAL} (${N_MAIN} основных + ${N_TOTAL-N_MAIN} резервных)`, 'm');
+loop();
+</script>
+
+
+  
