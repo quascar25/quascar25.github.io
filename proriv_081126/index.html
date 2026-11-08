@@ -37,9 +37,10 @@
 
   /* === режим "Человек" === */
   body.human h1 { color: #aaa; letter-spacing: 4px; }
+  body.human #stage { display: none; }        /* ← добавь эту строку */
   body.human #expertPanel { display: none; }
   body.human #humanPanel { display: block; }
-  body.human #cubePanel { display: none; }
+  body.human #cubePanel { display: none; }    /* это можно оставить, не мешает */
   body.human #humanStage { display: flex; }
   body.human #tagline { display: block; }
 
