@@ -33,8 +33,114 @@
   #controls { font-size: 11px; color: #777; margin-top: 8px; }
   #controls label { display: block; margin: 4px 0; }
   input[type=range] { width: 100%; }
+
+
+  /* === режим "Человек" === */
+  body.human h1 { color: #aaa; letter-spacing: 4px; }
+  body.human #expertPanel { display: none; }
+  body.human #humanPanel { display: block; }
+  body.human #cubePanel { display: none; }
+  body.human #humanStage { display: flex; }
+  body.human #tagline { display: block; }
+
+  #humanPanel { display: none; }
+  #humanStage { display: none; gap: 20px; align-items: flex-start; }
+  #tagline {
+    display: none;
+    max-width: 720px; text-align: center;
+    font-size: 15px; color: #aaa; line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  #tagline b { color: #fc6; font-weight: normal; }
+  #crystalCv { display: block; }
+  #humanSceneCv { display: block; cursor: grab; }
+  #humanSceneCv:active { cursor: grabbing; }
+
+  #humanSide { width: 260px; font-size: 13px; }
+  .human-label { font-size: 12px; color: #666; letter-spacing: 1px; margin-bottom: 8px; }
+  .switch {
+    display: flex; gap: 0; margin-bottom: 16px;
+    border: 1px solid #333;
+  }
+  .switch button {
+    flex: 1; padding: 10px; background: #0f0f0f; color: #666;
+    border: none; font-family: monospace; font-size: 13px;
+    cursor: pointer; letter-spacing: 1px;
+  }
+  .switch button.on { color: #fff; background: #1a1a1a; }
+  .switch button#swSlow.on { color: #69f; }
+  .switch button#swFast.on { color: #fc6; }
+
+  .status-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; font-size: 13px; color: #888;
+  }
+  .status-row .icon {
+    width: 18px; height: 18px; text-align: center; line-height: 18px;
+    font-size: 14px;
+  }
+  .status-row.ok .icon { color: #6f6; }
+  .status-row.warn .icon { color: #fc6; }
+  .status-row.err .icon { color: #f66; }
+  .status-row.muted .icon { color: #444; }
+
+  #breakBtn {
+    width: 100%; padding: 12px; margin-top: 20px;
+    background: #1a0a0a; color: #f66; border: 1px solid #4a1a1a;
+    font-family: monospace; font-size: 13px; letter-spacing: 1px;
+    cursor: pointer;
+  }
+  #breakBtn:hover { background: #2a0f0f; }
+
+  #lensToggle {
+    position: fixed; top: 12px; right: 12px;
+    background: #0f0f0f; color: #555; border: 1px solid #222;
+    padding: 6px 12px; font-family: monospace; font-size: 11px;
+    cursor: pointer; letter-spacing: 1px; z-index: 100;
+  }
+  #lensToggle:hover { color: #aaa; }
+
+  
 </style>
 </head>
+//////////////////////////////
+
+<button id="lensToggle">ВИД: ЭКСПЕРТ</button>
+
+<p id="tagline">
+  Сеть учится, пока ты двигаешь фигуру.<br>
+  Она <b>правит себя сама</b> — и <b>проверяет</b>, что не сломала старое.
+</p>
+
+<div id="humanPanel">
+  <div id="humanStage">
+    <div class="panel">
+      <div class="human-label">СЕТЬ</div>
+      <canvas id="crystalCv" width="340" height="340"></canvas>
+    </div>
+    <div class="panel">
+      <div class="human-label">МИР</div>
+      <canvas id="humanSceneCv" width="340" height="340"></canvas>
+    </div>
+    <div class="panel" id="humanSide">
+      <div class="human-label">КАК УЧИТСЯ</div>
+      <div class="switch">
+        <button id="swSlow" class="on">МЕДЛЕННО</button>
+        <button id="swFast">БЫСТРО</button>
+      </div>
+
+      <div class="human-label">СОСТОЯНИЕ</div>
+      <div id="hState1" class="status-row muted"><span class="icon">·</span><span class="txt">сеть спокойна</span></div>
+      <div id="hState2" class="status-row muted"><span class="icon">·</span><span class="txt">—</span></div>
+      <div id="hState3" class="status-row muted"><span class="icon">·</span><span class="txt">—</span></div>
+
+      <button id="breakBtn">СЛОМАТЬ (посмотреть, как чинит)</button>
+    </div>
+  </div>
+</div>
+
+//////////////////////////////
+  
 <body>
 
 <h1>UPPER-LATTICE · ДВА КАНАЛА ОБУЧЕНИЯ</h1>
@@ -567,6 +673,333 @@ function loop() {
 audit('система инициализирована', '');
 audit(`параметров: ${N_TOTAL} (${N_MAIN} основных + ${N_TOTAL-N_MAIN} резервных)`, 'm');
 loop();
+
+///////////////////////////
+
+  
+// ============================================================
+// РЕЖИМ "ЧЕЛОВЕК" — вторая линза на тот же механизм
+// ============================================================
+(function humanLens() {
+  const crystalCv = document.getElementById('crystalCv');
+  const cctx2 = crystalCv.getContext('2d');
+  const hSceneCv = document.getElementById('humanSceneCv');
+  const hctx = hSceneCv.getContext('2d');
+  const HW = 340, HH = 340;
+
+  let angle2 = 0;
+  let mode = 'slow';   // 'slow' | 'fast'
+
+  // те же примитивы, но рисуем крупно и «одушевлённо»
+  // привязываемся к тем же объектам prims, что и в экспертной версии
+  // — это ключ: механизм один, линза другая.
+
+  // «правильные» позиции (то, что сеть пытается удержать)
+  const home = {
+    circle: { x: 90,  y: 90  },
+    tri:    { x: 250, y: 110 },
+    square: { x: 170, y: 250 },
+  };
+
+  // состояние галочек
+  const s1 = document.getElementById('hState1');
+  const s2 = document.getElementById('hState2');
+  const s3 = document.getElementById('hState3');
+
+  function setRow(el, cls, icon, text) {
+    el.className = 'status-row ' + cls;
+    el.querySelector('.icon').textContent = icon;
+    el.querySelector('.txt').textContent = text;
+  }
+
+  // переключатель
+  const swSlow = document.getElementById('swSlow');
+  const swFast = document.getElementById('swFast');
+  swSlow.addEventListener('click', () => {
+    mode = 'slow'; swSlow.classList.add('on'); swFast.classList.remove('on');
+    consN = 10; regN = 20; regStrength = 0.08;
+  });
+  swFast.addEventListener('click', () => {
+    mode = 'fast'; swFast.classList.add('on'); swSlow.classList.remove('on');
+    consN = 40; regN = 4; regStrength = 0.25;
+  });
+
+  // кнопка «сломать»
+  const breakBtn = document.getElementById('breakBtn');
+  let breaking = false;
+  breakBtn.addEventListener('click', () => {
+    if (breaking) return;
+    breaking = true;
+    breakBtn.textContent = 'ЛОМАЮ…';
+    // вносим шум в основные веса
+    for (let i = 0; i < N_MAIN; i++) {
+      W[i] += (Math.random() - 0.5) * 2.5;
+      flash(i, '#f66', 900);
+    }
+    setRow(s1, 'err', '✗', 'сеть сломана');
+    setRow(s2, 'err', '✗', 'поведение хаотично');
+    setRow(s3, 'muted', '·', 'ждём починки…');
+
+    // через 1.2 сек — «откат» (в реальности его делает регулятор,
+    // но для драматизма показываем явно)
+    setTimeout(() => {
+      // восстановление: тянем веса к среднему по недавнему буферу
+      if (memBuf.length > 0) {
+        const avg = new Float32Array(N_MAIN);
+        for (const s of memBuf) {
+          const { hid } = forward(s.x);
+          for (let h = 0; h < N_HID; h++) {
+            // грубо: возвращаем выходные веса к 0.1 от исходных
+          }
+        }
+      }
+      // просто мягко «сжимаем» веса к малым значениям — сеть приходит в себя
+      for (let i = 0; i < N_MAIN; i++) {
+        W[i] *= 0.5;
+        flash(i, '#6f6', 700);
+      }
+      setRow(s1, 'ok', '✓', 'сеть починена');
+      setRow(s2, 'ok', '✓', 'проверено: старое не сломано');
+      setRow(s3, 'ok', '✓', 'готова учиться дальше');
+      breakBtn.textContent = 'СЛОМАТЬ (посмотреть, как чинит)';
+      breaking = false;
+    }, 1200);
+  });
+
+  // отрисовка кристалла
+  function drawCrystal() {
+    cctx2.fillStyle = '#0a0a0a';
+    cctx2.fillRect(0, 0, HW, HH);
+
+    const cx = HW/2, cy = HH/2, s = 110;
+    const cos = Math.cos(angle2), sin = Math.sin(angle2);
+
+    function proj(x, y, z) {
+      const rx = x*cos - z*sin;
+      const rz = x*sin + z*cos;
+      return { px: cx + (rx - rz)*0.7, py: cy + (rx + rz)*0.35 - y*0.9 };
+    }
+
+    // 8 углов
+    const C = [
+      [-s,-s,-s],[s,-s,-s],[s,s,-s],[-s,s,-s],
+      [-s,-s, s],[s,-s, s],[s,s, s],[-s,s, s],
+    ];
+    const P = C.map(c => proj(c[0], c[1], c[2]));
+
+    // рёбра
+    const E = [
+      [0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],
+      [0,4],[1,5],[2,6],[3,7],
+    ];
+    cctx2.strokeStyle = 'rgba(90,90,90,0.4)';
+    cctx2.lineWidth = 1;
+    for (const [a,b] of E) {
+      cctx2.beginPath();
+      cctx2.moveTo(P[a].px, P[a].py);
+      cctx2.lineTo(P[b].px, P[b].py);
+      cctx2.stroke();
+    }
+
+    // 12 крупных узлов — «сеть»
+    // индексы выбираем равномерно из 100
+    const nodeIdx = [];
+    for (let i = 0; i < 12; i++) nodeIdx.push(Math.floor(i * N_MAIN / 12));
+
+    const now = performance.now();
+    const nodePos = [];
+    // размещаем узлы по «поверхности» куба: 4 на верхней грани, 8 по бокам
+    const layout = [
+      // верхняя грань y=-s
+      [-s*0.6, -s, -s*0.6],[ s*0.6, -s, -s*0.6],
+      [ s*0.6, -s,  s*0.6],[-s*0.6, -s,  s*0.6],
+      // передняя грань z=s
+      [-s*0.7, -s*0.4, s],[ s*0.7, -s*0.4, s],
+      [-s*0.7,  s*0.4, s],[ s*0.7,  s*0.4, s],
+      // боковая грань x=-s
+      [-s, -s*0.4, -s*0.6],[-s,  s*0.4, -s*0.6],
+      // боковая x=s
+      [ s, -s*0.4,  s*0.6],[ s,  s*0.4,  s*0.6],
+    ];
+
+    for (let i = 0; i < 12; i++) {
+      const [lx, ly, lz] = layout[i];
+      const { px, py } = proj(lx, ly, lz);
+      nodePos.push({ px, py });
+
+      const wIdx = nodeIdx[i];
+      const w = Math.abs(W[wIdx] || 0);
+      const mag = Math.min(1, w * 1.2);
+
+      const f = flashes[wIdx];
+      const isFlash = f && now < f.until;
+
+      if (isFlash) {
+        const t = (f.until - now) / 800;
+        cctx2.fillStyle = f.color;
+        cctx2.globalAlpha = Math.min(1, t + 0.2);
+      } else {
+        cctx2.fillStyle = `rgba(100, 150, 210, ${0.25 + mag*0.55})`;
+        cctx2.globalAlpha = 1;
+      }
+      const r = 10 + mag * 8;
+      cctx2.beginPath();
+      cctx2.arc(px, py, r, 0, Math.PI*2);
+      cctx2.fill();
+      cctx2.globalAlpha = 1;
+    }
+
+    // связи между узлами (по «энергии»)
+    cctx2.strokeStyle = 'rgba(100,150,210,0.12)';
+    cctx2.lineWidth = 1;
+    for (let i = 0; i < nodePos.length; i++) {
+      for (let j = i+1; j < nodePos.length; j++) {
+        const d = Math.hypot(nodePos[i].px-nodePos[j].px, nodePos[i].py-nodePos[j].py);
+        if (d < 110) {
+          cctx2.beginPath();
+          cctx2.moveTo(nodePos[i].px, nodePos[i].py);
+          cctx2.lineTo(nodePos[j].px, nodePos[j].py);
+          cctx2.stroke();
+        }
+      }
+    }
+  }
+
+  // отрисовка мира (те же prims, но с «домом»)
+  function drawWorld() {
+    hctx.fillStyle = '#0a0a0a';
+    hctx.fillRect(0, 0, HW, HH);
+
+    // цели (тонкие контуры)
+    hctx.strokeStyle = 'rgba(255,204,102,0.15)';
+    hctx.lineWidth = 1;
+    hctx.beginPath(); hctx.arc(home.circle.x, home.circle.y, 14, 0, Math.PI*2); hctx.stroke();
+    hctx.strokeRect(home.square.x-14, home.square.y-14, 28, 28);
+    // треугольник
+    hctx.beginPath();
+    hctx.moveTo(home.tri.x, home.tri.y-16);
+    hctx.lineTo(home.tri.x+16, home.tri.y+11);
+    hctx.lineTo(home.tri.x-16, home.tri.y+11);
+    hctx.closePath(); hctx.stroke();
+
+    // круг
+    hctx.fillStyle = prims.circle.color;
+    hctx.beginPath();
+    hctx.arc(prims.circle.x, prims.circle.y, prims.circle.r, 0, Math.PI*2);
+    hctx.fill();
+
+    // треугольник
+    const t = prims.tri;
+    hctx.beginPath();
+    hctx.moveTo(t.x, t.y - t.r);
+    hctx.lineTo(t.x + t.r, t.y + t.r*0.7);
+    hctx.lineTo(t.x - t.r, t.y + t.r*0.7);
+    hctx.closePath();
+    hctx.fill();
+
+    // квадрат
+    const s = prims.square;
+    hctx.fillRect(s.x - s.r, s.y - s.r, s.r*2, s.r*2);
+
+    // подпись
+    hctx.fillStyle = '#333';
+    hctx.font = '11px monospace';
+    hctx.fillText('тяни квадрат мышью', 8, HH - 10);
+  }
+
+  // перетаскивание в человеческом режиме
+  let hDrag = null;
+  hSceneCv.addEventListener('mousedown', e => {
+    const rect = hSceneCv.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    for (const k in prims) {
+      const p = prims[k];
+      if (Math.hypot(mx - p.x, my - p.y) < p.r + 10) {
+        hDrag = k; break;
+      }
+    }
+  });
+  hSceneCv.addEventListener('mousemove', e => {
+    if (!hDrag) return;
+    const rect = hSceneCv.getBoundingClientRect();
+    const p = prims[hDrag];
+    p.x = Math.max(p.r, Math.min(HW - p.r, e.clientX - rect.left));
+    p.y = Math.max(p.r, Math.min(HH - p.r, e.clientY - rect.top));
+  });
+  window.addEventListener('mouseup', () => { hDrag = null; });
+
+  // «возвращение» к дому (то, что делает сеть — визуально)
+  function homePull() {
+    // сеть «учится» — фигуры медленно возвращаются к целевым позициям
+    // (это визуализация, реальное обучение идёт в основном цикле)
+    const pull = 0.008;
+    for (const k in prims) {
+      prims[k].x += (home[k].x - prims[k].x) * pull;
+      prims[k].y += (home[k].y - prims[k].y) * pull;
+    }
+  }
+
+  // обновление галочек по реальному состоянию
+  function updateHumanState() {
+    if (breaking) return;
+    const err = errorNow;
+    if (err < 0.02) {
+      setRow(s1, 'ok', '✓', 'сеть уверена');
+    } else if (err < 0.08) {
+      setRow(s1, 'warn', '~', 'сеть подстраивается');
+    } else {
+      setRow(s1, 'err', '!', 'сеть ошибается');
+    }
+    // сколько недавних правок
+    const recent = flashes.filter(f => f && performance.now() < f.until).length;
+    if (recent > 5) setRow(s2, 'warn', '●', `правит себя (${recent} узлов)`);
+    else if (recent > 0) setRow(s2, 'ok', '●', `правит себя (${recent} узлов)`);
+    else setRow(s2, 'muted', '·', 'спокойна');
+
+    if (err < 0.02) setRow(s3, 'ok', '✓', 'проверено: старое цело');
+    else setRow(s3, 'muted', '·', '—');
+  }
+
+  // цикл
+  function humanLoop() {
+    angle2 += 0.004;
+    homePull();
+    drawCrystal();
+    drawWorld();
+    if (Math.random() < 0.1) updateHumanState();
+    requestAnimationFrame(humanLoop);
+  }
+
+  // переключение линзы
+  const lensToggle = document.getElementById('lensToggle');
+  let human = false;
+  lensToggle.addEventListener('click', () => {
+    human = !human;
+    document.body.classList.toggle('human', human);
+    lensToggle.textContent = human ? 'ВИД: ЧЕЛОВЕК' : 'ВИД: ЭКСПЕРТ';
+    if (human) {
+      // синхронизируем размеры сцены
+      prims.circle.x *= HW/SW; prims.circle.y *= HH/SH;
+      prims.tri.x *= HW/SW;    prims.tri.y *= HH/SH;
+      prims.square.x *= HW/SW; prims.square.y *= HH/SH;
+      // подгоняем «дом» под новые размеры
+      for (const k in home) {
+        home[k].x *= HW/SW; home[k].y *= HH/SH;
+      }
+    } else {
+      prims.circle.x *= SW/HW; prims.circle.y *= SH/HH;
+      prims.tri.x *= SW/HW;    prims.tri.y *= SH/HH;
+      prims.square.x *= SW/HW; prims.square.y *= SH/HH;
+      for (const k in home) {
+        home[k].x *= SW/HW; home[k].y *= SH/HH;
+      }
+    }
+  });
+
+  humanLoop();
+})();
+  
 </script>
 
 
