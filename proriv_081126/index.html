@@ -100,23 +100,83 @@
     body { padding: 8px; }
     h1 { font-size: 11px; margin-bottom: 8px; }
     #lensToggle { top: 6px; right: 6px; padding: 6px 10px; font-size: 10px; }
-    #stage, #humanStage {
-      flex-direction: column;
-      align-items: center;
+
+    /* ЭКСПЕРТ: кубик сверху, под ним сцена + панель в строку */
+    #stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        "cube cube"
+        "scene side";
+      gap: 8px;
       width: 100%;
-      gap: 10px;
+      justify-items: stretch;
+      align-items: start;
     }
-    .panel { width: 100%; max-width: 360px; }
-    #cubeCv, #sceneCv, #crystalCv, #humanSceneCv {
+    #stage > .panel:nth-child(1) { grid-area: cube; }   /* кубик */
+    #stage > .panel:nth-child(2) { grid-area: scene; }  /* сцена */
+    #stage > .panel:nth-child(3) { grid-area: side; }   /* панель */
+
+    /* canvas'ы не растягиваем: пусть будут по ширине своей ячейки,
+       но с сохранением пропорций */
+    #cubeCv {
       width: 100% !important;
       height: auto !important;
+      display: block;
+      margin: 0 auto;
     }
-    #side, #humanSide { width: 100%; max-width: 360px; }
-    #audit { height: 90px; }
-    #tagline { font-size: 14px; padding: 0 8px; }
-    /* на мобиле при переключении линзы скрываем не только #stage,
-       но и лишние подписи эксперта внутри человеческого вида */
+    #sceneCv {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+    }
+
+    /* панель (3) — во второй колонке, компактная */
+    #side {
+      width: 100% !important;
+      max-width: none;
+      font-size: 11px;
+    }
+    #side #audit { height: 70px; }
+    #side #controls { font-size: 10px; }
+    #side #controls label { margin: 4px 0; }
+
+    /* ЧЕЛОВЕК: такая же схема — кристалл сверху, мир + панель в строку */
+    #humanStage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        "crystal crystal"
+        "world humanSide";
+      gap: 8px;
+      width: 100%;
+      justify-items: stretch;
+      align-items: start;
+    }
+    #humanStage > .panel:nth-child(1) { grid-area: crystal; }
+    #humanStage > .panel:nth-child(2) { grid-area: world; }
+    #humanStage > .panel:nth-child(3) { grid-area: humanSide; }
+
+    #crystalCv {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+      margin: 0 auto;
+    }
+    #humanSceneCv {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+    }
+    #humanSide {
+      width: 100% !important;
+      max-width: none;
+      font-size: 12px;
+    }
+    #tagline { font-size: 13px; padding: 0 6px; margin-bottom: 8px; }
   }
+
+ 
 </style>
 </head>
 <body>
