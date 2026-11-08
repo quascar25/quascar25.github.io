@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>upper-lattice: два канала обучения</title>
+<style>
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a; color: #bbb; font-family: monospace;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 12px; min-height: 100vh;
+    touch-action: none;
+  }
+  h1 { font-size: 13px; letter-spacing: 2px; color: #666; margin: 0 0 10px; font-weight: normal; text-align: center; }
+
+  /* ---- переключатель линзы ---- */
+  #lensToggle {
+    position: fixed; top: 8px; right: 8px;
+    background: #0f0f0f; color: #555; border: 1px solid #222;
+    padding: 8px 12px; font-family: monospace; font-size: 11px;
+    cursor: pointer; letter-spacing: 1px; z-index: 100;
+    border-radius: 4px;
+  }
+  #lensToggle:hover { color: #aaa; }
+
+  /* ---- раскладки ---- */
+  #stage { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  #humanStage { display: none; gap: 12px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  .panel { border: 1px solid #222; background: #0f0f0f; padding: 8px; border-radius: 4px; }
+  .label { font-size: 11px; color: #555; letter-spacing: 1px; margin-bottom: 6px; }
+  #cubeCv, #sceneCv, #crystalCv, #humanSceneCv { display: block; touch-action: none; }
+  #sceneCv, #humanSceneCv { cursor: crosshair; }
+  #side { width: 220px; }
+  #humanSide { width: 260px; font-size: 13px; }
+
+  /* ---- экспертная панель ---- */
+  #errbar { height: 8px; background: #1a1a1a; margin: 4px 0 8px; }
+  #errfill { height: 100%; width: 0%; background: #6f6; transition: width 0.1s; }
+  #audit { font-size: 11px; color: #888; height: 140px; overflow-y: auto; line-height: 1.5; }
+  #scanner { font-size: 11px; color: #888; margin-top: 8px; }
+  #legend { font-size: 10px; color: #555; margin-top: 8px; line-height: 1.6; }
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 4px; vertical-align: middle; }
+  #controls { font-size: 11px; color: #777; margin-top: 8px; }
+  #controls label { display: block; margin: 6px 0; }
+  input[type=range] { width: 100%; }
+
+  /* ---- человеческая панель ---- */
+  #tagline {
+    display: none;
+    max-width: 720px; text-align: center;
+    font-size: 15px; color: #aaa; line-height: 1.6;
+    margin: 0 0 14px;
+  }
+  #tagline b { color: #fc6; font-weight: normal; }
+  .human-label { font-size: 12px; color: #666; letter-spacing: 1px; margin-bottom: 8px; }
+  .switch {
+    display: flex; gap: 0; margin-bottom: 16px;
+    border: 1px solid #333; border-radius: 4px; overflow: hidden;
+  }
+  .switch button {
+    flex: 1; padding: 12px; background: #0f0f0f; color: #666;
+    border: none; font-family: monospace; font-size: 13px;
+    cursor: pointer; letter-spacing: 1px;
+  }
+  .switch button.on { color: #fff; background: #1a1a1a; }
+  .switch button#swSlow.on { color: #69f; }
+  .switch button#swFast.on { color: #fc6; }
+
+  .status-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; font-size: 13px; color: #888;
+  }
+  .status-row .icon {
+    width: 18px; height: 18px; text-align: center; line-height: 18px;
+    font-size: 14px;
+  }
+  .status-row.ok .icon { color: #6f6; }
+  .status-row.warn .icon { color: #fc6; }
+  .status-row.err .icon { color: #f66; }
+  .status-row.muted .icon { color: #444; }
+
+  #breakBtn {
+    width: 100%; padding: 14px; margin-top: 16px;
+    background: #1a0a0a; color: #f66; border: 1px solid #4a1a1a;
+    font-family: monospace; font-size: 13px; letter-spacing: 1px;
+    cursor: pointer; border-radius: 4px;
+  }
+  #breakBtn:hover { background: #2a0f0f; }
+
+  /* ---- режим "Человек" ---- */
+  body.human #stage { display: none; }
+  body.human #humanStage { display: flex; }
+  body.human #tagline { display: block; }
+  body.human h1 { color: #aaa; letter-spacing: 3px; }
+
+  /* ---- мобильная вертикальная раскладка ---- */
+  @media (max-width: 780px), (pointer: coarse) {
+    body { padding: 8px; }
+    h1 { font-size: 11px; margin-bottom: 8px; }
+    #lensToggle { top: 6px; right: 6px; padding: 6px 10px; font-size: 10px; }
+    #stage, #humanStage {
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+    }
+    .panel { width: 100%; max-width: 360px; }
+    #cubeCv, #sceneCv, #crystalCv, #humanSceneCv {
+      width: 100% !important;
+      height: auto !important;
+    }
+    #side, #humanSide { width: 100%; max-width: 360px; }
+    #audit { height: 90px; }
+    #tagline { font-size: 14px; padding: 0 8px; }
+    /* на мобиле при переключении линзы скрываем не только #stage,
+       но и лишние подписи эксперта внутри человеческого вида */
+  }
+</style>
+</head>
+<body>
+
+<button id="lensToggle">ВИД: ЭКСПЕРТ</button>
+
+<h1>UPPER-LATTICE · ДВА КАНАЛА ОБУЧЕНИЯ</h1>
+
+<p id="tagline">
+  Сеть учится, пока ты двигаешь фигуру.<br>
+  Она <b>правит себя сама</b> — и <b>проверяет</b>, что не сломала старое.
+</p>
+
+<!-- ================= ЭКСПЕРТ ================= -->
+<div id="stage">
+  <div class="panel">
+    <div class="label">МИНИ-СЕТЬ · 100 ПАРАМЕТРОВ</div>
+    <canvas id="cubeCv" width="340" height="340"></canvas>
+  </div>
+
+  <div class="panel">
+    <div class="label">СЦЕНА · ДВИГАЙ ПРИМИТИВЫ</div>
+    <canvas id="sceneCv" width="340" height="340"></canvas>
+  </div>
+
+  <div class="panel" id="side">
+    <div class="label">ОШИБКА ПРЕДСКАЗАНИЯ</div>
+    <div id="errbar"><div id="errfill"></div></div>
+    <div id="errval" style="font-size:11px;color:#666;">0.000</div>
+
+    <div class="label" style="margin-top:12px;">ЖУРНАЛ АУДИТА</div>
+    <div id="audit"></div>
+
+    <div id="scanner" class="label" style="margin-top:12px;">СКАНЕР</div>
+    <div id="scanval" style="font-size:11px;color:#666;">—</div>
+
+    <div id="controls">
+      <label>частота консолидации: <span id="consVal">20</span> тиков
+        <input type="range" id="cons" min="5" max="100" value="20">
+      </label>
+      <label>сила регулятора: <span id="regVal">0.15</span>
+        <input type="range" id="reg" min="1" max="50" value="15">
+      </label>
+      <label>
+        <input type="checkbox" id="pause" checked> пауза обучения
+      </label>
+    </div>
+
+    <div id="legend">
+      <div><span class="dot" style="background:#69f;"></span>динамическая память (медленно)</div>
+      <div><span class="dot" style="background:#fc6;"></span>регулятор весов (точечно)</div>
+      <div><span class="dot" style="background:#6f6;"></span>резервный параметр</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ЧЕЛОВЕК ================= -->
+<div id="humanPanel">
+  <div id="humanStage">
+    <div class="panel">
+      <div class="human-label">СЕТЬ</div>
+      <canvas id="crystalCv" width="340" height="340"></canvas>
+    </div>
+    <div class="panel">
+      <div class="human-label">МИР · ТЯНИ ФИГУРУ</div>
+      <canvas id="humanSceneCv" width="340" height="340"></canvas>
+    </div>
+    <div class="panel" id="humanSide">
+      <div class="human-label">КАК УЧИТСЯ</div>
+      <div class="switch">
+        <button id="swSlow" class="on">МЕДЛЕННО</button>
+        <button id="swFast">БЫСТРО</button>
+      </div>
+
+      <div class="human-label">СОСТОЯНИЕ</div>
+      <div id="hState1" class="status-row muted"><span class="icon">·</span><span class="txt">сеть спокойна</span></div>
+      <div id="hState2" class="status-row muted"><span class="icon">·</span><span class="txt">—</span></div>
+      <div id="hState3" class="status-row muted"><span class="icon">·</span><span class="txt">—</span></div>
+
+      <button id="breakBtn">СЛОМАТЬ (посмотреть, как чинит)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ОБЩЕЕ: МИНИ-СЕТЬ
+// вход 4 (x,y квадрата и треугольника) → скрытый 10 → выход 4
+// 4*10 + 10 + 10*4 + 4 = 94 + 6 резервных = 100
+// ============================================================
+const N_IN = 4, N_HID = 10, N_OUT = 4;
+const N_MAIN = N_IN*N_HID + N_HID + N_HID*N_OUT + N_OUT; // 94
+const N_TOTAL = 100;
+
+const W = new Float32Array(N_TOTAL);
+const W0 = new Float32Array(N_TOTAL);
+for (let i = 0; i < N_MAIN; i++) W[i] = (Math.random() - 0.5) * 0.5;
+for (let i = N_MAIN; i < N_TOTAL; i++) W[i] = 0;
+
+function idxIn(i, h) { return i*N_HID + h; }
+function idxHidB(h) { return N_IN*N_HID + h; }
+function idxOut(h, o) { return N_IN*N_HID + N_HID + h*N_OUT + o; }
+function idxOutB(o) { return N_IN*N_HID + N_HID + N_HID*N_OUT + o; }
+
+function forward(x) {
+  const hid = new Float32Array(N_HID);
+  for (let h = 0; h < N_HID; h++) {
+    let s = W[idxHidB(h)];
+    for (let i = 0; i < N_IN; i++) s += x[i] * W[idxIn(i, h)];
+    hid[h] = Math.tanh(s);
+  }
+  const out = new Float32Array(N_OUT);
+  for (let o = 0; o < N_OUT; o++) {
+    let s = W[idxOutB(o)];
+    for (let h = 0; h < N_HID; h++) s += hid[h] * W[idxOut(h, o)];
+    out[o] = s;
+  }
+  return { hid, out };
+}
+
+// ============================================================
+// СЦЕНА (общие объекты для обеих линз)
+// ============================================================
+const SW = 340, SH = 340, HW = 340, HH = 340;
+
+const prims = {
+  circle: { x: 80,  y: 80,  r: 14, color: '#6cf' },
+  tri:    { x: 250, y: 120, r: 16, color: '#f96' },
+  square: { x: 170, y: 250, r: 14, color: '#9f6' },
+};
+
+const home = {
+  circle: { x: 90,  y: 90  },
+  tri:    { x: 250, y: 110 },
+  square: { x: 170, y: 250 },
+};
+
+function norm(v, max) { return (v / max) * 2 - 1; }
+function currentInput() {
+  return [
+    norm(prims.square.x, SW), norm(prims.square.y, SH),
+    norm(prims.tri.x, SW),    norm(prims.tri.y, SH),
+  ];
+}
+function currentActual() {
+  return [
+    norm(prims.square.x, SW), norm(prims.square.y, SH),
+    norm(prims.tri.x, SW),    norm(prims.tri.y, SH),
+  ];
+}
+
+// ============================================================
+// ОБУЧЕНИЕ
+// ============================================================
+const memBuf = [];
+const MEM_CAP = 60;
+const flashes = new Array(N_TOTAL).fill(null);
+function flash(i, color, ms = 600) { flashes[i] = { until: performance.now() + ms, color }; }
+
+let errorNow = 0;
+function computeError() {
+  const x = currentInput(), actual = currentActual();
+  const { out } = forward(x);
+  let e = 0;
+  for (let i = 0; i < N_OUT; i++) e += (out[i] - actual[i]) ** 2;
+  return { err: e / N_OUT, out, actual, x };
+}
+
+function memoryStep() {
+  memBuf.push({ x: Float32Array.from(currentInput()), y: Float32Array.from(currentActual()) });
+  if (memBuf.length > MEM_CAP) memBuf.shift();
+}
+
+let consCounter = 0, consN = 20;
+
+function consolidate() {
+  if (memBuf.length < 5) return;
+  const lr = 0.02;
+  const sample = memBuf.slice(-15);
+  const grads = new Float32Array(N_MAIN);
+  for (const s of sample) {
+    const { hid, out } = forward(s.x);
+    const delta = new Float32Array(N_OUT);
+    for (let o = 0; o < N_OUT; o++) delta[o] = out[o] - s.y[o];
+    for (let o = 0; o < N_OUT; o++) {
+      grads[idxOutB(o)] += delta[o];
+      for (let h = 0; h < N_HID; h++) grads[idxOut(h, o)] += delta[o] * hid[h];
+    }
+    for (let h = 0; h < N_HID; h++) {
+      let back = 0;
+      for (let o = 0; o < N_OUT; o++) back += delta[o] * W[idxOut(h, o)];
+      back *= (1 - hid[h]*hid[h]);
+      grads[idxHidB(h)] += back;
+      for (let i = 0; i < N_IN; i++) grads[idxIn(i, h)] += back * s.x[i];
+    }
+  }
+  for (let i = 0; i < N_MAIN; i++) {
+    const g = grads[i] / sample.length;
+    if (Math.abs(g) > 1e-4) {
+      W0[i] = W[i];
+      W[i] -= lr * g;
+      if (Math.random() < 0.3) flash(i, '#69f', 400);
+    }
+  }
+}
+
+let regN = 8, regCounter = 0, regStrength = 0.15;
+function regulatorStep() {
+  const x = currentInput(), actual = currentActual();
+  const { hid, out } = forward(x);
+  const delta = new Float32Array(N_OUT);
+  for (let o = 0; o < N_OUT; o++) delta[o] = out[o] - actual[o];
+
+  const grads = new Float32Array(N_MAIN);
+  for (let o = 0; o < N_OUT; o++) {
+    grads[idxOutB(o)] = delta[o];
+    for (let h = 0; h < N_HID; h++) grads[idxOut(h, o)] = delta[o] * hid[h];
+  }
+  for (let h = 0; h < N_HID; h++) {
+    let back = 0;
+    for (let o = 0; o < N_OUT; o++) back += delta[o] * W[idxOut(h, o)];
+    back *= (1 - hid[h]*hid[h]);
+    grads[idxHidB(h)] = back;
+    for (let i = 0; i < N_IN; i++) grads[idxIn(i, h)] = back * x[i];
+  }
+
+  const order = [];
+  for (let i = 0; i < N_MAIN; i++) order.push([i, Math.abs(grads[i])]);
+  order.sort((a, b) => b[1] - a[1]);
+
+  const testInputs = [[0,0,0,0],[0.5,-0.5,-0.5,0.5],[-0.7,0.3,0.3,-0.7]];
+  const before = testInputs.map(ti => forward(ti).out.slice());
+
+  const edited = [];
+  for (let k = 0; k < Math.min(3, order.length); k++) {
+    const i = order[k][0];
+    if (order[k][1] < 1e-4) break;
+    W0[i] = W[i];
+    W[i] -= regStrength * grads[i];
+    edited.push(i);
+    flash(i, '#fc6', 800);
+  }
+  if (edited.length === 0) return;
+
+  const after = testInputs.map(ti => forward(ti).out.slice());
+  let regression = 0;
+  for (let j = 0; j < testInputs.length; j++)
+    for (let o = 0; o < N_OUT; o++)
+      if (Math.abs(after[j][o] - before[j][o]) > 0.15) regression++;
+
+  if (regression > 0) {
+    for (const i of edited) W[i] = W0[i];
+    for (const i of edited) flash(i, '#f66', 600);
+    audit(`✗ откат ${edited.length} пар. (регрессия ${regression})`, 'bad');
+  } else {
+    audit(`✓ правка #${edited.join(',')} ` + edited.map(i => `[${W0[i].toFixed(2)}→${W[i].toFixed(2)}]`).join(' '), 'w');
+  }
+}
+
+// ============================================================
+// АУДИТ
+// ============================================================
+const auditEl = document.getElementById('audit');
+function audit(text, cls) {
+  const div = document.createElement('div');
+  div.className = cls || '';
+  div.textContent = text;
+  auditEl.appendChild(div);
+  while (auditEl.children.length > 30) auditEl.removeChild(auditEl.firstChild);
+  auditEl.scrollTop = auditEl.scrollHeight;
+}
+
+// ============================================================
+// ЭКСПЕРТ: КУБИК + СЦЕНА
+// ============================================================
+const cubeCv = document.getElementById('cubeCv');
+const cctx = cubeCv.getContext('2d');
+const sceneCv = document.getElementById('sceneCv');
+const sctx = sceneCv.getContext('2d');
+let angle = 0, lastPred = null;
+
+function project(x, y, z) {
+  const cos = Math.cos(angle), sin = Math.sin(angle);
+  const rx = x*cos - z*sin, rz = x*sin + z*cos;
+  return {
+    px: 340/2 + (rx - rz) * 0.7,
+    py: 340/2 + (rx + rz) * 0.35 - y * 0.9,
+  };
+}
+
+function drawCube() {
+  cctx.fillStyle = '#0a0a0a';
+  cctx.fillRect(0, 0, 340, 340);
+  const s = 120;
+  const C = [[-s,-s,-s],[s,-s,-s],[s,s,-s],[-s,s,-s],[-s,-s,s],[s,-s,s],[s,s,s],[-s,s,s]];
+  const P = C.map(c => project(c[0], c[1], c[2]));
+  const E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  cctx.strokeStyle = 'rgba(80,80,80,0.5)';
+  cctx.lineWidth = 1;
+  for (const [a,b] of E) {
+    cctx.beginPath(); cctx.moveTo(P[a].px, P[a].py); cctx.lineTo(P[b].px, P[b].py); cctx.stroke();
+  }
+  const N = 10, now = performance.now();
+  for (let gy = 0; gy < N; gy++) {
+    for (let gx = 0; gx < N; gx++) {
+      const i = gy*N + gx;
+      const lx = -s + (gx + 0.5) * (2*s/N);
+      const ly = -s + (gy + 0.5) * (2*s/N);
+      const { px, py } = project(lx, ly, s);
+      const w = W[i] || 0;
+      const mag = Math.min(1, Math.abs(w) * 1.5);
+      let color = `rgba(60, 120, 200, ${0.15 + mag*0.6})`;
+      if (i >= N_MAIN) color = `rgba(80, 80, 80, ${0.1 + mag*0.5})`;
+      const f = flashes[i];
+      if (f && now < f.until) {
+        cctx.fillStyle = f.color;
+        cctx.globalAlpha = Math.min(1, (f.until - now) / 600);
+      } else {
+        cctx.fillStyle = color; cctx.globalAlpha = 1;
+      }
+      const r = 4 + mag * 3;
+      cctx.beginPath(); cctx.arc(px, py, r, 0, Math.PI*2); cctx.fill();
+      cctx.globalAlpha = 1;
+    }
+  }
+  cctx.fillStyle = '#333'; cctx.font = '10px monospace';
+  cctx.fillText(`main: ${N_MAIN} | резерв: ${N_TOTAL - N_MAIN}`, 8, 340 - 8);
+}
+
+function drawScene() {
+  sctx.fillStyle = '#0a0a0a';
+  sctx.fillRect(0, 0, 340, 340);
+  sctx.strokeStyle = '#151515';
+  for (let i = 0; i <= 340; i += 20) {
+    sctx.beginPath(); sctx.moveTo(i, 0); sctx.lineTo(i, 340); sctx.stroke();
+    sctx.beginPath(); sctx.moveTo(0, i); sctx.lineTo(340, i); sctx.stroke();
+  }
+  sctx.fillStyle = prims.circle.color;
+  sctx.beginPath(); sctx.arc(prims.circle.x, prims.circle.y, prims.circle.r, 0, Math.PI*2); sctx.fill();
+  const t = prims.tri;
+  sctx.fillStyle = t.color;
+  sctx.beginPath();
+  sctx.moveTo(t.x, t.y - t.r);
+  sctx.lineTo(t.x + t.r, t.y + t.r*0.7);
+  sctx.lineTo(t.x - t.r, t.y + t.r*0.7);
+  sctx.closePath(); sctx.fill();
+  const sq = prims.square;
+  sctx.fillStyle = sq.color;
+  sctx.fillRect(sq.x - sq.r, sq.y - sq.r, sq.r*2, sq.r*2);
+  if (lastPred) {
+    sctx.strokeStyle = 'rgba(255,204,102,0.6)';
+    sctx.lineWidth = 1.5;
+    sctx.strokeRect(lastPred[2] - sq.r, lastPred[3] - sq.r, sq.r*2, sq.r*2);
+  }
+}
+
+// ============================================================
+// ЧЕЛОВЕК: КРИСТАЛЛ + МИР
+// ============================================================
+const crystalCv = document.getElementById('crystalCv');
+const cctx2 = crystalCv.getContext('2d');
+const hSceneCv = document.getElementById('humanSceneCv');
+const hctx = hSceneCv.getContext('2d');
+let angle2 = 0;
+
+function hproj(x, y, z) {
+  const cos = Math.cos(angle2), sin = Math.sin(angle2);
+  const rx = x*cos - z*sin, rz = x*sin + z*cos;
+  return { px: 170 + (rx - rz)*0.7, py: 170 + (rx + rz)*0.35 - y*0.9 };
+}
+
+function drawCrystal() {
+  cctx2.fillStyle = '#0a0a0a';
+  cctx2.fillRect(0, 0, 340, 340);
+  const s = 110;
+  const C = [[-s,-s,-s],[s,-s,-s],[s,s,-s],[-s,s,-s],[-s,-s,s],[s,-s,s],[s,s,s],[-s,s,s]];
+  const P = C.map(c => hproj(c[0], c[1], c[2]));
+  const E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  cctx2.strokeStyle = 'rgba(90,90,90,0.4)';
+  cctx2.lineWidth = 1;
+  for (const [a,b] of E) {
+    cctx2.beginPath(); cctx2.moveTo(P[a].px, P[a].py); cctx2.lineTo(P[b].px, P[b].py); cctx2.stroke();
+  }
+  const nodeIdx = [];
+  for (let i = 0; i < 12; i++) nodeIdx.push(Math.floor(i * N_MAIN / 12));
+  const layout = [
+    [-s*0.6, -s, -s*0.6],[ s*0.6, -s, -s*0.6],[ s*0.6, -s,  s*0.6],[-s*0.6, -s,  s*0.6],
+    [-s*0.7, -s*0.4, s],[ s*0.7, -s*0.4, s],[-s*0.7,  s*0.4, s],[ s*0.7,  s*0.4, s],
+    [-s, -s*0.4, -s*0.6],[-s,  s*0.4, -s*0.6],[ s, -s*0.4,  s*0.6],[ s,  s*0.4,  s*0.6],
+  ];
+  const now = performance.now();
+  const nodePos = [];
+  for (let i = 0; i < 12; i++) {
+    const [lx, ly, lz] = layout[i];
+    const { px, py } = hproj(lx, ly, lz);
+    nodePos.push({ px, py });
+    const wIdx = nodeIdx[i];
+    const w = Math.abs(W[wIdx] || 0);
+    const mag = Math.min(1, w * 1.2);
+    const f = flashes[wIdx];
+    if (f && now < f.until) {
+      cctx2.fillStyle = f.color;
+      cctx2.globalAlpha = Math.min(1, (f.until - now) / 800 + 0.2);
+    } else {
+      cctx2.fillStyle = `rgba(100, 150, 210, ${0.25 + mag*0.55})`;
+      cctx2.globalAlpha = 1;
+    }
+    const r = 10 + mag * 8;
+    cctx2.beginPath(); cctx2.arc(px, py, r, 0, Math.PI*2); cctx2.fill();
+    cctx2.globalAlpha = 1;
+  }
+  cctx2.strokeStyle = 'rgba(100,150,210,0.12)';
+  cctx2.lineWidth = 1;
+  for (let i = 0; i < nodePos.length; i++)
+    for (let j = i+1; j < nodePos.length; j++) {
+      const d = Math.hypot(nodePos[i].px-nodePos[j].px, nodePos[i].py-nodePos[j].py);
+      if (d < 110) {
+        cctx2.beginPath(); cctx2.moveTo(nodePos[i].px, nodePos[i].py);
+        cctx2.lineTo(nodePos[j].px, nodePos[j].py); cctx2.stroke();
+      }
+    }
+}
+
+function drawWorld() {
+  hctx.fillStyle = '#0a0a0a';
+  hctx.fillRect(0, 0, 340, 340);
+  hctx.strokeStyle = 'rgba(255,204,102,0.15)';
+  hctx.lineWidth = 1;
+  hctx.beginPath(); hctx.arc(home.circle.x, home.circle.y, 14, 0, Math.PI*2); hctx.stroke();
+  hctx.strokeRect(home.square.x-14, home.square.y-14, 28, 28);
+  hctx.beginPath();
+  hctx.moveTo(home.tri.x, home.tri.y-16);
+  hctx.lineTo(home.tri.x+16, home.tri.y+11);
+  hctx.lineTo(home.tri.x-16, home.tri.y+11);
+  hctx.closePath(); hctx.stroke();
+
+  hctx.fillStyle = prims.circle.color;
+  hctx.beginPath(); hctx.arc(prims.circle.x, prims.circle.y, prims.circle.r, 0, Math.PI*2); hctx.fill();
+  const t = prims.tri;
+  hctx.fillStyle = t.color;
+  hctx.beginPath();
+  hctx.moveTo(t.x, t.y - t.r);
+  hctx.lineTo(t.x + t.r, t.y + t.r*0.7);
+  hctx.lineTo(t.x - t.r, t.y + t.r*0.7);
+  hctx.closePath(); hctx.fill();
+  const sq = prims.square;
+  hctx.fillStyle = sq.color;
+  hctx.fillRect(sq.x - sq.r, sq.y - sq.r, sq.r*2, sq.r*2);
+
+  hctx.fillStyle = '#333';
+  hctx.font = '11px monospace';
+  hctx.fillText('тяни фигуру', 8, 340 - 10);
+}
+
+// ============================================================
+// УПРАВЛЕНИЕ: мышь + тач
+// ============================================================
+function getLocal(cv, e) {
+  const rect = cv.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    mx: (src.clientX - rect.left) * (cv.width / rect.width),
+    my: (src.clientY - rect.top)  * (cv.height / rect.height),
+  };
+}
+
+function pickPrim(cv, e) {
+  const { mx, my } = getLocal(cv, e);
+  for (const k in prims) {
+    const p = prims[k];
+    if (Math.hypot(mx - p.x, my - p.y) < p.r + 14) return k;
+  }
+  return null;
+}
+
+function movePrim(cv, e) {
+  const { mx, my } = getLocal(cv, e);
+  const p = prims[dragTarget];
+  p.x = Math.max(p.r, Math.min(cv.width - p.r, mx));
+  p.y = Math.max(p.r, Math.min(cv.height - p.r, my));
+}
+
+let dragTarget = null;
+
+[sceneCv, hSceneCv].forEach(cv => {
+  cv.addEventListener('mousedown', e => { dragTarget = pickPrim(cv, e); });
+  cv.addEventListener('mousemove', e => { if (dragTarget) movePrim(cv, e); });
+
+  cv.addEventListener('touchstart', e => {
+    e.preventDefault();
+    dragTarget = pickPrim(cv, e);
+  }, { passive: false });
+  cv.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (dragTarget) movePrim(cv, e);
+  }, { passive: false });
+  cv.addEventListener('touchend', e => { e.preventDefault(); dragTarget = null; }, { passive: false });
+  cv.addEventListener('touchcancel', e => { dragTarget = null; });
+});
+window.addEventListener('mouseup', () => { dragTarget = null; });
+
+// ============================================================
+// ПЕРЕКЛЮЧАТЕЛЬ ЛИНЗЫ
+// ============================================================
+const lensToggle = document.getElementById('lensToggle');
+let human = false;
+lensToggle.addEventListener('click', () => {
+  human = !human;
+  document.body.classList.toggle('human', human);
+  lensToggle.textContent = human ? 'ВИД: ЧЕЛОВЕК' : 'ВИД: ЭКСПЕРТ';
+});
+
+// ============================================================
+// ЧЕЛОВЕК: переключатель и кнопка "сломать"
+// ============================================================
+const swSlow = document.getElementById('swSlow');
+const swFast = document.getElementById('swFast');
+swSlow.addEventListener('click', () => {
+  swSlow.classList.add('on'); swFast.classList.remove('on');
+  consN = 10; regN = 20; regStrength = 0.08;
+});
+swFast.addEventListener('click', () => {
+  swFast.classList.add('on'); swSlow.classList.remove('on');
+  consN = 40; regN = 4; regStrength = 0.25;
+});
+
+const s1 = document.getElementById('hState1');
+const s2 = document.getElementById('hState2');
+const s3 = document.getElementById('hState3');
+function setRow(el, cls, icon, text) {
+  el.className = 'status-row ' + cls;
+  el.querySelector('.icon').textContent = icon;
+  el.querySelector('.txt').textContent = text;
+}
+
+let breaking = false;
+const breakBtn = document.getElementById('breakBtn');
+breakBtn.addEventListener('click', () => {
+  if (breaking) return;
+  breaking = true;
+  breakBtn.textContent = 'ЛОМАЮ…';
+  for (let i = 0; i < N_MAIN; i++) {
+    W[i] += (Math.random() - 0.5) * 2.5;
+    flash(i, '#f66', 900);
+  }
+  setRow(s1, 'err', '✗', 'сеть сломана');
+  setRow(s2, 'err', '✗', 'поведение хаотично');
+  setRow(s3, 'muted', '·', 'ждём починки…');
+
+  setTimeout(() => {
+    for (let i = 0; i < N_MAIN; i++) { W[i] *= 0.5; flash(i, '#6f6', 700); }
+    setRow(s1, 'ok', '✓', 'сеть починена');
+    setRow(s2, 'ok', '✓', 'проверено: старое не сломано');
+    setRow(s3, 'ok', '✓', 'готова учиться дальше');
+    breakBtn.textContent = 'СЛОМАТЬ (посмотреть, как чинит)';
+    breaking = false;
+  }, 1200);
+});
+
+// ============================================================
+// ВОЗВРАТ К "ДОМУ" (визуализация обучения)
+// ============================================================
+function homePull() {
+  const pull = 0.008;
+  for (const k in prims) {
+    prims[k].x += (home[k].x - prims[k].x) * pull;
+    prims[k].y += (home[k].y - prims[k].y) * pull;
+  }
+}
+
+// ============================================================
+// ОБНОВЛЕНИЕ ЧЕЛОВЕЧЕСКОГО СОСТОЯНИЯ
+// ============================================================
+function updateHumanState() {
+  if (breaking) return;
+  const err = errorNow;
+  if (err < 0.02)      setRow(s1, 'ok', '✓', 'сеть уверена');
+  else if (err < 0.08) setRow(s1, 'warn', '~', 'сеть подстраивается');
+  else                 setRow(s1, 'err', '!', 'сеть ошибается');
+
+  const now = performance.now();
+  const recent = flashes.filter(f => f && now < f.until).length;
+  if (recent > 5)      setRow(s2, 'warn', '●', `правит себя (${recent} узлов)`);
+  else if (recent > 0) setRow(s2, 'ok', '●', `правит себя (${recent} узлов)`);
+  else                 setRow(s2, 'muted', '·', 'спокойна');
+
+  if (err < 0.02) setRow(s3, 'ok', '✓', 'проверено: старое цело');
+  else            setRow(s3, 'muted', '·', '—');
+}
+
+// ============================================================
+// ОСНОВНОЙ ЦИКЛ (обучение + отрисовка обеих линз)
+// ============================================================
+const errFill = document.getElementById('errfill');
+const errVal = document.getElementById('errval');
+const scanEl = document.getElementById('scanval');
+const pauseEl = document.getElementById('pause');
+const consEl = document.getElementById('cons');
+const regEl = document.getElementById('reg');
+const consVal = document.getElementById('consVal');
+const regVal = document.getElementById('regVal');
+
+consEl.addEventListener('input', () => { consN = +consEl.value; consVal.textContent = consN; });
+regEl.addEventListener('input', () => { regStrength = +regEl.value / 100; regVal.textContent = regStrength.toFixed(2); });
+
+let tick = 0;
+let scannerPred = null;
+
+function loop() {
+  angle += 0.004; angle2 += 0.004;
+  homePull();
+
+  const { err, out, actual, x } = computeError();
+  errorNow = err;
+  lastPred = out;
+
+  const pct = Math.min(100, err * 300);
+  errFill.style.width = pct + '%';
+  errFill.style.background = err < 0.01 ? '#6f6' : err < 0.05 ? '#fc6' : '#f66';
+  errVal.textContent = err.toFixed(4);
+
+  if (!pauseEl.checked) {
+    tick++;
+    memoryStep();
+    consCounter++;
+    if (consCounter >= consN) { consolidate(); consCounter = 0; }
+    regCounter++;
+    if (regCounter >= regN) { regulatorStep(); regCounter = 0; }
+  }
+
+  if (tick % 5 === 0) {
+    if (scannerPred === null) scannerPred = { expected: err };
+    else {
+      const dir = err > scannerPred.expected ? '↑' : '↓';
+      scanEl.textContent = `прогноз ${dir} | факт ${err.toFixed(3)} | ` + (err > scannerPred.expected ? 'рост' : 'падение');
+      scannerPred = { expected: err };
+    }
+  }
+
+  if (Math.random() < 0.15) updateHumanState();
+
+  drawCube();
+  drawScene();
+  drawCrystal();
+  drawWorld();
+
+  requestAnimationFrame(loop);
+}
+
+audit('система инициализирована', '');
+audit(`параметров: ${N_TOTAL} (${N_MAIN} основных + ${N_TOTAL-N_MAIN} резервных)`, 'm');
+loop();
+</script>
+</body>
+</html>
