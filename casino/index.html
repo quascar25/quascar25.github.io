@@ -458,7 +458,7 @@
   const historyEl = $('history');
   const coldEl = $('cold');
   const balanceEl = $('balance');
-  const balanceVal = $('balance-val');
+  //const balanceVal = $('balance-val');
   const numbersGrid = $('numbers');
 
   // ---------- Генерация сетки чисел ----------
@@ -479,9 +479,10 @@
   }
 
   // ---------- Баланс ----------
-  function updateBalance() {
-    balanceVal.textContent = state.balance;
-  }
+function updateBalance() {
+  const el = document.getElementById('balance-val');
+  if (el) el.textContent = state.balance;
+}
 
   // Редактирование баланса по клику
   balanceEl.addEventListener('click', () => {
