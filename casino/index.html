@@ -2,144 +2,387 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Рулетка — ставки + спин по кругу</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Рулетка — рама</title>
 <style>
-  body { font-family: system-ui, sans-serif; text-align: center; background:#111; color:#eee; padding:20px; }
-  #wheel { width:220px; height:220px; border-radius:50%; margin:20px auto;
-           display:flex; align-items:center; justify-content:center;
-           font-size:42px; font-weight:bold; cursor:pointer;
-           background:#333; transition: background .1s; user-select:none; }
-  #wheel:active { transform: scale(0.97); }
-  button { padding:10px 18px; margin:5px; font-size:15px; border:none; border-radius:8px; cursor:pointer; }
-  .red { background:#c0392b; color:#fff; }
-  .black { background:#222; color:#fff; border:1px solid #555; }
-  .green { background:#27ae60; color:#fff; }
-  .dozen { background:#2c3e50; color:#fff; }
-  .clear { background:#7f8c8d; color:#fff; }
-  #bets { margin-top:10px; font-size:14px; color:#f1c40f; white-space:pre-line; min-height:40px; }
-  #log { margin-top:10px; font-size:14px; color:#aaa; white-space:pre-line; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #0b0e13;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* ===== Центрируем сцену 14:9 ===== */
+  #stage {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100vh * 14 / 9));
+    height: min(calc(100vw * 9 / 14), 100vh);
+    background: #12161d;
+    border: 1px solid #232a35;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== Верхняя панель: баланс + история + переключатель режимов ===== */
+  #topbar {
+    flex: 0 0 11%;
+    display: flex;
+    align-items: center;
+    gap: 1.2%;
+    padding: 0 1.5%;
+    background: #0e1218;
+    border-bottom: 1px solid #232a35;
+    font-size: clamp(9px, 1.6vw, 18px);
+  }
+
+  #balance {
+    flex: 0 0 22%;
+    background: #1a2130;
+    border: 1px solid #2e3a4d;
+    border-radius: 4px;
+    padding: 1% 2%;
+    color: #f0c040;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  #balance small { color: #7a8699; font-weight: 400; font-size: 0.7em; display: block; }
+
+  #history {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 0.5%;
+    overflow: hidden;
+    justify-content: flex-end;
+  }
+  .hist-ball {
+    flex: 0 0 auto;
+    width: 2.4em; height: 2.4em;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85em;
+    font-weight: 700;
+    color: #fff;
+    background: #333;
+  }
+  .hist-ball.red    { background: #c0392b; }
+  .hist-ball.black  { background: #1c2128; border: 1px solid #3a4553; }
+  .hist-ball.green  { background: #1e8449; }
+
+  /* Переключатель режимов */
+  #modes {
+    flex: 0 0 auto;
+    display: flex;
+    background: #1a2130;
+    border: 1px solid #2e3a4d;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #modes button {
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0.6em 1.2em;
+    background: transparent;
+    color: #7a8699;
+    border: none;
+    cursor: pointer;
+  }
+  #modes button.active {
+    background: #f0c040;
+    color: #12161d;
+    font-weight: 700;
+  }
+
+  /* ===== Основная зона: слева колесо, справа поле ставок ===== */
+  #main {
+    flex: 1 1 auto;
+    display: flex;
+    min-height: 0;
+    padding: 1.5%;
+    gap: 1.5%;
+  }
+
+  /* Колёсная зона */
+  #wheel-zone {
+    flex: 0 0 32%;
+    display: flex;
+    flex-direction: column;
+    gap: 2%;
+    min-width: 0;
+  }
+
+  #wheel-frame {
+    flex: 1 1 auto;
+    background: #0e1218;
+    border: 1px solid #232a35;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+  }
+  /* Заглушка колеса — потом заменим на canvas/SVG */
+  #wheel-placeholder {
+    width: 88%; aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      repeating-conic-gradient(
+        #c0392b 0deg 9.73deg, #1c2128 9.73deg 19.46deg,
+        #c0392b 19.46deg 29.19deg, #1c2128 29.19deg 38.92deg,
+        #c0392b 38.92deg 48.65deg, #1c2128 48.65deg 58.38deg,
+        #c0392b 58.38deg 68.11deg, #1c2128 68.11deg 77.84deg,
+        #c0392b 77.84deg 87.57deg, #1c2128 87.57deg 97.3deg,
+        #c0392b 97.3deg 107.03deg, #1c2128 107.03deg 116.76deg,
+        #c0392b 116.76deg 126.49deg, #1c2128 126.49deg 136.22deg,
+        #c0392b 136.22deg 145.95deg, #1c2128 145.95deg 155.68deg,
+        #c0392b 155.68deg 165.41deg, #1c2128 165.41deg 175.14deg,
+        #c0392b 175.14deg 184.87deg, #1c2128 184.87deg 194.6deg,
+        #c0392b 194.6deg 204.33deg, #1c2128 204.33deg 214.06deg,
+        #c0392b 214.06deg 223.79deg, #1c2128 223.79deg 233.52deg,
+        #c0392b 233.52deg 243.25deg, #1c2128 243.25deg 252.98deg,
+        #c0392b 252.98deg 262.71deg, #1c2128 262.71deg 272.44deg,
+        #c0392b 272.44deg 282.17deg, #1c2128 282.17deg 291.9deg,
+        #c0392b 291.9deg 301.63deg, #1c2128 301.63deg 311.36deg,
+        #c0392b 311.36deg 321.09deg, #1c2128 321.09deg 330.82deg,
+        #c0392b 330.82deg 340.55deg, #1c2128 340.55deg 350.28deg,
+        #1e8449 350.28deg 360deg
+      );
+    box-shadow: 0 0 0 4px #2e3a4d, 0 0 30px rgba(0,0,0,0.6);
+    position: relative;
+  }
+  #wheel-placeholder::after {
+    content: "37";
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(14px, 4vw, 42px);
+    font-weight: 800;
+    color: #fff;
+    background: radial-gradient(circle, #1a2130 0 30%, transparent 31%);
+    border-radius: 50%;
+  }
+
+  /* Подколесная панель: результат + кнопка запуска */
+  #under-wheel {
+    flex: 0 0 20%;
+    display: flex;
+    gap: 2%;
+    min-height: 0;
+  }
+  #result-box {
+    flex: 1 1 auto;
+    background: #0e1218;
+    border: 1px solid #232a35;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(11px, 2.4vw, 26px);
+    font-weight: 800;
+    color: #f0c040;
+  }
+  #spin-btn {
+    flex: 0 0 34%;
+    border: none; border-radius: 6px;
+    background: linear-gradient(180deg, #f0c040, #c99a1e);
+    color: #12161d;
+    font: inherit; font-size: clamp(9px, 1.6vw, 16px);
+    font-weight: 800;
+    cursor: pointer;
+  }
+  #spin-btn:active { transform: scale(0.97); }
+
+  /* Поле ставок */
+  #board-zone {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5%;
+  }
+
+  /* Сетка чисел: 12 колонок × 3 ряда + зеро + правые ставки */
+  #numbers {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 1.1fr repeat(12, 1fr) 1.1fr;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    min-height: 0;
+  }
+
+  .cell {
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(8px, 1.5vw, 17px);
+    font-weight: 700;
+    color: #fff;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: filter .1s;
+  }
+  .cell:active { filter: brightness(1.4); }
+  .cell.red   { background: #b3312a; }
+  .cell.black { background: #1c2128; }
+  .cell.green { background: #1e8449; }
+  .cell.outside {
+    background: #1a2130;
+    border-color: #2e3a4d;
+    color: #c8d2e0;
+    font-size: clamp(7px, 1.15vw, 13px);
+  }
+
+  #zero {
+    grid-column: 1;
+    grid-row: 1 / 4;
+  }
+
+  /* Нижний ряд внешних ставок */
+  #outside-bottom {
+    flex: 0 0 26%;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+    min-height: 0;
+  }
+
+  /* ===== Нижняя панель: фишки ===== */
+  #chips {
+    flex: 0 0 9%;
+    display: flex;
+    align-items: center;
+    gap: 1.2%;
+    padding: 0 1.5%;
+    background: #0e1218;
+    border-top: 1px solid #232a35;
+  }
+  .chip {
+    flex: 0 0 auto;
+    width: 2.2em; height: 2.2em;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(7px, 1.15vw, 12px);
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+  }
+  .chip[data-v="1"]   { background: #ecf0f1; color: #12161d; }
+  .chip[data-v="5"]   { background: #c0392b; }
+  .chip[data-v="25"]  { background: #27ae60; }
+  .chip[data-v="100"] { background: #2c3e50; }
+  .chip[data-v="500"] { background: #8e44ad; }
+  .chip.selected { outline: 3px solid #f0c040; outline-offset: 2px; }
 </style>
 </head>
 <body>
-<h2>Рулетка: набери ставки → жми на круг</h2>
+<div id="stage">
 
-<div id="wheel" onclick="spin()">?</div>
+  <!-- ВЕРХ: баланс, история, режимы -->
+  <div id="topbar">
+    <div id="balance">
+      <small>Баланс</small>
+      1000 ₽
+    </div>
+    <div id="history">
+      <!-- заглушки истории -->
+      <div class="hist-ball red">3</div>
+      <div class="hist-ball black">14</div>
+      <div class="hist-ball green">0</div>
+      <div class="hist-ball red">36</div>
+      <div class="hist-ball black">22</div>
+      <div class="hist-ball red">7</div>
+    </div>
+    <div id="modes">
+      <button class="active" data-mode="auto">Своя генерация</button>
+      <button data-mode="manual">Ручной ввод</button>
+    </div>
+  </div>
 
-<div>
-  <button class="red" onclick="addBet('red')">Красное</button>
-  <button class="black" onclick="addBet('black')">Чёрное</button>
-  <button class="green" onclick="addBet('green')">Зелёное</button>
-</div>
-<div>
-  <button class="dozen" onclick="addBet('d1')">1–12</button>
-  <button class="dozen" onclick="addBet('d2')">13–24</button>
-  <button class="dozen" onclick="addBet('d3')">25–36</button>
-</div>
-<div>
-  <button class="clear" onclick="clearBets()">Очистить ставки</button>
-</div>
+  <!-- ОСНОВНОЕ: колесо + поле -->
+  <div id="main">
 
-<div id="bets">Ставок нет</div>
-<div id="log">Баланс: 1000</div>
+    <!-- Колесо -->
+    <div id="wheel-zone">
+      <div id="wheel-frame">
+        <div id="wheel-placeholder"></div>
+      </div>
+      <div id="under-wheel">
+        <div id="result-box">—</div>
+        <button id="spin-btn">КРУТИТЬ</button>
+      </div>
+    </div>
+
+    <!-- Поле ставок -->
+    <div id="board-zone">
+      <div id="numbers">
+        <div class="cell green" id="zero">0</div>
+        <!-- 12 колонок × 3 ряда генерируются скриптом -->
+      </div>
+      <div id="outside-bottom">
+        <div class="cell outside">1-12</div>
+        <div class="cell outside">13-24</div>
+        <div class="cell outside">25-36</div>
+        <div class="cell outside">ЧЁТ</div>
+        <div class="cell outside">КРАСН</div>
+        <div class="cell outside">ЧЁРН</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ФИШКИ -->
+  <div id="chips">
+    <div class="chip" data-v="1">1</div>
+    <div class="chip selected" data-v="5">5</div>
+    <div class="chip" data-v="25">25</div>
+    <div class="chip" data-v="100">100</div>
+    <div class="chip" data-v="500">500</div>
+  </div>
+
+</div>
 
 <script>
-let balance = 1000;
-const betAmount = 100;
-let pendingBets = []; // массив типов ставок на текущий спин
-let spinning = false;
+  /* ---- Генерация сетки чисел: 12 колонок × 3 ряда ---- */
+  const numbersGrid = document.getElementById('numbers');
+  const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 
-const wheel = document.getElementById('wheel');
-const betsEl = document.getElementById('bets');
-const log = document.getElementById('log');
-
-const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-const betNames = { red:'красное', black:'чёрное', green:'зелёное', d1:'1–12', d2:'13–24', d3:'25–36' };
-
-function colorOf(n) {
-  if (n === 0) return 'green';
-  return redNumbers.includes(n) ? 'red' : 'black';
-}
-function dozenOf(n) {
-  if (n >= 1 && n <= 12) return 'd1';
-  if (n >= 13 && n <= 24) return 'd2';
-  if (n >= 25 && n <= 36) return 'd3';
-  return null;
-}
-
-function renderBets() {
-  if (pendingBets.length === 0) { betsEl.textContent = 'Ставок нет'; return; }
-  betsEl.textContent = 'Текущие ставки: ' + pendingBets.map(t => betNames[t]).join(', ') +
-                       '  (каждая ' + betAmount + ')';
-}
-
-function addBet(type) {
-  if (spinning) return;
-  if (balance < betAmount) { log.textContent = 'Недостаточно средств'; return; }
-  balance -= betAmount;
-  pendingBets.push(type);
-  renderBets();
-  log.textContent = 'Баланс: ' + balance;
-}
-
-function clearBets() {
-  if (spinning) return;
-  balance += pendingBets.length * betAmount;
-  pendingBets = [];
-  renderBets();
-  log.textContent = 'Ставки сняты. Баланс: ' + balance;
-}
-
-function spin() {
-  if (spinning) return;
-  if (pendingBets.length === 0) { log.textContent = 'Сначала сделай ставку'; return; }
-
-  spinning = true;
-  let ticks = 0;
-  const anim = setInterval(() => {
-    const tmp = Math.floor(Math.random() * 37);
-    const c = colorOf(tmp);
-    wheel.style.background = c === 'red' ? '#c0392b' : c === 'black' ? '#222' : '#27ae60';
-    wheel.textContent = '?';
-    if (++ticks > 12) {
-      clearInterval(anim);
-      const n = Math.floor(Math.random() * 37);
-      const c = colorOf(n);
-      const d = dozenOf(n);
-
-      wheel.style.background = c === 'red' ? '#c0392b' : c === 'black' ? '#222' : '#27ae60';
-      wheel.textContent = n;
-
-      let totalWin = 0;
-      let details = [];
-
-      for (const type of pendingBets) {
-        let win = 0;
-        if (type === 'red' || type === 'black' || type === 'green') {
-          if (type === c) win = type === 'green' ? betAmount * 14 : betAmount * 2;
-        } else if (type === d) {
-          win = betAmount * 3;
-        }
-        totalWin += win;
-        details.push(`${betNames[type]}: ${win ? '+' + win : '0'}`);
-      }
-
-      balance += totalWin;
-
-      const colorName = c === 'red' ? 'красное' : c === 'black' ? 'чёрное' : 'зелёное';
-      log.textContent =
-        `Выпало: ${n} (${colorName})\n` +
-        details.join('\n') + '\n' +
-        `Итого: ${totalWin ? '+' + totalWin : '0'}\n` +
-        `Баланс: ${balance}`;
-
-      pendingBets = [];
-      renderBets();
-      spinning = false;
+  // порядок как на реальном столе: сверху вниз 3-й ряд, 2-й, 1-й
+  for (let row = 0; row < 3; row++) {
+    for (let col = 1; col <= 12; col++) {
+      const n = col * 3 - row;           // 3,6,9... / 2,5,8... / 1,4,7...
+      const el = document.createElement('div');
+      el.className = 'cell ' + (RED.has(n) ? 'red' : 'black');
+      el.textContent = n;
+      el.dataset.num = n;
+      numbersGrid.appendChild(el);
     }
-  }, 60);
-}
+    // правая колонка "2 к 1" для каждого ряда
+    const colBtn = document.createElement('div');
+    colBtn.className = 'cell outside';
+    colBtn.textContent = '2:1';
+    numbersGrid.appendChild(colBtn);
+  }
 
-renderBets();
+  /* ---- Переключение режимов (пока только визуал) ---- */
+  document.querySelectorAll('#modes button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#modes button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  /* ---- Выбор фишки (пока только визуал) ---- */
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    });
+  });
 </script>
 </body>
 </html>
