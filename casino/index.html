@@ -720,7 +720,8 @@ function updateBalance() {
         if (n >= 25 && n <= 36) win += amount * 3;
       } else if (key.startsWith('col:')) {
         const col = parseInt(key.slice(4), 10);
-        if (n !== 0 && Math.ceil(n / 3) === col) win += amount * 3;
+        const actualCol = n === 0 ? 0 : ((n - 1) % 3 + 1);
+        if (actualCol === col) win += amount * 3;
       }
     }
     return win;
@@ -784,7 +785,7 @@ function updateBalance() {
       if (key === 'range1' && n >= 1 && n <= 12) hit = true;
       if (key === 'range2' && n >= 13 && n <= 24) hit = true;
       if (key === 'range3' && n >= 25 && n <= 36) hit = true;
-      if (key.startsWith('col:') && n !== 0 && Math.ceil(n / 3) === parseInt(key.slice(4), 10)) hit = true;
+      if (key.startsWith('col:') && n !== 0 && ((n - 1) % 3 + 1) === parseInt(key.slice(4), 10)) hit = true;
       if (hit) { cell.classList.add('hit'); winners.push(cell); }
     });
     setTimeout(() => winners.forEach(c => c.classList.remove('hit')), 800);
