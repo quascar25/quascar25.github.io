@@ -673,7 +673,7 @@ function updateBalance() {
   historyEl.addEventListener('click', () => {
     if (state.spinning) return;
     for (const n of state.history.slice(0, 12)) {
-      addBet('num:' + n, 1);
+      addBet(n === 0 ? 'zero' : 'num:' + n, 1);
     }
     updateBalance();
     renderBets();
@@ -683,7 +683,7 @@ function updateBalance() {
   coldEl.addEventListener('click', () => {
     if (state.spinning) return;
     for (const n of state.coldNumbers) {
-      addBet('num:' + n, 1);
+      addBet(n === 0 ? 'zero' : 'num:' + n, 1);
     }
     updateBalance();
     renderBets();
