@@ -47,6 +47,13 @@
     flex-direction: column;
     gap: 4px;
   }
+  #banner {
+   flex: 0 0 auto;
+   height: clamp(28px, 6vh, 48px);
+   background: #1a2130;
+   border: 2px solid #2e3a4d;
+   border-radius: 6px;
+ }
 
   /* Верхний ряд: два прямоугольника */
   #top-row {
@@ -214,6 +221,7 @@
 
   #numbers {
     flex: 1 1 auto;
+    height: clamp(48px, 12vh, 90px);   /* было ~2× больше */
     display: grid;
     grid-template-columns: 1.1fr repeat(12, 1fr) 1.1fr;
     grid-template-rows: repeat(3, 1fr);
@@ -407,7 +415,7 @@
 
     <!-- ВЕРХ -->
     <div id="top">
-
+      <div id="banner"></div>          <!-- новый прямоугольник -->
       <div id="top-row">
         <div id="balance" title="Нажми, чтобы изменить">
           <div class="lbl">Баланс</div>
