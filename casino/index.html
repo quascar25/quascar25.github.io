@@ -296,16 +296,9 @@
     border-top: 1px solid #232a35;
   }
 
-  #balance-wrap {
-    flex: 0 0 40%;   /* ← вот это 28%*/
-    height: 100%;
-    display: flex;
-    gap: 3px;
-    min-width: 0;
-  }
-
+  /* Баланс наверху */
   #balance {
-    flex: 1 1 auto;
+    flex: 0 0 28%;
     background: #1a2130;
     border: 2px solid #2e3a4d;
     border-radius: 6px;
@@ -380,6 +373,26 @@
     cursor: pointer;
     min-width: 0;
   }
+
+  #spin-btn {
+    flex: 0 0 auto;
+    height: 86%;
+    padding: 0 clamp(6px, 2vw, 14px);
+    border: 2px solid #c99a1e;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #f0c040, #c99a1e);
+    color: #12161d;
+    font: inherit;
+    font-size: clamp(8px, 1.7vh, 13px);
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #spin-btn:active { transform: scale(0.97); }
+  #spin-btn:disabled { opacity: .5; cursor: wait; }
+
+
+ 
   .chip[data-v="1"]   { background: #ecf0f1; color: #12161d; }
   .chip[data-v="5"]   { background: #c0392b; }
   .chip[data-v="25"]  { background: #27ae60; }
@@ -394,13 +407,19 @@
 
     <!-- ВЕРХ -->
     <div id="top">
+
       <div id="top-row">
-        <div id="result" class="rect" title="Нажми, чтобы крутить">—</div>
+        <div id="balance" title="Нажми, чтобы изменить">
+          <div class="lbl">Баланс</div>
+          <div class="val" id="balance-val">1000</div>
+        </div>
+        <div id="result" class="rect">—</div>
         <div id="manual-wrap" class="rect">
           <input id="manual" type="text" inputmode="numeric" placeholder="?">
           <button id="manual-clear" title="Очистить">×</button>
         </div>
       </div>
+     
       <div id="history">
         <span class="title">ПОСЛЕДНИЕ 12</span>
       </div>
@@ -427,13 +446,7 @@
 
     <!-- НИЗ -->
     <div id="bottom">
-      <div id="balance-wrap">
-        <div id="balance" title="Нажми, чтобы изменить">
-          <div class="lbl">Баланс</div>
-          <div class="val" id="balance-val">1000</div>
-        </div>
-        <button id="clear-bets" title="Очистить все ставки">×</button>
-      </div>
+      <button id="clear-bets" title="Очистить все ставки">×</button>
       <div id="chips">
         <div class="chip" data-v="1">1</div>
         <div class="chip selected" data-v="5">5</div>
@@ -441,6 +454,7 @@
         <div class="chip" data-v="100">100</div>
         <div class="chip" data-v="500">500</div>
       </div>
+      <button id="spin-btn">КРУТИТЬ</button>
     </div>
 
   </div>
@@ -744,6 +758,9 @@ function updateBalance() {
 
   // ---------- Кручение ----------
   function spin() {
+   
+    $('spin-btn').disabled = true;
+   
     if (state.spinning) return;
     state.spinning = true;
     resultEl.classList.add('busy', 'spinning');
@@ -785,6 +802,7 @@ function updateBalance() {
 
     highlightWinners(n);
     state.spinning = false;
+    $('spin-btn').disabled = false;
   }
 
   function highlightWinners(n) {
@@ -807,7 +825,8 @@ function updateBalance() {
     setTimeout(() => winners.forEach(c => c.classList.remove('hit')), 800);
   }
 
-  resultEl.addEventListener('click', spin);
+  //resultEl.addEventListener('click', spin);
+  $('spin-btn').addEventListener('click', spin);
 
   // Инициализация
   updateBalance();
