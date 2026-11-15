@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI1 — Устав цивилизационного масштаба</title>
+    <title>AI1 — Спасательный круг цивилизации</title>
     <style>
         * {
             margin: 0;
@@ -52,7 +52,112 @@
             text-transform: uppercase;
         }
 
-        /* Картинка под шапкой */
+        /* МАНИФЕСТ */
+        .manifesto {
+            background: linear-gradient(180deg, #0d1117 0%, #0a0e14 100%);
+            border-bottom: 1px solid #2a3441;
+            padding: 36px 24px 32px;
+            text-align: center;
+        }
+
+        .manifesto h2 {
+            font-family: 'Arial', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #c9a84c;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            border: none;
+            padding: 0;
+        }
+
+        .manifesto .lead {
+            font-size: 15px;
+            color: #8a9ab0;
+            font-style: italic;
+            margin-bottom: 24px;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .manifesto-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 900px;
+            margin: 0 auto 24px;
+            text-align: left;
+        }
+
+        .manifesto-card {
+            background: #131a24;
+            border: 1px solid #2a3441;
+            border-radius: 6px;
+            padding: 16px 18px;
+            transition: border-color 0.2s;
+        }
+
+        .manifesto-card:hover {
+            border-color: #c9a84c;
+        }
+
+        .manifesto-card .num {
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #c9a84c;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .manifesto-card p {
+            font-size: 14px;
+            color: #b8c2d0;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .manifesto-card strong {
+            color: #e8e0c8;
+        }
+
+        .manifesto-cta {
+            display: inline-block;
+            background: #c9a84c;
+            color: #0a0e14;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 14px 36px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 2px solid #c9a84c;
+        }
+
+        .manifesto-cta:hover {
+            background: transparent;
+            color: #c9a84c;
+        }
+
+        .manifesto .closing {
+            margin-top: 18px;
+            font-size: 15px;
+            color: #8a9ab0;
+            font-style: italic;
+        }
+
+        .manifesto .closing strong {
+            color: #c9a84c;
+            font-style: normal;
+        }
+
+        /* Картинка под манифестом */
         .hero-image {
             width: 100%;
             max-width: 500px;
@@ -267,6 +372,12 @@
         }
 
         /* Адаптив */
+        @media (max-width: 800px) {
+            .manifesto-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 700px) {
             .header {
                 flex-direction: column;
@@ -302,6 +413,13 @@
                 height: auto;
                 aspect-ratio: 2/1;
             }
+            .manifesto-grid {
+                grid-template-columns: 1fr;
+            }
+            .manifesto h2 {
+                font-size: 17px;
+                letter-spacing: 2px;
+            }
         }
     </style>
 </head>
@@ -312,6 +430,34 @@
     <h1>AI1</h1>
     <span class="subtitle">Устав цивилизационного масштаба · 2050</span>
 </header>
+
+<!-- МАНИФЕСТ -->
+<section class="manifesto">
+    <h2>AI1 — Спасательный круг цивилизации</h2>
+    <p class="lead">Мир стоит на пороге AGI. У каждого человека сейчас два вопроса: как получить равные со всеми права на эту технологию — и как снять угрозы, которые она несёт.</p>
+
+    <div class="manifesto-grid">
+        <div class="manifesto-card">
+            <div class="num">01 · Равные права</div>
+            <p>Каждый член — <strong>один голос</strong>. Взнос $100/год — не цена доступа, а членский билет. Доступ к AGI — не привилегия, а право штатного сотрудника.</p>
+        </div>
+        <div class="manifesto-card">
+            <div class="num">02 · Контроль у всех и у науки</div>
+            <p>Не у капитала, не у государства, не у одного основателя. Устав защищает миссию от захвата <strong>(ст. 5.4, 17, 19)</strong>.</p>
+        </div>
+        <div class="manifesto-card">
+            <div class="num">03 · Угрозы снимаются конструкцией</div>
+            <p>Некоммерческая форма, публичный реестр патронов, научный совет с правом вето, <strong>запрет на военное и наблюдательное использование AGI</strong> (ст. 13).</p>
+        </div>
+        <div class="manifesto-card">
+            <div class="num">04 · Никто не на обочине</div>
+            <p>Работник получает статус, доступ и символическую зарплату. Патрон — свидетельство «жил для людей». Программист — <strong>свободу и голос</strong>.</p>
+        </div>
+    </div>
+
+    <a href="#" class="manifesto-cta">Вступить в AI1</a>
+    <p class="closing"><strong>AI1 — не ещё одна ИИ-компания.</strong> Это институт, где технология принадлежит тем, кто её создаёт и применяет, а контроль защищён от денег и власти.</p>
+</section>
 
 <!-- КАРТИНКА -->
 <img src="img.jpg" alt="Карта: штаб-квартира AI1 в Бельгии, дата-центр в Гренландии" class="hero-image">
@@ -496,7 +642,7 @@
 
         <p><span class="article-num">Статья 15. (Персональные ассистенты и роботизированные агенты)</span></p>
         <ol>
-            <li>Каждый официальный удалённый работник обеспечивается <strong>персональным ассистентом AGI</strong> (программная форма) для assistance в работе и жизни.</li>
+            <li>Каждый официальный удалённый работник обеспечивается <strong>персональным ассистентом AGI</strong> (программная форма) для помощи в работе и жизни.</li>
             <li>Члены-вкладчики могут запрашивать <strong>роботизированного агента</strong> (физическая форма) в зависимости от задач; права доступа и продолжительность использования распределяются Исполнительным руководством исходя из доступности ресурсов.</li>
             <li>Данные об использовании персональных ассистентов и роботизированных агентов используются только в анонимизированном виде для улучшения систем и не могут применяться для оценки или наблюдения за отдельными членами.</li>
         </ol>
