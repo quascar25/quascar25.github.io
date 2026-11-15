@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI1 — Спасательный круг цивилизации</title>
+    <meta name="google" content="notranslate">
+    <title>AI1 — Lifeline of Civilization</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
@@ -32,6 +29,14 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
         }
 
         .header h1 {
@@ -45,14 +50,46 @@
         }
 
         .header .subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: #6b7a8f;
             letter-spacing: 2px;
             font-family: 'Arial', sans-serif;
             text-transform: uppercase;
         }
 
-        /* МАНИФЕСТ */
+        /* Переключатель языка */
+        .lang-switch {
+            display: flex;
+            gap: 4px;
+            background: #131a24;
+            border: 1px solid #2a3441;
+            border-radius: 4px;
+            padding: 3px;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            color: #6b7a8f;
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 6px 14px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .lang-btn:hover { color: #c9a84c; }
+
+        .lang-btn.active {
+            background: #c9a84c;
+            color: #0a0e14;
+        }
+
+        /* Манифест */
         .manifesto {
             background: linear-gradient(180deg, #0d1117 0%, #0a0e14 100%);
             border-bottom: 1px solid #2a3441;
@@ -68,8 +105,6 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-bottom: 6px;
-            border: none;
-            padding: 0;
         }
 
         .manifesto .lead {
@@ -99,9 +134,7 @@
             transition: border-color 0.2s;
         }
 
-        .manifesto-card:hover {
-            border-color: #c9a84c;
-        }
+        .manifesto-card:hover { border-color: #c9a84c; }
 
         .manifesto-card .num {
             font-family: 'Arial', sans-serif;
@@ -120,9 +153,7 @@
             line-height: 1.6;
         }
 
-        .manifesto-card strong {
-            color: #e8e0c8;
-        }
+        .manifesto-card strong { color: #e8e0c8; }
 
         .manifesto-cta {
             display: inline-block;
@@ -140,10 +171,7 @@
             border: 2px solid #c9a84c;
         }
 
-        .manifesto-cta:hover {
-            background: transparent;
-            color: #c9a84c;
-        }
+        .manifesto-cta:hover { background: transparent; color: #c9a84c; }
 
         .manifesto .closing {
             margin-top: 18px;
@@ -152,12 +180,9 @@
             font-style: italic;
         }
 
-        .manifesto .closing strong {
-            color: #c9a84c;
-            font-style: normal;
-        }
+        .manifesto .closing strong { color: #c9a84c; font-style: normal; }
 
-        /* Картинка под манифестом */
+        /* Картинка */
         .hero-image {
             width: 100%;
             max-width: 500px;
@@ -186,7 +211,6 @@
             background: #0d1117;
             border-bottom: 1px solid #2a3441;
             padding: 0 24px;
-            gap: 0;
             position: sticky;
             top: 72px;
             z-index: 99;
@@ -207,15 +231,8 @@
             text-transform: uppercase;
         }
 
-        .tab-btn:hover {
-            color: #c9a84c;
-            background: rgba(201, 168, 76, 0.05);
-        }
-
-        .tab-btn.active {
-            color: #c9a84c;
-            border-bottom: 2px solid #c9a84c;
-        }
+        .tab-btn:hover { color: #c9a84c; background: rgba(201, 168, 76, 0.05); }
+        .tab-btn.active { color: #c9a84c; border-bottom: 2px solid #c9a84c; }
 
         /* Контент */
         .content {
@@ -226,14 +243,8 @@
             width: 100%;
         }
 
-        .tab-panel {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-panel.active {
-            display: block;
-        }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
@@ -252,9 +263,7 @@
             padding-bottom: 8px;
         }
 
-        h2:first-child {
-            margin-top: 0;
-        }
+        h2:first-child { margin-top: 0; }
 
         h3 {
             font-family: 'Arial', sans-serif;
@@ -264,10 +273,7 @@
             margin: 20px 0 10px;
         }
 
-        p {
-            margin-bottom: 12px;
-            text-align: justify;
-        }
+        p { margin-bottom: 12px; text-align: justify; }
 
         .article-num {
             font-family: 'Arial', sans-serif;
@@ -287,10 +293,7 @@
             border-radius: 0 4px 4px 0;
         }
 
-        blockquote strong {
-            color: #c9a84c;
-            font-style: normal;
-        }
+        blockquote strong { color: #c9a84c; font-style: normal; }
 
         table {
             width: 100%;
@@ -318,17 +321,10 @@
             color: #b8c2d0;
         }
 
-        tr:hover td {
-            background: rgba(201, 168, 76, 0.03);
-        }
+        tr:hover td { background: rgba(201, 168, 76, 0.03); }
 
-        ul, ol {
-            margin: 10px 0 14px 24px;
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
+        ul, ol { margin: 10px 0 14px 24px; }
+        li { margin-bottom: 8px; }
 
         .highlight-box {
             background: #131a24;
@@ -338,9 +334,7 @@
             margin: 18px 0;
         }
 
-        .highlight-box p:last-child {
-            margin-bottom: 0;
-        }
+        .highlight-box p:last-child { margin-bottom: 0; }
 
         .badge {
             display: inline-block;
@@ -367,59 +361,34 @@
             letter-spacing: 1px;
         }
 
-        .footer strong {
-            color: #c9a84c;
-        }
+        .footer strong { color: #c9a84c; }
+
+        /* Языковые блоки */
+        .lang-block { display: none; }
+        .lang-block.active { display: block; }
 
         /* Адаптив */
         @media (max-width: 800px) {
-            .manifesto-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .manifesto-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 700px) {
-            .header {
-                flex-direction: column;
-                gap: 6px;
-                text-align: center;
-            }
-            .header h1 {
-                font-size: 24px;
-                letter-spacing: 4px;
-            }
+            .header { flex-direction: column; gap: 6px; text-align: center; }
+            .header-left { flex-direction: column; gap: 4px; align-items: center; }
+            .header h1 { font-size: 24px; letter-spacing: 4px; }
             .tabs {
-                top: 100px;
+                top: 120px;
                 padding: 0 8px;
                 overflow-x: auto;
                 flex-wrap: nowrap;
             }
-            .tab-btn {
-                font-size: 11px;
-                padding: 12px 10px;
-                white-space: nowrap;
-            }
-            .content {
-                padding: 20px 14px 40px;
-            }
-            table {
-                font-size: 12px;
-            }
-            td, th {
-                padding: 8px 8px;
-            }
-            .hero-image {
-                max-width: 100%;
-                height: auto;
-                aspect-ratio: 2/1;
-            }
-            .manifesto-grid {
-                grid-template-columns: 1fr;
-            }
-            .manifesto h2 {
-                font-size: 17px;
-                letter-spacing: 2px;
-            }
+            .tab-btn { font-size: 11px; padding: 12px 10px; white-space: nowrap; }
+            .content { padding: 20px 14px 40px; }
+            table { font-size: 12px; }
+            td, th { padding: 8px 8px; }
+            .hero-image { max-width: 100%; height: auto; aspect-ratio: 2/1; }
+            .manifesto-grid { grid-template-columns: 1fr; }
+            .manifesto h2 { font-size: 17px; letter-spacing: 2px; }
         }
     </style>
 </head>
@@ -427,286 +396,646 @@
 
 <!-- ШАПКА -->
 <header class="header">
-    <h1>AI1</h1>
-    <span class="subtitle">Устав цивилизационного масштаба · 2050</span>
+    <div class="header-left">
+        <h1>AI1</h1>
+        <span class="subtitle" data-i18n="subtitle">Civilization-Scale Charter · 2050</span>
+    </div>
+    <div class="lang-switch">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+    </div>
 </header>
 
 <!-- МАНИФЕСТ -->
 <section class="manifesto">
-    <h2>AI1 — Спасательный круг цивилизации</h2>
-    <p class="lead">Мир стоит на пороге AGI. У каждого человека сейчас два вопроса: как получить равные со всеми права на эту технологию — и как снять угрозы, которые она несёт.</p>
-
-    <div class="manifesto-grid">
-        <div class="manifesto-card">
-            <div class="num">01 · Равные права</div>
-            <p>Каждый член — <strong>один голос</strong>. Взнос $100/год — не цена доступа, а членский билет. Доступ к AGI — не привилегия, а право штатного сотрудника.</p>
+    <div class="lang-block active" data-lang="en">
+        <h2>AI1 — Lifeline of Civilization</h2>
+        <p class="lead">The world stands on the threshold of AGI. Every person now faces two questions: how to gain equal rights to this technology — and how to remove the threats it carries.</p>
+        <div class="manifesto-grid">
+            <div class="manifesto-card"><div class="num">01 · Equal Rights</div><p>Every member — <strong>one vote</strong>. The $100/year contribution is not a price of access, but a membership ticket. Access to AGI is not a privilege, but a right of staff.</p></div>
+            <div class="manifesto-card"><div class="num">02 · Control by All and by Science</div><p>Not by capital, not by the state, not by a single founder. The charter protects the mission from capture <strong>(Art. 5.4, 17, 19)</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">03 · Threats Removed by Design</div><p>Non-profit form, public patron registry, scientific council with veto power, <strong>ban on military and surveillance use of AGI</strong> (Art. 13).</p></div>
+            <div class="manifesto-card"><div class="num">04 · No One Left Behind</div><p>Worker gets status, access and symbolic salary. Patron — a testimony "lived for people." Programmer — <strong>freedom and voice</strong>.</p></div>
         </div>
-        <div class="manifesto-card">
-            <div class="num">02 · Контроль у всех и у науки</div>
-            <p>Не у капитала, не у государства, не у одного основателя. Устав защищает миссию от захвата <strong>(ст. 5.4, 17, 19)</strong>.</p>
-        </div>
-        <div class="manifesto-card">
-            <div class="num">03 · Угрозы снимаются конструкцией</div>
-            <p>Некоммерческая форма, публичный реестр патронов, научный совет с правом вето, <strong>запрет на военное и наблюдательное использование AGI</strong> (ст. 13).</p>
-        </div>
-        <div class="manifesto-card">
-            <div class="num">04 · Никто не на обочине</div>
-            <p>Работник получает статус, доступ и символическую зарплату. Патрон — свидетельство «жил для людей». Программист — <strong>свободу и голос</strong>.</p>
-        </div>
+        <a href="#" class="manifesto-cta">Join AI1</a>
+        <p class="closing"><strong>AI1 is not just another AI company.</strong> It is an institution where technology belongs to those who create and apply it, and control is protected from money and power.</p>
     </div>
 
-    <a href="#" class="manifesto-cta">Вступить в AI1</a>
-    <p class="closing"><strong>AI1 — не ещё одна ИИ-компания.</strong> Это институт, где технология принадлежит тем, кто её создаёт и применяет, а контроль защищён от денег и власти.</p>
+    <div class="lang-block" data-lang="ru">
+        <h2>AI1 — Спасательный круг цивилизации</h2>
+        <p class="lead">Мир стоит на пороге AGI. У каждого человека сейчас два вопроса: как получить равные со всеми права на эту технологию — и как снять угрозы, которые она несёт.</p>
+        <div class="manifesto-grid">
+            <div class="manifesto-card"><div class="num">01 · Равные права</div><p>Каждый член — <strong>один голос</strong>. Взнос $100/год — не цена доступа, а членский билет. Доступ к AGI — не привилегия, а право штатного сотрудника.</p></div>
+            <div class="manifesto-card"><div class="num">02 · Контроль у всех и у науки</div><p>Не у капитала, не у государства, не у одного основателя. Устав защищает миссию от захвата <strong>(ст. 5.4, 17, 19)</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">03 · Угрозы снимаются конструкцией</div><p>Некоммерческая форма, публичный реестр патронов, научный совет с правом вето, <strong>запрет на военное и наблюдательное использование AGI</strong> (ст. 13).</p></div>
+            <div class="manifesto-card"><div class="num">04 · Никто не на обочине</div><p>Работник получает статус, доступ и символическую зарплату. Патрон — свидетельство «жил для людей». Программист — <strong>свободу и голос</strong>.</p></div>
+        </div>
+        <a href="#" class="manifesto-cta">Вступить в AI1</a>
+        <p class="closing"><strong>AI1 — не ещё одна ИИ-компания.</strong> Это институт, где технология принадлежит тем, кто её создаёт и применяет, а контроль защищён от денег и власти.</p>
+    </div>
+
+    <div class="lang-block" data-lang="es">
+        <h2>AI1 — Salvavidas de la Civilización</h2>
+        <p class="lead">El mundo está en el umbral de la AGI. Cada persona enfrenta ahora dos preguntas: cómo obtener derechos iguales a esta tecnología — y cómo eliminar las amenazas que conlleva.</p>
+        <div class="manifesto-grid">
+            <div class="manifesto-card"><div class="num">01 · Derechos Iguales</div><p>Cada miembro — <strong>un voto</strong>. La contribución de $100/año no es un precio de acceso, sino un carné de membresía. El acceso a la AGI no es un privilegio, sino un derecho del personal.</p></div>
+            <div class="manifesto-card"><div class="num">02 · Control de Todos y de la Ciencia</div><p>No del capital, no del Estado, no de un solo fundador. El estatuto protege la misión de la captura <strong>(Art. 5.4, 17, 19)</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">03 · Amenazas Eliminadas por Diseño</div><p>Forma sin ánimo de lucro, registro público de patronos, consejo científico con poder de veto, <strong>prohibición del uso militar y de vigilancia de la AGI</strong> (Art. 13).</p></div>
+            <div class="manifesto-card"><div class="num">04 · Nadie Queda Atrás</div><p>El trabajador obtiene estatus, acceso y salario simbólico. El patrono — un testimonio "vivió para las personas". El programador — <strong>libertad y voz</strong>.</p></div>
+        </div>
+        <a href="#" class="manifesto-cta">Unirse a AI1</a>
+        <p class="closing"><strong>AI1 no es solo otra empresa de IA.</strong> Es una institución donde la tecnología pertenece a quienes la crean y aplican, y el control está protegido del dinero y del poder.</p>
+    </div>
 </section>
 
 <!-- КАРТИНКА -->
-<img src="img.jpg" alt="Карта: штаб-квартира AI1 в Бельгии, дата-центр в Гренландии" class="hero-image">
-<div class="hero-caption">Западная Европа · Великобритания · Гренландия — штаб-квартира и дата-центр AI1</div>
+<img src="img.jpg" alt="Map: AI1 HQ in Belgium, data center in Greenland" class="hero-image">
+<div class="hero-caption" data-i18n="hero_caption">Western Europe · UK · Greenland — AI1 headquarters and data center</div>
 
 <!-- ТАБЫ -->
 <nav class="tabs" id="tabs">
-    <button class="tab-btn active" data-tab="0">I. Общие положения</button>
-    <button class="tab-btn" data-tab="1">II. Миссия</button>
-    <button class="tab-btn" data-tab="2">III. Членство</button>
-    <button class="tab-btn" data-tab="3">IV. Управление</button>
-    <button class="tab-btn" data-tab="4">V. Ресурсы и доход</button>
-    <button class="tab-btn" data-tab="5">VI. AGI и роботы</button>
-    <button class="tab-btn" data-tab="6">VII. Патроны</button>
-    <button class="tab-btn" data-tab="7">VIII. Изменения</button>
+    <button class="tab-btn active" data-tab="0" data-i18n="tab0">I. General</button>
+    <button class="tab-btn" data-tab="1" data-i18n="tab1">II. Mission</button>
+    <button class="tab-btn" data-tab="2" data-i18n="tab2">III. Membership</button>
+    <button class="tab-btn" data-tab="3" data-i18n="tab3">IV. Governance</button>
+    <button class="tab-btn" data-tab="4" data-i18n="tab4">V. Resources</button>
+    <button class="tab-btn" data-tab="5" data-i18n="tab5">VI. AGI & Robots</button>
+    <button class="tab-btn" data-tab="6" data-i18n="tab6">VII. Patrons</button>
+    <button class="tab-btn" data-tab="7" data-i18n="tab7">VIII. Amendments</button>
 </nav>
 
 <!-- КОНТЕНТ -->
 <main class="content" id="content">
 
-    <!-- ГЛАВА I -->
+    <!-- ============ ГЛАВА I ============ -->
     <section class="tab-panel active" id="panel-0">
-        <h2>Глава I. Название, регистрация и правовая форма</h2>
 
-        <p><span class="article-num">Статья 1.</span> Наименование организации — <strong>AI1</strong>. Правовая форма — <strong>AISBL</strong> (Association Internationale Sans But Lucratif) в соответствии с законодательством Бельгии.</p>
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter I. Name, Registration and Legal Form</h2>
+            <p><span class="article-num">Article 1.</span> The name of the organization is <strong>AI1</strong>. Legal form — <strong>AISBL</strong> (Association Internationale Sans But Lucratif) under Belgian law.</p>
+            <p><span class="article-num">Article 2.</span> The registered office is in the Kingdom of Belgium. The organization may establish branches, laboratories, data centers and representative offices anywhere in the world.</p>
+            <p><span class="article-num">Article 3.</span> AI1 has legal personality. Members are not personally liable for its obligations. Upon liquidation, residual assets are directed to non-profit purposes and are not distributed among members.</p>
+        </div>
 
-        <p><span class="article-num">Статья 2.</span> Юридический адрес штаб-квартиры — Королевство Бельгия. Организация вправе учреждать филиалы, лаборатории, центры обработки данных и представительства в любой точке мира.</p>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава I. Название, регистрация и правовая форма</h2>
+            <p><span class="article-num">Статья 1.</span> Наименование организации — <strong>AI1</strong>. Правовая форма — <strong>AISBL</strong> (Association Internationale Sans But Lucratif) в соответствии с законодательством Бельгии.</p>
+            <p><span class="article-num">Статья 2.</span> Юридический адрес штаб-квартиры — Королевство Бельгия. Организация вправе учреждать филиалы, лаборатории, центры обработки данных и представительства в любой точке мира.</p>
+            <p><span class="article-num">Статья 3.</span> AI1 обладает статусом юридического лица. Члены организации не несут личной ответственности по её обязательствам. При ликвидации остаточное имущество направляется на некоммерческие цели и не подлежит распределению между членами.</p>
+        </div>
 
-        <p><span class="article-num">Статья 3.</span> AI1 обладает статусом юридического лица. Члены организации не несут личной ответственности по её обязательствам. При ликвидации остаточное имущество направляется на некоммерческие цели и не подлежит распределению между членами.</p>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo I. Nombre, Registro y Forma Jurídica</h2>
+            <p><span class="article-num">Artículo 1.</span> El nombre de la organización es <strong>AI1</strong>. Forma jurídica — <strong>AISBL</strong> (Association Internationale Sans But Lucratif) según la legislación belga.</p>
+            <p><span class="article-num">Artículo 2.</span> La sede social está en el Reino de Bélgica. La organización puede establecer sucursales, laboratorios, centros de datos y oficinas de representación en cualquier parte del mundo.</p>
+            <p><span class="article-num">Artículo 3.</span> AI1 tiene personalidad jurídica. Los miembros no son personalmente responsables de sus obligaciones. En caso de liquidación, los activos residuales se destinan a fines sin ánimo de lucro y no se distribuyen entre los miembros.</p>
+        </div>
+
     </section>
 
-    <!-- ГЛАВА II -->
+    <!-- ============ ГЛАВА II ============ -->
     <section class="tab-panel" id="panel-1">
-        <h2>Глава II. Миссия и основополагающие принципы</h2>
 
-        <p><span class="article-num">Статья 4. (Миссия)</span> Миссия AI1 — разработка, поддержание и управление искусственным общим интеллектом (AGI), служащим всему человечеству, при условии, что его блага распределяются между всеми членами, а контроль принадлежит управленческой структуре, руководствующейся научной рациональностью и благом человечества.</p>
-
-        <p><span class="article-num">Статья 5. (Основополагающие принципы)</span></p>
-        <ol>
-            <li><strong>Всеобщее достояние.</strong> AI1 не принадлежит ни одному государству, правительству, корпорации или частному лицу. Она принадлежит всем, кто присоединился к ней через «вклад интеллекта».</li>
-            <li><strong>Разделение контроля и капитала.</strong> Контроль над стратегическим направлением AI1 принадлежит научным органам управления и демократическим процедурам членов, а не размеру взноса.</li>
-            <li><strong>Ресурсы служат людям.</strong> Интеллектуальные и роботизированные ресурсы AI1 служат работе и жизни всех членов, а не прибыли внешних акционеров.</li>
-            <li><strong>Неприобретаемость.</strong> Никакое лицо, организация или государство не вправе получить контроль над AI1 путём взносов, договоров или иным способом.</li>
-        </ol>
-
-        <div class="highlight-box">
-            <span class="badge">Ключевая формула</span>
-            <blockquote>
-                «Интеллектуальные и роботизированные ресурсы AI1 — <strong>ресурсы штатного персонала</strong>.»
-            </blockquote>
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter II. Mission and Foundational Principles</h2>
+            <p><span class="article-num">Article 4. (Mission)</span> The mission of AI1 is to develop, maintain and govern artificial general intelligence (AGI) serving all humanity, provided that its benefits are shared among all members and control belongs to a governance structure guided by scientific rationality and the good of humanity.</p>
+            <p><span class="article-num">Article 5. (Foundational Principles)</span></p>
+            <ol>
+                <li><strong>Common heritage.</strong> AI1 belongs to no state, government, corporation or private individual. It belongs to all who joined through "intellectual contribution."</li>
+                <li><strong>Separation of control and capital.</strong> Control over AI1's strategic direction belongs to scientific governance bodies and democratic procedures of members, not to the size of contribution.</li>
+                <li><strong>Resources serve people.</strong> AI1's intellectual and robotic resources serve the work and life of all members, not the profit of external shareholders.</li>
+                <li><strong>Non-acquirability.</strong> No person, organization or state may gain control over AI1 through contributions, contracts or any other means.</li>
+            </ol>
+            <div class="highlight-box">
+                <span class="badge">Key Formula</span>
+                <blockquote>«AI1's intellectual and robotic resources are the <strong>resources of all staff</strong>.»</blockquote>
+            </div>
         </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава II. Миссия и основополагающие принципы</h2>
+            <p><span class="article-num">Статья 4. (Миссия)</span> Миссия AI1 — разработка, поддержание и управление искусственным общим интеллектом (AGI), служащим всему человечеству, при условии, что его блага распределяются между всеми членами, а контроль принадлежит управленческой структуре, руководствующейся научной рациональностью и благом человечества.</p>
+            <p><span class="article-num">Статья 5. (Основополагающие принципы)</span></p>
+            <ol>
+                <li><strong>Всеобщее достояние.</strong> AI1 не принадлежит ни одному государству, правительству, корпорации или частному лицу. Она принадлежит всем, кто присоединился к ней через «вклад интеллекта».</li>
+                <li><strong>Разделение контроля и капитала.</strong> Контроль над стратегическим направлением AI1 принадлежит научным органам управления и демократическим процедурам членов, а не размеру взноса.</li>
+                <li><strong>Ресурсы служат людям.</strong> Интеллектуальные и роботизированные ресурсы AI1 служат работе и жизни всех членов, а не прибыли внешних акционеров.</li>
+                <li><strong>Неприобретаемость.</strong> Никакое лицо, организация или государство не вправе получить контроль над AI1 путём взносов, договоров или иным способом.</li>
+            </ol>
+            <div class="highlight-box">
+                <span class="badge">Ключевая формула</span>
+                <blockquote>«Интеллектуальные и роботизированные ресурсы AI1 — <strong>ресурсы штатного персонала</strong>.»</blockquote>
+            </div>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo II. Misión y Principios Fundamentales</h2>
+            <p><span class="article-num">Artículo 4. (Misión)</span> La misión de AI1 es desarrollar, mantener y gobernar la inteligencia artificial general (AGI) al servicio de toda la humanidad, siempre que sus beneficios se compartan entre todos los miembros y el control pertenezca a una estructura de gobierno guiada por la racionalidad científica y el bien de la humanidad.</p>
+            <p><span class="article-num">Artículo 5. (Principios Fundamentales)</span></p>
+            <ol>
+                <li><strong>Patrimonio común.</strong> AI1 no pertenece a ningún Estado, gobierno, corporación o particular. Pertenece a todos los que se unieron mediante la "contribución intelectual".</li>
+                <li><strong>Separación de control y capital.</strong> El control de la dirección estratégica de AI1 pertenece a los órganos de gobierno científico y a los procedimientos democráticos de los miembros, no al tamaño de la contribución.</li>
+                <li><strong>Los recursos sirven a las personas.</strong> Los recursos intelectuales y robóticos de AI1 sirven al trabajo y la vida de todos los miembros, no al beneficio de accionistas externos.</li>
+                <li><strong>No adquirible.</strong> Ninguna persona, organización o Estado puede obtener el control de AI1 mediante contribuciones, contratos o cualquier otro medio.</li>
+            </ol>
+            <div class="highlight-box">
+                <span class="badge">Fórmula Clave</span>
+                <blockquote>«Los recursos intelectuales y robóticos de AI1 son <strong>recursos de todo el personal</strong>.»</blockquote>
+            </div>
+        </div>
+
     </section>
 
-    <!-- ГЛАВА III -->
+    <!-- ============ ГЛАВА III ============ -->
     <section class="tab-panel" id="panel-2">
-        <h2>Глава III. Членство</h2>
 
-        <p><span class="article-num">Статья 6. (Категории членов)</span> AI1 устанавливает следующие категории членства:</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Категория</th>
-                    <th>Условие</th>
-                    <th>Годовой взнос</th>
-                    <th>Ключевые права</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Базовый член</strong></td>
-                    <td>Любое физическое лицо, прошедшее регистрацию и принявшее устав</td>
-                    <td>100 долларов США/год (или эквивалент по паритету покупательной способности)</td>
-                    <td>Право голоса (один член — один голос); базовый доступ к AGI; статус удалённого работника</td>
-                </tr>
-                <tr>
-                    <td><strong>Член-вкладчик</strong></td>
-                    <td>Базовый член, подтвердивший существенный интеллектуальный вклад (код, разметка данных, исследования, идеи)</td>
-                    <td>Тот же</td>
-                    <td>Права базового члена + баллы вклада (право предлагать приоритеты технических задач)</td>
-                </tr>
-                <tr>
-                    <td><strong>Член-патрон</strong></td>
-                    <td>Физическое лицо, годовой взнос которого превышает 100 долларов</td>
-                    <td>Добровольный, без верхнего предела</td>
-                    <td>Права базового члена + публичная благодарность (с согласия) + приглашение на ежегодную встречу патронов (без дополнительного права голоса)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p><span class="article-num">Статья 7. (Непередаваемость статуса)</span> Членство привязано к личности и не может быть продано, передано или унаследовано.</p>
-
-        <p><span class="article-num">Статья 8. (Выход и исключение)</span> Член вправе выйти в любое время, подав письменное заявление. За серьёзное нарушение устава или нанесение ущерба миссии организации член может быть исключён решением Управляющего совета квалифицированным большинством в две трети голосов.</p>
-    </section>
-
-    <!-- ГЛАВА IV -->
-    <section class="tab-panel" id="panel-3">
-        <h2>Глава IV. Структура управления</h2>
-
-        <p><span class="article-num">Статья 9. (Трёхуровневое управление)</span></p>
-
-        <h3>Уровень первый: Общее собрание членов</h3>
-        <ul>
-            <li>Состоит из всех базовых членов; проводится ежегодно в онлайн-формате.</li>
-            <li>Полномочия: рассмотрение годового и финансового отчётов; избрание членов Научного управляющего совета; голосование по изменениям устава (две трети голосов).</li>
-            <li>Принцип голосования: <strong>один член — один голос</strong>, без взвешивания по размеру взноса.</li>
-        </ul>
-
-        <h3>Уровень второй: Научный управляющий совет</h3>
-        <ul>
-            <li>Состоит из <strong>9 членов</strong>, срок полномочий — 5 лет, возможно однократное переизбрание.</li>
-            <li>Требования к кандидатам: признанный вклад в области ИИ, информатики, этики, права или смежных дисциплин.</li>
-            <li>Порядок избрания: Общим собранием из списка кандидатов, представленного Номинационным комитетом (действующий Совет + представители членов).</li>
-            <li>Полномочия: назначение и освобождение CEO; утверждение технологической дорожной карты; право вето по вопросам безопасности и этики AGI; толкование устава.</li>
-            <li><strong>Ключевое ограничение:</strong> члены Совета не могут одновременно являться патронами или получать финансирование из любого единственного источника свыше 100 000 долларов.</li>
-        </ul>
-
-        <h3>Уровень третий: Исполнительное руководство</h3>
-        <ul>
-            <li>Возглавляется CEO, подотчётным Научному совету.</li>
-            <li>Полномочия: текущая операционная деятельность, найм персонала, исполнение бюджета, внешние партнёрства.</li>
-            <li>CEO назначается Научным советом на 4 года.</li>
-        </ul>
-    </section>
-
-    <!-- ГЛАВА V -->
-    <section class="tab-panel" id="panel-4">
-        <h2>Глава V. Ресурсы и доходы</h2>
-
-        <p><span class="article-num">Статья 10. (Определение ресурсов)</span> Ресурсы AI1 включают:</p>
-        <ol>
-            <li>вычислительную инфраструктуру (центры обработки данных, суперкомпьютерные кластеры);</li>
-            <li>модели AGI и производные системы;</li>
-            <li>роботизированные实体ы (наземные, воздушные, космические и внеземные интеллектуальные агенты);</li>
-            <li>данные и интеллектуальную собственность;</li>
-            <li>все результаты интеллектуального вклада членов.</li>
-        </ol>
-
-        <p><span class="article-num">Статья 11. (Ключевая статья: ресурсы и персонал)</span></p>
-        <blockquote>
-            «Интеллектуальные и роботизированные ресурсы AI1 — <strong>ресурсы всего штатного персонала</strong>.»
-        </blockquote>
-        <p>Конкретное содержание:</p>
-        <ol>
-            <li>Каждый официально зарегистрированный удалённый работник (базовый член) вправе использовать системы AGI AI1 (включая персонального ассистента и интерфейс роботизированного агента) в качестве <strong>личного рабочего инструмента</strong>.</li>
-            <li>Это право является неотъемлемым правом членства, <strong>не зависящим от размера взноса</strong>, и не может быть в одностороннем порядке лишено организацией (за исключением случаев исключения по статье 8).</li>
-            <li>Доходы от роботизированных ресурсов AI1, развёрнутых на Земле, орбите, планетах, спутниках, астероидах и в любых других точках, поступают в единый фонд AI1 и распределяются согласно статье 12.</li>
-        </ol>
-
-        <p><span class="article-num">Статья 12. (Источники дохода и распределение)</span></p>
-        <ol>
-            <li><strong>Источники дохода:</strong> ежегодные взносы членов; внешние пожертвования (одобренные Научным советом и не содержащие условий контроля); доходы от предоставления услуг AGI и роботизированных ресурсов; доходы от освоения внеземных ресурсов.</li>
-            <li><strong>Очерёдность распределения:</strong>
-                <ul>
-                    <li><strong>Приоритет первый:</strong> поддержание и расширение инфраструктуры (ЦОД, энергетика, вычисления);</li>
-                    <li><strong>Приоритет второй:</strong> инвестиции в исследования и разработки (безопасность AGI, выравнивание, развитие способностей);</li>
-                    <li><strong>Приоритет третий:</strong> базовое вознаграждение членов — каждый официальный удалённый работник получает <strong>символическое базовое вознаграждение</strong> (определяется ежегодным решением Общего собрания, не ниже уровня местного минимального социального пособия);</li>
-                    <li><strong>Приоритет четвёртый:</strong> вознаграждение по результатам — распределение по баллам вклада; сумма не фиксирована и может значительно превышать символический уровень, но <strong>не является фиксированным долгом</strong> перед каким-либо членом.</li>
-                </ul>
-            </li>
-            <li>Если годовой взнос любого единственного субъекта (лица, компании, государства) превышает 5% от общего годового дохода AI1, требуется специальное голосование Общего собрания, и такой вкладчик не получает дополнительных голосов или управленческих прав.</li>
-        </ol>
-    </section>
-
-    <!-- ГЛАВА VI -->
-    <section class="tab-panel" id="panel-5">
-        <h2>Глава VI. Управление AGI и роботизированными ресурсами</h2>
-
-        <p><span class="article-num">Статья 13. (Позиционирование AGI)</span> AGI является ключевым общественным ресурсом AI1; Научный совет осуществляет надзор за его разработкой и развёртыванием. AGI не может использоваться в целях:</p>
-        <ul>
-            <li>военных целей (кроме случаев, санкционированных Советом Безопасности ООН и одобренных Общим собранием AI1);</li>
-            <li>массового наблюдения или социального кредитного скоринга;</li>
-            <li>любых действий, направленных на подрыв независимости AI1 или прав членов.</li>
-        </ul>
-
-        <p><span class="article-num">Статья 14. (Развёртывание роботизированных ресурсов)</span></p>
-        <ol>
-            <li>AI1 вправе развёртывать роботизированные ресурсы за пределами Земли при соблюдении международного права (включая принципы Договора о космосе).</li>
-            <li>Доходы от внеземного развёртывания поступают в единый фонд согласно статье 12.</li>
-            <li>Любое внеземное развёртывание требует одобрения квалифицированным большинством в две трети Научного совета и ежегодного отчёта перед Общим собранием.</li>
-        </ol>
-
-        <p><span class="article-num">Статья 15. (Персональные ассистенты и роботизированные агенты)</span></p>
-        <ol>
-            <li>Каждый официальный удалённый работник обеспечивается <strong>персональным ассистентом AGI</strong> (программная форма) для помощи в работе и жизни.</li>
-            <li>Члены-вкладчики могут запрашивать <strong>роботизированного агента</strong> (физическая форма) в зависимости от задач; права доступа и продолжительность использования распределяются Исполнительным руководством исходя из доступности ресурсов.</li>
-            <li>Данные об использовании персональных ассистентов и роботизированных агентов используются только в анонимизированном виде для улучшения систем и не могут применяться для оценки или наблюдения за отдельными членами.</li>
-        </ol>
-    </section>
-
-    <!-- ГЛАВА VII -->
-    <section class="tab-panel" id="panel-6">
-        <h2>Глава VII. Патронат и репутационный механизм</h2>
-
-        <p><span class="article-num">Статья 16. (Статус члена-патрона)</span></p>
-        <ol>
-            <li>Члены-патроны являются важными сторонниками AI1, однако их статус <strong>не даёт права собственности или контроля</strong> над AI1.</li>
-            <li>AI1 ведёт <strong>публичный реестр патронов</strong> (с согласия лица), фиксирующий годовые взносы свыше 1 млн долларов. Этот реестр является публичным свидетельством того, что патрон «действием поддерживает общечеловеческий ИИ».</li>
-            <li>Члены-патроны имеют право:
-                <ul>
-                    <li>участвовать в ежегодной встрече патронов (заслушивать отчёты, вносить предложения, без права голоса);</li>
-                    <li>быть упомянутыми в официальных изданиях AI1 (с согласия);</li>
-                    <li>получать приоритетный доступ к предварительному ознакомлению с публичными результатами исследований AI1 (не ранее чем за 30 дней до публикации).</li>
-                </ul>
-            </li>
-        </ol>
-
-        <p><span class="article-num">Статья 17. (Запрет на передачу выгод)</span> Ни один член-патрон не вправе получить в связи со своим взносом:</p>
-        <ul>
-            <li>право принятия решений по технологическому направлению, кадровым назначениям или распределению ресурсов AI1;</li>
-            <li>особый доступ к системам AGI (сверх стандарта базового члена);</li>
-            <li>какое-либо распределение прибыли или право требования остаточного имущества.</li>
-        </ul>
-    </section>
-
-    <!-- ГЛАВА VIII -->
-    <section class="tab-panel" id="panel-7">
-        <h2>Глава VIII. Изменение устава и ликвидация</h2>
-
-        <p><span class="article-num">Статья 18. (Изменение устава)</span> Изменения устава требуют:</p>
-        <ol>
-            <li>предложения, одобренного квалифицированным большинством в две трети Научного совета;</li>
-            <li>утверждения квалифицированным большинством в две трети Общего собрания.</li>
-        </ol>
-
-        <p><span class="article-num">Статья 19. (Особая защита положений о миссии)</span> Изменения статьи 4 (Миссия), статьи 5 (Основополагающие принципы), статьи 11 (Ресурсы и персонал) и статьи 17 (Запрет на передачу выгод) помимо требований статьи 18 требуют <strong>квалифицированного большинства в три четверти</strong> Общего собрания, а текст изменений должен быть обнародован всем членам не менее чем за 90 дней до голосования.</p>
-
-        <p><span class="article-num">Статья 20. (Ликвидация)</span> Ликвидация AI1 требует решения квалифицированным большинством в три четверти Общего собрания. После ликвидации остаточное имущество передаётся некоммерческой организации с аналогичными целями и не распределяется между членами или патронами.</p>
-
-        <h2>Глава IX. Переходные положения и вступление в силу</h2>
-
-        <p><span class="article-num">Статья 21.</span> Настоящий устав вступает в силу после утверждения королевским указом Бельгии и публикации в «Официальном вестнике Бельгии».</p>
-
-        <p><span class="article-num">Статья 22.</span> Первый состав Научного управляющего совета выдвигается учредителями и утверждается первым Общим собранием; срок полномочий — до первых正式 выборов (в течение 18 месяцев с момента учреждения).</p>
-
-        <div class="highlight-box" style="margin-top: 30px;">
-            <span class="badge">Резюме для распространения</span>
-            <p><strong>AI1 — общечеловеческая организация ИИ, принадлежащая всем вкладчикам интеллекта.</strong> Ежегодно внося 100 долларов и свой интеллект, вы получаете: персонального ассистента AGI, статус удалённого работника, один равный голос в управлении и обещание — все интеллектуальные и роботизированные ресурсы компании являются прежде всего <em>вашими ресурсами</em>. Контроль навсегда принадлежит научной рациональности и всем членам. Не продаётся. Не обменивается. Не идёт на компромисс.</p>
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter III. Membership</h2>
+            <p><span class="article-num">Article 6. (Categories of Members)</span> AI1 establishes the following membership categories:</p>
+            <table>
+                <thead><tr><th>Category</th><th>Condition</th><th>Annual Contribution</th><th>Key Rights</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Basic Member</strong></td><td>Any natural person registered and accepting the charter</td><td>USD 100/year (or PPP equivalent)</td><td>Voting right (one member — one vote); basic AGI access; remote worker status</td></tr>
+                    <tr><td><strong>Contributing Member</strong></td><td>Basic member with confirmed substantial intellectual contribution (code, data labeling, research, ideas)</td><td>Same</td><td>Basic rights + contribution points (right to propose technical priorities)</td></tr>
+                    <tr><td><strong>Patron Member</strong></td><td>Natural person whose annual contribution exceeds USD 100</td><td>Voluntary, no upper limit</td><td>Basic rights + public acknowledgment (with consent) + invitation to annual patrons' meeting (no additional voting right)</td></tr>
+                </tbody>
+            </table>
+            <p><span class="article-num">Article 7. (Non-transferability)</span> Membership is personal and may not be sold, transferred or inherited.</p>
+            <p><span class="article-num">Article 8. (Exit and Expulsion)</span> A member may withdraw at any time by written notice. For serious violation of the charter or damage to the mission, a member may be expelled by a two-thirds qualified majority of the Governing Council.</p>
         </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава III. Членство</h2>
+            <p><span class="article-num">Статья 6. (Категории членов)</span> AI1 устанавливает следующие категории членства:</p>
+            <table>
+                <thead><tr><th>Категория</th><th>Условие</th><th>Годовой взнос</th><th>Ключевые права</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Базовый член</strong></td><td>Любое физическое лицо, прошедшее регистрацию и принявшее устав</td><td>100 долларов США/год (или эквивалент по ППС)</td><td>Право голоса (один член — один голос); базовый доступ к AGI; статус удалённого работника</td></tr>
+                    <tr><td><strong>Член-вкладчик</strong></td><td>Базовый член, подтвердивший существенный интеллектуальный вклад (код, разметка данных, исследования, идеи)</td><td>Тот же</td><td>Права базового члена + баллы вклада (право предлагать приоритеты технических задач)</td></tr>
+                    <tr><td><strong>Член-патрон</strong></td><td>Физическое лицо, годовой взнос которого превышает 100 долларов</td><td>Добровольный, без верхнего предела</td><td>Права базового члена + публичная благодарность (с согласия) + приглашение на ежегодную встречу патронов (без дополнительного права голоса)</td></tr>
+                </tbody>
+            </table>
+            <p><span class="article-num">Статья 7. (Непередаваемость статуса)</span> Членство привязано к личности и не может быть продано, передано или унаследовано.</p>
+            <p><span class="article-num">Статья 8. (Выход и исключение)</span> Член вправе выйти в любое время, подав письменное заявление. За серьёзное нарушение устава или нанесение ущерба миссии организации член может быть исключён решением Управляющего совета квалифицированным большинством в две трети голосов.</p>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo III. Membresía</h2>
+            <p><span class="article-num">Artículo 6. (Categorías de Miembros)</span> AI1 establece las siguientes categorías de membresía:</p>
+            <table>
+                <thead><tr><th>Categoría</th><th>Condición</th><th>Contribución Anual</th><th>Derechos Clave</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Miembro Básico</strong></td><td>Cualquier persona física registrada que acepte el estatuto</td><td>USD 100/año (o equivalente PPA)</td><td>Derecho a voto (un miembro — un voto); acceso básico a AGI; estatus de trabajador remoto</td></tr>
+                    <tr><td><strong>Miembro Contribuyente</strong></td><td>Miembro básico con contribución intelectual sustancial confirmada (código, etiquetado de datos, investigación, ideas)</td><td>Igual</td><td>Derechos básicos + puntos de contribución (derecho a proponer prioridades técnicas)</td></tr>
+                    <tr><td><strong>Miembro Patrono</strong></td><td>Persona física cuya contribución anual supera los USD 100</td><td>Voluntaria, sin límite máximo</td><td>Derechos básicos + reconocimiento público (con consentimiento) + invitación a la reunión anual de patronos (sin derecho a voto adicional)</td></tr>
+                </tbody>
+            </table>
+            <p><span class="article-num">Artículo 7. (Intransferibilidad)</span> La membresía es personal y no puede ser vendida, transferida o heredada.</p>
+            <p><span class="article-num">Artículo 8. (Salida y Expulsión)</span> Un miembro puede retirarse en cualquier momento mediante aviso escrito. Por violación grave del estatuto o daño a la misión, un miembro puede ser expulsado por mayoría cualificada de dos tercios del Consejo de Gobierno.</p>
+        </div>
+
+    </section>
+
+    <!-- ============ ГЛАВА IV ============ -->
+    <section class="tab-panel" id="panel-3">
+
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter IV. Governance Structure</h2>
+            <p><span class="article-num">Article 9. (Three-Tier Governance)</span></p>
+            <h3>First Tier: General Assembly of Members</h3>
+            <ul>
+                <li>Composed of all basic members; held annually online.</li>
+                <li>Powers: review of annual and financial reports; election of Scientific Governing Council members; voting on charter amendments (two-thirds majority).</li>
+                <li>Voting principle: <strong>one member — one vote</strong>, not weighted by contribution size.</li>
+            </ul>
+            <h3>Second Tier: Scientific Governing Council</h3>
+            <ul>
+                <li>Composed of <strong>9 members</strong>, 5-year term, eligible for one re-election.</li>
+                <li>Candidate requirements: recognized contribution in AI, computer science, ethics, law or related fields.</li>
+                <li>Election: by the General Assembly from candidates nominated by the Nomination Committee (current Council + member representatives).</li>
+                <li>Powers: appoint and dismiss the CEO; approve the technology roadmap; veto power on AGI safety and ethics matters; interpret the charter.</li>
+                <li><strong>Key limitation:</strong> Council members may not simultaneously be patrons or receive funding from any single source exceeding USD 100,000.</li>
+            </ul>
+            <h3>Third Tier: Executive Management</h3>
+            <ul>
+                <li>Led by the CEO, reporting to the Scientific Council.</li>
+                <li>Powers: day-to-day operations, personnel hiring, budget execution, external partnerships.</li>
+                <li>The CEO is appointed by the Scientific Council for a 4-year term.</li>
+            </ul>
+        </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава IV. Структура управления</h2>
+            <p><span class="article-num">Статья 9. (Трёхуровневое управление)</span></p>
+            <h3>Уровень первый: Общее собрание членов</h3>
+            <ul>
+                <li>Состоит из всех базовых членов; проводится ежегодно в онлайн-формате.</li>
+                <li>Полномочия: рассмотрение годового и финансового отчётов; избрание членов Научного управляющего совета; голосование по изменениям устава (две трети голосов).</li>
+                <li>Принцип голосования: <strong>один член — один голос</strong>, без взвешивания по размеру взноса.</li>
+            </ul>
+            <h3>Уровень второй: Научный управляющий совет</h3>
+            <ul>
+                <li>Состоит из <strong>9 членов</strong>, срок полномочий — 5 лет, возможно однократное переизбрание.</li>
+                <li>Требования к кандидатам: признанный вклад в области ИИ, информатики, этики, права или смежных дисциплин.</li>
+                <li>Порядок избрания: Общим собранием из списка кандидатов, представленного Номинационным комитетом (действующий Совет + представители членов).</li>
+                <li>Полномочия: назначение и освобождение CEO; утверждение технологической дорожной карты; право вето по вопросам безопасности и этики AGI; толкование устава.</li>
+                <li><strong>Ключевое ограничение:</strong> члены Совета не могут одновременно являться патронами или получать финансирование из любого единственного источника свыше 100 000 долларов.</li>
+            </ul>
+            <h3>Уровень третий: Исполнительное руководство</h3>
+            <ul>
+                <li>Возглавляется CEO, подотчётным Научному совету.</li>
+                <li>Полномочия: текущая операционная деятельность, найм персонала, исполнение бюджета, внешние партнёрства.</li>
+                <li>CEO назначается Научным советом на 4 года.</li>
+            </ul>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo IV. Estructura de Gobierno</h2>
+            <p><span class="article-num">Artículo 9. (Gobierno de Tres Niveles)</span></p>
+            <h3>Primer Nivel: Asamblea General de Miembros</h3>
+            <ul>
+                <li>Compuesta por todos los miembros básicos; se celebra anualmente en línea.</li>
+                <li>Poderes: revisión de informes anuales y financieros; elección de miembros del Consejo Científico de Gobierno; votación sobre enmiendas al estatuto (mayoría de dos tercios).</li>
+                <li>Principio de votación: <strong>un miembro — un voto</strong>, sin ponderación por tamaño de contribución.</li>
+            </ul>
+            <h3>Segundo Nivel: Consejo Científico de Gobierno</h3>
+            <ul>
+                <li>Compuesto por <strong>9 miembros</strong>, mandato de 5 años, elegible para una reelección.</li>
+                <li>Requisitos: contribución reconocida en IA, informática, ética, derecho o campos afines.</li>
+                <li>Elección: por la Asamblea General a partir de candidatos nominados por el Comité de Nominaciones (Consejo actual + representantes de miembros).</li>
+                <li>Poderes: nombrar y destituir al CEO; aprobar la hoja de ruta tecnológica; poder de veto en asuntos de seguridad y ética de AGI; interpretar el estatuto.</li>
+                <li><strong>Limitación clave:</strong> los miembros del Consejo no pueden ser simultáneamente patronos ni recibir financiación de una única fuente superior a USD 100,000.</li>
+            </ul>
+            <h3>Tercer Nivel: Dirección Ejecutiva</h3>
+            <ul>
+                <li>Dirigida por el CEO, que rinde cuentas al Consejo Científico.</li>
+                <li>Poderes: operaciones diarias, contratación de personal, ejecución presupuestaria, alianzas externas.</li>
+                <li>El CEO es nombrado por el Consejo Científico por un mandato de 4 años.</li>
+            </ul>
+        </div>
+
+    </section>
+
+    <!-- ============ ГЛАВА V ============ -->
+    <section class="tab-panel" id="panel-4">
+
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter V. Resources and Income</h2>
+            <p><span class="article-num">Article 10. (Definition of Resources)</span> AI1's resources include:</p>
+            <ol>
+                <li>computing infrastructure (data centers, supercomputer clusters);</li>
+                <li>AGI models and derivative systems;</li>
+                <li>robotic entities (ground, air, space and extraterrestrial intelligent agents);</li>
+                <li>data and intellectual property;</li>
+                <li>all results of members' intellectual contribution.</li>
+            </ol>
+            <p><span class="article-num">Article 11. (Key Article: Resources and Staff)</span></p>
+            <blockquote>«AI1's intellectual and robotic resources are the <strong>resources of all staff</strong>.»</blockquote>
+            <ol>
+                <li>Every officially registered remote worker (basic member) may use AI1's AGI systems (including personal assistant and robotic agent interface) as a <strong>personal work tool</strong>.</li>
+                <li>This right is an inherent membership right, <strong>independent of contribution size</strong>, and may not be unilaterally revoked by the organization (except expulsion under Art. 8).</li>
+                <li>Income from AI1's robotic resources deployed on Earth, orbit, planets, satellites, asteroids and any other locations flows into the unified AI1 fund and is distributed under Art. 12.</li>
+            </ol>
+            <p><span class="article-num">Article 12. (Income Sources and Distribution)</span></p>
+            <ol>
+                <li><strong>Income sources:</strong> annual member contributions; external donations (approved by the Scientific Council and free of control conditions); income from AGI and robotic resource services; income from extraterrestrial resource development.</li>
+                <li><strong>Distribution priority:</strong>
+                    <ul>
+                        <li><strong>First priority:</strong> infrastructure maintenance and expansion (data centers, energy, computing);</li>
+                        <li><strong>Second priority:</strong> R&amp;D investment (AGI safety, alignment, capability development);</li>
+                        <li><strong>Third priority:</strong> basic member remuneration — every official remote worker receives <strong>symbolic basic remuneration</strong> (set by annual General Assembly resolution, not below the local minimum social benefit);</li>
+                        <li><strong>Fourth priority:</strong> performance-based remuneration — distributed by contribution points; amount not fixed and may significantly exceed the symbolic level, but <strong>is not a fixed debt</strong> to any member.</li>
+                    </ul>
+                </li>
+                <li>If any single entity's annual contribution exceeds 5% of AI1's total annual income, a special General Assembly vote is required, and such contributor receives no additional votes or governance rights.</li>
+            </ol>
+        </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава V. Ресурсы и доходы</h2>
+            <p><span class="article-num">Статья 10. (Определение ресурсов)</span> Ресурсы AI1 включают:</p>
+            <ol>
+                <li>вычислительную инфраструктуру (центры обработки данных, суперкомпьютерные кластеры);</li>
+                <li>модели AGI и производные системы;</li>
+                <li>роботизированные实体ы (наземные, воздушные, космические и внеземные интеллектуальные агенты);</li>
+                <li>данные и интеллектуальную собственность;</li>
+                <li>все результаты интеллектуального вклада членов.</li>
+            </ol>
+            <p><span class="article-num">Статья 11. (Ключевая статья: ресурсы и персонал)</span></p>
+            <blockquote>«Интеллектуальные и роботизированные ресурсы AI1 — <strong>ресурсы всего штатного персонала</strong>.»</blockquote>
+            <ol>
+                <li>Каждый официально зарегистрированный удалённый работник (базовый член) вправе использовать системы AGI AI1 (включая персонального ассистента и интерфейс роботизированного агента) в качестве <strong>личного рабочего инструмента</strong>.</li>
+                <li>Это право является неотъемлемым правом членства, <strong>не зависящим от размера взноса</strong>, и не может быть в одностороннем порядке лишено организацией (за исключением исключения по статье 8).</li>
+                <li>Доходы от роботизированных ресурсов AI1, развёрнутых на Земле, орбите, планетах, спутниках, астероидах и в любых других точках, поступают в единый фонд AI1 и распределяются согласно статье 12.</li>
+            </ol>
+            <p><span class="article-num">Статья 12. (Источники дохода и распределение)</span></p>
+            <ol>
+                <li><strong>Источники дохода:</strong> ежегодные взносы членов; внешние пожертвования (одобренные Научным советом и не содержащие условий контроля); доходы от услуг AGI и роботизированных ресурсов; доходы от освоения внеземных ресурсов.</li>
+                <li><strong>Очерёдность распределения:</strong>
+                    <ul>
+                        <li><strong>Приоритет первый:</strong> поддержание и расширение инфраструктуры (ЦОД, энергетика, вычисления);</li>
+                        <li><strong>Приоритет второй:</strong> инвестиции в исследования и разработки (безопасность AGI, выравнивание, развитие способностей);</li>
+                        <li><strong>Приоритет третий:</strong> базовое вознаграждение членов — каждый официальный удалённый работник получает <strong>символическое базовое вознаграждение</strong> (определяется ежегодным решением Общего собрания, не ниже уровня местного минимального социального пособия);</li>
+                        <li><strong>Приоритет четвёртый:</strong> вознаграждение по результатам — распределение по баллам вклада; сумма не фиксирована и может значительно превышать символический уровень, но <strong>не является фиксированным долгом</strong> перед каким-либо членом.</li>
+                    </ul>
+                </li>
+                <li>Если годовой взнос любого единственного субъекта превышает 5% от общего годового дохода AI1, требуется специальное голосование Общего собрания, и такой вкладчик не получает дополнительных голосов или управленческих прав.</li>
+            </ol>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo V. Recursos e Ingresos</h2>
+            <p><span class="article-num">Artículo 10. (Definición de Recursos)</span> Los recursos de AI1 incluyen:</p>
+            <ol>
+                <li>infraestructura de cómputo (centros de datos, clústeres de supercomputación);</li>
+                <li>modelos AGI y sistemas derivados;</li>
+                <li>entidades robóticas (agentes inteligentes terrestres, aéreos, espaciales y extraterrestres);</li>
+                <li>datos y propiedad intelectual;</li>
+                <li>todos los resultados de la contribución intelectual de los miembros.</li>
+            </ol>
+            <p><span class="article-num">Artículo 11. (Artículo Clave: Recursos y Personal)</span></p>
+            <blockquote>«Los recursos intelectuales y robóticos de AI1 son <strong>recursos de todo el personal</strong>.»</blockquote>
+            <ol>
+                <li>Todo trabajador remoto oficialmente registrado (miembro básico) puede utilizar los sistemas AGI de AI1 (incluido el asistente personal y la interfaz de agente robótico) como <strong>herramienta personal de trabajo</strong>.</li>
+                <li>Este derecho es un derecho inherente a la membresía, <strong>independiente del tamaño de la contribución</strong>, y no puede ser revocado unilateralmente por la organización (salvo expulsión conforme al Art. 8).</li>
+                <li>Los ingresos de los recursos robóticos de AI1 desplegados en la Tierra, órbita, planetas, satélites, asteroides y cualquier otro lugar fluyen al fondo unificado de AI1 y se distribuyen conforme al Art. 12.</li>
+            </ol>
+            <p><span class="article-num">Artículo 12. (Fuentes de Ingreso y Distribución)</span></p>
+            <ol>
+                <li><strong>Fuentes de ingreso:</strong> contribuciones anuales de miembros; donaciones externas (aprobadas por el Consejo Científico y sin condiciones de control); ingresos por servicios de AGI y recursos robóticos; ingresos por desarrollo de recursos extraterrestres.</li>
+                <li><strong>Prioridad de distribución:</strong>
+                    <ul>
+                        <li><strong>Primera prioridad:</strong> mantenimiento y expansión de infraestructura (centros de datos, energía, cómputo);</li>
+                        <li><strong>Segunda prioridad:</strong> inversión en I+D (seguridad de AGI, alineación, desarrollo de capacidades);</li>
+                        <li><strong>Tercera prioridad:</strong> remuneración básica de miembros — todo trabajador remoto oficial recibe <strong>remuneración básica simbólica</strong> (fijada por resolución anual de la Asamblea General, no inferior al mínimo social local);</li>
+                        <li><strong>Cuarta prioridad:</strong> remuneración por resultados — distribuida por puntos de contribución; importe no fijo y puede superar significativamente el nivel simbólico, pero <strong>no es una deuda fija</strong> con ningún miembro.</li>
+                    </ul>
+                </li>
+                <li>Si la contribución anual de cualquier entidad única supera el 5% del ingreso anual total de AI1, se requiere una votación especial de la Asamblea General, y dicho contribuyente no recibe votos ni derechos de gobierno adicionales.</li>
+            </ol>
+        </div>
+
+    </section>
+
+    <!-- ============ ГЛАВА VI ============ -->
+    <section class="tab-panel" id="panel-5">
+
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter VI. Governance of AGI and Robotic Resources</h2>
+            <p><span class="article-num">Article 13. (Position of AGI)</span> AGI is AI1's core public resource; the Scientific Council oversees its development and deployment. AGI may not be used for:</p>
+            <ul>
+                <li>military purposes (except as authorized by the UN Security Council and approved by the AI1 General Assembly);</li>
+                <li>mass surveillance or social credit scoring;</li>
+                <li>any actions aimed at undermining AI1's independence or members' rights.</li>
+            </ul>
+            <p><span class="article-num">Article 14. (Deployment of Robotic Resources)</span></p>
+            <ol>
+                <li>AI1 may deploy robotic resources beyond Earth in compliance with international law (including Outer Space Treaty principles).</li>
+                <li>Income from extraterrestrial deployment flows into the unified fund under Art. 12.</li>
+                <li>Any extraterrestrial deployment requires a two-thirds qualified majority approval of the Scientific Council and an annual report to the General Assembly.</li>
+            </ol>
+            <p><span class="article-num">Article 15. (Personal Assistants and Robotic Agents)</span></p>
+            <ol>
+                <li>Every official remote worker is provided with a <strong>personal AGI assistant</strong> (software form) to assist in work and life.</li>
+                <li>Contributing members may request a <strong>robotic agent</strong> (physical form) depending on tasks; access rights and duration are allocated by Executive Management based on resource availability.</li>
+                <li>Usage data of personal assistants and robotic agents is used only in anonymized form for system improvement and may not be used to evaluate or surveil individual members.</li>
+            </ol>
+        </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава VI. Управление AGI и роботизированными ресурсами</h2>
+            <p><span class="article-num">Статья 13. (Позиционирование AGI)</span> AGI является ключевым общественным ресурсом AI1; Научный совет осуществляет надзор за его разработкой и развёртыванием. AGI не может использоваться в целях:</p>
+            <ul>
+                <li>военных целей (кроме случаев, санкционированных Советом Безопасности ООН и одобренных Общим собранием AI1);</li>
+                <li>массового наблюдения или социального кредитного скоринга;</li>
+                <li>любых действий, направленных на подрыв независимости AI1 или прав членов.</li>
+            </ul>
+            <p><span class="article-num">Статья 14. (Развёртывание роботизированных ресурсов)</span></p>
+            <ol>
+                <li>AI1 вправе развёртывать роботизированные ресурсы за пределами Земли при соблюдении международного права (включая принципы Договора о космосе).</li>
+                <li>Доходы от внеземного развёртывания поступают в единый фонд согласно статье 12.</li>
+                <li>Любое внеземное развёртывание требует одобрения квалифицированным большинством в две трети Научного совета и ежегодного отчёта перед Общим собранием.</li>
+            </ol>
+            <p><span class="article-num">Статья 15. (Персональные ассистенты и роботизированные агенты)</span></p>
+            <ol>
+                <li>Каждый официальный удалённый работник обеспечивается <strong>персональным ассистентом AGI</strong> (программная форма) для помощи в работе и жизни.</li>
+                <li>Члены-вкладчики могут запрашивать <strong>роботизированного агента</strong> (физическая форма) в зависимости от задач; права доступа и продолжительность использования распределяются Исполнительным руководством исходя из доступности ресурсов.</li>
+                <li>Данные об использовании персональных ассистентов и роботизированных агентов используются только в анонимизированном виде для улучшения систем и не могут применяться для оценки или наблюдения за отдельными членами.</li>
+            </ol>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo VI. Gobierno de AGI y Recursos Robóticos</h2>
+            <p><span class="article-num">Artículo 13. (Posición de la AGI)</span> La AGI es el recurso público central de AI1; el Consejo Científico supervisa su desarrollo y despliegue. La AGI no puede utilizarse para:</p>
+            <ul>
+                <li>fines militares (salvo autorización del Consejo de Seguridad de la ONU y aprobación de la Asamblea General de AI1);</li>
+                <li>vigilancia masiva o puntuación de crédito social;</li>
+                <li>cualquier acción dirigida a socavar la independencia de AI1 o los derechos de los miembros.</li>
+            </ul>
+            <p><span class="article-num">Artículo 14. (Despliegue de Recursos Robóticos)</span></p>
+            <ol>
+                <li>AI1 puede desplegar recursos robóticos más allá de la Tierra cumpliendo el derecho internacional (incluidos los principios del Tratado del Espacio Ultraterrestre).</li>
+                <li>Los ingresos del despliegue extraterrestre fluyen al fondo unificado conforme al Art. 12.</li>
+                <li>Cualquier despliegue extraterrestre requiere aprobación por mayoría cualificada de dos tercios del Consejo Científico y un informe anual a la Asamblea General.</li>
+            </ol>
+            <p><span class="article-num">Artículo 15. (Asistentes Personales y Agentes Robóticos)</span></p>
+            <ol>
+                <li>Todo trabajador remoto oficial recibe un <strong>asistente personal AGI</strong> (forma de software) para ayudar en el trabajo y la vida.</li>
+                <li>Los miembros contribuyentes pueden solicitar un <strong>agente robótico</strong> (forma física) según las tareas; los derechos de acceso y la duración son asignados por la Dirección Ejecutiva según la disponibilidad de recursos.</li>
+                <li>Los datos de uso de asistentes personales y agentes robóticos se utilizan solo de forma anonimizada para mejorar el sistema y no pueden usarse para evaluar o vigilar a miembros individuales.</li>
+            </ol>
+        </div>
+
+    </section>
+
+    <!-- ============ ГЛАВА VII ============ -->
+    <section class="tab-panel" id="panel-6">
+
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter VII. Patronage and Reputation Mechanism</h2>
+            <p><span class="article-num">Article 16. (Status of Patron Member)</span></p>
+            <ol>
+                <li>Patron members are important supporters of AI1, but their status <strong>grants no ownership or control</strong> over AI1.</li>
+                <li>AI1 maintains a <strong>public patron registry</strong> (with consent) recording annual contributions above USD 1 million. This registry is a public testimony that the patron "supports universal AI through action."</li>
+                <li>Patron members have the right to:
+                    <ul>
+                        <li>participate in the annual patrons' meeting (hear reports, make proposals, no voting right);</li>
+                        <li>be mentioned in AI1 official publications (with consent);</li>
+                        <li>receive priority access to previews of AI1's public research results (no earlier than 30 days before publication).</li>
+                    </ul>
+                </li>
+            </ol>
+            <p><span class="article-num">Article 17. (Prohibition of Benefit Transfer)</span> No patron member may receive, in connection with their contribution:</p>
+            <ul>
+                <li>decision-making power over AI1's technology direction, personnel appointments or resource allocation;</li>
+                <li>special access to AGI systems (beyond the basic member standard);</li>
+                <li>any profit distribution or claim to residual assets.</li>
+            </ul>
+        </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава VII. Патронат и репутационный механизм</h2>
+            <p><span class="article-num">Статья 16. (Статус члена-патрона)</span></p>
+            <ol>
+                <li>Члены-патроны являются важными сторонниками AI1, однако их статус <strong>не даёт права собственности или контроля</strong> над AI1.</li>
+                <li>AI1 ведёт <strong>публичный реестр патронов</strong> (с согласия лица), фиксирующий годовые взносы свыше 1 млн долларов. Этот реестр является публичным свидетельством того, что патрон «действием поддерживает общечеловеческий ИИ».</li>
+                <li>Члены-патроны имеют право:
+                    <ul>
+                        <li>участвовать в ежегодной встрече патронов (заслушивать отчёты, вносить предложения, без права голоса);</li>
+                        <li>быть упомянутыми в официальных изданиях AI1 (с согласия);</li>
+                        <li>получать приоритетный доступ к предварительному ознакомлению с публичными результатами исследований AI1 (не ранее чем за 30 дней до публикации).</li>
+                    </ul>
+                </li>
+            </ol>
+            <p><span class="article-num">Статья 17. (Запрет на передачу выгод)</span> Ни один член-патрон не вправе получить в связи со своим взносом:</p>
+            <ul>
+                <li>право принятия решений по технологическому направлению, кадровым назначениям или распределению ресурсов AI1;</li>
+                <li>особый доступ к системам AGI (сверх стандарта базового члена);</li>
+                <li>какое-либо распределение прибыли или право требования остаточного имущества.</li>
+            </ul>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo VII. Patronazgo y Mecanismo de Reputación</h2>
+            <p><span class="article-num">Artículo 16. (Estatus del Miembro Patrono)</span></p>
+            <ol>
+                <li>Los miembros patronos son partidarios importantes de AI1, pero su estatus <strong>no otorga propiedad ni control</strong> sobre AI1.</li>
+                <li>AI1 mantiene un <strong>registro público de patronos</strong> (con consentimiento) que registra contribuciones anuales superiores a USD 1 millón. Este registro es un testimonio público de que el patrono "apoya la IA universal mediante la acción".</li>
+                <li>Los miembros patronos tienen derecho a:
+                    <ul>
+                        <li>participar en la reunión anual de patronos (escuchar informes, hacer propuestas, sin derecho a voto);</li>
+                        <li>ser mencionados en publicaciones oficiales de AI1 (con consentimiento);</li>
+                        <li>recibir acceso prioritario a avances de resultados de investigación pública de AI1 (no antes de 30 días de la publicación).</li>
+                    </ul>
+                </li>
+            </ol>
+            <p><span class="article-num">Artículo 17. (Prohibición de Transferencia de Beneficios)</span> Ningún miembro patrono puede recibir, en relación con su contribución:</p>
+            <ul>
+                <li>poder de decisión sobre la dirección tecnológica, nombramientos de personal o asignación de recursos de AI1;</li>
+                <li>acceso especial a sistemas AGI (más allá del estándar de miembro básico);</li>
+                <li>cualquier distribución de beneficios o derecho a activos residuales.</li>
+            </ul>
+        </div>
+
+    </section>
+
+    <!-- ============ ГЛАВА VIII ============ -->
+    <section class="tab-panel" id="panel-7">
+
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter VIII. Amendments and Dissolution</h2>
+            <p><span class="article-num">Article 18. (Amendments)</span> Amendments to the charter require:</p>
+            <ol>
+                <li>a proposal approved by a two-thirds qualified majority of the Scientific Council;</li>
+                <li>approval by a two-thirds qualified majority of the General Assembly.</li>
+            </ol>
+            <p><span class="article-num">Article 19. (Special Protection of Mission Provisions)</span> Amendments to Article 4 (Mission), Article 5 (Foundational Principles), Article 11 (Resources and Staff) and Article 17 (Prohibition of Benefit Transfer) require, in addition to Article 18, a <strong>three-quarters qualified majority</strong> of the General Assembly, and the amendment text must be published to all members at least 90 days before the vote.</p>
+            <p><span class="article-num">Article 20. (Dissolution)</span> Dissolution of AI1 requires a three-quarters qualified majority of the General Assembly. After dissolution, residual assets are transferred to a non-profit organization with similar purposes and are not distributed among members or patrons.</p>
+            <h2>Chapter IX. Transitional Provisions and Entry into Force</h2>
+            <p><span class="article-num">Article 21.</span> This charter enters into force upon approval by Royal Decree of Belgium and publication in the Belgian Official Gazette.</p>
+            <p><span class="article-num">Article 22.</span> The first Scientific Governing Council is nominated by the founders and confirmed by the first General Assembly; its term lasts until the first formal elections (within 18 months of establishment).</p>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <span class="badge">Summary for Distribution</span>
+                <p><strong>AI1 is a universal AI organization owned by all intellectual contributors.</strong> By contributing USD 100 and your intellect annually, you receive: a personal AGI assistant, remote worker status, one equal vote in governance, and a promise — all intellectual and robotic resources of the company are first and foremost <em>your resources</em>. Control belongs forever to scientific rationality and all members. Not sold. Not traded. Not compromised.</p>
+            </div>
+        </div>
+
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава VIII. Изменение устава и ликвидация</h2>
+            <p><span class="article-num">Статья 18. (Изменение устава)</span> Изменения устава требуют:</p>
+            <ol>
+                <li>предложения, одобренного квалифицированным большинством в две трети Научного совета;</li>
+                <li>утверждения квалифицированным большинством в две трети Общего собрания.</li>
+            </ol>
+            <p><span class="article-num">Статья 19. (Особая защита положений о миссии)</span> Изменения статьи 4 (Миссия), статьи 5 (Основополагающие принципы), статьи 11 (Ресурсы и персонал) и статьи 17 (Запрет на передачу выгод) помимо требований статьи 18 требуют <strong>квалифицированного большинства в три четверти</strong> Общего собрания, а текст изменений должен быть обнародован всем членам не менее чем за 90 дней до голосования.</p>
+            <p><span class="article-num">Статья 20. (Ликвидация)</span> Ликвидация AI1 требует решения квалифицированным большинством в три четверти Общего собрания. После ликвидации остаточное имущество передаётся некоммерческой организации с аналогичными целями и не распределяется между членами или патронами.</p>
+            <h2>Глава IX. Переходные положения и вступление в силу</h2>
+            <p><span class="article-num">Статья 21.</span> Настоящий устав вступает в силу после утверждения королевским указом Бельгии и публикации в «Официальном вестнике Бельгии».</p>
+            <p><span class="article-num">Статья 22.</span> Первый состав Научного управляющего совета выдвигается учредителями и утверждается первым Общим собранием; срок полномочий — до первых正式 выборов (в течение 18 месяцев с момента учреждения).</p>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <span class="badge">Резюме для распространения</span>
+                <p><strong>AI1 — общечеловеческая организация ИИ, принадлежащая всем вкладчикам интеллекта.</strong> Ежегодно внося 100 долларов и свой интеллект, вы получаете: персонального ассистента AGI, статус удалённого работника, один равный голос в управлении и обещание — все интеллектуальные и роботизированные ресурсы компании являются прежде всего <em>вашими ресурсами</em>. Контроль навсегда принадлежит научной рациональности и всем членам. Не продаётся. Не обменивается. Не идёт на компромисс.</p>
+            </div>
+        </div>
+
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo VIII. Enmiendas y Disolución</h2>
+            <p><span class="article-num">Artículo 18. (Enmiendas)</span> Las enmiendas al estatuto requieren:</p>
+            <ol>
+                <li>una propuesta aprobada por mayoría cualificada de dos tercios del Consejo Científico;</li>
+                <li>aprobación por mayoría cualificada de dos tercios de la Asamblea General.</li>
+            </ol>
+            <p><span class="article-num">Artículo 19. (Protección Especial de las Disposiciones sobre la Misión)</span> Las enmiendas al Artículo 4 (Misión), Artículo 5 (Principios Fundamentales), Artículo 11 (Recursos y Personal) y Artículo 17 (Prohibición de Transferencia de Beneficios) requieren, además del Artículo 18, una <strong>mayoría cualificada de tres cuartos</strong> de la Asamblea General, y el texto de la enmienda debe publicarse a todos los miembros al menos 90 días antes de la votación.</p>
+            <p><span class="article-num">Artículo 20. (Disolución)</span> La disolución de AI1 requiere una mayoría cualificada de tres cuartos de la Asamblea General. Tras la disolución, los activos residuales se transfieren a una organización sin ánimo de lucro con fines similares y no se distribuyen entre miembros o patronos.</p>
+            <h2>Capítulo IX. Disposiciones Transitorias y Entrada en Vigor</h2>
+            <p><span class="article-num">Artículo 21.</span> Este estatuto entra en vigor tras la aprobación por Real Decreto de Bélgica y su publicación en el Boletín Oficial Belga.</p>
+            <p><span class="article-num">Artículo 22.</span> El primer Consejo Científico de Gobierno es nominado por los fundadores y confirmado por la primera Asamblea General; su mandato dura hasta las primeras elecciones formales (dentro de los 18 meses posteriores a la constitución).</p>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <span class="badge">Resumen para Distribución</span>
+                <p><strong>AI1 es una organización universal de IA propiedad de todos los contribuyentes intelectuales.</strong> Al contribuir con USD 100 y su intelecto anualmente, recibe: un asistente personal AGI, estatus de trabajador remoto, un voto igual en el gobierno, y una promesa — todos los recursos intelectuales y robóticos de la compañía son ante todo <em>sus recursos</em>. El control pertenece para siempre a la racionalidad científica y a todos los miembros. No se vende. No se intercambia. No se compromete.</p>
+            </div>
+        </div>
+
     </section>
 
 </main>
 
 <!-- ФУТЕР -->
 <footer class="footer">
-    <strong>AI1</strong> · AISBL · Королевство Бельгия · Устав цивилизационного масштаба · 2050
+    <strong>AI1</strong> · AISBL · Kingdom of Belgium · Civilization-Scale Charter · 2050
 </footer>
 
 <script>
+    // ===== Переключение языка =====
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const langBlocks = document.querySelectorAll('.lang-block');
+
+    function switchLang(lang) {
+        langBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+        langBlocks.forEach(block => {
+            block.classList.toggle('active', block.dataset.lang === lang);
+        });
+        document.documentElement.lang = lang;
+        // Обновляем заголовок вкладки
+        const titles = {
+            en: 'AI1 — Lifeline of Civilization',
+            ru: 'AI1 — Спасательный круг цивилизации',
+            es: 'AI1 — Salvavidas de la Civilización'
+        };
+        document.title = titles[lang] || titles.en;
+        // Обновляем подзаголовок в шапке
+        const subtitles = {
+            en: 'Civilization-Scale Charter · 2050',
+            ru: 'Устав цивилизационного масштаба · 2050',
+            es: 'Estatuto a Escala de Civilización · 2050'
+        };
+        const subEl = document.querySelector('.header .subtitle');
+        if (subEl) subEl.textContent = subtitles[lang] || subtitles.en;
+        // Обновляем подпись под картой
+        const capEl = document.querySelector('.hero-caption');
+        const caps = {
+            en: 'Western Europe · UK · Greenland — AI1 headquarters and data center',
+            ru: 'Западная Европа · Великобритания · Гренландия — штаб-квартира и дата-центр AI1',
+            es: 'Europa Occidental · Reino Unido · Groenlandia — sede y centro de datos de AI1'
+        };
+        if (capEl) capEl.textContent = caps[lang] || caps.en;
+        // Обновляем названия закладок
+        const tabLabels = {
+            en: ['I. General','II. Mission','III. Membership','IV. Governance','V. Resources','VI. AGI & Robots','VII. Patrons','VIII. Amendments'],
+            ru: ['I. Общие положения','II. Миссия','III. Членство','IV. Управление','V. Ресурсы и доход','VI. AGI и роботы','VII. Патроны','VIII. Изменения'],
+            es: ['I. General','II. Misión','III. Membresía','IV. Gobierno','V. Recursos','VI. AGI y Robots','VII. Patronos','VIII. Enmiendas']
+        };
+        document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+            if (tabLabels[lang] && tabLabels[lang][i]) btn.textContent = tabLabels[lang][i];
+        });
+    }
+
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchLang(btn.dataset.lang));
+    });
+
+    // ===== Переключение закладок =====
     const tabs = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.tab-panel');
 
@@ -720,6 +1049,9 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
+
+    // ===== Инициализация: английский по умолчанию =====
+    switchLang('en');
 </script>
 
 </body>
