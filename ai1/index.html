@@ -6,6 +6,9 @@
     <meta name="google" content="notranslate">
     <title>AI1 — Lifeline of Civilization</title>
     <style>
+        /* ===== БАЗОВЫЙ МАСШТАБ (одна ручка) ===== */
+        html { font-size: 14px; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -16,12 +19,13 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            font-size: 1rem;
         }
 
         .header {
             background: #0d1117;
             border-bottom: 2px solid #c9a84c;
-            padding: 12px 20px;
+            padding: 0.86rem 1.43rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -29,35 +33,36 @@
             top: 0;
             z-index: 100;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 0.57rem;
         }
 
-        .header-left { display: flex; align-items: baseline; gap: 12px; }
+        .header-left { display: flex; align-items: baseline; gap: 0.86rem; }
 
         .header h1 {
             font-family: 'Arial', sans-serif;
-            font-size: 26px;
+            font-size: 1.86rem;
             font-weight: 900;
-            letter-spacing: 5px;
+            letter-spacing: 0.36rem;
             color: #c9a84c;
             text-transform: uppercase;
         }
 
         .header .subtitle {
-            font-size: 10px;
+            font-size: 0.71rem;
             color: #6b7a8f;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.11rem;
             font-family: 'Arial', sans-serif;
             text-transform: uppercase;
         }
 
+        /* Переключатель языка */
         .lang-switch {
             display: flex;
-            gap: 3px;
+            gap: 0.21rem;
             background: #131a24;
             border: 1px solid #2a3441;
-            border-radius: 4px;
-            padding: 2px;
+            border-radius: 0.29rem;
+            padding: 0.14rem;
         }
 
         .lang-btn {
@@ -65,59 +70,98 @@
             border: none;
             color: #6b7a8f;
             font-family: 'Arial', sans-serif;
-            font-size: 11px;
+            font-size: 0.79rem;
             font-weight: 700;
-            letter-spacing: 1px;
-            padding: 4px 10px;
+            letter-spacing: 0.07rem;
+            padding: 0.29rem 0.71rem;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 0.21rem;
             transition: all 0.2s;
         }
 
         .lang-btn:hover { color: #c9a84c; }
         .lang-btn.active { background: #c9a84c; color: #0a0e14; }
 
+        /* Переключатель масштаба */
+        .zoom-switch {
+            display: flex;
+            gap: 0.21rem;
+            background: #131a24;
+            border: 1px solid #2a3441;
+            border-radius: 0.29rem;
+            padding: 0.14rem;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            background: none;
+            border: none;
+            color: #6b7a8f;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.79rem;
+            font-weight: 700;
+            padding: 0.29rem 0.57rem;
+            cursor: pointer;
+            border-radius: 0.21rem;
+            transition: all 0.2s;
+            min-width: 2rem;
+        }
+
+        .zoom-btn:hover { color: #c9a84c; background: rgba(201, 168, 76, 0.08); }
+        .zoom-btn:active { background: #c9a84c; color: #0a0e14; }
+
+        .zoom-label {
+            font-family: 'Arial', sans-serif;
+            font-size: 0.64rem;
+            color: #4a5568;
+            letter-spacing: 0.05rem;
+            min-width: 2.4rem;
+            text-align: center;
+            user-select: none;
+        }
+
+        /* Манифест */
         .manifesto {
             background: linear-gradient(180deg, #0d1117 0%, #0a0e14 100%);
             border-bottom: 1px solid #2a3441;
-            padding: 20px;
+            padding: 1.43rem;
             text-align: center;
         }
 
         .manifesto h2 {
             font-family: 'Arial', sans-serif;
-            font-size: 16px;
+            font-size: 1.14rem;
             font-weight: 900;
             color: #c9a84c;
-            letter-spacing: 2px;
+            letter-spacing: 0.14rem;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 0.29rem;
         }
 
         .manifesto .lead {
-            font-size: 12px;
+            font-size: 0.86rem;
             color: #8a9ab0;
             font-style: italic;
-            margin-bottom: 14px;
-            max-width: 560px;
+            margin-bottom: 1rem;
+            max-width: 40rem;
             margin-left: auto;
             margin-right: auto;
         }
 
         .manifesto-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-            gap: 10px;
-            max-width: 960px;
-            margin: 0 auto 14px;
+            grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+            gap: 0.71rem;
+            max-width: 68.57rem;
+            margin: 0 auto 1rem;
             text-align: left;
         }
 
         .manifesto-card {
             background: #131a24;
             border: 1px solid #2a3441;
-            border-radius: 5px;
-            padding: 10px 12px;
+            border-radius: 0.36rem;
+            padding: 0.71rem 0.86rem;
             transition: border-color 0.2s;
         }
 
@@ -125,16 +169,16 @@
 
         .manifesto-card .num {
             font-family: 'Arial', sans-serif;
-            font-size: 9px;
+            font-size: 0.64rem;
             font-weight: 700;
             color: #c9a84c;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04rem;
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 0.21rem;
         }
 
         .manifesto-card p {
-            font-size: 11px;
+            font-size: 0.79rem;
             color: #b8c2d0;
             margin: 0;
             line-height: 1.5;
@@ -147,12 +191,12 @@
             background: #c9a84c;
             color: #0a0e14;
             font-family: 'Arial', sans-serif;
-            font-size: 11px;
+            font-size: 0.79rem;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.11rem;
             text-transform: uppercase;
-            padding: 8px 24px;
-            border-radius: 3px;
+            padding: 0.57rem 1.71rem;
+            border-radius: 0.21rem;
             text-decoration: none;
             transition: all 0.2s;
             border: 2px solid #c9a84c;
@@ -161,43 +205,45 @@
         .manifesto-cta:hover { background: transparent; color: #c9a84c; }
 
         .manifesto .closing {
-            margin-top: 10px;
-            font-size: 11px;
+            margin-top: 0.71rem;
+            font-size: 0.79rem;
             color: #8a9ab0;
             font-style: italic;
         }
 
         .manifesto .closing strong { color: #c9a84c; font-style: normal; }
 
+        /* Карта */
         .hero-image {
             width: 100%;
-            max-width: 420px;
-            height: 210px;
-            margin: 14px auto 6px;
+            max-width: 30rem;
+            height: 15rem;
+            margin: 1rem auto 0.43rem;
             display: block;
             border: 1px solid #2a3441;
-            border-radius: 4px;
+            border-radius: 0.29rem;
             background: #0d1117;
             object-fit: cover;
         }
 
         .hero-caption {
             text-align: center;
-            font-size: 10px;
+            font-size: 0.71rem;
             color: #6b7a8f;
-            margin-bottom: 14px;
+            margin-bottom: 1rem;
             font-family: 'Arial', sans-serif;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04rem;
         }
 
+        /* Закладки */
         .tabs {
             display: flex;
             flex-wrap: wrap;
             background: #0d1117;
             border-bottom: 1px solid #2a3441;
-            padding: 0 16px;
+            padding: 0 1.14rem;
             position: sticky;
-            top: 62px;
+            top: 4.43rem;
             z-index: 99;
         }
 
@@ -206,10 +252,10 @@
             border: none;
             color: #6b7a8f;
             font-family: 'Arial', sans-serif;
-            font-size: 11px;
+            font-size: 0.79rem;
             font-weight: 600;
-            letter-spacing: 0.3px;
-            padding: 10px 12px;
+            letter-spacing: 0.02rem;
+            padding: 0.71rem 0.86rem;
             cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: all 0.2s;
@@ -219,11 +265,12 @@
         .tab-btn:hover { color: #c9a84c; background: rgba(201, 168, 76, 0.05); }
         .tab-btn.active { color: #c9a84c; border-bottom: 2px solid #c9a84c; }
 
+        /* Контент */
         .content {
             flex: 1;
-            max-width: 860px;
+            max-width: 61.43rem;
             margin: 0 auto;
-            padding: 20px 18px 40px;
+            padding: 1.43rem 1.29rem 2.86rem;
             width: 100%;
         }
 
@@ -237,45 +284,45 @@
 
         h2 {
             font-family: 'Arial', sans-serif;
-            font-size: 14px;
+            font-size: 1rem;
             font-weight: 700;
             color: #c9a84c;
-            margin: 18px 0 10px;
-            letter-spacing: 0.5px;
+            margin: 1.29rem 0 0.71rem;
+            letter-spacing: 0.04rem;
             text-transform: uppercase;
             border-bottom: 1px solid #2a3441;
-            padding-bottom: 6px;
+            padding-bottom: 0.43rem;
         }
 
         h2:first-child { margin-top: 0; }
 
         h3 {
             font-family: 'Arial', sans-serif;
-            font-size: 12px;
+            font-size: 0.86rem;
             font-weight: 700;
             color: #e8e0c8;
-            margin: 12px 0 6px;
+            margin: 0.86rem 0 0.43rem;
         }
 
-        p { margin-bottom: 8px; text-align: justify; font-size: 12.5px; }
+        p { margin-bottom: 0.57rem; text-align: justify; font-size: 0.89rem; }
 
         .article-num {
             font-family: 'Arial', sans-serif;
             font-weight: 700;
             color: #c9a84c;
-            font-size: 11px;
-            letter-spacing: 0.5px;
+            font-size: 0.79rem;
+            letter-spacing: 0.04rem;
         }
 
         blockquote {
             border-left: 3px solid #c9a84c;
-            padding: 10px 14px;
-            margin: 10px 0;
+            padding: 0.71rem 1rem;
+            margin: 0.71rem 0;
             background: rgba(201, 168, 76, 0.06);
             font-style: italic;
             color: #e8e0c8;
-            border-radius: 0 4px 4px 0;
-            font-size: 12.5px;
+            border-radius: 0 0.29rem 0.29rem 0;
+            font-size: 0.89rem;
         }
 
         blockquote strong { color: #c9a84c; font-style: normal; }
@@ -283,39 +330,39 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0;
-            font-size: 11px;
+            margin: 0.71rem 0;
+            font-size: 0.79rem;
             font-family: 'Arial', sans-serif;
         }
 
         th {
             background: #131a24;
             color: #c9a84c;
-            padding: 8px 10px;
+            padding: 0.57rem 0.71rem;
             text-align: left;
             font-weight: 700;
             border-bottom: 1px solid #2a3441;
-            font-size: 10px;
+            font-size: 0.71rem;
             text-transform: uppercase;
         }
 
         td {
-            padding: 7px 10px;
+            padding: 0.5rem 0.71rem;
             border-bottom: 1px solid #1a2230;
             color: #b8c2d0;
         }
 
         tr:hover td { background: rgba(201, 168, 76, 0.03); }
 
-        ul, ol { margin: 6px 0 10px 20px; }
-        li { margin-bottom: 4px; font-size: 12.5px; }
+        ul, ol { margin: 0.43rem 0 0.71rem 1.43rem; }
+        li { margin-bottom: 0.29rem; font-size: 0.89rem; }
 
         .highlight-box {
             background: #131a24;
             border: 1px solid #2a3441;
-            border-radius: 5px;
-            padding: 12px 16px;
-            margin: 12px 0;
+            border-radius: 0.36rem;
+            padding: 0.86rem 1.14rem;
+            margin: 0.86rem 0;
         }
 
         .highlight-box p:last-child { margin-bottom: 0; }
@@ -325,24 +372,24 @@
             background: #c9a84c;
             color: #0a0e14;
             font-family: 'Arial', sans-serif;
-            font-size: 9px;
+            font-size: 0.64rem;
             font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 3px;
-            letter-spacing: 0.5px;
+            padding: 0.14rem 0.57rem;
+            border-radius: 0.21rem;
+            letter-spacing: 0.04rem;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 0.43rem;
         }
 
         .footer {
             background: #0d1117;
             border-top: 1px solid #2a3441;
-            padding: 10px 20px;
+            padding: 0.71rem 1.43rem;
             text-align: center;
-            font-size: 10px;
+            font-size: 0.71rem;
             color: #4a5568;
             font-family: 'Arial', sans-serif;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04rem;
         }
 
         .footer strong { color: #c9a84c; }
@@ -351,16 +398,16 @@
         .lang-block.active { display: block; }
 
         @media (max-width: 700px) {
-            .header { flex-direction: column; gap: 4px; text-align: center; padding: 10px; }
-            .header-left { flex-direction: column; gap: 2px; align-items: center; }
-            .header h1 { font-size: 20px; letter-spacing: 3px; }
+            .header { flex-direction: column; gap: 0.29rem; text-align: center; padding: 0.71rem; }
+            .header-left { flex-direction: column; gap: 0.14rem; align-items: center; }
+            .header h1 { font-size: 1.43rem; letter-spacing: 0.21rem; }
             .manifesto-grid { grid-template-columns: 1fr; }
-            .manifesto h2 { font-size: 13px; }
-            .tabs { top: 100px; padding: 0 6px; overflow-x: auto; flex-wrap: nowrap; }
-            .tab-btn { font-size: 10px; padding: 8px 8px; white-space: nowrap; }
-            .content { padding: 12px 10px 30px; }
-            table { font-size: 10px; }
-            td, th { padding: 5px 5px; }
+            .manifesto h2 { font-size: 0.93rem; }
+            .tabs { top: 7.14rem; padding: 0 0.43rem; overflow-x: auto; flex-wrap: nowrap; }
+            .tab-btn { font-size: 0.71rem; padding: 0.57rem 0.57rem; white-space: nowrap; }
+            .content { padding: 0.86rem 0.71rem 2.14rem; }
+            table { font-size: 0.71rem; }
+            td, th { padding: 0.36rem 0.36rem; }
             .hero-image { max-width: 100%; height: auto; aspect-ratio: 2/1; }
         }
     </style>
@@ -372,10 +419,17 @@
         <h1>AI1</h1>
         <span class="subtitle" data-i18n="subtitle">Civilization-Scale Charter · 2050</span>
     </div>
-    <div class="lang-switch">
-        <button class="lang-btn active" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="ru">RU</button>
-        <button class="lang-btn" data-lang="es">ES</button>
+    <div style="display:flex; gap:0.43rem; align-items:center; flex-wrap:wrap;">
+        <div class="zoom-switch">
+            <button class="zoom-btn" id="zoomOut" title="Уменьшить масштаб">A−</button>
+            <span class="zoom-label" id="zoomLabel">100%</span>
+            <button class="zoom-btn" id="zoomIn" title="Увеличить масштаб">A+</button>
+        </div>
+        <div class="lang-switch">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ru">RU</button>
+            <button class="lang-btn" data-lang="es">ES</button>
+        </div>
     </div>
 </header>
 
@@ -702,7 +756,7 @@
             <h2>Chapter IX. Transition</h2>
             <p><span class="article-num">Art. 21.</span> In force upon Royal Decree + Belgian Official Gazette.</p>
             <p><span class="article-num">Art. 22.</span> First Scientific Council nominated by founders, confirmed by first GA; until formal elections within 18 months.</p>
-            <div class="highlight-box" style="margin-top: 16px;">
+            <div class="highlight-box" style="margin-top: 1.14rem;">
                 <span class="badge">Summary</span>
                 <p><strong>AI1 — universal AI organization owned by all intellectual contributors.</strong> $100 + your intellect = personal AGI assistant, remote worker status, one equal vote, and a promise: all AI1 resources are first and foremost <em>your resources</em>. Control forever with scientific rationality and all members. Not sold. Not traded. Not compromised.</p>
             </div>
@@ -715,7 +769,7 @@
             <h2>Глава IX. Переходные положения</h2>
             <p><span class="article-num">Ст. 21.</span> Вступает в силу после королевского указа + публикации в «Официальном вестнике Бельгии».</p>
             <p><span class="article-num">Ст. 22.</span> Первый Научный совет — учредители, утверждает первое ОС; до формальных выборов в течение 18 месяцев.</p>
-            <div class="highlight-box" style="margin-top: 16px;">
+            <div class="highlight-box" style="margin-top: 1.14rem;">
                 <span class="badge">Резюме</span>
                 <p><strong>AI1 — общечеловеческая организация ИИ, принадлежащая всем вкладчикам интеллекта.</strong> $100 + интеллект = персональный ассистент AGI, статус удалённого работника, один равный голос и обещание: все ресурсы AI1 — прежде всего <em>ваши ресурсы</em>. Контроль навсегда у научной рациональности и всех членов. Не продаётся. Не обменивается. Не идёт на компромисс.</p>
             </div>
@@ -728,7 +782,7 @@
             <h2>Capítulo IX. Transición</h2>
             <p><span class="article-num">Art. 21.</span> Vigor tras Real Decreto + Boletín Oficial Belga.</p>
             <p><span class="article-num">Art. 22.</span> Primer Consejo Científico nominado por fundadores, confirmado por primera AG; hasta elecciones formales en 18 meses.</p>
-            <div class="highlight-box" style="margin-top: 16px;">
+            <div class="highlight-box" style="margin-top: 1.14rem;">
                 <span class="badge">Resumen</span>
                 <p><strong>AI1 — organización universal de IA propiedad de todos los contribuyentes intelectuales.</strong> $100 + tu intelecto = asistente personal AGI, estatus de trabajador remoto, un voto igual, y una promesa: todos los recursos de AI1 son ante todo <em>tus recursos</em>. Control para siempre con racionalidad científica y todos los miembros. No se vende. No se intercambia. No se compromete.</p>
             </div>
@@ -742,6 +796,7 @@
 </footer>
 
 <script>
+    /* ===== Язык ===== */
     const langBtns = document.querySelectorAll('.lang-btn');
     const langBlocks = document.querySelectorAll('.lang-block');
 
@@ -769,6 +824,7 @@
 
     langBtns.forEach(btn => btn.addEventListener('click', () => switchLang(btn.dataset.lang)));
 
+    /* ===== Закладки ===== */
     const tabs = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.tab-panel');
     tabs.forEach(btn => {
@@ -782,6 +838,36 @@
         });
     });
 
+    /* ===== Масштаб (одна ручка — html font-size) ===== */
+    const ZOOM_MIN = 10;      // px
+    const ZOOM_MAX = 22;      // px
+    const ZOOM_STEP = 1;      // px
+    const ZOOM_DEFAULT = 14;  // px
+
+    const zoomLabel = document.getElementById('zoomLabel');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+
+    function applyZoom(px) {
+        px = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, px));
+        document.documentElement.style.fontSize = px + 'px';
+        const percent = Math.round((px / ZOOM_DEFAULT) * 100);
+        zoomLabel.textContent = percent + '%';
+        localStorage.setItem('ai1_zoom', px);
+        return px;
+    }
+
+    let currentZoom = parseInt(localStorage.getItem('ai1_zoom')) || ZOOM_DEFAULT;
+    applyZoom(currentZoom);
+
+    zoomInBtn.addEventListener('click', () => {
+        currentZoom = applyZoom(currentZoom + ZOOM_STEP);
+    });
+    zoomOutBtn.addEventListener('click', () => {
+        currentZoom = applyZoom(currentZoom - ZOOM_STEP);
+    });
+
+    /* ===== Инициализация ===== */
     switchLang('en');
 </script>
 
