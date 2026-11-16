@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>SpaceK — Cosmos of Korolev</title>
+    <style>
+        html { font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', 'Times New Roman', serif; background: #0a0e14; color: #d4d9e0; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; font-size: 1rem; }
+        .header { background: #0d1117; border-bottom: 2px solid #c9a84c; padding: 0.86rem 1.43rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 0.57rem; }
+        .header-left { display: flex; align-items: baseline; gap: 0.86rem; }
+        .header h1 { font-family: 'Arial', sans-serif; font-size: 1.86rem; font-weight: 900; letter-spacing: 0.29rem; color: #c9a84c; text-transform: uppercase; }
+        .header .subtitle { font-size: 0.71rem; color: #6b7a8f; letter-spacing: 0.11rem; font-family: 'Arial', sans-serif; text-transform: uppercase; }
+        .lang-switch { display: flex; gap: 0.21rem; background: #131a24; border: 1px solid #2a3441; border-radius: 0.29rem; padding: 0.14rem; }
+        .lang-btn { background: none; border: none; color: #6b7a8f; font-family: 'Arial', sans-serif; font-size: 0.79rem; font-weight: 700; letter-spacing: 0.07rem; padding: 0.29rem 0.71rem; cursor: pointer; border-radius: 0.21rem; transition: all 0.2s; }
+        .lang-btn:hover { color: #c9a84c; }
+        .lang-btn.active { background: #c9a84c; color: #0a0e14; }
+        .zoom-switch { display: flex; gap: 0.21rem; background: #131a24; border: 1px solid #2a3441; border-radius: 0.29rem; padding: 0.14rem; align-items: center; }
+        .zoom-btn { background: none; border: none; color: #6b7a8f; font-family: 'Arial', sans-serif; font-size: 0.79rem; font-weight: 700; padding: 0.29rem 0.57rem; cursor: pointer; border-radius: 0.21rem; transition: all 0.2s; min-width: 2rem; }
+        .zoom-btn:hover { color: #c9a84c; background: rgba(201, 168, 76, 0.08); }
+        .zoom-btn:active { background: #c9a84c; color: #0a0e14; }
+        .zoom-label { font-family: 'Arial', sans-serif; font-size: 0.64rem; color: #4a5568; letter-spacing: 0.05rem; min-width: 2.4rem; text-align: center; user-select: none; }
+        .manifesto { background: linear-gradient(180deg, #0d1117 0%, #0a0e14 100%); border-bottom: 1px solid #2a3441; padding: 1.43rem; text-align: center; }
+        .manifesto h2 { font-family: 'Arial', sans-serif; font-size: 1.14rem; font-weight: 900; color: #c9a84c; letter-spacing: 0.14rem; text-transform: uppercase; margin-bottom: 0.29rem; }
+        .manifesto .lead { font-size: 0.86rem; color: #8a9ab0; font-style: italic; margin-bottom: 1rem; max-width: 40rem; margin-left: auto; margin-right: auto; }
+        .manifesto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.71rem; max-width: 68.57rem; margin: 0 auto 1rem; text-align: left; }
+        .manifesto-card { background: #131a24; border: 1px solid #2a3441; border-radius: 0.36rem; padding: 0.71rem 0.86rem; transition: border-color 0.2s; }
+        .manifesto-card:hover { border-color: #c9a84c; }
+        .manifesto-card .num { font-family: 'Arial', sans-serif; font-size: 0.64rem; font-weight: 700; color: #c9a84c; letter-spacing: 0.04rem; text-transform: uppercase; margin-bottom: 0.21rem; }
+        .manifesto-card p { font-size: 0.79rem; color: #b8c2d0; margin: 0; line-height: 1.5; }
+        .manifesto-card strong { color: #e8e0c8; }
+        .manifesto-cta { display: inline-block; background: #c9a84c; color: #0a0e14; font-family: 'Arial', sans-serif; font-size: 0.79rem; font-weight: 700; letter-spacing: 0.11rem; text-transform: uppercase; padding: 0.57rem 1.71rem; border-radius: 0.21rem; text-decoration: none; transition: all 0.2s; border: 2px solid #c9a84c; }
+        .manifesto-cta:hover { background: transparent; color: #c9a84c; }
+        .manifesto .closing { margin-top: 0.71rem; font-size: 0.79rem; color: #8a9ab0; font-style: italic; }
+        .manifesto .closing strong { color: #c9a84c; font-style: normal; }
+        .hero-image { width: 100%; max-width: 30rem; height: 15rem; margin: 1rem auto 0.43rem; display: block; border: 1px solid #2a3441; border-radius: 0.29rem; background: #0d1117; object-fit: cover; }
+        .hero-caption { text-align: center; font-size: 0.71rem; color: #6b7a8f; margin-bottom: 1rem; font-family: 'Arial', sans-serif; letter-spacing: 0.04rem; }
+        .tabs { display: flex; flex-wrap: wrap; background: #0d1117; border-bottom: 1px solid #2a3441; padding: 0 1.14rem; position: sticky; top: 4.43rem; z-index: 99; }
+        .tab-btn { background: none; border: none; color: #6b7a8f; font-family: 'Arial', sans-serif; font-size: 0.79rem; font-weight: 600; letter-spacing: 0.02rem; padding: 0.71rem 0.86rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; text-transform: uppercase; }
+        .tab-btn:hover { color: #c9a84c; background: rgba(201, 168, 76, 0.05); }
+        .tab-btn.active { color: #c9a84c; border-bottom: 2px solid #c9a84c; }
+        .content { flex: 1; max-width: 61.43rem; margin: 0 auto; padding: 1.43rem 1.29rem 2.86rem; width: 100%; }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { font-family: 'Arial', sans-serif; font-size: 1rem; font-weight: 700; color: #c9a84c; margin: 1.29rem 0 0.71rem; letter-spacing: 0.04rem; text-transform: uppercase; border-bottom: 1px solid #2a3441; padding-bottom: 0.43rem; }
+        h2:first-child { margin-top: 0; }
+        h3 { font-family: 'Arial', sans-serif; font-size: 0.86rem; font-weight: 700; color: #e8e0c8; margin: 0.86rem 0 0.43rem; }
+        p { margin-bottom: 0.57rem; text-align: justify; font-size: 0.89rem; }
+        .article-num { font-family: 'Arial', sans-serif; font-weight: 700; color: #c9a84c; font-size: 0.79rem; letter-spacing: 0.04rem; }
+        blockquote { border-left: 3px solid #c9a84c; padding: 0.71rem 1rem; margin: 0.71rem 0; background: rgba(201, 168, 76, 0.06); font-style: italic; color: #e8e0c8; border-radius: 0 0.29rem 0.29rem 0; font-size: 0.89rem; }
+        blockquote strong { color: #c9a84c; font-style: normal; }
+        table { width: 100%; border-collapse: collapse; margin: 0.71rem 0; font-size: 0.79rem; font-family: 'Arial', sans-serif; }
+        th { background: #131a24; color: #c9a84c; padding: 0.57rem 0.71rem; text-align: left; font-weight: 700; border-bottom: 1px solid #2a3441; font-size: 0.71rem; text-transform: uppercase; }
+        td { padding: 0.5rem 0.71rem; border-bottom: 1px solid #1a2230; color: #b8c2d0; }
+        tr:hover td { background: rgba(201, 168, 76, 0.03); }
+        ul, ol { margin: 0.43rem 0 0.71rem 1.43rem; }
+        li { margin-bottom: 0.29rem; font-size: 0.89rem; }
+        .highlight-box { background: #131a24; border: 1px solid #2a3441; border-radius: 0.36rem; padding: 0.86rem 1.14rem; margin: 0.86rem 0; }
+        .highlight-box p:last-child { margin-bottom: 0; }
+        .badge { display: inline-block; background: #c9a84c; color: #0a0e14; font-family: 'Arial', sans-serif; font-size: 0.64rem; font-weight: 700; padding: 0.14rem 0.57rem; border-radius: 0.21rem; letter-spacing: 0.04rem; text-transform: uppercase; margin-bottom: 0.43rem; }
+        .footer { background: #0d1117; border-top: 1px solid #2a3441; padding: 0.71rem 1.43rem; text-align: center; font-size: 0.71rem; color: #4a5568; font-family: 'Arial', sans-serif; letter-spacing: 0.04rem; }
+        .footer strong { color: #c9a84c; }
+        .lang-block { display: none; }
+        .lang-block.active { display: block; }
+        @media (max-width: 700px) {
+            .header { flex-direction: column; gap: 0.29rem; text-align: center; padding: 0.71rem; }
+            .header-left { flex-direction: column; gap: 0.14rem; align-items: center; }
+            .header h1 { font-size: 1.43rem; letter-spacing: 0.21rem; }
+            .manifesto-grid { grid-template-columns: 1fr; }
+            .manifesto h2 { font-size: 0.93rem; }
+            .tabs { top: 7.14rem; padding: 0 0.43rem; overflow-x: auto; flex-wrap: nowrap; }
+            .tab-btn { font-size: 0.71rem; padding: 0.57rem 0.57rem; white-space: nowrap; }
+            .content { padding: 0.86rem 0.71rem 2.14rem; }
+            table { font-size: 0.71rem; }
+            td, th { padding: 0.36rem 0.36rem; }
+            .hero-image { max-width: 100%; height: auto; aspect-ratio: 2/1; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-left">
+        <h1>SpaceK</h1>
+        <span class="subtitle" data-i18n="subtitle">Cosmos of Korolev · Civilization-Scale Charter · 2050</span>
+    </div>
+    <div style="display:flex; gap:0.43rem; align-items:center; flex-wrap:wrap;">
+        <div class="zoom-switch">
+            <button class="zoom-btn" id="zoomOut" title="Уменьшить масштаб">A−</button>
+            <span class="zoom-label" id="zoomLabel">100%</span>
+            <button class="zoom-btn" id="zoomIn" title="Увеличить масштаб">A+</button>
+        </div>
+        <div class="lang-switch">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ru">RU</button>
+            <button class="lang-btn" data-lang="es">ES</button>
+        </div>
+    </div>
+</header>
+
+<section class="manifesto">
+    <div class="lang-block active" data-lang="en">
+        <h2>SpaceK — Cosmos of Korolev</h2>
+        <p class="lead">AGI is coming. In 2050, the best AGI data centers will be in space — 24/7 energy. SpaceK is the cosmic component. Two questions for everyone: how to get equal rights — and how to remove the threats?</p>
+        <div class="manifesto-grid">
+            <div class="manifesto-card"><div class="num">01 · Equal Rights</div><p>One member — <strong>one vote</strong>. $100/year is a membership ticket, not a price. AGI access is a staff right, not a privilege.</p></div>
+            <div class="manifesto-card"><div class="num">02 · Control by All & Science</div><p>Not capital, not state, not one founder. Charter protects mission from capture <strong>(Art. 5.4, 17, 19)</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">03 · Threats Removed by Design</div><p>Non-profit, public patron registry, scientific veto, <strong>ban on military & surveillance use</strong> (Art. 13).</p></div>
+            <div class="manifesto-card"><div class="num">04 · No One Left Behind</div><p>Worker: status, access, symbolic pay. Patron: proof "lived for people." Programmer: <strong>freedom & voice</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">05 · Ideas Over Connections</div><p>AGI rates every idea instantly. High priority → front page. In SpaceK, <strong>useful idea = status</strong>. No payoffs to gatekeepers.</p></div>
+            <div class="manifesto-card"><div class="num">06 · Space as a Resource</div><p>24/7 energy in orbit. AGI data centers in space. Any space company will need its own AI division — <strong>SpaceK is that division</strong>.</p></div>
+        </div>
+        <a href="#" class="manifesto-cta">Join SpaceK</a>
+        <p class="closing"><strong>SpaceK is not another AI company.</strong> It is an institution where technology belongs to those who build it, control is protected from money and power, and the cosmos is a shared resource.</p>
+    </div>
+
+    <div class="lang-block" data-lang="ru">
+        <h2>SpaceK — Космос Королёва</h2>
+        <p class="lead">AGI на пороге. В 2050 лучшие AGI-дата-центры будут в космосе — энергия 24/7. SpaceK — космическая составляющая. У каждого два вопроса: как получить равные права — и как снять угрозы?</p>
+        <div class="manifesto-grid">
+            <div class="manifesto-card"><div class="num">01 · Равные права</div><p>Один член — <strong>один голос</strong>. $100/год — членский билет, не цена. Доступ к AGI — право штата, не привилегия.</p></div>
+            <div class="manifesto-card"><div class="num">02 · Контроль у всех и науки</div><p>Не капитал, не государство, не один основатель. Устав защищает миссию от захвата <strong>(ст. 5.4, 17, 19)</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">03 · Угрозы сняты конструкцией</div><p>Некоммерческая форма, реестр патронов, научное вето, <strong>запрет на военное и наблюдательное использование</strong> (ст. 13).</p></div>
+            <div class="manifesto-card"><div class="num">04 · Никто не на обочине</div><p>Работник: статус, доступ, символическая плата. Патрон: свидетельство «жил для людей». Программист: <strong>свобода и голос</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">05 · Идея важнее связей</div><p>AGI мгновенно оценивает идею. Высокий приоритет → первая страница. В SpaceK <strong>полезная идея = статус</strong>. Без платы «на пути».</p></div>
+            <div class="manifesto-card"><div class="num">06 · Космос как ресурс</div><p>Энергия 24/7 на орбите. AGI-дата-центры в космосе. Любой космической компании нужно своё ИИ-подразделение — <strong>SpaceK и есть это подразделение</strong>.</p></div>
+        </div>
+        <a href="#" class="manifesto-cta">Вступить в SpaceK</a>
+        <p class="closing"><strong>SpaceK — не ещё одна ИИ-компания.</strong> Институт, где технология принадлежит тем, кто её строит, контроль защищён от денег и власти, а космос — общий ресурс.</p>
+    </div>
+
+    <div class="lang-block" data-lang="es">
+        <h2>SpaceK — Cosmos de Korolev</h2>
+        <p class="lead">La AGI llega. En 2050, los mejores centros de datos AGI estarán en el espacio — energía 24/7. SpaceK es el componente cósmico. Dos preguntas para todos: ¿cómo obtener derechos iguales — y cómo eliminar las amenazas?</p>
+        <div class="manifesto-grid">
+            <div class="manifesto-card"><div class="num">01 · Derechos Iguales</div><p>Un miembro — <strong>un voto</strong>. $100/año es carné, no precio. Acceso a AGI es derecho del personal, no privilegio.</p></div>
+            <div class="manifesto-card"><div class="num">02 · Control de Todos y Ciencia</div><p>No capital, no Estado, no un fundador. El estatuto protege la misión de la captura <strong>(Art. 5.4, 17, 19)</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">03 · Amenazas Eliminadas por Diseño</div><p>Sin ánimo de lucro, registro de patronos, veto científico, <strong>prohibición de uso militar y vigilancia</strong> (Art. 13).</p></div>
+            <div class="manifesto-card"><div class="num">04 · Nadie Queda Atrás</div><p>Trabajador: estatus, acceso, pago simbólico. Patrono: prueba "vivió para las personas". Programador: <strong>libertad y voz</strong>.</p></div>
+            <div class="manifesto-card"><div class="num">05 · Ideas Sobre Conexiones</div><p>AGI evalúa cada idea al instante. Alta prioridad → primera página. En SpaceK, <strong>idea útil = estatus</strong>. Sin pagos a intermediarios.</p></div>
+            <div class="manifesto-card"><div class="num">06 · Espacio como Recurso</div><p>Energía 24/7 en órbita. Centros de datos AGI en el espacio. Cualquier empresa espacial necesitará su división de IA — <strong>SpaceK es esa división</strong>.</p></div>
+        </div>
+        <a href="#" class="manifesto-cta">Unirse a SpaceK</a>
+        <p class="closing"><strong>SpaceK no es otra empresa de IA.</strong> Es una institución donde la tecnología pertenece a quienes la construyen, el control está protegido del dinero y del poder, y el cosmos es un recurso compartido.</p>
+    </div>
+</section>
+
+<img src="img.jpg" alt="Map: SpaceK HQ in Belgium, data center in Greenland, orbital data centers" class="hero-image">
+<div class="hero-caption" data-i18n="hero_caption">Western Europe · UK · Greenland — SpaceK HQ, ground data center, orbital data centers</div>
+
+<nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="0">I. General</button>
+    <button class="tab-btn" data-tab="1">II. Mission</button>
+    <button class="tab-btn" data-tab="2">III. Membership</button>
+    <button class="tab-btn" data-tab="3">IV. Governance</button>
+    <button class="tab-btn" data-tab="4">V. Resources</button>
+    <button class="tab-btn" data-tab="5">VI. AGI & Robots</button>
+    <button class="tab-btn" data-tab="6">VII. Patrons</button>
+    <button class="tab-btn" data-tab="7">VIII. Amendments</button>
+    <button class="tab-btn" data-tab="8">IX. SpaceK</button>
+</nav>
+
+<main class="content" id="content">
+
+    <!-- I -->
+    <section class="tab-panel active" id="panel-0">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter I. Name, Registration, Legal Form</h2>
+            <p><span class="article-num">Art. 1.</span> Name: <strong>SpaceK</strong> (Cosmos of Korolev). Legal form: <strong>AISBL</strong> under Belgian law.</p>
+            <p><span class="article-num">Art. 2.</span> Registered office: Kingdom of Belgium. Branches, labs, data centers — ground and orbital — worldwide.</p>
+            <p><span class="article-num">Art. 3.</span> Legal personality. Members not personally liable. Residual assets go to non-profit purposes, not members.</p>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава I. Название, регистрация, правовая форма</h2>
+            <p><span class="article-num">Ст. 1.</span> Наименование: <strong>SpaceK</strong> (Космос Королёва). Форма: <strong>AISBL</strong> по праву Бельгии.</p>
+            <p><span class="article-num">Ст. 2.</span> Штаб-квартира: Королевство Бельгия. Филиалы, лаборатории, ЦОД — наземные и орбитальные — по всему миру.</p>
+            <p><span class="article-num">Ст. 3.</span> Юрлицо. Члены не отвечают лично. Остаток при ликвидации — на некоммерческие цели, не членам.</p>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo I. Nombre, Registro, Forma Jurídica</h2>
+            <p><span class="article-num">Art. 1.</span> Nombre: <strong>SpaceK</strong> (Cosmos de Korolev). Forma: <strong>AISBL</strong> según ley belga.</p>
+            <p><span class="article-num">Art. 2.</span> Sede: Reino de Bélgica. Sucursales, laboratorios, centros de datos — terrestres y orbitales — worldwide.</p>
+            <p><span class="article-num">Art. 3.</span> Personalidad jurídica. Miembros no responsables personalmente. Activos residuales a fines sin ánimo de lucro, no a miembros.</p>
+        </div>
+    </section>
+
+    <!-- II -->
+    <section class="tab-panel" id="panel-1">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter II. Mission & Principles</h2>
+            <p><span class="article-num">Art. 4. (Mission)</span> Develop, maintain, govern AGI for all humanity; benefits shared by all members; control by scientific rationality and the common good. SpaceK extends this mission to space: AGI data centers in orbit, 24/7 energy, shared cosmic resources.</p>
+            <p><span class="article-num">Art. 5. (Principles)</span></p>
+            <ol>
+                <li><strong>Common heritage.</strong> Belongs to no state, corporation, or individual. Belongs to all intellectual contributors.</li>
+                <li><strong>Control ≠ capital.</strong> Strategic control by scientific bodies and member democracy, not contribution size.</li>
+                <li><strong>Resources serve people.</strong> SpaceK resources — ground and orbital — serve members' work and life, not external shareholders.</li>
+                <li><strong>Non-acquirable.</strong> No entity may gain control via contributions, contracts, or any means.</li>
+                <li><strong>Space as shared resource.</strong> Orbital energy and data centers are common heritage, not private monopoly.</li>
+            </ol>
+            <div class="highlight-box"><span class="badge">Key Formula</span><blockquote>«SpaceK's intellectual and robotic resources — on Earth and in space — are the <strong>resources of all staff</strong>.»</blockquote></div>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава II. Миссия и принципы</h2>
+            <p><span class="article-num">Ст. 4. (Миссия)</span> Разработка, поддержание, управление AGI для всего человечества; блага — всем членам; контроль — у научной рациональности и общего блага. SpaceK расширяет миссию в космос: AGI-дата-центры на орбите, энергия 24/7, общие космические ресурсы.</p>
+            <p><span class="article-num">Ст. 5. (Принципы)</span></p>
+            <ol>
+                <li><strong>Всеобщее достояние.</strong> Не принадлежит государству, корпорации, лицу. Принадлежит всем вкладчикам интеллекта.</li>
+                <li><strong>Контроль ≠ капитал.</strong> Стратегический контроль — у научных органов и демократии членов, не у размера взноса.</li>
+                <li><strong>Ресурсы служат людям.</strong> Ресурсы SpaceK — наземные и орбитальные — для работы и жизни членов, не для внешних акционеров.</li>
+                <li><strong>Неприобретаемость.</strong> Никто не получит контроль через взносы, договоры или иное.</li>
+                <li><strong>Космос — общий ресурс.</strong> Орбитальная энергия и дата-центры — всеобщее достояние, не частная монополия.</li>
+            </ol>
+            <div class="highlight-box"><span class="badge">Ключевая формула</span><blockquote>«Интеллектуальные и роботизированные ресурсы SpaceK — на Земле и в космосе — <strong>ресурсы всего штата</strong>.»</blockquote></div>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo II. Misión y Principios</h2>
+            <p><span class="article-num">Art. 4. (Misión)</span> Desarrollar, mantener, gobernar AGI para toda la humanidad; beneficios a todos los miembros; control por racionalidad científica y bien común. SpaceK extiende esta misión al espacio: centros de datos AGI en órbita, energía 24/7, recursos cósmicos compartidos.</p>
+            <p><span class="article-num">Art. 5. (Principios)</span></p>
+            <ol>
+                <li><strong>Patrimonio común.</strong> No pertenece a Estado, corporación o individuo. Pertenece a todos los contribuyentes intelectuales.</li>
+                <li><strong>Control ≠ capital.</strong> Control estratégico por órganos científicos y democracia de miembros, no por tamaño de contribución.</li>
+                <li><strong>Recursos sirven a personas.</strong> Recursos de SpaceK — terrestres y orbitales — para trabajo y vida de miembros, no para accionistas externos.</li>
+                <li><strong>No adquirible.</strong> Ninguna entidad puede obtener control vía contribuciones, contratos o cualquier medio.</li>
+                <li><strong>Espacio como recurso compartido.</strong> Energía orbital y centros de datos son patrimonio común, no monopolio privado.</li>
+            </ol>
+            <div class="highlight-box"><span class="badge">Fórmula Clave</span><blockquote>«Los recursos intelectuales y robóticos de SpaceK — en la Tierra y en el espacio — son <strong>recursos de todo el personal</strong>.»</blockquote></div>
+        </div>
+    </section>
+
+    <!-- III -->
+    <section class="tab-panel" id="panel-2">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter III. Membership</h2>
+            <p><span class="article-num">Art. 6. (Categories)</span></p>
+            <table>
+                <thead><tr><th>Category</th><th>Condition</th><th>Contribution</th><th>Rights</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Basic</strong></td><td>Any registered person accepting charter</td><td>$100/yr (PPP eq.)</td><td>1 vote; basic AGI access; remote worker status</td></tr>
+                    <tr><td><strong>Contributing</strong></td><td>Basic + confirmed intellectual contribution</td><td>Same</td><td>Basic + contribution points (propose priorities)</td></tr>
+                    <tr><td><strong>Patron</strong></td><td>Contribution > $100</td><td>Voluntary, no cap</td><td>Basic + public acknowledgment + patrons' meeting (no extra vote)</td></tr>
+                </tbody>
+            </table>
+            <p><span class="article-num">Art. 7.</span> Non-transferable, non-inheritable.</p>
+            <p><span class="article-num">Art. 8.</span> Exit anytime in writing. Expulsion by 2/3 Governing Council for serious breach.</p>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава III. Членство</h2>
+            <p><span class="article-num">Ст. 6. (Категории)</span></p>
+            <table>
+                <thead><tr><th>Категория</th><th>Условие</th><th>Взнос</th><th>Права</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Базовый</strong></td><td>Любой зарегистрированный, принявший устав</td><td>$100/год (ППС)</td><td>1 голос; базовый доступ к AGI; статус удалённого работника</td></tr>
+                    <tr><td><strong>Вкладчик</strong></td><td>Базовый + подтверждённый интеллектуальный вклад</td><td>Тот же</td><td>Базовые + баллы вклада (предлагать приоритеты)</td></tr>
+                    <tr><td><strong>Патрон</strong></td><td>Взнос > $100</td><td>Добровольный, без предела</td><td>Базовые + публичная благодарность + встреча патронов (без доп. голоса)</td></tr>
+                </tbody>
+            </table>
+            <p><span class="article-num">Ст. 7.</span> Непередаваемо, ненаследуемо.</p>
+            <p><span class="article-num">Ст. 8.</span> Выход в любое время письменно. Исключение — 2/3 Управляющего совета за серьёзное нарушение.</p>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo III. Membresía</h2>
+            <p><span class="article-num">Art. 6. (Categorías)</span></p>
+            <table>
+                <thead><tr><th>Categoría</th><th>Condición</th><th>Contribución</th><th>Derechos</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Básico</strong></td><td>Cualquier persona registrada que acepte estatuto</td><td>$100/año (PPA)</td><td>1 voto; acceso básico AGI; estatus trabajador remoto</td></tr>
+                    <tr><td><strong>Contribuyente</strong></td><td>Básico + contribución intelectual confirmada</td><td>Igual</td><td>Básicos + puntos de contribución (proponer prioridades)</td></tr>
+                    <tr><td><strong>Patrono</strong></td><td>Contribución > $100</td><td>Voluntaria, sin tope</td><td>Básicos + reconocimiento público + reunión de patronos (sin voto extra)</td></tr>
+                </tbody>
+            </table>
+            <p><span class="article-num">Art. 7.</span> Intransferible, no heredable.</p>
+            <p><span class="article-num">Art. 8.</span> Salida en cualquier momento por escrito. Expulsión por 2/3 del Consejo de Gobierno por incumplimiento grave.</p>
+        </div>
+    </section>
+
+    <!-- IV -->
+    <section class="tab-panel" id="panel-3">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter IV. Governance</h2>
+            <p><span class="article-num">Art. 9. (Three Tiers)</span></p>
+            <h3>1. General Assembly</h3>
+            <ul><li>All basic members, annual online. Reviews reports, elects Scientific Council, votes charter changes (2/3). <strong>One member — one vote.</strong></li></ul>
+            <h3>2. Scientific Governing Council</h3>
+            <ul><li><strong>9 members</strong>, 5-year term, one re-election. Recognized AI/CS/ethics/law/aerospace experts. Appoints CEO, approves roadmap, veto on AGI safety/ethics. <strong>No patron status; no single funding > $100k.</strong></li></ul>
+            <h3>3. Executive Management</h3>
+            <ul><li>CEO reports to Council. Operations, hiring, budget, partnerships (including space industry). 4-year term.</li></ul>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава IV. Управление</h2>
+            <p><span class="article-num">Ст. 9. (Три уровня)</span></p>
+            <h3>1. Общее собрание</h3>
+            <ul><li>Все базовые члены, ежегодно онлайн. Отчёты, выборы Научного совета, изменения устава (2/3). <strong>Один член — один голос.</strong></li></ul>
+            <h3>2. Научный управляющий совет</h3>
+            <ul><li><strong>9 членов</strong>, 5 лет, одно переизбрание. Признанные эксперты ИИ/CS/этики/права/аэрокосмоса. Назначает CEO, утверждает дорожную карту, вето по безопасности/этике AGI. <strong>Не патрон; без финансирования > $100k из одного источника.</strong></li></ul>
+            <h3>3. Исполнительное руководство</h3>
+            <ul><li>CEO подотчётен Совету. Операции, найм, бюджет, партнёрства (включая космическую отрасль). 4 года.</li></ul>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo IV. Gobierno</h2>
+            <p><span class="article-num">Art. 9. (Tres Niveles)</span></p>
+            <h3>1. Asamblea General</h3>
+            <ul><li>Todos los miembros básicos, anual en línea. Informes, elección del Consejo Científico, cambios de estatuto (2/3). <strong>Un miembro — un voto.</strong></li></ul>
+            <h3>2. Consejo Científico de Gobierno</h3>
+            <ul><li><strong>9 miembros</strong>, 5 años, una reelección. Expertos reconocidos en IA/CS/ética/derecho/aeroespacial. Nombra CEO, aprueba hoja de ruta, veto en seguridad/ética AGI. <strong>Sin estatus de patrono; sin financiación única > $100k.</strong></li></ul>
+            <h3>3. Dirección Ejecutiva</h3>
+            <ul><li>CEO rinde cuentas al Consejo. Operaciones, contratación, presupuesto, alianzas (incluida la industria espacial). 4 años.</li></ul>
+        </div>
+    </section>
+
+    <!-- V -->
+    <section class="tab-panel" id="panel-4">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter V. Resources & Income</h2>
+            <p><span class="article-num">Art. 10. (Resources)</span> Computing, AGI models, robotic entities (Earth, orbit, planets, asteroids), data & IP, orbital energy, all member contributions.</p>
+            <p><span class="article-num">Art. 11. (Key: Resources & Staff)</span></p>
+            <blockquote>«SpaceK's intellectual and robotic resources — on Earth and in space — are the <strong>resources of all staff</strong>.»</blockquote>
+            <ol>
+                <li>Every registered remote worker may use AGI systems as a <strong>personal work tool</strong>.</li>
+                <li>Inherent membership right, <strong>independent of contribution</strong>, not unilaterally revocable (except Art. 8).</li>
+                <li>Income from robotic and orbital resources anywhere flows to unified fund (Art. 12).</li>
+            </ol>
+            <p><span class="article-num">Art. 12. (Income & Distribution)</span></p>
+            <ol>
+                <li><strong>Sources:</strong> contributions, approved donations, AGI/robotic services, orbital energy, extraterrestrial development.</li>
+                <li><strong>Priority:</strong> 1) infrastructure (ground & orbital); 2) R&D (safety, alignment); 3) <strong>symbolic basic pay</strong> (≥ local social minimum); 4) performance pay by contribution points (not fixed debt).</li>
+                <li>Single entity > 5% of annual income: special GA vote; no extra votes or governance rights.</li>
+            </ol>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава V. Ресурсы и доход</h2>
+            <p><span class="article-num">Ст. 10. (Ресурсы)</span> Вычисления, модели AGI, роботы (Земля, орбита, планеты, астероиды), данные и ИС, орбитальная энергия, весь вклад членов.</p>
+            <p><span class="article-num">Ст. 11. (Ключевая: ресурсы и штат)</span></p>
+            <blockquote>«Интеллектуальные и роботизированные ресурсы SpaceK — на Земле и в космосе — <strong>ресурсы всего штата</strong>.»</blockquote>
+            <ol>
+                <li>Каждый удалённый работник использует AGI как <strong>личный рабочий инструмент</strong>.</li>
+                <li>Неотъемлемое право членства, <strong>не зависит от взноса</strong>, не отзывается в одностороннем порядке (кроме ст. 8).</li>
+                <li>Доход от роботов и орбитальных ресурсов в любой точке — в единый фонд (ст. 12).</li>
+            </ol>
+            <p><span class="article-num">Ст. 12. (Доход и распределение)</span></p>
+            <ol>
+                <li><strong>Источники:</strong> взносы, одобренные пожертвования, услуги AGI/роботов, орбитальная энергия, внеземное освоение.</li>
+                <li><strong>Приоритет:</strong> 1) инфраструктура (наземная и орбитальная); 2) R&D (безопасность, выравнивание); 3) <strong>символическая базовая плата</strong> (≥ местный социальный минимум); 4) плата по баллам вклада (не фиксированный долг).</li>
+                <li>Один субъект > 5% годового дохода: спецголосование ОС; без доп. голосов и прав управления.</li>
+            </ol>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo V. Recursos e Ingresos</h2>
+            <p><span class="article-num">Art. 10. (Recursos)</span> Cómputo, modelos AGI, entidades robóticas (Tierra, órbita, planetas, asteroides), datos y PI, energía orbital, todas las contribuciones de miembros.</p>
+            <p><span class="article-num">Art. 11. (Clave: Recursos y Personal)</span></p>
+            <blockquote>«Los recursos intelectuales y robóticos de SpaceK — en la Tierra y en el espacio — son <strong>recursos de todo el personal</strong>.»</blockquote>
+            <ol>
+                <li>Todo trabajador remoto registrado usa AGI como <strong>herramienta personal de trabajo</strong>.</li>
+                <li>Derecho inherente a membresía, <strong>independiente de contribución</strong>, no revocable unilateralmente (salvo Art. 8).</li>
+                <li>Ingresos de recursos robóticos y orbitales en cualquier lugar → fondo unificado (Art. 12).</li>
+            </ol>
+            <p><span class="article-num">Art. 12. (Ingresos y Distribución)</span></p>
+            <ol>
+                <li><strong>Fuentes:</strong> contribuciones, donaciones aprobadas, servicios AGI/robóticos, energía orbital, desarrollo extraterrestre.</li>
+                <li><strong>Prioridad:</strong> 1) infraestructura (terrestre y orbital); 2) I+D (seguridad, alineación); 3) <strong>pago básico simbólico</strong> (≥ mínimo social local); 4) pago por puntos de contribución (no deuda fija).</li>
+                <li>Entidad única > 5% del ingreso anual: voto especial de AG; sin votos ni derechos de gobierno extra.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- VI -->
+    <section class="tab-panel" id="panel-5">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter VI. AGI & Robots</h2>
+            <p><span class="article-num">Art. 13. (AGI Position)</span> Core public resource. Scientific Council oversees. Banned: military (except UNSC + GA approval), mass surveillance, social credit, undermining SpaceK/members.</p>
+            <p><span class="article-num">Art. 14. (Robotic Deployment)</span> Beyond Earth per international law (Outer Space Treaty). Income → unified fund. Requires 2/3 Scientific Council + annual GA report.</p>
+            <p><span class="article-num">Art. 15. (Assistants & Agents)</span> Every remote worker gets a <strong>personal AGI assistant</strong>. Contributing members may request <strong>robotic agents</strong> as resources allow. Usage data anonymized only; no surveillance of members.</p>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава VI. AGI и роботы</h2>
+            <p><span class="article-num">Ст. 13. (Статус AGI)</span> Ключевой общественный ресурс. Надзор — Научный совет. Запрещено: военное (кроме СБ ООН + ОС), массовое наблюдение, соцскоринг, подрыв SpaceK/членов.</p>
+            <p><span class="article-num">Ст. 14. (Развёртывание роботов)</span> За пределами Земли — по международному праву (Договор о космосе). Доход → единый фонд. Требует 2/3 Научного совета + годовой отчёт ОС.</p>
+            <p><span class="article-num">Ст. 15. (Ассистенты и агенты)</span> Каждому удалённому работнику — <strong>персональный ассистент AGI</strong>. Вкладчики могут запрашивать <strong>роботов-агентов</strong> по доступности. Данные только анонимно; без наблюдения за членами.</p>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo VI. AGI y Robots</h2>
+            <p><span class="article-num">Art. 13. (Posición AGI)</span> Recurso público central. Consejo Científico supervisa. Prohibido: militar (salvo CS ONU + AG), vigilancia masiva, crédito social, socavar SpaceK/miembros.</p>
+            <p><span class="article-num">Art. 14. (Despliegue Robótico)</span> Más allá de la Tierra según derecho internacional (Tratado del Espacio). Ingresos → fondo unificado. Requiere 2/3 del Consejo Científico + informe anual a AG.</p>
+            <p><span class="article-num">Art. 15. (Asistentes y Agentes)</span> Todo trabajador remoto recibe <strong>asistente personal AGI</strong>. Contribuyentes pueden solicitar <strong>agentes robóticos</strong> según recursos. Datos solo anonimizados; sin vigilancia de miembros.</p>
+        </div>
+    </section>
+
+    <!-- VII -->
+    <section class="tab-panel" id="panel-6">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter VII. Patrons & Reputation</h2>
+            <p><span class="article-num">Art. 16. (Patron Status)</span></p>
+            <ol>
+                <li>Important supporters; <strong>no ownership or control</strong>.</li>
+                <li><strong>Public patron registry</strong> (with consent) for contributions > $1M — public proof of "supporting universal AI by action."</li>
+                <li>Rights: annual patrons' meeting (no vote), mention in publications, 30-day preview of public research.</li>
+            </ol>
+            <p><span class="article-num">Art. 17. (No Benefit Transfer)</span> No patron gets: decision power, special AGI access, profit share, or residual assets.</p>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава VII. Патроны и репутация</h2>
+            <p><span class="article-num">Ст. 16. (Статус патрона)</span></p>
+            <ol>
+                <li>Важные сторонники; <strong>без собственности и контроля</strong>.</li>
+                <li><strong>Публичный реестр патронов</strong> (с согласия) при взносе > $1M — публичное свидетельство «поддерживает общечеловеческий ИИ делом».</li>
+                <li>Права: ежегодная встреча патронов (без голоса), упоминание в изданиях, предпросмотр публичных исследований за 30 дней.</li>
+            </ol>
+            <p><span class="article-num">Ст. 17. (Запрет передачи выгод)</span> Патрон не получает: право решений, особый доступ к AGI, долю прибыли, остаточное имущество.</p>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo VII. Patronos y Reputación</h2>
+            <p><span class="article-num">Art. 16. (Estatus de Patrono)</span></p>
+            <ol>
+                <li>Partidarios importantes; <strong>sin propiedad ni control</strong>.</li>
+                <li><strong>Registro público de patronos</strong> (con consentimiento) para contribuciones > $1M — prueba pública de "apoyar la IA universal con acción".</li>
+                <li>Derechos: reunión anual de patronos (sin voto), mención en publicaciones, vista previa de 30 días de investigación pública.</li>
+            </ol>
+            <p><span class="article-num">Art. 17. (Sin Transferencia de Beneficios)</span> Ningún patrono obtiene: poder de decisión, acceso especial a AGI, participación en beneficios ni activos residuales.</p>
+        </div>
+    </section>
+
+    <!-- VIII -->
+    <section class="tab-panel" id="panel-7">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter VIII. Amendments & Dissolution</h2>
+            <p><span class="article-num">Art. 18.</span> Amendments: 2/3 Scientific Council + 2/3 General Assembly.</p>
+            <p><span class="article-num">Art. 19.</span> Arts. 4, 5, 11, 17 need <strong>3/4 GA</strong> + 90-day publication.</p>
+            <p><span class="article-num">Art. 20.</span> Dissolution: 3/4 GA. Residual assets to similar non-profit, not members/patrons.</p>
+            <h2>Chapter IX. Transition</h2>
+            <p><span class="article-num">Art. 21.</span> In force upon Royal Decree + Belgian Official Gazette.</p>
+            <p><span class="article-num">Art. 22.</span> First Scientific Council nominated by founders, confirmed by first GA; until formal elections within 18 months.</p>
+            <div class="highlight-box" style="margin-top: 1.14rem;">
+                <span class="badge">Summary</span>
+                <p><strong>SpaceK — universal AI organization owned by all intellectual contributors.</strong> $100 + your intellect = personal AGI assistant, remote worker status, one equal vote, and a promise: all SpaceK resources — ground and orbital — are first and foremost <em>your resources</em>. Control forever with scientific rationality and all members. Not sold. Not traded. Not compromised.</p>
+            </div>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава VIII. Изменения и ликвидация</h2>
+            <p><span class="article-num">Ст. 18.</span> Изменения: 2/3 Научного совета + 2/3 Общего собрания.</p>
+            <p><span class="article-num">Ст. 19.</span> Ст. 4, 5, 11, 17 — <strong>3/4 ОС</strong> + публикация за 90 дней.</p>
+            <p><span class="article-num">Ст. 20.</span> Ликвидация: 3/4 ОС. Остаток — аналогичной НКО, не членам/патронам.</p>
+            <h2>Глава IX. Переходные положения</h2>
+            <p><span class="article-num">Ст. 21.</span> Вступает в силу после королевского указа + публикации в «Официальном вестнике Бельгии».</p>
+            <p><span class="article-num">Ст. 22.</span> Первый Научный совет — учредители, утверждает первое ОС; до формальных выборов в течение 18 месяцев.</p>
+            <div class="highlight-box" style="margin-top: 1.14rem;">
+                <span class="badge">Резюме</span>
+                <p><strong>SpaceK — общечеловеческая организация ИИ, принадлежащая всем вкладчикам интеллекта.</strong> $100 + интеллект = персональный ассистент AGI, статус удалённого работника, один равный голос и обещание: все ресурсы SpaceK — наземные и орбитальные — прежде всего <em>ваши ресурсы</em>. Контроль навсегда у научной рациональности и всех членов. Не продаётся. Не обменивается. Не идёт на компромисс.</p>
+            </div>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo VIII. Enmiendas y Disolución</h2>
+            <p><span class="article-num">Art. 18.</span> Enmiendas: 2/3 Consejo Científico + 2/3 Asamblea General.</p>
+            <p><span class="article-num">Art. 19.</span> Arts. 4, 5, 11, 17 — <strong>3/4 AG</strong> + publicación 90 días.</p>
+            <p><span class="article-num">Art. 20.</span> Disolución: 3/4 AG. Activos residuales a ONG similar, no a miembros/patronos.</p>
+            <h2>Capítulo IX. Transición</h2>
+            <p><span class="article-num">Art. 21.</span> Vigor tras Real Decreto + Boletín Oficial Belga.</p>
+            <p><span class="article-num">Art. 22.</span> Primer Consejo Científico nominado por fundadores, confirmado por primera AG; hasta elecciones formales en 18 meses.</p>
+            <div class="highlight-box" style="margin-top: 1.14rem;">
+                <span class="badge">Resumen</span>
+                <p><strong>SpaceK — organización universal de IA propiedad de todos los contribuyentes intelectuales.</strong> $100 + tu intelecto = asistente personal AGI, estatus de trabajador remoto, un voto igual, y una promesa: todos los recursos de SpaceK — terrestres y orbitales — son ante todo <em>tus recursos</em>. Control para siempre con racionalidad científica y todos los miembros. No se vende. No se intercambia. No se compromete.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- IX — SPACEK -->
+    <section class="tab-panel" id="panel-8">
+        <div class="lang-block active" data-lang="en">
+            <h2>Chapter IX. SpaceK — The Cosmic Component</h2>
+            <p><span class="article-num">Art. 23. (Name and Meaning)</span> <strong>SpaceK</strong> — "Cosmos of Korolev". The name honors Sergei Korolev, founder of practical cosmonautics, and reflects the organization's core: space is not a frontier to conquer, but a shared resource to develop for all humanity.</p>
+            <p><span class="article-num">Art. 24. (Orbital Data Centers)</span> In 2050, the best AGI data centers will be predominantly in space. Reason: constant 24/7 energy — solar, without atmospheric loss, without day-night cycles, without weather. SpaceK develops orbital data centers as common heritage.</p>
+            <p><span class="article-num">Art. 25. (Economic Logic)</span> Any company engaged in large-scale space activity — not only launch, but manufacturing, mining, research — will be forced to have its own AI division. Why: orbital 24/7 energy makes AI computation economically embedded in space resources. <strong>SpaceK is that division</strong> — a shared, non-profit AI division for all space actors.</p>
+            <p><span class="article-num">Art. 26. (Partnerships)</span> SpaceK may partner with space companies, agencies and research institutions on terms that:
+                <ul>
+                    <li>preserve SpaceK's non-profit status and member control;</li>
+                    <li>guarantee that orbital AI resources remain common heritage;</li>
+                    <li>do not grant any single entity control over SpaceK or its AGI.</li>
+                </ul>
+            </p>
+            <p><span class="article-num">Art. 27. (Orbital Energy)</span> Energy generated in orbit by SpaceK infrastructure is a shared resource. Income from orbital energy flows to the unified fund (Art. 12) and is distributed according to the same priorities.</p>
+            <p><span class="article-num">Art. 28. (Space Law)</span> All SpaceK activities in space comply with international law, including the Outer Space Treaty (1967), the Rescue Agreement (1968), the Liability Convention (1972), the Registration Convention (1975), and the Moon Agreement (1979) where applicable.</p>
+            <div class="highlight-box">
+                <span class="badge">Key Formula</span>
+                <blockquote>«SpaceK — the cosmic component. 24/7 energy in orbit. AGI data centers in space. Any space company needs its AI division — <strong>SpaceK is that division</strong>.»</blockquote>
+            </div>
+        </div>
+        <div class="lang-block" data-lang="ru">
+            <h2>Глава IX. SpaceK — Космическая составляющая</h2>
+            <p><span class="article-num">Ст. 23. (Название и смысл)</span> <strong>SpaceK</strong> — «Космос Королёва». Имя отдаёт дань Сергею Королёву, основателю практической космонавтики, и отражает суть организации: космос — не фронтир для завоевания, а общий ресурс для развития всем человечеством.</p>
+            <p><span class="article-num">Ст. 24. (Орбитальные дата-центры)</span> В 2050 лучшие AGI-дата-центры будут преимущественно в космосе. Причина: постоянная энергия 24/7 — солнечная, без атмосферных потерь, без суточных циклов, без погоды. SpaceK развивает орбитальные дата-центры как всеобщее достояние.</p>
+            <p><span class="article-num">Ст. 25. (Экономическая логика)</span> Любая компания, занятая масштабной космической деятельностью — не только выводом на орбиту, но и производством, добычей, исследованиями — будет вынуждена иметь собственное ИИ-подразделение. Причина: орбитальная энергия 24/7 делает ИИ-вычисления экономически встроенными в космические ресурсы. <strong>SpaceK и есть это подразделение</strong> — общее некоммерческое ИИ-подразделение для всех космических игроков.</p>
+            <p><span class="article-num">Ст. 26. (Партнёрства)</span> SpaceK может сотрудничать с космическими компаниями, агентствами и исследовательскими институтами на условиях:
+                <ul>
+                    <li>сохранения некоммерческого статуса SpaceK и контроля членов;</li>
+                    <li>гарантии, что орбитальные ИИ-ресурсы остаются всеобщим достоянием;</li>
+                    <li>непредоставления любому единственному субъекту контроля над SpaceK или её AGI.</li>
+                </ul>
+            </p>
+            <p><span class="article-num">Ст. 27. (Орбитальная энергия)</span> Энергия, генерируемая на орбите инфраструктурой SpaceK, — общий ресурс. Доход от орбитальной энергии поступает в единый фонд (ст. 12) и распределяется по тем же приоритетам.</p>
+            <p><span class="article-num">Ст. 28. (Космическое право)</span> Вся деятельность SpaceK в космосе соответствует международному праву, включая Договор о космосе (1967), Соглашение о спасании (1968), Конвенцию о ответственности (1972), Конвенцию о регистрации (1975) и Соглашение о Луне (1979) в применимой части.</p>
+            <div class="highlight-box">
+                <span class="badge">Ключевая формула</span>
+                <blockquote>«SpaceK — космическая составляющая. Энергия 24/7 на орбите. AGI-дата-центры в космосе. Любой космической компании нужно ИИ-подразделение — <strong>SpaceK и есть это подразделение</strong>.»</blockquote>
+            </div>
+        </div>
+        <div class="lang-block" data-lang="es">
+            <h2>Capítulo IX. SpaceK — El Componente Cósmico</h2>
+            <p><span class="article-num">Art. 23. (Nombre y Significado)</span> <strong>SpaceK</strong> — "Cosmos de Korolev". El nombre honra a Serguéi Koroliov, fundador de la cosmonáutica práctica, y refleja el núcleo de la organización: el espacio no es una frontera a conquistar, sino un recurso compartido a desarrollar para toda la humanidad.</p>
+            <p><span class="article-num">Art. 24. (Centros de Datos Orbitales)</span> En 2050, los mejores centros de datos AGI estarán predominantemente en el espacio. Razón: energía constante 24/7 — solar, sin pérdida atmosférica, sin ciclos día-noche, sin clima. SpaceK desarrolla centros de datos orbitales como patrimonio común.</p>
+            <p><span class="article-num">Art. 25. (Lógica Económica)</span> Cualquier empresa dedicada a actividad espacial a gran escala — no solo lanzamiento, sino fabricación, minería, investigación — se verá obligada a tener su propia división de IA. Razón: la energía orbital 24/7 hace que la computación de IA esté económicamente integrada en los recursos espaciales. <strong>SpaceK es esa división</strong> — una división de IA compartida y sin ánimo de lucro para todos los actores espaciales.</p>
+            <p><span class="article-num">Art. 26. (Alianzas)</span> SpaceK puede asociarse con empresas espaciales, agencias e instituciones de investigación en términos que:
+                <ul>
+                    <li>preserven el estatus sin ánimo de lucro de SpaceK y el control de los miembros;</li>
+                    <li>garanticen que los recursos de IA orbitales sigan siendo patrimonio común;</li>
+                    <li>no otorguen a ninguna entidad única control sobre SpaceK o su AGI.</li>
+                </ul>
+            </p>
+            <p><span class="article-num">Art. 27. (Energía Orbital)</span> La energía generada en órbita por la infraestructura de SpaceK es un recurso compartido. Los ingresos de energía orbital fluyen al fondo unificado (Art. 12) y se distribuyen según las mismas prioridades.</p>
+            <p><span class="article-num">Art. 28. (Derecho Espacial)</span> Todas las actividades de SpaceK en el espacio cumplen el derecho internacional, incluidos el Tratado del Espacio Ultraterrestre (1967), el Acuerdo de Rescate (1968), el Convenio de Responsabilidad (1972), el Convenio de Registro (1975) y el Acuerdo de la Luna (1979) cuando corresponda.</p>
+            <div class="highlight-box">
+                <span class="badge">Fórmula Clave</span>
+                <blockquote>«SpaceK — el componente cósmico. Energía 24/7 en órbita. Centros de datos AGI en el espacio. Cualquier empresa espacial necesita su división de IA — <strong>SpaceK es esa división</strong>.»</blockquote>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <strong>SpaceK</strong> · AISBL · Kingdom of Belgium · Cosmos of Korolev · Civilization-Scale Charter · 2050
+</footer>
+
+<script>
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const langBlocks = document.querySelectorAll('.lang-block');
+
+    function switchLang(lang) {
+        langBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+        langBlocks.forEach(block => block.classList.toggle('active', block.dataset.lang === lang));
+        document.documentElement.lang = lang;
+        const titles = { en: 'SpaceK — Cosmos of Korolev', ru: 'SpaceK — Космос Королёва', es: 'SpaceK — Cosmos de Korolev' };
+        document.title = titles[lang] || titles.en;
+        const subtitles = { en: 'Cosmos of Korolev · Civilization-Scale Charter · 2050', ru: 'Космос Королёва · Устав цивилизационного масштаба · 2050', es: 'Cosmos de Korolev · Estatuto a Escala de Civilización · 2050' };
+        const subEl = document.querySelector('.header .subtitle');
+        if (subEl) subEl.textContent = subtitles[lang] || subtitles.en;
+        const capEl = document.querySelector('.hero-caption');
+        const caps = { en: 'Western Europe · UK · Greenland — SpaceK HQ, ground data center, orbital data centers', ru: 'Западная Европа · Великобритания · Гренландия — штаб-квартира, наземный ЦОД и орбитальные ЦОД SpaceK', es: 'Europa Occidental · Reino Unido · Groenlandia — sede, centro de datos terrestre y centros orbitales de SpaceK' };
+        if (capEl) capEl.textContent = caps[lang] || caps.en;
+        const tabLabels = {
+            en: ['I. General','II. Mission','III. Membership','IV. Governance','V. Resources','VI. AGI & Robots','VII. Patrons','VIII. Amendments','IX. SpaceK'],
+            ru: ['I. Общие','II. Миссия','III. Членство','IV. Управление','V. Ресурсы','VI. AGI и роботы','VII. Патроны','VIII. Изменения','IX. SpaceK'],
+            es: ['I. General','II. Misión','III. Membresía','IV. Gobierno','V. Recursos','VI. AGI y Robots','VII. Patronos','VIII. Enmiendas','IX. SpaceK']
+        };
+        document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+            if (tabLabels[lang] && tabLabels[lang][i]) btn.textContent = tabLabels[lang][i];
+        });
+    }
+
+    langBtns.forEach(btn => btn.addEventListener('click', () => switchLang(btn.dataset.lang)));
+
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+    tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idx = btn.dataset.tab;
+            tabs.forEach(b => b.classList.remove('active'));
+            panels.forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('panel-' + idx).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+
+    const ZOOM_MIN = 10, ZOOM_MAX = 22, ZOOM_STEP = 1, ZOOM_DEFAULT = 14;
+    const zoomLabel = document.getElementById('zoomLabel');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+
+    function applyZoom(px) {
+        px = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, px));
+        document.documentElement.style.fontSize = px + 'px';
+        zoomLabel.textContent = Math.round((px / ZOOM_DEFAULT) * 100) + '%';
+        localStorage.setItem('spacek_zoom', px);
+        return px;
+    }
+
+    let currentZoom = parseInt(localStorage.getItem('spacek_zoom')) || ZOOM_DEFAULT;
+    applyZoom(currentZoom);
+    zoomInBtn.addEventListener('click', () => { currentZoom = applyZoom(currentZoom + ZOOM_STEP); });
+    zoomOutBtn.addEventListener('click', () => { currentZoom = applyZoom(currentZoom - ZOOM_STEP); });
+
+    switchLang('en');
+</script>
+
+</body>
+</html>
