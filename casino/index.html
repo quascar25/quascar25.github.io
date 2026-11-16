@@ -47,13 +47,26 @@
     flex-direction: column;
     gap: 4px;
   }
+
   #banner {
-   flex: 0 0 auto;
-   height: 100px;      /*height: clamp(28px, 6vh, 180px);*/
-   background: #1a2130;
-   border: 2px solid #2e3a4d;
-   border-radius: 6px;
- }
+    flex: 0 0 auto;
+    height: 100px;                    /* ← твоя высота, оставь свою */
+    background: #1a2130 url('rf.jpg') center/contain no-repeat;
+    border: 2px solid #2e3a4d;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  #banner-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;             /* вмещать целиком */
+    display: block;
+    background: transparent;
+  }
+
+ 
 
   /* Верхний ряд: два прямоугольника */
   #top-row {
@@ -415,7 +428,9 @@
 
     <!-- ВЕРХ -->
     <div id="top">
-      <div id="banner"></div>          <!-- новый прямоугольник -->
+      <div id="banner">
+       <video id="banner-video" muted playsinline preload="auto"></video>
+      </div>          <!-- новый прямоугольник -->
       <div id="top-row">
         <div id="balance" title="Нажми, чтобы изменить">
           <div class="lbl">Баланс</div>
@@ -770,6 +785,7 @@ function updateBalance() {
     $('spin-btn').disabled = true;
    
     if (state.spinning) return;
+    playBannerVideo();   
     state.spinning = true;
     resultEl.classList.add('busy', 'spinning');
     resultEl.classList.remove('red', 'black', 'green');
@@ -832,6 +848,35 @@ function updateBalance() {
     });
     setTimeout(() => winners.forEach(c => c.classList.remove('hit')), 800);
   }
+
+
+    // ---------- Видео-баннер ----------
+   const bannerVideo = $('banner-video');
+   const VIDEO_SOURCES = ['r01.mp4', 'r02.mp4', 'r03.mp4'];
+   let lastVideoIndex = -1;
+   
+   function playBannerVideo() {
+     // чистый рандом, может повториться (по твоему условию)
+     const idx = Math.floor(Math.random() * VIDEO_SOURCES.length);
+     bannerVideo.src = VIDEO_SOURCES[idx];
+     bannerVideo.currentTime = 0;
+     bannerVideo.play().catch(() => {
+       // если автоплей не сработал — просто останется последний кадр
+     });
+   }
+   
+   // Пауза после окончания (чтобы остался последний кадр)
+   bannerVideo.addEventListener('ended', () => {
+     // Ничего не делаем — браузер сам держит последний кадр.
+     // Если понадобится принудительно — можно bannerVideo.pause();
+   });
+
+
+ 
+   
+   // Первичная загрузка первого видео (без воспроизведения)
+   bannerVideo.src = VIDEO_SOURCES[0];
+   bannerVideo.load();
 
   //resultEl.addEventListener('click', spin);
   $('spin-btn').addEventListener('click', spin);
