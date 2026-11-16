@@ -65,7 +65,26 @@
     display: block;
     background: transparent;
   }
-
+ 
+  #sound-toggle {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #2e3a4d;
+    background: rgba(14,18,24,0.8);
+    color: #c8d2e0;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 0;
+  }
+  #sound-toggle:active { transform: scale(0.95); }
  
 
   /* Верхний ряд: два прямоугольника */
@@ -430,6 +449,7 @@
     <div id="top">
       <div id="banner">
        <video id="banner-video" muted playsinline preload="auto"></video>
+       <button id="sound-toggle" title="Звук">🔇</button>
       </div>          <!-- новый прямоугольник -->
       <div id="top-row">
         <div id="balance" title="Нажми, чтобы изменить">
@@ -860,23 +880,45 @@ function updateBalance() {
      const idx = Math.floor(Math.random() * VIDEO_SOURCES.length);
      bannerVideo.src = VIDEO_SOURCES[idx];
      bannerVideo.currentTime = 0;
+
+     bannerVideo.muted = !soundOn;            // ← добавить
+    
      bannerVideo.play().catch(() => {
        // если автоплей не сработал — просто останется последний кадр
      });
    }
+
+
    
    // Пауза после окончания (чтобы остался последний кадр)
    bannerVideo.addEventListener('ended', () => {
      // Ничего не делаем — браузер сам держит последний кадр.
      // Если понадобится принудительно — можно bannerVideo.pause();
    });
-
-
  
    
    // Первичная загрузка первого видео (без воспроизведения)
    bannerVideo.src = VIDEO_SOURCES[0];
    bannerVideo.load();
+
+      const soundToggle = $('sound-toggle');
+      let soundOn = localStorage.getItem('roulette_sound') === '1';
+      
+      function applySoundState() {
+        bannerVideo.muted = !soundOn;
+        soundToggle.textContent = soundOn ? '🔊' : '🔇';
+      }
+      applySoundState();
+      
+      soundToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        soundOn = !soundOn;
+        localStorage.setItem('roulette_sound', soundOn ? '1' : '0');
+        applySoundState();
+      });
+
+
+ 
 
   //resultEl.addEventListener('click', spin);
   $('spin-btn').addEventListener('click', spin);
