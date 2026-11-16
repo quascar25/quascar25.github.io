@@ -57,6 +57,32 @@
             background: #0d1117;
             object-fit: cover;
             flex: 1 1 18rem;     }
+
+        .hero-video {
+            max-width: 40rem;
+            margin: 1rem auto 0.43rem;
+            padding: 0 1.43rem;
+            text-align: center;
+        }
+        
+        .hero-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 1px solid #2a3441;
+            border-radius: 0.29rem;
+            background: #0d1117;
+        }
+        
+        .video-caption {
+            text-align: center;
+            font-size: 0.71rem;
+            color: #6b7a8f;
+            margin-top: 0.43rem;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.04rem;
+        }
+        
         
         .hero-caption { text-align: center; font-size: 0.71rem; color: #6b7a8f; margin-bottom: 1rem; font-family: 'Arial', sans-serif; letter-spacing: 0.04rem; }
         .tabs { display: flex; flex-wrap: wrap; background: #0d1117; border-bottom: 1px solid #2a3441; padding: 0 1.14rem; position: sticky; top: 4.43rem; z-index: 99; }
@@ -179,6 +205,14 @@
     <img src="img2.jpg" alt="SpaceK space infrastructure" class="hero-image">
 </div>
 <div class="hero-caption" data-i18n="hero_caption">Western Europe · UK · Greenland — SpaceK HQ, ground data center, orbital data centers</div>
+
+<div class="hero-video">
+    <video controls preload="metadata" playsinline poster="img3.jpg">
+        <source src="pos.mp4" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+    <div class="video-caption" data-i18n="video_caption">SpaceK: lunar regolith → metal → orbital data centers</div>
+</div>
 
 <nav class="tabs" id="tabs">
     <button class="tab-btn active" data-tab="0">I. General</button>
