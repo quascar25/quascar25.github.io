@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>37 кружков — переключатель</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 16px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            background: #000000;
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            will-change: background, border-color;
+            flex-shrink: 0;
+        }
+        /* Белый кружок: чёрный текст для читаемости */
+        .circle.white {
+            background: #ffffff;
+            border-color: #ffffff;
+            color: #000000;
+        }
+        /* Синий кружок: белый текст */
+        .circle.blue {
+            background: #0077ff;
+            border-color: #0077ff;
+            color: #ffffff;
+        }
+        /* Чёрный кружок: белый текст (по умолчанию) */
+        .circle.black {
+            background: #000000;
+            border-color: #444;
+            color: #ffffff;
+        }
+        /* Адаптив для маленьких экранов */
+        @media (max-width: 600px) {
+            .circle {
+                width: 52px;
+                height: 52px;
+                font-size: 16px;
+            }
+            .container {
+                gap: 8px;
+            }
+        }
+        @media (max-width: 400px) {
+            .circle {
+                width: 44px;
+                height: 44px;
+                font-size: 14px;
+            }
+            .container {
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="circlesContainer"></div>
+
+    <script>
+        (function() {
+            const container = document.getElementById('circlesContainer');
+            // Массив для хранения ссылок на DOM-элементы кружков
+            const circleElements = [];
+
+            // Создаём 37 кружков (0-36)
+            for (let i = 0; i <= 36; i++) {
+                const circle = document.createElement('div');
+                circle.className = 'circle black'; // начальное состояние — чёрный
+                circle.textContent = i;
+                circle.dataset.state = 'black';    // будем хранить состояние в data-атрибуте
+                circle.setAttribute('aria-label', `Кружок ${i}, состояние: чёрный`);
+                circle.setAttribute('role', 'button');
+                circle.setAttribute('tabindex', '0');
+
+                // Функция переключения состояния
+                const toggleState = () => {
+                    const currentState = circle.dataset.state;
+
+                    if (currentState === 'black') {
+                        // чёрный -> белый
+                        circle.classList.remove('black');
+                        circle.classList.add('white');
+                        circle.dataset.state = 'white';
+                        circle.setAttribute('aria-label', `Кружок ${i}, состояние: белый`);
+                    } else if (currentState === 'white') {
+                        // белый -> синий
+                        circle.classList.remove('white');
+                        circle.classList.add('blue');
+                        circle.dataset.state = 'blue';
+                        circle.setAttribute('aria-label', `Кружок ${i}, состояние: синий`);
+                    } else if (currentState === 'blue') {
+                        // синий -> чёрный
+                        circle.classList.remove('blue');
+                        circle.classList.add('black');
+                        circle.dataset.state = 'black';
+                        circle.setAttribute('aria-label', `Кружок ${i}, состояние: чёрный`);
+                    }
+                };
+
+                // Клик мышью или тап
+                circle.addEventListener('click', toggleState);
+                // Поддержка клавиатуры (Enter / Пробел)
+                circle.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleState();
+                    }
+                });
+
+                container.appendChild(circle);
+                circleElements.push(circle);
+            }
+        })();
+    </script>
+</body>
+</html>
