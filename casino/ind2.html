@@ -156,23 +156,25 @@
 
   .col-two-to-one { grid-row: 14; }
 
-  /* Баланс в ячейке таблицы */
+  /* Баланс в объединённой ячейке 1-2 первой строки */
   #balance {
     background: #1a2130;
     border: 2px solid #2e3a4d;
     border-radius: 3px;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     justify-content: center;
+    gap: 6px;
     cursor: pointer;
-    padding: 0 4px;
+    padding: 0 6px;
   }
   #balance .lbl {
-    font-size: clamp(6px, 1.2vh, 9px);
+    font-size: clamp(7px, 1.4vh, 10px);
     color: #7a8699;
     font-weight: 600;
   }
   #balance .val {
-    font-size: clamp(10px, 2.2vh, 18px);
+    font-size: clamp(11px, 2.4vh, 20px);
     color: #f0c040;
     font-weight: 800;
     white-space: nowrap;
@@ -184,9 +186,10 @@
     background: transparent; border: none; outline: none;
     color: #f0c040;
     font: inherit;
-    font-size: clamp(10px, 2.2vh, 18px);
+    font-size: clamp(11px, 2.4vh, 20px);
     font-weight: 800;
     padding: 0;
+    text-align: center;
   }
 
   /* Кнопка × (очистка ставок) в левом нижнем углу */
@@ -213,11 +216,6 @@
     min-width: 0;
   }
 
-  /* Блок «число + ввод» — высота как у #zero.
-     #zero занимает 1 строку из 14 в сетке (grid-row 1).
-     Чтобы совпасть, используем ту же долю: 1/14 от высоты #numbers.
-     Т.к. #numbers растягивается по высоте #left, задаём flex-basis в процентах
-     от #right — проще: делаем #result-row flex: 0 0 calc(100% / 14). */
   #result-row {
     flex: 0 0 calc(100% / 14);
     display: flex;
@@ -281,7 +279,7 @@
   }
   #manual-clear.visible { display: flex; }
 
-  /* Статистика — два столбика, забирают всё свободное */
+  /* Статистика — ДВА столбика, ОДИН номер на строку, СВЕРХУ ВНИЗ */
   #stats-row {
     flex: 1 1 auto;
     display: flex;
@@ -294,61 +292,47 @@
     border: 2px solid #2e3a4d;
     border-radius: 6px;
     display: flex;
-    align-items: center;
-    gap: 3px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
     padding: 4px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     cursor: pointer;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: flex-start;
     transition: border-color .15s;
-    position: relative;
     min-height: 0;
     min-width: 0;
   }
   #history:active, #cold:active { border-color: #f0c040; }
   #history .title, #cold .title {
+    flex: 0 0 auto;
     width: 100%;
     font-size: clamp(6px, 1.1vh, 9px);
     color: #7a8699;
     font-weight: 600;
     letter-spacing: .5px;
     pointer-events: none;
-    flex: 0 0 100%;
+    text-align: center;
     margin-bottom: 2px;
   }
 
-  .hist-ball {
+  /* Шарики статистики — на всю ширину, по центру */
+  .hist-ball, .cold-ball {
     flex: 0 0 auto;
-    width: clamp(16px, 4vh, 30px);
-    height: clamp(16px, 4vh, 30px);
+    width: 100%;
+    height: clamp(16px, 3.2vh, 26px);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: clamp(7px, 1.7vh, 12px);
+    font-size: clamp(7px, 1.6vh, 12px);
     font-weight: 700;
     color: #fff;
   }
-  .hist-ball.red    { background: #b3312a; }
-  .hist-ball.black  { background: #1c2128; border: 1px solid #3a4553; }
-  .hist-ball.green  { background: #1e8449; }
+  .hist-ball.red,   .cold-ball.red   { background: #b3312a; }
+  .hist-ball.black, .cold-ball.black { background: #1c2128; border: 1px solid #3a4553; }
+  .hist-ball.green, .cold-ball.green { background: #1e8449; }
+  .cold-ball { opacity: .85; }
 
-  .cold-ball {
-    flex: 0 0 auto;
-    width: clamp(14px, 3.6vh, 26px);
-    height: clamp(14px, 3.6vh, 26px);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: clamp(6px, 1.5vh, 11px);
-    font-weight: 700;
-    color: #fff;
-    opacity: .85;
-  }
-  .cold-ball.red    { background: #b3312a; }
-  .cold-ball.black  { background: #1c2128; border: 1px solid #3a4553; }
-  .cold-ball.green  { background: #1e8449; }
-
-  /* Фишки */
+  /* Фишки — уменьшены в 1.8 раза */
   #chips {
     flex: 0 0 12%;
     display: flex;
@@ -360,11 +344,11 @@
   .chip {
     flex: 0 0 auto;
     aspect-ratio: 1;
-    height: 70%;
+    height: 39%;
     border-radius: 50%;
     border: 2px dashed rgba(255,255,255,0.5);
     display: flex; align-items: center; justify-content: center;
-    font-size: clamp(7px, 1.5vh, 12px);
+    font-size: clamp(6px, 1.2vh, 10px);
     font-weight: 800;
     color: #fff;
     cursor: pointer;
@@ -394,13 +378,13 @@
   #spin-btn:active { transform: scale(0.97); }
   #spin-btn:disabled { opacity: .5; cursor: wait; }
 
-  /* Фишка-маркер выпавшего числа */
+  /* Фишка-маркер выпавшего числа — опущена на 13px от центра */
   .cell.drop-marker { position: relative; }
   .cell.drop-marker::after {
     content: '';
     position: absolute;
     left: 50%;
-    top: calc(50% - 23px);
+    top: calc(50% + 13px);
     transform: translate(-50%, -50%);
     width: 25px;
     height: 25px;
@@ -428,9 +412,9 @@
         <div id="numbers">
 
           <!-- Строка 1: баланс (кол.1-2) + 0 (кол.3-5) -->
-          <div class="cell" id="balance" title="Нажми, чтобы изменить">
-            <div class="lbl">Баланс</div>
-            <div class="val" id="balance-val">1000</div>
+          <div class="cell" id="r1c_balance" title="Нажми, чтобы изменить">
+            <span class="lbl">Баланс:</span>
+            <span class="val" id="balance-val">1000</span>
           </div>
           <div class="cell green" id="zero" data-bet="zero">0</div>
 
@@ -515,17 +499,15 @@
   const manualClear = $('manual-clear');
   const historyEl = $('history');
   const coldEl = $('cold');
-  const balanceEl = $('balance');
+  const balanceEl = $('r1c_balance');
   const numbersGrid = $('numbers');
   const bannerVideo = $('banner-video');
   const spinBtn = $('spin-btn');
 
   // ---------- Генерация чисел в сетке 5×14 ----------
-  // Строки 2-13, колонки 3-5. Порядок: строка = 1..12, числа = row*3+1..row*3+3
-  // row 2 -> 1,2,3 ; row 3 -> 4,5,6 ; ... ; row 13 -> 34,35,36
   for (let row = 2; row <= 13; row++) {
     for (let col = 3; col <= 5; col++) {
-      const n = (row - 2) * 3 + (col - 3 + 1); // 1..36
+      const n = (row - 2) * 3 + (col - 3 + 1);
       const el = document.createElement('div');
       el.className = 'cell ' + (RED.has(n) ? 'red' : 'black');
       el.textContent = n;
@@ -548,7 +530,7 @@
 
     const old = state.balance;
     const wrap = balanceEl;
-    wrap.innerHTML = '<div class="lbl">Баланс</div>';
+    wrap.innerHTML = '';
     const inp = document.createElement('input');
     inp.type = 'text';
     inp.inputMode = 'numeric';
@@ -562,7 +544,7 @@
       if (isNaN(v)) v = old;
       v = Math.max(0, Math.min(100000, v));
       state.balance = v;
-      wrap.innerHTML = '<div class="lbl">Баланс</div><div class="val" id="balance-val">' + v + '</div>';
+      wrap.innerHTML = '<span class="lbl">Баланс:</span><span class="val" id="balance-val">' + v + '</span>';
     };
     inp.addEventListener('blur', commit, { once: true });
     inp.addEventListener('keydown', (e) => {
@@ -574,7 +556,7 @@
     });
   });
 
-  // ---------- История ----------
+  // ---------- История (новые СВЕРХУ, один на строку) ----------
   function addHistory(n) {
     state.history.unshift(n);
     if (state.history.length > 12) state.history.pop();
@@ -582,8 +564,7 @@
   }
   function renderHistory() {
     historyEl.innerHTML = '<span class="title">ПОСЛЕДНИЕ 12</span>';
-    const arr = state.history.slice(0, 12).reverse();
-    for (const n of arr) {
+    for (const n of state.history) {
       const b = document.createElement('div');
       b.className = 'hist-ball ' + colorOf(n);
       b.textContent = n;
@@ -591,7 +572,7 @@
     }
   }
 
-  // ---------- Невыпавшие ----------
+  // ---------- Невыпавшие (новые СВЕРХУ, один на строку) ----------
   function updateCold(n) {
     state.spinCount++;
     state.lastSeen[n] = state.spinCount;
@@ -605,8 +586,7 @@
   }
   function renderCold() {
     coldEl.innerHTML = '<span class="title">НЕ ВЫПАДАЛИ ≥15</span>';
-    const arr = state.coldNumbers.slice().reverse();
-    for (const n of arr) {
+    for (const n of state.coldNumbers) {
       const b = document.createElement('div');
       b.className = 'cold-ball ' + colorOf(n);
       b.textContent = n;
