@@ -435,6 +435,24 @@
   .chip[data-v="100"] { background: #2c3e50; }
   .chip[data-v="500"] { background: #8e44ad; }
   .chip.selected { outline: 3px solid #f0c040; outline-offset: 1px; }
+
+  /* Фишка-маркер выпавшего числа */
+    .cell.drop-marker {
+      position: relative;
+    }
+    .cell.drop-marker::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: calc(50% - 10px);
+      transform: translate(-50%, -50%);
+      width: 25px;
+      height: 25px;
+      background: url('tisch.png') center/contain no-repeat;
+      pointer-events: none;
+      z-index: 3;
+    }
+ 
 </style>
 </head>
 <body>
@@ -639,6 +657,7 @@
 
   function placeBet(key) {
     if (state.spinning) return;
+      clearDropMarker();
     if (addBet(key, state.selectedChip)) {
       updateBalance();
       renderBets();
@@ -657,6 +676,8 @@
 
   function clearAllBets() {
     if (state.spinning) return;
+    clearDropMarker();
+   
     for (const amt of Object.values(state.bets)) {
       state.balance += amt;
     }
@@ -891,6 +912,8 @@
     updateBalance();
 
     highlightWinners(n);
+    showDropMarker(n);
+   
     state.spinning = false;
     spinBtn.disabled = false;
   }
@@ -903,6 +926,7 @@
   // --- Аккуратные версии ---
   function spinSafe() {
     if (state.spinning) return;
+    clearDropMarker();
 
     const manualVal = getManualValue();
     const finalN = manualVal !== null ? manualVal : Math.floor(Math.random() * 37);
@@ -925,6 +949,17 @@
   spinBtn.addEventListener('click', spinSafe);
 
   // Удаляем старую привязку (если была) — ниже её нет, поэтому ок.
+
+   // ---------- Маркер выпавшего числа ----------
+  function clearDropMarker() {
+    document.querySelectorAll('#board .cell.drop-marker').forEach(c => c.classList.remove('drop-marker'));
+  }
+  function showDropMarker(n) {
+    clearDropMarker();
+    const key = n === 0 ? 'zero' : 'num:' + n;
+    const cell = document.querySelector('#board [data-bet="' + key + '"]');
+    if (cell) cell.classList.add('drop-marker');
+  }
 
   function highlightWinners(n) {
     const winners = [];
