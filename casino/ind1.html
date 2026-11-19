@@ -14,40 +14,39 @@
     user-select: none;
   }
 
-  /* Периметр приложения (как stage) */
   #stage {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: min(100vw, calc(100vh * 9 / 14));
     height: min(calc(100vw * 14 / 9), 100vh);
-    background: #333333;            /* тёмно-серый фон */
-    border: 2px solid #000;         /* внешняя чёрная рамка */
-    display: flex;                  /* две колонки */
+    background: #333333;
+    border: 2px solid #000;
+    display: flex;
   }
 
   /* ==== ЛЕВАЯ КОЛОНКА: таблица рулетки ==== */
   #left {
     flex: 1 1 62%;
-    border-right: 3px solid #000;   /* вертикальная разделительная линия */
+    border-right: 3px solid #000;
     display: flex;
     flex-direction: column;
     padding: 4px;
     gap: 4px;
   }
 
-  /* Числовая таблица — вертикальные числа.
-     Сетка: 3 строки (ряды чисел) x 13 колонок (12 чисел + 2:1 в конце).
-     Слева 0 — отдельная колонка. */
+  /* Числовая таблица — ВЕРТИКАЛЬНО:
+     4 строки: [0 сверху] + 3 строки чисел + [2:1 снизу]
+     13 колонок: 1 колонка для 0 + 12 колонок чисел */
   #numbers {
     flex: 1 1 auto;
     display: grid;
-    /* 0 + 12 чисел + колонка 2:1 */
-    grid-template-columns: 1fr repeat(12, 1fr) 1fr;
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: 1fr repeat(12, 1fr);
+    grid-template-rows: 0.6fr repeat(3, 1fr) 0.6fr;
     gap: 2px;
     border: 2px solid #000;
     padding: 2px;
+    min-height: 0;
   }
   .cell {
     border: 1px solid #000;
@@ -55,25 +54,34 @@
     align-items: center;
     justify-content: center;
     color: #ddd;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
+    min-width: 0;
+    min-height: 0;
   }
-  #zero { grid-column: 1; grid-row: 1 / 4; }
 
-  /* Внешние ставки снизу (1-12 / 13-24 / 25-36 / чёт / красн / чёрн / нечёт) */
+  /* 0 — сверху в левой колонке, на всю высоту чисел (3 строки) */
+  #zero { grid-column: 1; grid-row: 2 / 5; }
+
+  /* 2:1 — нижняя строка под каждым столбцом (12 шт.) */
+  .col-two-to-one { grid-row: 5; }
+
+  /* Внешние ставки снизу */
   #outside {
-    flex: 0 0 22%;
+    flex: 0 0 20%;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 2px;
     border: 2px solid #000;
     padding: 2px;
+    min-height: 0;
   }
   #outside > div {
     border: 1px solid #000;
     display: flex; align-items: center; justify-content: center;
     color: #ddd; font-size: 9px; font-weight: 700;
+    min-width: 0; min-height: 0;
   }
   #outside > div:nth-child(1),
   #outside > div:nth-child(2),
@@ -90,25 +98,21 @@
     flex-direction: column;
     gap: 4px;
     padding: 4px;
+    min-width: 0;
   }
 
-  /* Видео */
   #banner {
     flex: 0 0 22%;
     border: 2px solid #000;
     display: flex; align-items: center; justify-content: center;
     color: #888; font-size: 11px;
   }
-
-  /* Баланс */
   #balance {
     flex: 0 0 8%;
     border: 2px solid #000;
     display: flex; align-items: center; justify-content: center;
     color: #888; font-size: 11px;
   }
-
-  /* Результат + ручной ввод — в ряд */
   #result-row {
     flex: 0 0 12%;
     display: flex;
@@ -120,8 +124,6 @@
     display: flex; align-items: center; justify-content: center;
     color: #888; font-size: 11px;
   }
-
-  /* Статистика: два столбика */
   #stats-row {
     flex: 1 1 auto;
     display: flex;
@@ -135,16 +137,12 @@
     color: #888; font-size: 10px;
     text-align: center;
   }
-
-  /* Фишки */
   #chips {
     flex: 0 0 10%;
     border: 2px solid #000;
     display: flex; align-items: center; justify-content: center;
     color: #888; font-size: 10px;
   }
-
-  /* Кнопки: обнуление + крутить */
   #buttons {
     flex: 0 0 9%;
     display: flex;
@@ -166,26 +164,38 @@
   <!-- ЛЕВАЯ КОЛОНКА -->
   <div id="left">
     <div id="numbers">
+      <!-- Строка 1: 0 (слева) + 12 чисел верхнего ряда -->
       <div class="cell" id="zero">0</div>
-      <!-- 3 ряда по 12 чисел + 2:1 в каждом ряду -->
-      <!-- ряд 1 -->
       <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div>
       <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div>
       <div class="cell">7</div><div class="cell">8</div><div class="cell">9</div>
       <div class="cell">10</div><div class="cell">11</div><div class="cell">12</div>
-      <div class="cell">2:1</div>
-      <!-- ряд 2 -->
+
+      <!-- Строка 2 -->
       <div class="cell">13</div><div class="cell">14</div><div class="cell">15</div>
       <div class="cell">16</div><div class="cell">17</div><div class="cell">18</div>
       <div class="cell">19</div><div class="cell">20</div><div class="cell">21</div>
       <div class="cell">22</div><div class="cell">23</div><div class="cell">24</div>
-      <div class="cell">2:1</div>
-      <!-- ряд 3 -->
+
+      <!-- Строка 3 -->
       <div class="cell">25</div><div class="cell">26</div><div class="cell">27</div>
       <div class="cell">28</div><div class="cell">29</div><div class="cell">30</div>
       <div class="cell">31</div><div class="cell">32</div><div class="cell">33</div>
       <div class="cell">34</div><div class="cell">35</div><div class="cell">36</div>
-      <div class="cell">2:1</div>
+
+      <!-- Строка 4: 2:1 под каждым столбцом -->
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
+      <div class="cell col-two-to-one">2:1</div>
     </div>
 
     <div id="outside">
