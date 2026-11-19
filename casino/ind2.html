@@ -437,6 +437,27 @@
     pointer-events: none;
     z-index: 3;
   }
+ 
+  /* Голубые ромбы вокруг КРАСН и ЧЁРН */
+  #c1_red, #c1_blk {
+    position: relative;
+    overflow: visible;          /* чтобы ромб не обрезался */
+  }
+  #c1_red::before,
+  #c1_blk::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 26px; height: 26px;           /* размер ромба */
+    border: 1px solid #5bc8e8;           /* голубая рамка 1px */
+    background: transparent;
+    transform: translate(-50%, -50%) rotate(45deg);
+    pointer-events: none;                 /* не мешает кликам */
+    z-index: 1;
+  }
+
+
+ 
 </style>
 </head>
 <body>
