@@ -316,7 +316,7 @@
     margin-bottom: 2px;
   }
 
-  /* Шарики статистики — на всю ширину, по центру */
+  /* Шарики статистики — на всю ширину, по центру 
   .hist-ball, .cold-ball {
     flex: 0 0 auto;
     width: 100%;
@@ -327,10 +327,55 @@
     font-weight: 700;
     color: #fff;
   }
+ 
   .hist-ball.red,   .cold-ball.red   { background: #b3312a; }
   .hist-ball.black, .cold-ball.black { background: #1c2128; border: 1px solid #3a4553; }
   .hist-ball.green, .cold-ball.green { background: #1e8449; }
   .cold-ball { opacity: .85; }
+ */
+
+   /* Шарик на всю ширину — но для красных прижимаем влево, для чёрных вправо */
+  .hist-ball, .cold-ball {
+    flex: 0 0 auto;
+    height: clamp(16px, 3.2vh, 26px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(7px, 1.6vh, 12px);
+    font-weight: 700;
+    color: #fff;
+    /* по умолчанию — во всю ширину */
+    width: 100%;
+    align-self: stretch;
+  }
+
+  /* КРАСНЫЕ — прижаты к левому краю колонки, круг по высоте */
+  .hist-ball.red, .cold-ball.red {
+    background: #b3312a;
+    width: auto;
+    aspect-ratio: 1;
+    align-self: flex-start;
+  }
+
+  /* ЧЁРНЫЕ — прижаты к правому краю колонки */
+  .hist-ball.black, .cold-ball.black {
+    background: #1c2128;
+    border: 1px solid #3a4553;
+    width: auto;
+    aspect-ratio: 1;
+    align-self: flex-end;
+  }
+
+  /* ЗЕЛЁНЫЕ (0) — по центру, как было */
+  .hist-ball.green, .cold-ball.green {
+    background: #1e8449;
+    width: auto;
+    aspect-ratio: 1;
+    align-self: center;
+  }
+
+  .cold-ball { opacity: .85; }
+
+ 
 
   /* Фишки — уменьшены в 1.8 раза */
   #chips {
@@ -384,7 +429,7 @@
     content: '';
     position: absolute;
     left: 50%;
-    top: calc(50% + 13px);
+    top: calc(50%);    /* top: calc(50% + 13px);  */
     transform: translate(-50%, -50%);
     width: 25px;
     height: 25px;
