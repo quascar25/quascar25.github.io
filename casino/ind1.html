@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Рулетка — макет</title>
+<title>Рулетка — сетка 5×14</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -20,7 +20,7 @@
     transform: translate(-50%, -50%);
     width: min(100vw, calc(100vh * 9 / 14));
     height: min(calc(100vw * 14 / 9), 100vh);
-    background: #333333;
+    background: #333;
     border: 2px solid #000;
     display: flex;
   }
@@ -32,64 +32,47 @@
     display: flex;
     flex-direction: column;
     padding: 4px;
-    gap: 4px;
+    min-width: 0;
   }
 
-  /* Числовая таблица — ВЕРТИКАЛЬНО:
-     4 строки: [0 сверху] + 3 строки чисел + [2:1 снизу]
-     13 колонок: 1 колонка для 0 + 12 колонок чисел */
+  /* Сетка 5 колонок × 14 строк */
   #numbers {
     flex: 1 1 auto;
     display: grid;
-    grid-template-columns: 1fr repeat(12, 1fr);
-    grid-template-rows: 0.6fr repeat(3, 1fr) 0.6fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: repeat(14, 1fr);
     gap: 2px;
     border: 2px solid #000;
     padding: 2px;
     min-height: 0;
   }
+
   .cell {
     border: 1px solid #000;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ddd;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     min-width: 0;
     min-height: 0;
+    text-align: center;
+    overflow: hidden;
   }
 
-  /* 0 — сверху в левой колонке, на всю высоту чисел (3 строки) */
-  #zero { grid-column: 1; grid-row: 2 / 5; }
+  /* ---- Строка 1 ---- */
+  #r1c1 { grid-row: 1; grid-column: 1 / 3; }   /* "" объединено 1-2 */
+  #r1c0 { grid-row: 1; grid-column: 3 / 6; }   /* "0" объединено 3-5 */
 
-  /* 2:1 — нижняя строка под каждым столбцом (12 шт.) */
-  .col-two-to-one { grid-row: 5; }
+  /* ---- Кол.1: 1-18 (строки 2-3) ---- */
+  #c1_118 { grid-row: 2 / 4; grid-column: 1; }
+  /* ---- Кол.2: 1-12 (строки 2-5) ---- */
+  #c2_112 { grid-row: 2 / 6; grid-column: 2; }
+  /* ---- Кол.1: ЧЁТ (строки 4-5) ---- */
+  #c1_even { grid-row: 4 / 6; grid-column: 1; }
 
-  /* Внешние ставки снизу */
-  #outside {
-    flex: 0 0 20%;
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 2px;
-    border: 2px solid #000;
-    padding: 2px;
-    min-height: 0;
-  }
-  #outside > div {
-    border: 1px solid #000;
-    display: flex; align-items: center; justify-content: center;
-    color: #ddd; font-size: 9px; font-weight: 700;
-    min-width: 0; min-height: 0;
-  }
-  #outside > div:nth-child(1),
-  #outside > div:nth-child(2),
-  #outside > div:nth-child(3) { grid-column: span 4; }
-  #outside > div:nth-child(4),
-  #outside > div:nth-child(5),
-  #outside > div:nth-child(6),
-  #outside > div:nth-child(7) { grid-column: span 3; }
+  /* Числа — просто по позициям. Помечу их классом .num и data-атрибутом. */
 
   /* ==== ПРАВАЯ КОЛОНКА ==== */
   #right {
@@ -164,48 +147,81 @@
   <!-- ЛЕВАЯ КОЛОНКА -->
   <div id="left">
     <div id="numbers">
-      <!-- Строка 1: 0 (слева) + 12 чисел верхнего ряда -->
-      <div class="cell" id="zero">0</div>
-      <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div>
-      <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div>
-      <div class="cell">7</div><div class="cell">8</div><div class="cell">9</div>
-      <div class="cell">10</div><div class="cell">11</div><div class="cell">12</div>
+
+      <!-- Строка 1 -->
+      <div class="cell" id="r1c1"></div>
+      <div class="cell" id="r1c0">0</div>
+
+      <!-- Кол.1: 1-18 (строки 2-3) -->
+      <div class="cell" id="c1_118">1-18</div>
+
+      <!-- Кол.2: 1-12 (строки 2-5) -->
+      <div class="cell" id="c2_112">1-12</div>
+
+      <!-- Кол.1: ЧЁТ (строки 4-5) -->
+      <div class="cell" id="c1_even">ЧЁТ</div>
+
+      <!-- ===== Числа: строки 2-13, колонки 3,4,5 =====
+           строка 2: 1,2,3 ; строка 3: 4,5,6 ; ... ; строка 13: 34,35,36 -->
 
       <!-- Строка 2 -->
-      <div class="cell">13</div><div class="cell">14</div><div class="cell">15</div>
-      <div class="cell">16</div><div class="cell">17</div><div class="cell">18</div>
-      <div class="cell">19</div><div class="cell">20</div><div class="cell">21</div>
-      <div class="cell">22</div><div class="cell">23</div><div class="cell">24</div>
-
+      <div class="cell" style="grid-row:2;grid-column:3;">1</div>
+      <div class="cell" style="grid-row:2;grid-column:4;">2</div>
+      <div class="cell" style="grid-row:2;grid-column:5;">3</div>
       <!-- Строка 3 -->
-      <div class="cell">25</div><div class="cell">26</div><div class="cell">27</div>
-      <div class="cell">28</div><div class="cell">29</div><div class="cell">30</div>
-      <div class="cell">31</div><div class="cell">32</div><div class="cell">33</div>
-      <div class="cell">34</div><div class="cell">35</div><div class="cell">36</div>
+      <div class="cell" style="grid-row:3;grid-column:3;">4</div>
+      <div class="cell" style="grid-row:3;grid-column:4;">5</div>
+      <div class="cell" style="grid-row:3;grid-column:5;">6</div>
+      <!-- Строка 4 -->
+      <div class="cell" style="grid-row:4;grid-column:3;">7</div>
+      <div class="cell" style="grid-row:4;grid-column:4;">8</div>
+      <div class="cell" style="grid-row:4;grid-column:5;">9</div>
+      <!-- Строка 5 -->
+      <div class="cell" style="grid-row:5;grid-column:3;">10</div>
+      <div class="cell" style="grid-row:5;grid-column:4;">11</div>
+      <div class="cell" style="grid-row:5;grid-column:5;">12</div>
 
-      <!-- Строка 4: 2:1 под каждым столбцом -->
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-      <div class="cell col-two-to-one">2:1</div>
-    </div>
+      <!-- Строки 6-13 — числа 13-36, по аналогии.
+           Кол.1 и Кол.2 в строках 6-13 — оставляю ПУСТЫМИ, допишешь (19-36, 13-24 и т.д.) -->
 
-    <div id="outside">
-      <div>1-12</div>
-      <div>13-24</div>
-      <div>25-36</div>
-      <div>ЧЁТ</div>
-      <div>КРАСН</div>
-      <div>ЧЁРН</div>
-      <div>НЕЧЁТ</div>
+      <!-- Строка 6 -->
+      <div class="cell" style="grid-row:6;grid-column:3;">13</div>
+      <div class="cell" style="grid-row:6;grid-column:4;">14</div>
+      <div class="cell" style="grid-row:6;grid-column:5;">15</div>
+      <!-- Строка 7 -->
+      <div class="cell" style="grid-row:7;grid-column:3;">16</div>
+      <div class="cell" style="grid-row:7;grid-column:4;">17</div>
+      <div class="cell" style="grid-row:7;grid-column:5;">18</div>
+      <!-- Строка 8 -->
+      <div class="cell" style="grid-row:8;grid-column:3;">19</div>
+      <div class="cell" style="grid-row:8;grid-column:4;">20</div>
+      <div class="cell" style="grid-row:8;grid-column:5;">21</div>
+      <!-- Строка 9 -->
+      <div class="cell" style="grid-row:9;grid-column:3;">22</div>
+      <div class="cell" style="grid-row:9;grid-column:4;">23</div>
+      <div class="cell" style="grid-row:9;grid-column:5;">24</div>
+      <!-- Строка 10 -->
+      <div class="cell" style="grid-row:10;grid-column:3;">25</div>
+      <div class="cell" style="grid-row:10;grid-column:4;">26</div>
+      <div class="cell" style="grid-row:10;grid-column:5;">27</div>
+      <!-- Строка 11 -->
+      <div class="cell" style="grid-row:11;grid-column:3;">28</div>
+      <div class="cell" style="grid-row:11;grid-column:4;">29</div>
+      <div class="cell" style="grid-row:11;grid-column:5;">30</div>
+      <!-- Строка 12 -->
+      <div class="cell" style="grid-row:12;grid-column:3;">31</div>
+      <div class="cell" style="grid-row:12;grid-column:4;">32</div>
+      <div class="cell" style="grid-row:12;grid-column:5;">33</div>
+      <!-- Строка 13 -->
+      <div class="cell" style="grid-row:13;grid-column:3;">34</div>
+      <div class="cell" style="grid-row:13;grid-column:4;">35</div>
+      <div class="cell" style="grid-row:13;grid-column:5;">36</div>
+
+      <!-- Строка 14: 2:1 под колонками 3,4,5 (заглушки) -->
+      <div class="cell" style="grid-row:14;grid-column:3;">2:1</div>
+      <div class="cell" style="grid-row:14;grid-column:4;">2:1</div>
+      <div class="cell" style="grid-row:14;grid-column:5;">2:1</div>
+
     </div>
   </div>
 
