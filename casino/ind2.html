@@ -458,7 +458,7 @@
 
           <!-- Строка 1: баланс (кол.1-2) + 0 (кол.3-5) -->
           <div class="cell" id="r1c_balance" title="Нажми, чтобы изменить">
-            <span class="lbl">Баланс:</span>
+            <span class="lbl">$:</span>     <!-- вместо баланса $ -->
             <span class="val" id="balance-val">1000</span>
           </div>
           <div class="cell green" id="zero" data-bet="zero">0</div>
@@ -589,7 +589,7 @@
       if (isNaN(v)) v = old;
       v = Math.max(0, Math.min(100000, v));
       state.balance = v;
-      wrap.innerHTML = '<span class="lbl">Баланс:</span><span class="val" id="balance-val">' + v + '</span>';
+      wrap.innerHTML = '<span class="lbl">$:</span><span class="val" id="balance-val">' + v + '</span>';  // -- вместо Баланс: поставил $
     };
     inp.addEventListener('blur', commit, { once: true });
     inp.addEventListener('keydown', (e) => {
