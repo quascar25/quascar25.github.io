@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Рулетка — макет</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+  }
+
+  /* Периметр приложения (как stage) */
+  #stage {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100vh * 9 / 14));
+    height: min(calc(100vw * 14 / 9), 100vh);
+    background: #333333;            /* тёмно-серый фон */
+    border: 2px solid #000;         /* внешняя чёрная рамка */
+    display: flex;                  /* две колонки */
+  }
+
+  /* ==== ЛЕВАЯ КОЛОНКА: таблица рулетки ==== */
+  #left {
+    flex: 1 1 62%;
+    border-right: 3px solid #000;   /* вертикальная разделительная линия */
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  /* Числовая таблица — вертикальные числа.
+     Сетка: 3 строки (ряды чисел) x 13 колонок (12 чисел + 2:1 в конце).
+     Слева 0 — отдельная колонка. */
+  #numbers {
+    flex: 1 1 auto;
+    display: grid;
+    /* 0 + 12 чисел + колонка 2:1 */
+    grid-template-columns: 1fr repeat(12, 1fr) 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    border: 2px solid #000;
+    padding: 2px;
+  }
+  .cell {
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ddd;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  #zero { grid-column: 1; grid-row: 1 / 4; }
+
+  /* Внешние ставки снизу (1-12 / 13-24 / 25-36 / чёт / красн / чёрн / нечёт) */
+  #outside {
+    flex: 0 0 22%;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2px;
+    border: 2px solid #000;
+    padding: 2px;
+  }
+  #outside > div {
+    border: 1px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #ddd; font-size: 9px; font-weight: 700;
+  }
+  #outside > div:nth-child(1),
+  #outside > div:nth-child(2),
+  #outside > div:nth-child(3) { grid-column: span 4; }
+  #outside > div:nth-child(4),
+  #outside > div:nth-child(5),
+  #outside > div:nth-child(6),
+  #outside > div:nth-child(7) { grid-column: span 3; }
+
+  /* ==== ПРАВАЯ КОЛОНКА ==== */
+  #right {
+    flex: 1 1 38%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  /* Видео */
+  #banner {
+    flex: 0 0 22%;
+    border: 2px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; font-size: 11px;
+  }
+
+  /* Баланс */
+  #balance {
+    flex: 0 0 8%;
+    border: 2px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; font-size: 11px;
+  }
+
+  /* Результат + ручной ввод — в ряд */
+  #result-row {
+    flex: 0 0 12%;
+    display: flex;
+    gap: 4px;
+  }
+  #result, #manual {
+    flex: 1 1 0;
+    border: 2px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; font-size: 11px;
+  }
+
+  /* Статистика: два столбика */
+  #stats-row {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 4px;
+    min-height: 0;
+  }
+  #history, #cold {
+    flex: 1 1 0;
+    border: 2px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; font-size: 10px;
+    text-align: center;
+  }
+
+  /* Фишки */
+  #chips {
+    flex: 0 0 10%;
+    border: 2px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; font-size: 10px;
+  }
+
+  /* Кнопки: обнуление + крутить */
+  #buttons {
+    flex: 0 0 9%;
+    display: flex;
+    gap: 4px;
+  }
+  #clear, #spin {
+    border: 2px solid #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; font-size: 11px;
+    font-weight: 700;
+  }
+  #clear { flex: 0 0 35%; }
+  #spin  { flex: 1 1 auto; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ЛЕВАЯ КОЛОНКА -->
+  <div id="left">
+    <div id="numbers">
+      <div class="cell" id="zero">0</div>
+      <!-- 3 ряда по 12 чисел + 2:1 в каждом ряду -->
+      <!-- ряд 1 -->
+      <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div>
+      <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div>
+      <div class="cell">7</div><div class="cell">8</div><div class="cell">9</div>
+      <div class="cell">10</div><div class="cell">11</div><div class="cell">12</div>
+      <div class="cell">2:1</div>
+      <!-- ряд 2 -->
+      <div class="cell">13</div><div class="cell">14</div><div class="cell">15</div>
+      <div class="cell">16</div><div class="cell">17</div><div class="cell">18</div>
+      <div class="cell">19</div><div class="cell">20</div><div class="cell">21</div>
+      <div class="cell">22</div><div class="cell">23</div><div class="cell">24</div>
+      <div class="cell">2:1</div>
+      <!-- ряд 3 -->
+      <div class="cell">25</div><div class="cell">26</div><div class="cell">27</div>
+      <div class="cell">28</div><div class="cell">29</div><div class="cell">30</div>
+      <div class="cell">31</div><div class="cell">32</div><div class="cell">33</div>
+      <div class="cell">34</div><div class="cell">35</div><div class="cell">36</div>
+      <div class="cell">2:1</div>
+    </div>
+
+    <div id="outside">
+      <div>1-12</div>
+      <div>13-24</div>
+      <div>25-36</div>
+      <div>ЧЁТ</div>
+      <div>КРАСН</div>
+      <div>ЧЁРН</div>
+      <div>НЕЧЁТ</div>
+    </div>
+  </div>
+
+  <!-- ПРАВАЯ КОЛОНКА -->
+  <div id="right">
+    <div id="banner">ВИДЕО</div>
+    <div id="balance">БАЛАНС</div>
+    <div id="result-row">
+      <div id="result">ЧИСЛО</div>
+      <div id="manual">ВВОД</div>
+    </div>
+    <div id="stats-row">
+      <div id="history">ВЫПАВШИЕ</div>
+      <div id="cold">НЕВЫПАВШИЕ</div>
+    </div>
+    <div id="chips">ФИШКИ</div>
+    <div id="buttons">
+      <div id="clear">×</div>
+      <div id="spin">КРУТИТЬ</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
