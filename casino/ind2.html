@@ -219,13 +219,13 @@
   }
 
   #result-row {
-    flex: 0 0 calc(50% / 14);
+    flex: 0 0 calc(100% / 14);
     display: flex;
     gap: 4px;
     min-height: 0;
   }
   #result, #manual-wrap {
-    flex: 1 1 0;
+    flex: 1 1 50%;               /* было  flex: 1 1 0; */
     border-radius: 6px;
     border: 2px solid #2e3a4d;
     background: #1a2130;
