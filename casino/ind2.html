@@ -159,7 +159,7 @@
   .col-two-to-one { grid-row: 14; }
 
   /* Баланс в объединённой ячейке 1-2 первой строки */
-  #balance {
+  #r1c_balance {
     background: #1a2130;
     border: 2px solid #2e3a4d;
     border-radius: 3px;
@@ -168,30 +168,36 @@
     justify-content: center;
     gap: 6px;
     cursor: pointer;
-    padding: 0 6px;
-  }
-  #balance .lbl {
+    padding: 0 6px;     /* ← уменьши c 6px до 0 2px, если нужно */
+    /*overflow: hidden; */
+ }
+  #r1c_balance .lbl {
     font-size: clamp(7px, 1.4vh, 10px);
     color: #7a8699;
-    font-weight: 600;
+    font-weight: 700;
   }
-  #balance .val {
-    font-size: clamp(11px, 2.4vh, 20px);
+  #r1c_balance .val {
+    font-size: clamp(11px, 3.4vh, 20px);
     color: #f0c040;
-    font-weight: 800;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  #balance input {
-    width: 100%;
-    background: transparent; border: none; outline: none;
+  #r1c_balance input {
+    width: 100%;           
+    max-width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
     color: #f0c040;
     font: inherit;
-    font-size: clamp(11px, 2.4vh, 20px);
-    font-weight: 800;
+    font-size: clamp(11px, 3.4vh, 20px);
+    font-weight: 600;
     padding: 0;
-    text-align: center;
+    text-align: right;
+    direction: rtl;
+    /* margin-left: auto;           прижать вправо */
   }
 
   /* Кнопка × (очистка ставок) в левом нижнем углу */
@@ -497,8 +503,8 @@
           <!-- Кол.1 -->
           <div class="cell outside" id="c1_118"  data-bet="range1_18">1-18</div>
           <div class="cell outside" id="c1_even" data-bet="even">ЧЁТ</div>
-          <div class="cell outside red-bet" id="c1_red" data-bet="red">КРАСН</div>
-          <div class="cell outside" id="c1_blk"  data-bet="black">ЧЁРН</div>
+          <div class="cell outside red-bet" id="c1_red" data-bet="red">К</div>
+          <div class="cell outside" id="c1_blk"  data-bet="black">Ч</div>
           <div class="cell outside" id="c1_odd"  data-bet="odd">НЕЧЁТ</div>
           <div class="cell outside" id="c1_1936" data-bet="range19_36">19-36</div>
 
@@ -619,7 +625,7 @@
     const commit = () => {
       let v = parseInt(inp.value.replace(/[^\d]/g, ''), 10);
       if (isNaN(v)) v = old;
-      v = Math.max(0, Math.min(100000, v));
+      v = Math.max(0, Math.min(9999999, v));
       state.balance = v;
       wrap.innerHTML = '<span class="lbl">$:</span><span class="val" id="balance-val">' + v + '</span>';  // -- вместо Баланс: поставил $
     };
@@ -629,7 +635,7 @@
       if (e.key === 'Escape') { inp.value = old; inp.blur(); }
     });
     inp.addEventListener('input', () => {
-      inp.value = inp.value.replace(/[^\d]/g, '').slice(0, 6);
+      inp.value = inp.value.replace(/[^\d]/g, '').slice(0, 7);
     });
   });
 
