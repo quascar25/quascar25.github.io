@@ -163,27 +163,44 @@
     background: #1a2130;
     border: 2px solid #2e3a4d;
     border-radius: 3px;
-    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
     cursor: pointer;
     padding: 0 6px;     /* ← уменьши c 6px до 0 2px, если нужно */
     /*overflow: hidden; */
+    flex-direction: column;   /*  баланс сверху, сумма ставок снизу */
+    gap: 0px;
+    justify-content: center;
  }
   #r1c_balance .lbl {
     font-size: clamp(7px, 1.4vh, 10px);
     color: #7a8699;
     font-weight: 700;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
   }
   #r1c_balance .val {
-    font-size: clamp(11px, 3.4vh, 20px);
+    font-size: clamp(5px, 4.4vh, 28px); /* 3.4vh, */
     color: #f0c040;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
   }
+
+  #r1c_balance .sum {
+    font-size: clamp(7px, 1.4vh, 10px);
+    color: #7a8699;
+    font-weight: 400;
+    margin-left: 6px;
+     line-height: 1;
+     margin: 0;
+     padding: 0;
+  }
+
   #r1c_balance input {
     width: 100%;           
     max-width: 100%;
@@ -495,9 +512,13 @@
 
           <!-- Строка 1: баланс (кол.1-2) + 0 (кол.3-5) -->
           <div class="cell" id="r1c_balance" title="Нажми, чтобы изменить">
-            <span class="lbl">$:</span>     <!-- вместо баланса $ -->
+            <span class="lbl"></span>  <!-- вместо баланса $ , потом "" -->
             <span class="val" id="balance-val">1000</span>
+            <span class="sum" id="bet-sum">Ст: 0</span>
           </div>
+
+
+
           <div class="cell green" id="zero" data-bet="zero">0</div>
 
           <!-- Кол.1 -->
@@ -607,6 +628,14 @@
     if (el) el.textContent = state.balance;
   }
 
+  function updateBetSum() {
+    const el = document.getElementById('bet-sum');
+    if (!el) return;
+    const total = Object.values(state.bets).reduce((s, a) => s + a, 0);
+    el.textContent = 'Ст: ' + total;
+  }
+
+
   balanceEl.addEventListener('click', () => {
     if (state.spinning) return;
     if (balanceEl.querySelector('input')) return;
@@ -627,7 +656,9 @@
       if (isNaN(v)) v = old;
       v = Math.max(0, Math.min(9999999, v));
       state.balance = v;
-      wrap.innerHTML = '<span class="lbl">$:</span><span class="val" id="balance-val">' + v + '</span>';  // -- вместо Баланс: поставил $
+      wrap.innerHTML = '<span class="lbl"></span><span class="val" id="balance-val">' + v + '</span> <span class="sum" id="bet-sum">Ст: 0</span>';
+      updateBetSum();
+
     };
     inp.addEventListener('blur', commit, { once: true });
     inp.addEventListener('keydown', (e) => {
@@ -731,6 +762,7 @@
         m.textContent = amt;
         cell.appendChild(m);
       }
+    updateBetSum();   //перерисовка суммы ставки
     });
   }
 
@@ -907,6 +939,18 @@
     const manualVal = getManualValue();
     const finalN = manualVal !== null ? manualVal : Math.floor(Math.random() * 37);
     pendingNumber = finalN;
+
+    ////////////========
+    // Автоматическая ставка на зеро: целое((сумма всех ставок)/36 + 1)
+    const totalBets = Object.values(state.bets).reduce((s, a) => s + a, 0);
+    if (totalBets > 0) {
+      const zeroBet = Math.floor(totalBets / 36 + 1);
+      if (addBet('zero', zeroBet)) {
+        updateBalance();
+        renderBets();
+      }
+    }
+    ////////////==========
 
     state.spinning = true;
     spinBtn.disabled = true;
